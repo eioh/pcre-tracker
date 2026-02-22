@@ -1,0 +1,148 @@
+import { characterProgressSchema } from "./schemas";
+import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "./levels";
+import type { CharacterProgress, MasterCharacter, StoredStateV1 } from "./types";
+
+export const STORAGE_KEY = "pcr_growth_tracker";
+export const CURRENT_SCHEMA_VERSION = 1 as const;
+
+type MigratedStoredState = {
+  schemaVersion: 1;
+  progressByName: Record<string, unknown>;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function createDefaultProgress(character: MasterCharacter): CharacterProgress {
+  return {
+    owned: false,
+    ue1Level: character.implemented.ue1 ? 0 : null,
+    ue1SpEquipped: false,
+    ue2Level: character.implemented.ue2 ? 0 : null,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+function toUe1Level(value: number | null): CharacterProgress["ue1Level"] {
+  if (value === null) {
+    return null;
+  }
+  return UE1_LEVEL_VALUES.includes(value as (typeof UE1_LEVEL_VALUES)[number])
+    ? (value as (typeof UE1_LEVEL_VALUES)[number])
+    : 0;
+}
+
+function toUe2Level(value: number | null): CharacterProgress["ue2Level"] {
+  if (value === null) {
+    return null;
+  }
+  return UE2_LEVEL_VALUES.includes(value as (typeof UE2_LEVEL_VALUES)[number])
+    ? (value as (typeof UE2_LEVEL_VALUES)[number])
+    : 0;
+}
+
+function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): CharacterProgress {
+  const defaultProgress = createDefaultProgress(character);
+  const parsed = characterProgressSchema.safeParse(rawProgress);
+  if (!parsed.success) {
+    return defaultProgress;
+  }
+
+  const normalized: CharacterProgress = {
+    owned: parsed.data.owned,
+    ue1Level: toUe1Level(parsed.data.ue1Level),
+    ue1SpEquipped: parsed.data.ue1SpEquipped,
+    ue2Level: toUe2Level(parsed.data.ue2Level),
+    updatedAt: parsed.data.updatedAt,
+  };
+
+  // 旧データや不整合データでも「未実装項目は null に固定」するための補正。
+  if (!character.implemented.ue1) {
+    normalized.ue1Level = null;
+  } else if (normalized.ue1Level === null) {
+    normalized.ue1Level = 0;
+  }
+
+  // 専用2も同様に未実装と入力可能値の境界をここで統一する。
+  if (!character.implemented.ue2) {
+    normalized.ue2Level = null;
+  } else if (normalized.ue2Level === null) {
+    normalized.ue2Level = 0;
+  }
+
+  if (!character.implemented.ue1Sp) {
+    normalized.ue1SpEquipped = false;
+  }
+
+  return normalized;
+}
+
+function migrateToLatestState(raw: unknown): MigratedStoredState | null {
+  if (!isRecord(raw)) {
+    return null;
+  }
+
+  if (raw.schemaVersion === CURRENT_SCHEMA_VERSION && isRecord(raw.progressByName)) {
+    return {
+      schemaVersion: 1,
+      progressByName: raw.progressByName,
+    };
+  }
+
+  if (isRecord(raw.progressByName)) {
+    return {
+      schemaVersion: 1,
+      progressByName: raw.progressByName,
+    };
+  }
+
+  return null;
+}
+
+function reconcileWithMaster(
+  masterCharacters: MasterCharacter[],
+  migratedState: MigratedStoredState | null,
+): StoredStateV1 {
+  const progressByName: StoredStateV1["progressByName"] = {};
+
+  for (const character of masterCharacters) {
+    const rawProgress = migratedState?.progressByName[character.name];
+    progressByName[character.name] = sanitizeProgress(character, rawProgress);
+  }
+
+  return {
+    schemaVersion: CURRENT_SCHEMA_VERSION,
+    progressByName,
+  };
+}
+
+export function buildInitialState(masterCharacters: MasterCharacter[]): StoredStateV1 {
+  return reconcileWithMaster(masterCharacters, null);
+}
+
+export function loadStoredState(masterCharacters: MasterCharacter[]): StoredStateV1 {
+  if (typeof window === "undefined") {
+    return buildInitialState(masterCharacters);
+  }
+
+  const rawText = window.localStorage.getItem(STORAGE_KEY);
+  if (!rawText) {
+    return buildInitialState(masterCharacters);
+  }
+
+  try {
+    const parsed = JSON.parse(rawText) as unknown;
+    const migrated = migrateToLatestState(parsed);
+    return reconcileWithMaster(masterCharacters, migrated);
+  } catch {
+    return buildInitialState(masterCharacters);
+  }
+}
+
+export function saveStoredState(state: StoredStateV1): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}

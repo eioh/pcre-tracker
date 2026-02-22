@@ -1,0 +1,58 @@
+import { describe, expect, it } from "vitest";
+import { buildDashboardSummary } from "./dashboard";
+import type { MasterCharacter, StoredStateV1 } from "../domain/types";
+
+const masterCharacters: MasterCharacter[] = [
+  {
+    name: "ヒヨリ",
+    limited: false,
+    implemented: { star6: true, ue1: true, ue1Sp: true, ue2: true },
+    memoryPieceSources: ["hard_quest"],
+  },
+  {
+    name: "ユイ",
+    limited: false,
+    implemented: { star6: true, ue1: false, ue1Sp: false, ue2: false },
+    memoryPieceSources: ["side_story"],
+  },
+];
+
+const state: StoredStateV1 = {
+  schemaVersion: 1,
+  progressByName: {
+    ヒヨリ: {
+      owned: true,
+      ue1Level: 140,
+      ue1SpEquipped: true,
+      ue2Level: 2,
+      updatedAt: "2026-02-22T00:00:00.000Z",
+    },
+    ユイ: {
+      owned: false,
+      ue1Level: null,
+      ue1SpEquipped: false,
+      ue2Level: null,
+      updatedAt: "2026-02-22T00:00:00.000Z",
+    },
+  },
+};
+
+describe("buildDashboardSummary", () => {
+  it("主要KPIと分布を計算できる", () => {
+    const summary = buildDashboardSummary(masterCharacters, state);
+
+    expect(summary.totalCharacters).toBe(2);
+    expect(summary.ownedCharacters).toBe(1);
+    expect(summary.ue1Sp.implemented).toBe(1);
+    expect(summary.ue1Sp.equipped).toBe(1);
+    expect(summary.ue1Sp.unimplemented).toBe(1);
+
+    const ue1Lv140 = summary.ue1Distribution.find((item) => item.label === "Lv140");
+    const ue1Unimplemented = summary.ue1Distribution.find((item) => item.label === "未実装");
+    const ue2Lv2 = summary.ue2Distribution.find((item) => item.label === "Lv2");
+
+    expect(ue1Lv140?.count).toBe(1);
+    expect(ue1Unimplemented?.count).toBe(1);
+    expect(ue2Lv2?.count).toBe(1);
+  });
+});

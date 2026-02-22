@@ -1,0 +1,40 @@
+import type { Ue1Level, Ue2Level } from "./levels";
+
+export const MEMORY_PIECE_SOURCES = [
+  "dungeon_coin",
+  "arena_coin",
+  "p_arena_coin",
+  "clan_coin",
+  "master_coin",
+  "hard_quest",
+  "side_story",
+] as const;
+
+export type MemoryPieceSource = (typeof MEMORY_PIECE_SOURCES)[number];
+
+export type MasterCharacter = {
+  name: string;
+  limited: boolean;
+  implemented: {
+    star6: boolean;
+    ue1: boolean;
+    ue1Sp: boolean;
+    ue2: boolean;
+  };
+  memoryPieceSources: MemoryPieceSource[];
+};
+
+export type CharacterProgress = {
+  owned: boolean;
+  ue1Level: Ue1Level;
+  ue1SpEquipped: boolean;
+  ue2Level: Ue2Level;
+  updatedAt: string;
+};
+
+export type StoredStateV1 = {
+  schemaVersion: 1;
+  progressByName: Record<string, CharacterProgress>;
+};
+
+export type AppState = StoredStateV1;

@@ -1,0 +1,4194 @@
+[
+  {
+    "name": "ヒヨリ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ユイ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "レイ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミソギ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "マツリ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "アカリ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミヤコ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "p_arena_coin"
+    ]
+  },
+  {
+    "name": "ユキ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "アンナ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "p_arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "マホ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "リノ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ハツネ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "p_arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ナナカ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "カスミ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミサト",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "スズナ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "p_arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "カオリ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "p_arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "イオ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "clan_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミミ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "クルミ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ヨリ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "clan_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "アヤネ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "スズメ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "clan_coin"
+    ]
+  },
+  {
+    "name": "リン",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "エリコ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "サレン",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ノゾミ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ニノン",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "シノブ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "アキノ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "マヒル",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ユカリ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "キョウカ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "トモ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "シオリ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "アオイ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "チカ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "clan_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "マコト",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "clan_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "イリヤ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "クウカ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "タマキ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ジュン",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミフユ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "シズル",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミサキ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミツキ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "リマ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "モニカ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ツムギ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "p_arena_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "アユミ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ルカ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ジータ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ペコリーヌ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "コッコロ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "キャル",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "dungeon_coin",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ムイミ",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "アリサ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "シェフィ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "カヤ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "イノリ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ホマレ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ラビリスタ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "カイザーインサイト",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ネネカ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "クリスティーナ",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ペコリーヌ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "コッコロ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "スズメ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "キャル（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "タマキ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ミフユ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": true,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "シノブ（ハロウィン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ミヤコ（ハロウィン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミサキ（ハロウィン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "チカ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "クルミ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "アヤネ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ヒヨリ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ユイ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "レイ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "エリコ（バレンタイン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "シズル（バレンタイン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "アン",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ルゥ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "グレア",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "クウカ（オーエド）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ニノン（オーエド）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "レム",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ラム",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "エミリア",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "スズナ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "イオ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "サレン（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "マコト（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "カオリ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "マホ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "アオイ（編入生）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "クロエ",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "チエル",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "ユニ",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "キョウカ（ハロウィン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ミソギ（ハロウィン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミミ（ハロウィン）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ルナ",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "クリスティーナ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ノゾミ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "イリヤ（クリスマス）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ペコリーヌ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "コッコロ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "キャル（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "スズメ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "カスミ（マジカル）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "シオリ（マジカル）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ウヅキ（デレマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "リン（デレマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ミオ（デレマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "リン（レンジャー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "マヒル（レンジャー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest",
+      "side_story"
+    ]
+  },
+  {
+    "name": "リノ（ワンダー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "アユミ（ワンダー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ルカ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "アンナ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ナナカ（サマー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ハツネ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ミサト（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ジュン（サマー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "アカリ（エンジェル）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ヨリ（エンジェル）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ツムギ（ハロウィン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "レイ（ハロウィン）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "マツリ（ハロウィン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "モニカ（マジカル）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "トモ（マジカル）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "アキノ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "サレン（クリスマス）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "clan_coin"
+    ]
+  },
+  {
+    "name": "ユカリ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ムイミ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ネネカ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "コッコロ（儀装束）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ユイ（儀装束）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "カスミ（サマー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "リマ（シンデレラ）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "マコト（シンデレラ）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "p_arena_coin"
+    ]
+  },
+  {
+    "name": "マホ（シンデレラ）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "クロエ（聖学祭）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin"
+    ]
+  },
+  {
+    "name": "チエル（聖学祭）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ユニ（聖学祭）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "イノリ（タイムトラベル）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "カヤ（タイムトラベル）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "アオイ（作業服）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "arena_coin"
+    ]
+  },
+  {
+    "name": "タマキ（作業服）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミフユ（作業服）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "エリコ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "シズル（サマー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": true
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ノゾミ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "チカ（サマー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "p_arena_coin"
+    ]
+  },
+  {
+    "name": "ツムギ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミツキ（オーエド）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ユキ（オーエド）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "カオリ（ハロウィン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ニノン（ハロウィン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "スズナ（ハロウィン）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin"
+    ]
+  },
+  {
+    "name": "クレジッタ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ランファ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ミソラ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "カリン",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ネビア",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "イオ（ノワール）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "クウカ（ノワール）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "マヒル（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "リノ（クリスマス）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "arena_coin"
+    ]
+  },
+  {
+    "name": "ミヤコ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "シズル（ノワール）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "シェフィ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ルカ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "イリヤ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ペコリーヌ（オーバーロード）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "キャル（オーバーロード）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ラビリスタ（オーバーロード）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "クルミ（ステージ）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ミサキ（ステージ）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "clan_coin"
+    ]
+  },
+  {
+    "name": "アユミ（怪盗）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "イノリ（怪盗）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "アンナ（パイレーツ）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin"
+    ]
+  },
+  {
+    "name": "シノブ（パイレーツ）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "アオイ（キャンプ）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ユカリ（キャンプ）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ヴァンピィ",
+    "limited": false,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ヒヨリ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "レイ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ユイ（サマー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "arena_coin"
+    ]
+  },
+  {
+    "name": "キョウカ（サマー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "ミソギ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ミミ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "アメス",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "マホ（エクスプローラー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "アヤネ（エクスプローラー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ネア",
+    "limited": true,
+    "implemented": {
+      "star6": true,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "リン（ハロウィン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "トモ（ハロウィン）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ナナカ（ハロウィン）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "クリスティーナ（ワイルド）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "マツリ（ワイルド）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "アカリ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ヨリ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ジュン（クリスマス）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "dungeon_coin"
+    ]
+  },
+  {
+    "name": "ホマレ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ミサト（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ミツキ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ノゾミ（リベレイター）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "カヤ（リベレイター）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ムイミ（リベレイター）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "タマキ（カフェ）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "モニカ（カフェ）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "hard_quest"
+    ]
+  },
+  {
+    "name": "コッコロ（レンジャー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "シオリ（レンジャー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "arena_coin"
+    ]
+  },
+  {
+    "name": "ジータ（ウォーロック）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ビカラ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "カリン（アルケミスト）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "リリ（フォールン）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "クリア（フォールン）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "プレシア（フォールン）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "イリヤ（儀装束）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ユキ（儀装束）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "クローチェ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ライラエル",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ネネカ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "アキノ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ユカリ（サマー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ランファ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "クウカ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "シノブ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "キャル（編入生）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "スズナ（編入生）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "サレン（サラサリア）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ルカ（サラサリア）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "リンド",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ヴルム",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ペコリーヌ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "クレジッタ（クリスマス）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "イノリ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ハツネ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "カスミ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ヒヨリ（アストラル）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "レイ（アストラル）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "side_story"
+    ]
+  },
+  {
+    "name": "ユイ（アストラル）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "エリス",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ユニ（ウィンター）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "クロエ（ウィンター）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "チエル（ウィンター）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "アネモネ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ネフィ＝ネラ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "マコト（コマンダー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "エリコ（コマンダー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ヤマト",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ワカナ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "フブキ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "キョウカ（スプリング）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "スズメ（スプリング）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "クルル",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "マホ（ドリームパーク）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ネア（サマー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ミソラ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "リリ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "アメス（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ホマレ（サマー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "エミリア（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "エキドナ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "レム（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ノゾミ（アルケミスト）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ルイズマリー",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "イロハ",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ソノ",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ライラエル（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "イオ（クリスマス）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "グレイス",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ヴァイオレット",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "モニカ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "サレン（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "メドゥーサ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ラビリスタ（アルファ）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ネネカ（アルファ）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "クリスティーナ（アルファ）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "フィオ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ランファ（儀装束）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "チカ（儀装束）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "クローチェ（エアリアル）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "アオイ（パイロット）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ホウオウ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ツムギ（ジオ・ゲヘナ）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "カノン",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "エリス（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "シェフィ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "プレシア（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "クリア（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "アネモネ（サマー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "アイラ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "シナツ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ヒヨリ（サラサリア）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ユキノ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "サツキ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "アラクネ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "サクラ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ナーナ",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ミソラ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ユイ（クリスマス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "シズル（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ニノン（サマー）",
+    "limited": false,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "カスミ（シスター）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "コッコロ（嚮導幼君）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "リノ（ニューイヤー）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ヴァイオレット（イサナミ）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ライラエル（パルフェクト）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ヒヨリ（プリンセス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ネフィ＝ネラ（鬼面仏心）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ユイ（プリンセス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "レイ（プリンセス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ペコリーヌ（プリンセス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "コッコロ（プリンセス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "キャル（プリンセス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ハツネ＆シオリ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "ミソギ＆ミミ＆キョウカ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "アキノ＆サレン",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "アン＆グレア",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": true,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "シズル＆リノ",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  },
+  {
+    "name": "シェフィ（プリンセス）",
+    "limited": true,
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [
+      "master_coin"
+    ]
+  }
+]
