@@ -154,6 +154,26 @@ h1 {
   color: var(--text-muted);
 }
 
+.memory-calc-section {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(122, 148, 197, 0.28);
+}
+
+.memory-calc-title {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.memory-calc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 300px));
+  gap: 12px;
+  justify-content: flex-start;
+}
+
 .multi-select-dropdown {
   position: relative;
 }
@@ -533,6 +553,10 @@ h1 {
 
 @media (max-width: 980px) {
   .input-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .memory-calc-grid {
     grid-template-columns: 1fr;
   }
 

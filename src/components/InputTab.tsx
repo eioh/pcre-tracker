@@ -416,30 +416,6 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           </select>
         </label>
 
-        <label className="field-group">
-          <span>必要メモピ計算</span>
-          <select
-            className="select-input"
-            value={ue1MemoryCalcMode}
-            onChange={(event) => setUe1MemoryCalcMode(event.target.value as Ue1MemoryCalcMode)}
-          >
-            <option value="implemented_max">実装段階の最大まで</option>
-            <option value="sp_max">SP最大まで（仮定）</option>
-          </select>
-        </label>
-
-        <label className="field-group">
-          <span>☆必要メモピ計算</span>
-          <select
-            className="select-input"
-            value={starMemoryCalcMode}
-            onChange={(event) => setStarMemoryCalcMode(event.target.value as StarMemoryCalcMode)}
-          >
-            <option value="implemented_max">実装段階の最大まで</option>
-            <option value="star6_max">☆6最大まで（仮定）</option>
-          </select>
-        </label>
-
         <div className="field-group">
           <span>☆フィルタ</span>
           <details className="multi-select-dropdown">
@@ -565,6 +541,35 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
               ))}
             </div>
           </details>
+        </div>
+
+        <div className="memory-calc-section">
+          <p className="memory-calc-title">必要メモピ計算</p>
+          <div className="memory-calc-grid">
+            <label className="field-group">
+              <span>☆</span>
+              <select
+                className="select-input"
+                value={starMemoryCalcMode}
+                onChange={(event) => setStarMemoryCalcMode(event.target.value as StarMemoryCalcMode)}
+              >
+                <option value="implemented_max">実装段階の最大まで</option>
+                <option value="star6_max">☆6最大まで（仮定）</option>
+              </select>
+            </label>
+
+            <label className="field-group">
+              <span>専用1</span>
+              <select
+                className="select-input"
+                value={ue1MemoryCalcMode}
+                onChange={(event) => setUe1MemoryCalcMode(event.target.value as Ue1MemoryCalcMode)}
+              >
+                <option value="implemented_max">実装段階の最大まで</option>
+                <option value="sp_max">SP最大まで（仮定）</option>
+              </select>
+            </label>
+          </div>
         </div>
       </div>
 
