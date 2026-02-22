@@ -101,10 +101,10 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
         <table className="character-table">
           <thead>
             <tr>
+              <th>所持</th>
               <th>キャラ</th>
               <th>区分</th>
               <th>星6</th>
-              <th>所持</th>
               <th>専用1</th>
               <th>専用1SP</th>
               <th>専用2</th>
@@ -130,6 +130,16 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
 
                 return (
                   <tr key={character.name}>
+                    <td>
+                      <label className="table-switch">
+                        <input
+                          type="checkbox"
+                          checked={progress.owned}
+                          aria-label={`${character.name}の所持状態`}
+                          onChange={(event) => onUpdateProgress(character.name, { owned: event.target.checked })}
+                        />
+                      </label>
+                    </td>
                     <td className="name-cell">{character.name}</td>
                     <td>
                       {character.limited ? <span className="badge limited">限定</span> : <span className="badge">恒常</span>}
@@ -138,16 +148,6 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                       <span className={character.implemented.star6 ? "status-pill yes" : "status-pill no"}>
                         {character.implemented.star6 ? "実装" : "未実装"}
                       </span>
-                    </td>
-                    <td>
-                      <label className="table-switch">
-                        <input
-                          type="checkbox"
-                          checked={progress.owned}
-                          onChange={(event) => onUpdateProgress(character.name, { owned: event.target.checked })}
-                        />
-                        <span>{progress.owned ? "所持" : "未所持"}</span>
-                      </label>
                     </td>
                     <td>
                       <select
