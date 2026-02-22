@@ -2,6 +2,11 @@ import { useEffect, useRef, useMemo, useState } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type { CharacterProgress, MasterCharacter, MemoryPieceSource, StoredStateV1 } from "../domain/types";
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
+import {
+  getStarRemainingMemoryPieceCount,
+  STAR_MEMORY_FILTER_VALUES,
+  type StarMemoryCalcMode,
+} from "../utils/starMemoryCost";
 
 type ProgressPatch = Partial<
   Pick<CharacterProgress, "owned" | "limitBreak" | "star" | "ue1Level" | "ue1SpEquipped" | "ue2Level">
@@ -17,10 +22,20 @@ type OwnedFilter = "all" | "owned" | "unowned";
 type LimitedFilter = "all" | "limited" | "normal";
 type LimitBreakFilter = "all" | "on" | "off";
 type StarFilter = CharacterProgress["star"];
+type StarMemoryNeedFilter = number;
 type Ue1Filter = "unimplemented" | "sp" | (typeof UE1_LEVEL_VALUES)[number];
 type Ue2Filter = "unimplemented" | (typeof UE2_LEVEL_VALUES)[number];
 type MemorySourceFilter = "none" | MemoryPieceSource;
-type SortKey = "owned" | "name" | "limited" | "limitBreak" | "star" | "ue1" | "ue2" | "ue1MemoryNeeded";
+type SortKey =
+  | "owned"
+  | "name"
+  | "limited"
+  | "limitBreak"
+  | "star"
+  | "ue1"
+  | "ue2"
+  | "starMemoryNeeded"
+  | "ue1MemoryNeeded";
 type SortDirection = "asc" | "desc" | null;
 
 const memorySourceLabelMap: Record<MemoryPieceSource, string> = {
@@ -62,8 +77,10 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>("all");
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>("all");
   const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>("all");
+  const [starMemoryCalcMode, setStarMemoryCalcMode] = useState<StarMemoryCalcMode>("implemented_max");
   const [ue1MemoryCalcMode, setUe1MemoryCalcMode] = useState<Ue1MemoryCalcMode>("implemented_max");
   const [starFilters, setStarFilters] = useState<StarFilter[]>([]);
+  const [starMemoryNeedFilters, setStarMemoryNeedFilters] = useState<StarMemoryNeedFilter[]>([]);
   const [ue1Filters, setUe1Filters] = useState<Ue1Filter[]>([]);
   const [ue2Filters, setUe2Filters] = useState<Ue2Filter[]>([]);
   const [memorySourceFilters, setMemorySourceFilters] = useState<MemorySourceFilter[]>([]);
@@ -71,6 +88,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
   const selectedStarSet = useMemo(() => new Set(starFilters), [starFilters]);
+  const selectedStarMemoryNeedSet = useMemo(() => new Set(starMemoryNeedFilters), [starMemoryNeedFilters]);
   const selectedUe1Set = useMemo(() => new Set(ue1Filters), [ue1Filters]);
   const selectedUe2Set = useMemo(() => new Set(ue2Filters), [ue2Filters]);
   const selectedMemorySourceSet = useMemo(() => new Set(memorySourceFilters), [memorySourceFilters]);
@@ -81,6 +99,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     const hasStarFilter = selectedStarSet.size > 0;
     const hasUe1Filter = selectedUe1Set.size > 0;
     const hasUe2Filter = selectedUe2Set.size > 0;
+    const hasStarMemoryNeedFilter = selectedStarMemoryNeedSet.size > 0;
     const hasMemorySourceFilter = selectedMemorySourceSet.size > 0;
     const hasNoneSourceFilter = selectedMemorySourceSet.has("none");
 
@@ -140,6 +159,12 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           continue;
         }
       }
+      if (hasStarMemoryNeedFilter) {
+        const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
+        if (!selectedStarMemoryNeedSet.has(starRemainingMemoryPiece)) {
+          continue;
+        }
+      }
       if (hasMemorySourceFilter) {
         const isNoneMatched = hasNoneSourceFilter && character.memoryPieceSources.length === 0;
         let isSourceMatched = false;
@@ -190,6 +215,11 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
         case "ue2":
           baseComparison = getUe2SortValue(aCharacter, aProgress) - getUe2SortValue(bCharacter, bProgress);
           break;
+        case "starMemoryNeeded":
+          baseComparison =
+            getStarRemainingMemoryPieceCount(aCharacter, aProgress, starMemoryCalcMode) -
+            getStarRemainingMemoryPieceCount(bCharacter, bProgress, starMemoryCalcMode);
+          break;
         case "ue1MemoryNeeded":
           baseComparison =
             getUe1RemainingMemoryPieceCount(aCharacter, aProgress, ue1MemoryCalcMode) -
@@ -217,10 +247,13 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     searchText,
     sortDirection,
     sortKey,
+    starMemoryCalcMode,
     ue1MemoryCalcMode,
     starFilters,
+    starMemoryNeedFilters,
     state.progressByName,
     selectedMemorySourceSet,
+    selectedStarMemoryNeedSet,
     selectedStarSet,
     selectedUe1Set,
     selectedUe2Set,
@@ -271,6 +304,13 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     );
   }
 
+  // ☆必要メモピフィルタの複数選択状態を切り替える。
+  function toggleStarMemoryNeedFilter(filter: StarMemoryNeedFilter): void {
+    setStarMemoryNeedFilters((previous) =>
+      previous.includes(filter) ? previous.filter((value) => value !== filter) : [...previous, filter],
+    );
+  }
+
   function toggleUe1Filter(filter: Ue1Filter): void {
     setUe1Filters((previous) =>
       previous.includes(filter) ? previous.filter((value) => value !== filter) : [...previous, filter],
@@ -287,6 +327,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     .map((filter) => (filter === "none" ? "情報なし" : memorySourceLabelMap[filter]))
     .join(" / ");
   const selectedStarLabels = starFilters.map((star) => `☆${star}`).join(" / ");
+  const selectedStarMemoryNeedLabels = starMemoryNeedFilters.map((value) => String(value)).join(" / ");
   const selectedUe1Labels = ue1Filters
     .map((filter) => (filter === "unimplemented" ? "未実装" : filter === "sp" ? "SP" : formatUeLevel(filter)))
     .join(" / ");
@@ -387,6 +428,18 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           </select>
         </label>
 
+        <label className="field-group">
+          <span>☆必要メモピ計算</span>
+          <select
+            className="select-input"
+            value={starMemoryCalcMode}
+            onChange={(event) => setStarMemoryCalcMode(event.target.value as StarMemoryCalcMode)}
+          >
+            <option value="implemented_max">実装段階の最大まで</option>
+            <option value="star6_max">☆6最大まで（仮定）</option>
+          </select>
+        </label>
+
         <div className="field-group">
           <span>☆フィルタ</span>
           <details className="multi-select-dropdown">
@@ -400,6 +453,27 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                     onChange={() => toggleStarFilter(star as CharacterProgress["star"])}
                   />
                   <span>☆{star}</span>
+                </label>
+              ))}
+            </div>
+          </details>
+        </div>
+
+        <div className="field-group">
+          <span>☆必要メモピフィルタ</span>
+          <details className="multi-select-dropdown">
+            <summary className="select-input multi-select-summary">
+              {starMemoryNeedFilters.length === 0 ? "すべて" : selectedStarMemoryNeedLabels}
+            </summary>
+            <div className="multi-select-panel">
+              {STAR_MEMORY_FILTER_VALUES.map((value) => (
+                <label key={value} className="memory-source-filter-item">
+                  <input
+                    type="checkbox"
+                    checked={starMemoryNeedFilters.includes(value)}
+                    onChange={() => toggleStarMemoryNeedFilter(value)}
+                  />
+                  <span>{value}</span>
                 </label>
               ))}
             </div>
@@ -535,9 +609,14 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                   専用2<span className="sort-indicator">{renderSortIndicator("ue2")}</span>
                 </button>
               </th>
+              <th aria-sort={getAriaSort("starMemoryNeeded")}>
+                <button type="button" className="sort-button" onClick={() => handleSort("starMemoryNeeded")}>
+                  ☆必要メモピ<span className="sort-indicator">{renderSortIndicator("starMemoryNeeded")}</span>
+                </button>
+              </th>
               <th aria-sort={getAriaSort("ue1MemoryNeeded")}>
                 <button type="button" className="sort-button" onClick={() => handleSort("ue1MemoryNeeded")}>
-                  必要メモピ<span className="sort-indicator">{renderSortIndicator("ue1MemoryNeeded")}</span>
+                  専用1必要メモピ<span className="sort-indicator">{renderSortIndicator("ue1MemoryNeeded")}</span>
                 </button>
               </th>
               <th>メモピ入手</th>
@@ -546,7 +625,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           <tbody>
             {visibleRows.length === 0 ? (
               <tr>
-                <td colSpan={9} className="empty-row">
+                <td colSpan={10} className="empty-row">
                   条件に一致するキャラがいません
                 </td>
               </tr>
@@ -557,6 +636,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                 const starMax = character.implemented.star6 ? 6 : 5;
                 const ue1CompositeValue =
                   character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped ? "sp" : ue1Value;
+                const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
                 const ue1RemainingMemoryPiece = getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode);
 
                 return (
@@ -652,6 +732,9 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                           <option value="null">-</option>
                         </select>
                       )}
+                    </td>
+                    <td>
+                      <span className="memory-piece-needed">{starRemainingMemoryPiece}</span>
                     </td>
                     <td>
                       <span className="memory-piece-needed">{ue1RemainingMemoryPiece}</span>
