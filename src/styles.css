@@ -133,7 +133,7 @@ h1 {
 
 .input-toolbar {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
 }
 
@@ -142,6 +142,59 @@ h1 {
   gap: 6px;
   font-size: 0.85rem;
   color: var(--text-muted);
+}
+
+.multi-select-dropdown {
+  position: relative;
+}
+
+.multi-select-summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.multi-select-summary::-webkit-details-marker {
+  display: none;
+}
+
+.multi-select-dropdown[open] .multi-select-summary {
+  border-color: rgba(0, 246, 208, 0.6);
+}
+
+.multi-select-panel {
+  position: absolute;
+  z-index: 4;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  max-height: 240px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(9, 14, 23, 0.96);
+  padding: 8px 10px;
+  display: grid;
+  gap: 8px;
+  box-shadow: var(--shadow);
+}
+
+.memory-source-filter-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-main);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.memory-source-filter-item input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
 }
 
 .text-input,
@@ -190,11 +243,33 @@ h1 {
   position: sticky;
   top: 0;
   z-index: 1;
-  text-align: left;
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   color: #c8d8f6;
   background: rgba(16, 24, 37, 0.96);
+}
+
+.sort-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sort-button:hover {
+  color: #dff8ff;
+}
+
+.sort-indicator {
+  min-width: 0.85em;
+  color: var(--accent);
+  font-size: 0.72rem;
 }
 
 .character-table tbody tr:hover {

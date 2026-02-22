@@ -14,6 +14,13 @@ type InputTabProps = {
 
 type OwnedFilter = "all" | "owned" | "unowned";
 type LimitedFilter = "all" | "limited" | "normal";
+type LimitBreakFilter = "all" | "on" | "off";
+type StarFilter = CharacterProgress["star"];
+type Ue1Filter = "unimplemented" | "sp" | (typeof UE1_LEVEL_VALUES)[number];
+type Ue2Filter = "unimplemented" | (typeof UE2_LEVEL_VALUES)[number];
+type MemorySourceFilter = "none" | MemoryPieceSource;
+type SortKey = "owned" | "name" | "limited" | "limitBreak" | "star" | "ue1" | "ue2";
+type SortDirection = "asc" | "desc" | null;
 
 const memorySourceLabelMap: Record<MemoryPieceSource, string> = {
   dungeon_coin: "ダンジョン",
@@ -29,33 +36,236 @@ function formatUeLevel(level: number): string {
   return level === 0 ? "未装備" : `Lv.${level}`;
 }
 
+// 専用1の並び順を統一するための比較値を返す。
+function getUe1SortValue(character: MasterCharacter, progress: CharacterProgress): number {
+  if (!character.implemented.ue1) {
+    return -1;
+  }
+  if (progress.ue1SpEquipped) {
+    return 1000;
+  }
+  return progress.ue1Level ?? 0;
+}
+
+// 専用2の並び順を統一するための比較値を返す。
+function getUe2SortValue(character: MasterCharacter, progress: CharacterProgress): number {
+  if (!character.implemented.ue2) {
+    return -1;
+  }
+  return progress.ue2Level ?? 0;
+}
+
 export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTabProps) {
   const [searchText, setSearchText] = useState("");
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>("all");
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>("all");
+  const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>("all");
+  const [starFilters, setStarFilters] = useState<StarFilter[]>([]);
+  const [ue1Filters, setUe1Filters] = useState<Ue1Filter[]>([]);
+  const [ue2Filters, setUe2Filters] = useState<Ue2Filter[]>([]);
+  const [memorySourceFilters, setMemorySourceFilters] = useState<MemorySourceFilter[]>([]);
+  const [sortKey, setSortKey] = useState<SortKey>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
-  const filteredCharacters = useMemo(() => {
+  const visibleRows = useMemo(() => {
     const trimmedSearchText = searchText.trim();
-    return masterCharacters.filter((character) => {
-      const progress = state.progressByName[character.name];
-      if (trimmedSearchText && !character.name.includes(trimmedSearchText)) {
-        return false;
+    const filteredRows = masterCharacters
+      .map((character, index) => ({
+        character,
+        progress: state.progressByName[character.name],
+        index,
+      }))
+      .filter((row): row is { character: MasterCharacter; progress: CharacterProgress; index: number } => !!row.progress)
+      .filter(({ character, progress }) => {
+        if (trimmedSearchText && !character.name.includes(trimmedSearchText)) {
+          return false;
+        }
+        if (ownedFilter === "owned" && !progress.owned) {
+          return false;
+        }
+        if (ownedFilter === "unowned" && progress.owned) {
+          return false;
+        }
+        if (limitedFilter === "limited" && !character.limited) {
+          return false;
+        }
+        if (limitedFilter === "normal" && character.limited) {
+          return false;
+        }
+        if (limitBreakFilter === "on" && !progress.limitBreak) {
+          return false;
+        }
+        if (limitBreakFilter === "off" && progress.limitBreak) {
+          return false;
+        }
+        if (starFilters.length > 0 && !starFilters.includes(progress.star)) {
+          return false;
+        }
+        if (ue1Filters.length > 0) {
+          const isUe1Matched = ue1Filters.some((filter) => {
+            if (filter === "unimplemented") {
+              return !character.implemented.ue1;
+            }
+            if (filter === "sp") {
+              return character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped;
+            }
+            return character.implemented.ue1 && !progress.ue1SpEquipped && progress.ue1Level === filter;
+          });
+          if (!isUe1Matched) {
+            return false;
+          }
+        }
+        if (ue2Filters.length > 0) {
+          const isUe2Matched = ue2Filters.some((filter) => {
+            if (filter === "unimplemented") {
+              return !character.implemented.ue2;
+            }
+            return character.implemented.ue2 && progress.ue2Level === filter;
+          });
+          if (!isUe2Matched) {
+            return false;
+          }
+        }
+        if (memorySourceFilters.length > 0) {
+          const selectedSourceSet = new Set(memorySourceFilters);
+          const hasNone = selectedSourceSet.has("none");
+          const isNoneMatched = hasNone && character.memoryPieceSources.length === 0;
+          const isSourceMatched = character.memoryPieceSources.some((source) => selectedSourceSet.has(source));
+          if (!isNoneMatched && !isSourceMatched) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+    if (!sortDirection) {
+      return filteredRows.map(({ character, progress }) => ({ character, progress }));
+    }
+
+    const directionMultiplier = sortDirection === "asc" ? 1 : -1;
+    const sortedRows = [...filteredRows].sort((a, b) => {
+      const { character: aCharacter, progress: aProgress } = a;
+      const { character: bCharacter, progress: bProgress } = b;
+      let baseComparison = 0;
+
+      switch (sortKey) {
+        case "owned":
+          baseComparison = Number(aProgress.owned) - Number(bProgress.owned);
+          break;
+        case "name":
+          baseComparison = aCharacter.name.localeCompare(bCharacter.name, "ja");
+          break;
+        case "limited":
+          baseComparison = Number(aCharacter.limited) - Number(bCharacter.limited);
+          break;
+        case "limitBreak":
+          baseComparison = Number(aProgress.limitBreak) - Number(bProgress.limitBreak);
+          break;
+        case "star":
+          baseComparison = aProgress.star - bProgress.star;
+          break;
+        case "ue1":
+          baseComparison = getUe1SortValue(aCharacter, aProgress) - getUe1SortValue(bCharacter, bProgress);
+          break;
+        case "ue2":
+          baseComparison = getUe2SortValue(aCharacter, aProgress) - getUe2SortValue(bCharacter, bProgress);
+          break;
       }
-      if (ownedFilter === "owned" && !progress?.owned) {
-        return false;
+
+      if (baseComparison !== 0) {
+        return baseComparison * directionMultiplier;
       }
-      if (ownedFilter === "unowned" && progress?.owned) {
-        return false;
+
+      const nameComparison = aCharacter.name.localeCompare(bCharacter.name, "ja");
+      if (nameComparison !== 0) {
+        return nameComparison;
       }
-      if (limitedFilter === "limited" && !character.limited) {
-        return false;
-      }
-      if (limitedFilter === "normal" && character.limited) {
-        return false;
-      }
-      return true;
+      return a.index - b.index;
     });
-  }, [limitedFilter, masterCharacters, ownedFilter, searchText, state.progressByName]);
+
+    return sortedRows.map(({ character, progress }) => ({ character, progress }));
+  }, [
+    limitBreakFilter,
+    limitedFilter,
+    masterCharacters,
+    ownedFilter,
+    searchText,
+    sortDirection,
+    sortKey,
+    starFilters,
+    state.progressByName,
+    memorySourceFilters,
+    ue1Filters,
+    ue2Filters,
+  ]);
+
+  // テーブルヘッダークリック時のソート状態遷移を管理する。
+  function handleSort(nextSortKey: SortKey): void {
+    if (sortKey !== nextSortKey) {
+      setSortKey(nextSortKey);
+      setSortDirection("asc");
+      return;
+    }
+    if (sortDirection === "asc") {
+      setSortDirection("desc");
+      return;
+    }
+    if (sortDirection === "desc") {
+      setSortDirection(null);
+      return;
+    }
+    setSortDirection("asc");
+  }
+
+  function getAriaSort(columnKey: SortKey): "none" | "ascending" | "descending" {
+    if (sortKey !== columnKey || sortDirection === null) {
+      return "none";
+    }
+    return sortDirection === "asc" ? "ascending" : "descending";
+  }
+
+  function renderSortIndicator(columnKey: SortKey): string {
+    if (sortKey !== columnKey || sortDirection === null) {
+      return "";
+    }
+    return sortDirection === "asc" ? "▲" : "▼";
+  }
+
+  // メモピ入手フィルタの複数選択状態を切り替える。
+  function toggleMemorySourceFilter(filter: MemorySourceFilter): void {
+    setMemorySourceFilters((previous) =>
+      previous.includes(filter) ? previous.filter((value) => value !== filter) : [...previous, filter],
+    );
+  }
+
+  function toggleStarFilter(filter: StarFilter): void {
+    setStarFilters((previous) =>
+      previous.includes(filter) ? previous.filter((value) => value !== filter) : [...previous, filter],
+    );
+  }
+
+  function toggleUe1Filter(filter: Ue1Filter): void {
+    setUe1Filters((previous) =>
+      previous.includes(filter) ? previous.filter((value) => value !== filter) : [...previous, filter],
+    );
+  }
+
+  function toggleUe2Filter(filter: Ue2Filter): void {
+    setUe2Filters((previous) =>
+      previous.includes(filter) ? previous.filter((value) => value !== filter) : [...previous, filter],
+    );
+  }
+
+  const selectedMemorySourceLabels = memorySourceFilters
+    .map((filter) => (filter === "none" ? "情報なし" : memorySourceLabelMap[filter]))
+    .join(" / ");
+  const selectedStarLabels = starFilters.map((star) => `☆${star}`).join(" / ");
+  const selectedUe1Labels = ue1Filters
+    .map((filter) => (filter === "unimplemented" ? "未実装" : filter === "sp" ? "SP" : formatUeLevel(filter)))
+    .join(" / ");
+  const selectedUe2Labels = ue2Filters
+    .map((filter) => (filter === "unimplemented" ? "未実装" : formatUeLevel(filter)))
+    .join(" / ");
 
   return (
     <section className="panel">
@@ -95,38 +305,180 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
             <option value="normal">恒常のみ</option>
           </select>
         </label>
+
+        <label className="field-group">
+          <span>限界突破フィルタ</span>
+          <select
+            className="select-input"
+            value={limitBreakFilter}
+            onChange={(event) => setLimitBreakFilter(event.target.value as LimitBreakFilter)}
+          >
+            <option value="all">すべて</option>
+            <option value="on">限界突破済み</option>
+            <option value="off">未限界突破</option>
+          </select>
+        </label>
+
+        <div className="field-group">
+          <span>☆フィルタ</span>
+          <details className="multi-select-dropdown">
+            <summary className="select-input multi-select-summary">{starFilters.length === 0 ? "すべて" : selectedStarLabels}</summary>
+            <div className="multi-select-panel">
+              {[1, 2, 3, 4, 5, 6].map((star) => (
+                <label key={star} className="memory-source-filter-item">
+                  <input
+                    type="checkbox"
+                    checked={starFilters.includes(star as CharacterProgress["star"])}
+                    onChange={() => toggleStarFilter(star as CharacterProgress["star"])}
+                  />
+                  <span>☆{star}</span>
+                </label>
+              ))}
+            </div>
+          </details>
+        </div>
+
+        <div className="field-group">
+          <span>専用1フィルタ</span>
+          <details className="multi-select-dropdown">
+            <summary className="select-input multi-select-summary">{ue1Filters.length === 0 ? "すべて" : selectedUe1Labels}</summary>
+            <div className="multi-select-panel">
+              <label className="memory-source-filter-item">
+                <input
+                  type="checkbox"
+                  checked={ue1Filters.includes("unimplemented")}
+                  onChange={() => toggleUe1Filter("unimplemented")}
+                />
+                <span>未実装</span>
+              </label>
+              {UE1_LEVEL_VALUES.map((level) => (
+                <label key={level} className="memory-source-filter-item">
+                  <input
+                    type="checkbox"
+                    checked={ue1Filters.includes(level)}
+                    onChange={() => toggleUe1Filter(level)}
+                  />
+                  <span>{formatUeLevel(level)}</span>
+                </label>
+              ))}
+              <label className="memory-source-filter-item">
+                <input type="checkbox" checked={ue1Filters.includes("sp")} onChange={() => toggleUe1Filter("sp")} />
+                <span>SP</span>
+              </label>
+            </div>
+          </details>
+        </div>
+
+        <div className="field-group">
+          <span>専用2フィルタ</span>
+          <details className="multi-select-dropdown">
+            <summary className="select-input multi-select-summary">{ue2Filters.length === 0 ? "すべて" : selectedUe2Labels}</summary>
+            <div className="multi-select-panel">
+              <label className="memory-source-filter-item">
+                <input
+                  type="checkbox"
+                  checked={ue2Filters.includes("unimplemented")}
+                  onChange={() => toggleUe2Filter("unimplemented")}
+                />
+                <span>未実装</span>
+              </label>
+              {UE2_LEVEL_VALUES.map((level) => (
+                <label key={level} className="memory-source-filter-item">
+                  <input
+                    type="checkbox"
+                    checked={ue2Filters.includes(level)}
+                    onChange={() => toggleUe2Filter(level)}
+                  />
+                  <span>{formatUeLevel(level)}</span>
+                </label>
+              ))}
+            </div>
+          </details>
+        </div>
+
+        <div className="field-group">
+          <span>メモピ入手フィルタ</span>
+          <details className="multi-select-dropdown">
+            <summary className="select-input multi-select-summary">
+              {memorySourceFilters.length === 0 ? "すべて" : selectedMemorySourceLabels}
+            </summary>
+            <div className="multi-select-panel">
+              <label className="memory-source-filter-item">
+                <input
+                  type="checkbox"
+                  checked={memorySourceFilters.includes("none")}
+                  onChange={() => toggleMemorySourceFilter("none")}
+                />
+                <span>情報なし</span>
+              </label>
+              {Object.entries(memorySourceLabelMap).map(([source, label]) => (
+                <label key={source} className="memory-source-filter-item">
+                  <input
+                    type="checkbox"
+                    checked={memorySourceFilters.includes(source as MemorySourceFilter)}
+                    onChange={() => toggleMemorySourceFilter(source as MemorySourceFilter)}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </details>
+        </div>
       </div>
 
-      <p className="result-count">表示件数: {filteredCharacters.length}</p>
+      <p className="result-count">表示件数: {visibleRows.length}</p>
 
       <div className="table-wrap">
         <table className="character-table">
           <thead>
             <tr>
-              <th>所持</th>
-              <th>キャラ</th>
-              <th>区分</th>
-              <th>限界突破</th>
-              <th>☆</th>
-              <th>専用1</th>
-              <th>専用2</th>
+              <th aria-sort={getAriaSort("owned")}>
+                <button type="button" className="sort-button" onClick={() => handleSort("owned")}>
+                  所持<span className="sort-indicator">{renderSortIndicator("owned")}</span>
+                </button>
+              </th>
+              <th aria-sort={getAriaSort("name")}>
+                <button type="button" className="sort-button" onClick={() => handleSort("name")}>
+                  キャラ<span className="sort-indicator">{renderSortIndicator("name")}</span>
+                </button>
+              </th>
+              <th aria-sort={getAriaSort("limited")}>
+                <button type="button" className="sort-button" onClick={() => handleSort("limited")}>
+                  区分<span className="sort-indicator">{renderSortIndicator("limited")}</span>
+                </button>
+              </th>
+              <th aria-sort={getAriaSort("limitBreak")}>
+                <button type="button" className="sort-button" onClick={() => handleSort("limitBreak")}>
+                  限界突破<span className="sort-indicator">{renderSortIndicator("limitBreak")}</span>
+                </button>
+              </th>
+              <th aria-sort={getAriaSort("star")}>
+                <button type="button" className="sort-button" onClick={() => handleSort("star")}>
+                  ☆<span className="sort-indicator">{renderSortIndicator("star")}</span>
+                </button>
+              </th>
+              <th aria-sort={getAriaSort("ue1")}>
+                <button type="button" className="sort-button" onClick={() => handleSort("ue1")}>
+                  専用1<span className="sort-indicator">{renderSortIndicator("ue1")}</span>
+                </button>
+              </th>
+              <th aria-sort={getAriaSort("ue2")}>
+                <button type="button" className="sort-button" onClick={() => handleSort("ue2")}>
+                  専用2<span className="sort-indicator">{renderSortIndicator("ue2")}</span>
+                </button>
+              </th>
               <th>メモピ入手</th>
             </tr>
           </thead>
           <tbody>
-            {filteredCharacters.length === 0 ? (
+            {visibleRows.length === 0 ? (
               <tr>
                 <td colSpan={8} className="empty-row">
                   条件に一致するキャラがいません
                 </td>
               </tr>
             ) : (
-              filteredCharacters.map((character) => {
-                const progress = state.progressByName[character.name];
-                if (!progress) {
-                  return null;
-                }
-
+              visibleRows.map(({ character, progress }) => {
                 const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
                 const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
                 const starMax = character.implemented.star6 ? 6 : 5;
