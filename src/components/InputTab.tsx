@@ -233,7 +233,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                           <span className="source-chip empty">情報なし</span>
                         ) : (
                           character.memoryPieceSources.map((source) => (
-                            <span key={source} className="source-chip">
+                            <span key={source} className={`source-chip source-chip-${source}`}>
                               {memorySourceLabelMap[source]}
                             </span>
                           ))
