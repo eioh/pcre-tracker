@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useMemo, useState } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type { CharacterProgress, MasterCharacter, MemoryPieceSource, StoredStateV1 } from "../domain/types";
 
@@ -56,6 +56,7 @@ function getUe2SortValue(character: MasterCharacter, progress: CharacterProgress
 }
 
 export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTabProps) {
+  const rootRef = useRef<HTMLElement | null>(null);
   const [searchText, setSearchText] = useState("");
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>("all");
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>("all");
@@ -67,76 +68,93 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
+  const selectedStarSet = useMemo(() => new Set(starFilters), [starFilters]);
+  const selectedUe1Set = useMemo(() => new Set(ue1Filters), [ue1Filters]);
+  const selectedUe2Set = useMemo(() => new Set(ue2Filters), [ue2Filters]);
+  const selectedMemorySourceSet = useMemo(() => new Set(memorySourceFilters), [memorySourceFilters]);
+
   const visibleRows = useMemo(() => {
     const trimmedSearchText = searchText.trim();
-    const filteredRows = masterCharacters
-      .map((character, index) => ({
-        character,
-        progress: state.progressByName[character.name],
-        index,
-      }))
-      .filter((row): row is { character: MasterCharacter; progress: CharacterProgress; index: number } => !!row.progress)
-      .filter(({ character, progress }) => {
-        if (trimmedSearchText && !character.name.includes(trimmedSearchText)) {
-          return false;
-        }
-        if (ownedFilter === "owned" && !progress.owned) {
-          return false;
-        }
-        if (ownedFilter === "unowned" && progress.owned) {
-          return false;
-        }
-        if (limitedFilter === "limited" && !character.limited) {
-          return false;
-        }
-        if (limitedFilter === "normal" && character.limited) {
-          return false;
-        }
-        if (limitBreakFilter === "on" && !progress.limitBreak) {
-          return false;
-        }
-        if (limitBreakFilter === "off" && progress.limitBreak) {
-          return false;
-        }
-        if (starFilters.length > 0 && !starFilters.includes(progress.star)) {
-          return false;
-        }
-        if (ue1Filters.length > 0) {
-          const isUe1Matched = ue1Filters.some((filter) => {
-            if (filter === "unimplemented") {
-              return !character.implemented.ue1;
-            }
-            if (filter === "sp") {
-              return character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped;
-            }
-            return character.implemented.ue1 && !progress.ue1SpEquipped && progress.ue1Level === filter;
-          });
-          if (!isUe1Matched) {
-            return false;
+    const filteredRows: Array<{ character: MasterCharacter; progress: CharacterProgress; index: number }> = [];
+    const hasStarFilter = selectedStarSet.size > 0;
+    const hasUe1Filter = selectedUe1Set.size > 0;
+    const hasUe2Filter = selectedUe2Set.size > 0;
+    const hasMemorySourceFilter = selectedMemorySourceSet.size > 0;
+    const hasNoneSourceFilter = selectedMemorySourceSet.has("none");
+
+    for (let index = 0; index < masterCharacters.length; index += 1) {
+      const character = masterCharacters[index];
+      const progress = state.progressByName[character.name];
+      if (!progress) {
+        continue;
+      }
+      if (trimmedSearchText && !character.name.includes(trimmedSearchText)) {
+        continue;
+      }
+      if (ownedFilter === "owned" && !progress.owned) {
+        continue;
+      }
+      if (ownedFilter === "unowned" && progress.owned) {
+        continue;
+      }
+      if (limitedFilter === "limited" && !character.limited) {
+        continue;
+      }
+      if (limitedFilter === "normal" && character.limited) {
+        continue;
+      }
+      if (limitBreakFilter === "on" && !progress.limitBreak) {
+        continue;
+      }
+      if (limitBreakFilter === "off" && progress.limitBreak) {
+        continue;
+      }
+      if (hasStarFilter && !selectedStarSet.has(progress.star)) {
+        continue;
+      }
+      if (hasUe1Filter) {
+        let isUe1Matched = false;
+        if (!character.implemented.ue1 && selectedUe1Set.has("unimplemented")) {
+          isUe1Matched = true;
+        } else if (character.implemented.ue1) {
+          if (progress.ue1SpEquipped && selectedUe1Set.has("sp")) {
+            isUe1Matched = true;
+          } else if (!progress.ue1SpEquipped && progress.ue1Level !== null && selectedUe1Set.has(progress.ue1Level)) {
+            isUe1Matched = true;
           }
         }
-        if (ue2Filters.length > 0) {
-          const isUe2Matched = ue2Filters.some((filter) => {
-            if (filter === "unimplemented") {
-              return !character.implemented.ue2;
+        if (!isUe1Matched) {
+          continue;
+        }
+      }
+      if (hasUe2Filter) {
+        let isUe2Matched = false;
+        if (!character.implemented.ue2 && selectedUe2Set.has("unimplemented")) {
+          isUe2Matched = true;
+        } else if (character.implemented.ue2 && progress.ue2Level !== null && selectedUe2Set.has(progress.ue2Level)) {
+          isUe2Matched = true;
+        }
+        if (!isUe2Matched) {
+          continue;
+        }
+      }
+      if (hasMemorySourceFilter) {
+        const isNoneMatched = hasNoneSourceFilter && character.memoryPieceSources.length === 0;
+        let isSourceMatched = false;
+        if (!isNoneMatched) {
+          for (const source of character.memoryPieceSources) {
+            if (selectedMemorySourceSet.has(source)) {
+              isSourceMatched = true;
+              break;
             }
-            return character.implemented.ue2 && progress.ue2Level === filter;
-          });
-          if (!isUe2Matched) {
-            return false;
           }
         }
-        if (memorySourceFilters.length > 0) {
-          const selectedSourceSet = new Set(memorySourceFilters);
-          const hasNone = selectedSourceSet.has("none");
-          const isNoneMatched = hasNone && character.memoryPieceSources.length === 0;
-          const isSourceMatched = character.memoryPieceSources.some((source) => selectedSourceSet.has(source));
-          if (!isNoneMatched && !isSourceMatched) {
-            return false;
-          }
+        if (!isNoneMatched && !isSourceMatched) {
+          continue;
         }
-        return true;
-      });
+      }
+      filteredRows.push({ character, progress, index });
+    }
 
     if (!sortDirection) {
       return filteredRows.map(({ character, progress }) => ({ character, progress }));
@@ -194,9 +212,10 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     sortKey,
     starFilters,
     state.progressByName,
-    memorySourceFilters,
-    ue1Filters,
-    ue2Filters,
+    selectedMemorySourceSet,
+    selectedStarSet,
+    selectedUe1Set,
+    selectedUe2Set,
   ]);
 
   // テーブルヘッダークリック時のソート状態遷移を管理する。
@@ -267,8 +286,37 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     .map((filter) => (filter === "unimplemented" ? "未実装" : formatUeLevel(filter)))
     .join(" / ");
 
+  useEffect(() => {
+    function handleDocumentPointerDown(event: MouseEvent): void {
+      const root = rootRef.current;
+      if (!root) {
+        return;
+      }
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+      const activeDropdowns = root.querySelectorAll("details.multi-select-dropdown[open]");
+      if (activeDropdowns.length === 0) {
+        return;
+      }
+      const isInsideAnyDropdown = Array.from(activeDropdowns).some((dropdown) => dropdown.contains(target));
+      if (isInsideAnyDropdown) {
+        return;
+      }
+      activeDropdowns.forEach((dropdown) => {
+        (dropdown as HTMLDetailsElement).open = false;
+      });
+    }
+
+    document.addEventListener("mousedown", handleDocumentPointerDown);
+    return () => {
+      document.removeEventListener("mousedown", handleDocumentPointerDown);
+    };
+  }, []);
+
   return (
-    <section className="panel">
+    <section className="panel" ref={rootRef}>
       <div className="input-toolbar">
         <label className="field-group">
           <span>キャラ検索</span>
