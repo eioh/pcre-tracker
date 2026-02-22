@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo, useState } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type { CharacterProgress, MasterCharacter, MemoryPieceSource, StoredStateV1 } from "../domain/types";
+import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
 
 type ProgressPatch = Partial<
   Pick<CharacterProgress, "owned" | "limitBreak" | "star" | "ue1Level" | "ue1SpEquipped" | "ue2Level">
@@ -19,7 +20,7 @@ type StarFilter = CharacterProgress["star"];
 type Ue1Filter = "unimplemented" | "sp" | (typeof UE1_LEVEL_VALUES)[number];
 type Ue2Filter = "unimplemented" | (typeof UE2_LEVEL_VALUES)[number];
 type MemorySourceFilter = "none" | MemoryPieceSource;
-type SortKey = "owned" | "name" | "limited" | "limitBreak" | "star" | "ue1" | "ue2";
+type SortKey = "owned" | "name" | "limited" | "limitBreak" | "star" | "ue1" | "ue2" | "ue1MemoryNeeded";
 type SortDirection = "asc" | "desc" | null;
 
 const memorySourceLabelMap: Record<MemoryPieceSource, string> = {
@@ -61,6 +62,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>("all");
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>("all");
   const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>("all");
+  const [ue1MemoryCalcMode, setUe1MemoryCalcMode] = useState<Ue1MemoryCalcMode>("implemented_max");
   const [starFilters, setStarFilters] = useState<StarFilter[]>([]);
   const [ue1Filters, setUe1Filters] = useState<Ue1Filter[]>([]);
   const [ue2Filters, setUe2Filters] = useState<Ue2Filter[]>([]);
@@ -188,6 +190,11 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
         case "ue2":
           baseComparison = getUe2SortValue(aCharacter, aProgress) - getUe2SortValue(bCharacter, bProgress);
           break;
+        case "ue1MemoryNeeded":
+          baseComparison =
+            getUe1RemainingMemoryPieceCount(aCharacter, aProgress, ue1MemoryCalcMode) -
+            getUe1RemainingMemoryPieceCount(bCharacter, bProgress, ue1MemoryCalcMode);
+          break;
       }
 
       if (baseComparison !== 0) {
@@ -210,6 +217,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     searchText,
     sortDirection,
     sortKey,
+    ue1MemoryCalcMode,
     starFilters,
     state.progressByName,
     selectedMemorySourceSet,
@@ -367,6 +375,18 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           </select>
         </label>
 
+        <label className="field-group">
+          <span>必要メモピ計算</span>
+          <select
+            className="select-input"
+            value={ue1MemoryCalcMode}
+            onChange={(event) => setUe1MemoryCalcMode(event.target.value as Ue1MemoryCalcMode)}
+          >
+            <option value="implemented_max">実装段階の最大まで</option>
+            <option value="sp_max">SP最大まで（仮定）</option>
+          </select>
+        </label>
+
         <div className="field-group">
           <span>☆フィルタ</span>
           <details className="multi-select-dropdown">
@@ -515,13 +535,18 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                   専用2<span className="sort-indicator">{renderSortIndicator("ue2")}</span>
                 </button>
               </th>
+              <th aria-sort={getAriaSort("ue1MemoryNeeded")}>
+                <button type="button" className="sort-button" onClick={() => handleSort("ue1MemoryNeeded")}>
+                  必要メモピ<span className="sort-indicator">{renderSortIndicator("ue1MemoryNeeded")}</span>
+                </button>
+              </th>
               <th>メモピ入手</th>
             </tr>
           </thead>
           <tbody>
             {visibleRows.length === 0 ? (
               <tr>
-                <td colSpan={8} className="empty-row">
+                <td colSpan={9} className="empty-row">
                   条件に一致するキャラがいません
                 </td>
               </tr>
@@ -532,6 +557,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                 const starMax = character.implemented.star6 ? 6 : 5;
                 const ue1CompositeValue =
                   character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped ? "sp" : ue1Value;
+                const ue1RemainingMemoryPiece = getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode);
 
                 return (
                   <tr key={character.name}>
@@ -626,6 +652,9 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                           <option value="null">-</option>
                         </select>
                       )}
+                    </td>
+                    <td>
+                      <span className="memory-piece-needed">{ue1RemainingMemoryPiece}</span>
                     </td>
                     <td>
                       <div className="table-source-list">
