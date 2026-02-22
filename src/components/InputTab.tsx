@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type { CharacterProgress, MasterCharacter, MemoryPieceSource, StoredStateV1 } from "../domain/types";
 
-type ProgressPatch = Partial<Pick<CharacterProgress, "owned" | "star" | "ue1Level" | "ue1SpEquipped" | "ue2Level">>;
+type ProgressPatch = Partial<
+  Pick<CharacterProgress, "owned" | "limitBreak" | "star" | "ue1Level" | "ue1SpEquipped" | "ue2Level">
+>;
 
 type InputTabProps = {
   masterCharacters: MasterCharacter[];
@@ -104,6 +106,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
               <th>所持</th>
               <th>キャラ</th>
               <th>区分</th>
+              <th>限界突破</th>
               <th>☆</th>
               <th>専用1</th>
               <th>専用2</th>
@@ -113,7 +116,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           <tbody>
             {filteredCharacters.length === 0 ? (
               <tr>
-                <td colSpan={7} className="empty-row">
+                <td colSpan={8} className="empty-row">
                   条件に一致するキャラがいません
                 </td>
               </tr>
@@ -145,6 +148,16 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                     <td className="name-cell">{character.name}</td>
                     <td>
                       {character.limited ? <span className="badge limited">限定</span> : <span className="badge">恒常</span>}
+                    </td>
+                    <td>
+                      <label className="table-switch">
+                        <input
+                          type="checkbox"
+                          checked={progress.limitBreak}
+                          aria-label={`${character.name}の限界突破状態`}
+                          onChange={(event) => onUpdateProgress(character.name, { limitBreak: event.target.checked })}
+                        />
+                      </label>
                     </td>
                     <td>
                       <select

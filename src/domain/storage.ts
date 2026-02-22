@@ -17,6 +17,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function createDefaultProgress(character: MasterCharacter): CharacterProgress {
   return {
     owned: false,
+    limitBreak: false,
     star: 1,
     ue1Level: character.implemented.ue1 ? 0 : null,
     ue1SpEquipped: false,
@@ -67,6 +68,7 @@ function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): Cha
 
   const normalized: CharacterProgress = {
     owned: parsed.data.owned,
+    limitBreak: parsed.data.limitBreak,
     star: toStar(parsed.data.star, character.implemented.star6),
     ue1Level: toUe1Level(parsed.data.ue1Level),
     ue1SpEquipped: parsed.data.ue1SpEquipped,

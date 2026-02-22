@@ -6,7 +6,9 @@ import { buildInitialState, loadStoredState, saveStoredState } from "./domain/st
 import type { CharacterProgress, StoredStateV1 } from "./domain/types";
 
 type ActiveTab = "input" | "dashboard";
-type ProgressPatch = Partial<Pick<CharacterProgress, "owned" | "star" | "ue1Level" | "ue1SpEquipped" | "ue2Level">>;
+type ProgressPatch = Partial<
+  Pick<CharacterProgress, "owned" | "limitBreak" | "star" | "ue1Level" | "ue1SpEquipped" | "ue2Level">
+>;
 
 function formatUpdatedAt(value: string): string {
   const date = new Date(value);

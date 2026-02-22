@@ -22,6 +22,7 @@ const state: StoredStateV1 = {
   progressByName: {
     ヒヨリ: {
       owned: true,
+      limitBreak: true,
       star: 6,
       ue1Level: 370,
       ue1SpEquipped: true,
@@ -30,6 +31,7 @@ const state: StoredStateV1 = {
     },
     ユイ: {
       owned: false,
+      limitBreak: false,
       star: 1,
       ue1Level: null,
       ue1SpEquipped: false,
@@ -45,6 +47,7 @@ describe("buildDashboardSummary", () => {
 
     expect(summary.totalCharacters).toBe(2);
     expect(summary.ownedCharacters).toBe(1);
+    expect(summary.limitBreakCharacters).toBe(1);
     expect(summary.star6.implemented).toBe(2);
     expect(summary.star6.promoted).toBe(1);
     expect(summary.ue1Sp.implemented).toBe(1);

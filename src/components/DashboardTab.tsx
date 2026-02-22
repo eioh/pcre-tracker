@@ -41,6 +41,8 @@ function Distribution({ title, items }: DistributionProps) {
 export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
   const summary = useMemo(() => buildDashboardSummary(masterCharacters, state), [masterCharacters, state]);
   const ownedRate = summary.totalCharacters === 0 ? 0 : (summary.ownedCharacters / summary.totalCharacters) * 100;
+  const limitBreakRate =
+    summary.totalCharacters === 0 ? 0 : (summary.limitBreakCharacters / summary.totalCharacters) * 100;
   const star6Rate = summary.star6.implemented === 0 ? 0 : (summary.star6.promoted / summary.star6.implemented) * 100;
 
   return (
@@ -52,6 +54,14 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
             {summary.ownedCharacters} / {summary.totalCharacters}
           </p>
           <small>所持率 {ownedRate.toFixed(1)}%</small>
+        </article>
+
+        <article className="kpi-card">
+          <h3>限界突破数</h3>
+          <p className="kpi-value">
+            {summary.limitBreakCharacters} / {summary.totalCharacters}
+          </p>
+          <small>全体比 {limitBreakRate.toFixed(1)}%</small>
         </article>
 
         <article className="kpi-card">

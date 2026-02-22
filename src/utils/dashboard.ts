@@ -9,6 +9,7 @@ export type DistributionItem = {
 export type DashboardSummary = {
   totalCharacters: number;
   ownedCharacters: number;
+  limitBreakCharacters: number;
   star6: {
     implemented: number;
     promoted: number;
@@ -45,6 +46,7 @@ export function buildDashboardSummary(
   const ue2Counts = new Map<string, number>(ue2Order.map((label) => [label, 0]));
 
   let ownedCharacters = 0;
+  let limitBreakCharacters = 0;
   let star6Implemented = 0;
   let star6Promoted = 0;
   let ue1SpImplemented = 0;
@@ -56,6 +58,9 @@ export function buildDashboardSummary(
     const progress = state.progressByName[character.name];
     if (progress?.owned) {
       ownedCharacters += 1;
+    }
+    if (progress?.limitBreak) {
+      limitBreakCharacters += 1;
     }
     const starLabel = `☆${progress?.star ?? 1}`;
     starCounts.set(starLabel, (starCounts.get(starLabel) ?? 0) + 1);
@@ -96,6 +101,7 @@ export function buildDashboardSummary(
   return {
     totalCharacters: masterCharacters.length,
     ownedCharacters,
+    limitBreakCharacters,
     star6: {
       implemented: star6Implemented,
       promoted: star6Promoted,
