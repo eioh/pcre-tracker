@@ -24,7 +24,7 @@ const memorySourceLabelMap: Record<MemoryPieceSource, string> = {
 };
 
 function formatUeLevel(level: number): string {
-  return level === 0 ? "未装備(0)" : `Lv${level}`;
+  return level === 0 ? "未装備" : `Lv.${level}`;
 }
 
 export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTabProps) {
@@ -106,7 +106,6 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
               <th>区分</th>
               <th>☆</th>
               <th>専用1</th>
-              <th>専用1SP</th>
               <th>専用2</th>
               <th>メモピ入手</th>
             </tr>
@@ -114,7 +113,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           <tbody>
             {filteredCharacters.length === 0 ? (
               <tr>
-                <td colSpan={8} className="empty-row">
+                <td colSpan={7} className="empty-row">
                   条件に一致するキャラがいません
                 </td>
               </tr>
@@ -128,6 +127,8 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                 const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
                 const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
                 const starMax = character.implemented.star6 ? 6 : 5;
+                const ue1CompositeValue =
+                  character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped ? "sp" : ue1Value;
 
                 return (
                   <tr key={character.name}>
@@ -161,66 +162,57 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                       </select>
                     </td>
                     <td>
-                      <select
-                        className="select-input table-select"
-                        value={character.implemented.ue1 ? ue1Value : "null"}
-                        disabled={!character.implemented.ue1}
-                        onChange={(event) => {
-                          const nextValue = (event.target.value === "null"
-                            ? null
-                            : Number(event.target.value)) as CharacterProgress["ue1Level"];
-                          onUpdateProgress(character.name, { ue1Level: nextValue });
-                        }}
-                      >
-                        {!character.implemented.ue1 ? <option value="null">未実装</option> : null}
-                        {character.implemented.ue1
-                          ? UE1_LEVEL_VALUES.map((level) => (
-                              <option key={level} value={level}>
-                                {formatUeLevel(level)}
-                              </option>
-                            ))
-                          : null}
-                      </select>
-                    </td>
-                    <td>
-                      {character.implemented.ue1Sp ? (
-                        <label className="table-switch">
-                          <input
-                            type="checkbox"
-                            checked={progress.ue1SpEquipped}
-                            onChange={(event) =>
-                              onUpdateProgress(character.name, {
-                                ue1SpEquipped: event.target.checked,
-                              })
+                      {character.implemented.ue1 ? (
+                        <select
+                          className="select-input table-select"
+                          value={ue1CompositeValue}
+                          onChange={(event) => {
+                            if (event.target.value === "sp") {
+                              onUpdateProgress(character.name, { ue1Level: 370, ue1SpEquipped: true });
+                              return;
                             }
-                          />
-                          <span>{progress.ue1SpEquipped ? "装備済み" : "未装備"}</span>
-                        </label>
+                            const nextValue = (event.target.value === "null"
+                              ? null
+                              : Number(event.target.value)) as CharacterProgress["ue1Level"];
+                            onUpdateProgress(character.name, { ue1Level: nextValue, ue1SpEquipped: false });
+                          }}
+                        >
+                          {UE1_LEVEL_VALUES.map((level) => (
+                            <option key={level} value={level}>
+                              {formatUeLevel(level)}
+                            </option>
+                          ))}
+                          {character.implemented.ue1Sp ? <option value="sp">SP</option> : null}
+                        </select>
                       ) : (
-                        <span className="status-pill no">未実装</span>
+                        <select className="select-input table-select table-select-disabled" value="null" disabled>
+                          <option value="null">-</option>
+                        </select>
                       )}
                     </td>
                     <td>
-                      <select
-                        className="select-input table-select"
-                        value={character.implemented.ue2 ? ue2Value : "null"}
-                        disabled={!character.implemented.ue2}
-                        onChange={(event) => {
-                          const nextValue = (event.target.value === "null"
-                            ? null
-                            : Number(event.target.value)) as CharacterProgress["ue2Level"];
-                          onUpdateProgress(character.name, { ue2Level: nextValue });
-                        }}
-                      >
-                        {!character.implemented.ue2 ? <option value="null">未実装</option> : null}
-                        {character.implemented.ue2
-                          ? UE2_LEVEL_VALUES.map((level) => (
-                              <option key={level} value={level}>
-                                {formatUeLevel(level)}
-                              </option>
-                            ))
-                          : null}
-                      </select>
+                      {character.implemented.ue2 ? (
+                        <select
+                          className="select-input table-select"
+                          value={ue2Value}
+                          onChange={(event) => {
+                            const nextValue = (event.target.value === "null"
+                              ? null
+                              : Number(event.target.value)) as CharacterProgress["ue2Level"];
+                            onUpdateProgress(character.name, { ue2Level: nextValue });
+                          }}
+                        >
+                          {UE2_LEVEL_VALUES.map((level) => (
+                            <option key={level} value={level}>
+                              {formatUeLevel(level)}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <select className="select-input table-select table-select-disabled" value="null" disabled>
+                          <option value="null">-</option>
+                        </select>
+                      )}
                     </td>
                     <td>
                       <div className="table-source-list">

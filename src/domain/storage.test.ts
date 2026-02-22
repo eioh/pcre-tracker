@@ -38,6 +38,7 @@ describe("loadStoredState", () => {
     expect(hiyori).toBeDefined();
     expect(hiyori?.star).toBe(1);
     expect(hiyori?.ue1Level).toBe(140);
+    expect(hiyori?.ue1SpEquipped).toBe(false);
     expect(hiyori?.ue2Level).toBeNull();
   });
 });

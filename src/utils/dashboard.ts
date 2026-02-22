@@ -37,7 +37,7 @@ export function buildDashboardSummary(
   state: StoredStateV1,
 ): DashboardSummary {
   const starOrder = [1, 2, 3, 4, 5, 6].map((star) => `☆${star}`);
-  const ue1Order = ["未実装", ...UE1_LEVEL_VALUES.map(formatUe1Label)];
+  const ue1Order = ["未実装", ...UE1_LEVEL_VALUES.map(formatUe1Label), "SP"];
   const ue2Order = ["未実装", ...UE2_LEVEL_VALUES.map(formatUe2Label)];
 
   const starCounts = new Map<string, number>(starOrder.map((label) => [label, 0]));
@@ -67,7 +67,7 @@ export function buildDashboardSummary(
     }
 
     if (character.implemented.ue1) {
-      const label = formatUe1Label(progress?.ue1Level ?? 0);
+      const label = progress?.ue1SpEquipped ? "SP" : formatUe1Label(progress?.ue1Level ?? 0);
       ue1Counts.set(label, (ue1Counts.get(label) ?? 0) + 1);
     } else {
       ue1Counts.set("未実装", (ue1Counts.get("未実装") ?? 0) + 1);

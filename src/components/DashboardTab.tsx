@@ -56,14 +56,10 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
 
         <article className="kpi-card">
           <h3>専用1SP装備数</h3>
-          <p className="kpi-value">{summary.ue1Sp.equipped}</p>
-          <small>実装済み {summary.ue1Sp.implemented}</small>
-        </article>
-
-        <article className="kpi-card">
-          <h3>専用1SP未装備</h3>
-          <p className="kpi-value">{summary.ue1Sp.unequipped}</p>
-          <small>未実装 {summary.ue1Sp.unimplemented}</small>
+          <p className="kpi-value">
+            {summary.ue1Sp.equipped} / {summary.ue1Sp.implemented}
+          </p>
+          <small>未装備 {summary.ue1Sp.unequipped}</small>
         </article>
 
         <article className="kpi-card">

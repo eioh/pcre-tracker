@@ -23,7 +23,7 @@ const state: StoredStateV1 = {
     ヒヨリ: {
       owned: true,
       star: 6,
-      ue1Level: 140,
+      ue1Level: 370,
       ue1SpEquipped: true,
       ue2Level: 2,
       updatedAt: "2026-02-22T00:00:00.000Z",
@@ -51,7 +51,7 @@ describe("buildDashboardSummary", () => {
     expect(summary.ue1Sp.equipped).toBe(1);
     expect(summary.ue1Sp.unimplemented).toBe(1);
 
-    const ue1Lv140 = summary.ue1Distribution.find((item) => item.label === "Lv140");
+    const ue1Sp = summary.ue1Distribution.find((item) => item.label === "SP");
     const ue1Unimplemented = summary.ue1Distribution.find((item) => item.label === "未実装");
     const ue2Lv2 = summary.ue2Distribution.find((item) => item.label === "Lv2");
     const star6 = summary.starDistribution.find((item) => item.label === "☆6");
@@ -59,7 +59,7 @@ describe("buildDashboardSummary", () => {
 
     expect(star6?.count).toBe(1);
     expect(star1?.count).toBe(1);
-    expect(ue1Lv140?.count).toBe(1);
+    expect(ue1Sp?.count).toBe(1);
     expect(ue1Unimplemented?.count).toBe(1);
     expect(ue2Lv2?.count).toBe(1);
   });

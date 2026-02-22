@@ -91,6 +91,10 @@ function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): Cha
   if (!character.implemented.ue1Sp) {
     normalized.ue1SpEquipped = false;
   }
+  // 専用1SPは専用1Lv370到達時のみ有効とする。
+  if (normalized.ue1SpEquipped && normalized.ue1Level !== 370) {
+    normalized.ue1SpEquipped = false;
+  }
 
   return normalized;
 }
