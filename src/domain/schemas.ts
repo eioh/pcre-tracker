@@ -33,6 +33,7 @@ export const ue2LevelSchema = z
 
 export const characterProgressSchema = z.object({
   owned: z.boolean(),
+  star: z.number().int().min(1).max(6).default(1),
   ue1Level: z.union([z.null(), ue1LevelSchema]),
   ue1SpEquipped: z.boolean(),
   ue2Level: z.union([z.null(), ue2LevelSchema]),

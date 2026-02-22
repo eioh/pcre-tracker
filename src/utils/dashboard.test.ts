@@ -22,6 +22,7 @@ const state: StoredStateV1 = {
   progressByName: {
     ヒヨリ: {
       owned: true,
+      star: 6,
       ue1Level: 140,
       ue1SpEquipped: true,
       ue2Level: 2,
@@ -29,6 +30,7 @@ const state: StoredStateV1 = {
     },
     ユイ: {
       owned: false,
+      star: 1,
       ue1Level: null,
       ue1SpEquipped: false,
       ue2Level: null,
@@ -43,6 +45,8 @@ describe("buildDashboardSummary", () => {
 
     expect(summary.totalCharacters).toBe(2);
     expect(summary.ownedCharacters).toBe(1);
+    expect(summary.star6.implemented).toBe(2);
+    expect(summary.star6.promoted).toBe(1);
     expect(summary.ue1Sp.implemented).toBe(1);
     expect(summary.ue1Sp.equipped).toBe(1);
     expect(summary.ue1Sp.unimplemented).toBe(1);
@@ -50,7 +54,11 @@ describe("buildDashboardSummary", () => {
     const ue1Lv140 = summary.ue1Distribution.find((item) => item.label === "Lv140");
     const ue1Unimplemented = summary.ue1Distribution.find((item) => item.label === "未実装");
     const ue2Lv2 = summary.ue2Distribution.find((item) => item.label === "Lv2");
+    const star6 = summary.starDistribution.find((item) => item.label === "☆6");
+    const star1 = summary.starDistribution.find((item) => item.label === "☆1");
 
+    expect(star6?.count).toBe(1);
+    expect(star1?.count).toBe(1);
     expect(ue1Lv140?.count).toBe(1);
     expect(ue1Unimplemented?.count).toBe(1);
     expect(ue2Lv2?.count).toBe(1);

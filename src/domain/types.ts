@@ -26,6 +26,7 @@ export type MasterCharacter = {
 
 export type CharacterProgress = {
   owned: boolean;
+  star: 1 | 2 | 3 | 4 | 5 | 6;
   ue1Level: Ue1Level;
   ue1SpEquipped: boolean;
   ue2Level: Ue2Level;

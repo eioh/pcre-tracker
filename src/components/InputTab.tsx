@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type { CharacterProgress, MasterCharacter, MemoryPieceSource, StoredStateV1 } from "../domain/types";
 
-type ProgressPatch = Partial<Pick<CharacterProgress, "owned" | "ue1Level" | "ue1SpEquipped" | "ue2Level">>;
+type ProgressPatch = Partial<Pick<CharacterProgress, "owned" | "star" | "ue1Level" | "ue1SpEquipped" | "ue2Level">>;
 
 type InputTabProps = {
   masterCharacters: MasterCharacter[];
@@ -104,7 +104,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
               <th>所持</th>
               <th>キャラ</th>
               <th>区分</th>
-              <th>星6</th>
+              <th>☆</th>
               <th>専用1</th>
               <th>専用1SP</th>
               <th>専用2</th>
@@ -127,6 +127,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
 
                 const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
                 const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
+                const starMax = character.implemented.star6 ? 6 : 5;
 
                 return (
                   <tr key={character.name}>
@@ -145,9 +146,19 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                       {character.limited ? <span className="badge limited">限定</span> : <span className="badge">恒常</span>}
                     </td>
                     <td>
-                      <span className={character.implemented.star6 ? "status-pill yes" : "status-pill no"}>
-                        {character.implemented.star6 ? "実装" : "未実装"}
-                      </span>
+                      <select
+                        className="select-input table-select"
+                        value={progress.star}
+                        onChange={(event) =>
+                          onUpdateProgress(character.name, { star: Number(event.target.value) as CharacterProgress["star"] })
+                        }
+                      >
+                        {Array.from({ length: starMax }, (_, index) => index + 1).map((star) => (
+                          <option key={star} value={star}>
+                            {star}
+                          </option>
+                        ))}
+                      </select>
                     </td>
                     <td>
                       <select

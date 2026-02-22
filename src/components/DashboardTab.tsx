@@ -41,6 +41,7 @@ function Distribution({ title, items }: DistributionProps) {
 export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
   const summary = useMemo(() => buildDashboardSummary(masterCharacters, state), [masterCharacters, state]);
   const ownedRate = summary.totalCharacters === 0 ? 0 : (summary.ownedCharacters / summary.totalCharacters) * 100;
+  const star6Rate = summary.star6.implemented === 0 ? 0 : (summary.star6.promoted / summary.star6.implemented) * 100;
 
   return (
     <section className="panel dashboard">
@@ -64,9 +65,18 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
           <p className="kpi-value">{summary.ue1Sp.unequipped}</p>
           <small>未実装 {summary.ue1Sp.unimplemented}</small>
         </article>
+
+        <article className="kpi-card">
+          <h3>☆6進捗</h3>
+          <p className="kpi-value">
+            {summary.star6.promoted} / {summary.star6.implemented}
+          </p>
+          <small>達成率 {star6Rate.toFixed(1)}%</small>
+        </article>
       </div>
 
       <div className="distribution-grid">
+        <Distribution title="☆分布" items={summary.starDistribution} />
         <Distribution title="専用1レベル分布" items={summary.ue1Distribution} />
         <Distribution title="専用2レベル分布" items={summary.ue2Distribution} />
       </div>

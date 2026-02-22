@@ -17,11 +17,23 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function createDefaultProgress(character: MasterCharacter): CharacterProgress {
   return {
     owned: false,
+    star: 1,
     ue1Level: character.implemented.ue1 ? 0 : null,
     ue1SpEquipped: false,
     ue2Level: character.implemented.ue2 ? 0 : null,
     updatedAt: new Date().toISOString(),
   };
+}
+
+function toStar(value: number, isStar6Implemented: boolean): CharacterProgress["star"] {
+  const maxStar = isStar6Implemented ? 6 : 5;
+  if (!Number.isInteger(value) || value < 1) {
+    return 1;
+  }
+  if (value > maxStar) {
+    return maxStar as CharacterProgress["star"];
+  }
+  return value as CharacterProgress["star"];
 }
 
 function toUe1Level(value: number | null): CharacterProgress["ue1Level"] {
@@ -44,13 +56,18 @@ function toUe2Level(value: number | null): CharacterProgress["ue2Level"] {
 
 function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): CharacterProgress {
   const defaultProgress = createDefaultProgress(character);
-  const parsed = characterProgressSchema.safeParse(rawProgress);
+  const normalizedRawProgress =
+    isRecord(rawProgress) && "rank" in rawProgress && !("star" in rawProgress)
+      ? { ...rawProgress, star: rawProgress.rank }
+      : rawProgress;
+  const parsed = characterProgressSchema.safeParse(normalizedRawProgress);
   if (!parsed.success) {
     return defaultProgress;
   }
 
   const normalized: CharacterProgress = {
     owned: parsed.data.owned,
+    star: toStar(parsed.data.star, character.implemented.star6),
     ue1Level: toUe1Level(parsed.data.ue1Level),
     ue1SpEquipped: parsed.data.ue1SpEquipped,
     ue2Level: toUe2Level(parsed.data.ue2Level),

@@ -36,6 +36,7 @@ describe("loadStoredState", () => {
     expect(loaded.schemaVersion).toBe(1);
     const hiyori = loaded.progressByName["ヒヨリ"];
     expect(hiyori).toBeDefined();
+    expect(hiyori?.star).toBe(1);
     expect(hiyori?.ue1Level).toBe(140);
     expect(hiyori?.ue2Level).toBeNull();
   });
