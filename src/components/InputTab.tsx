@@ -48,6 +48,44 @@ const memorySourceLabelMap: Record<MemoryPieceSource, string> = {
   side_story: "サイド",
 };
 
+const panelClass =
+  "rounded-[18px] border border-white/30 bg-linear-to-br from-[#131a27cc] to-[#0d1421f2] p-5 shadow-panel";
+const inputToolbarClass = "grid grid-cols-1 gap-3 lg:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]";
+const fieldGroupClass = "grid gap-1.5 text-sm text-muted";
+const controlClass =
+  "w-full rounded-[12px] border border-white/20 bg-[#090e17d9] px-3 py-2.5 text-sm text-main outline-none transition focus:border-accent-strong focus:ring-2 focus:ring-accent-strong/40";
+const multiSelectSummaryClass = `${controlClass} cursor-pointer list-none select-none overflow-hidden text-ellipsis whitespace-nowrap [&::-webkit-details-marker]:hidden`;
+const multiSelectPanelClass =
+  "absolute left-0 top-[calc(100%+6px)] z-10 grid max-h-60 w-full gap-2 overflow-auto rounded-[12px] border border-white/20 bg-[#090e17f5] px-2.5 py-2 shadow-panel";
+const multiSelectItemClass = "inline-flex items-center gap-1.5 whitespace-nowrap text-sm text-main";
+const memoryCalcSectionClass = "col-span-full mt-0.5 border-t border-[#7a94c547] pt-3.5";
+const memoryCalcGridClass = "grid grid-cols-1 gap-3 md:grid-cols-[repeat(2,minmax(220px,300px))]";
+const tableWrapClass = "overflow-auto rounded-[14px] border border-[#7a94c53d] bg-[#0b111bcc]";
+const tableClass = "w-full min-w-[1200px] border-collapse";
+const tableHeadCellClass = "sticky top-0 z-[1] border-b border-[#7a94c533] bg-[#101825f5] px-3 py-2.5 align-middle text-xs tracking-[0.04em] text-[#c8d8f6]";
+const tableBodyCellClass = "border-b border-[#7a94c533] px-3 py-2.5 align-middle";
+const sortButtonClass = "inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-inherit hover:text-[#dff8ff]";
+const sortIndicatorClass = "min-w-[0.85em] text-[0.72rem] text-accent";
+const tableSwitchClass = "inline-flex items-center gap-2 whitespace-nowrap text-sm";
+const tableCheckClass = "h-4 w-4 accent-accent";
+const tableSelectClass = `${controlClass} min-w-32 px-2.5 py-2`;
+const disabledTableSelectClass =
+  "w-full min-w-32 cursor-default appearance-none rounded-[12px] border border-[#788aad38] bg-[#070b12bf] px-2.5 py-2 text-sm text-[#9fb0cf] opacity-100 outline-none [box-shadow:inset_0_0_0_1px_rgba(9,14,23,0.35)]";
+const badgeClass = "rounded-full border border-white/20 px-2 py-0.5 text-[0.7rem] text-muted";
+const limitedBadgeClass = `${badgeClass} border-[#ff7e63b3] text-[#ff9e8a]`;
+const sourceChipBaseClass = "rounded-full border px-2 py-0.5 text-[0.72rem]";
+const sourceChipEmptyClass = `${sourceChipBaseClass} border-white/20 text-muted`;
+const sourceChipClassMap: Record<MemoryPieceSource, string> = {
+  dungeon_coin: `${sourceChipBaseClass} border-[#56c6ff99] bg-[#145c7e52] text-[#8fe6ff]`,
+  arena_coin: `${sourceChipBaseClass} border-[#ff9966a6] bg-[#823f2257] text-[#ffc58c]`,
+  p_arena_coin: `${sourceChipBaseClass} border-[#ba79ffa6] bg-[#522a7e5c] text-[#d9b0ff]`,
+  clan_coin: `${sourceChipBaseClass} border-[#ff6b7aa6] bg-[#7c223857] text-[#ff9ea4]`,
+  master_coin: `${sourceChipBaseClass} border-[#ffd455b3] bg-[#7e5a155c] text-[#ffe291]`,
+  hard_quest: `${sourceChipBaseClass} border-[#ff8150a6] bg-[#82341c57] text-[#ffad7c]`,
+  side_story: `${sourceChipBaseClass} border-[#5bdba4a6] bg-[#1c674957] text-[#9df0cb]`,
+};
+
+// 専用装備レベルの表示文字列を統一する。
 function formatUeLevel(level: number): string {
   return level === 0 ? "未装備" : `Lv.${level}`;
 }
@@ -71,6 +109,7 @@ function getUe2SortValue(character: MasterCharacter, progress: CharacterProgress
   return progress.ue2Level ?? 0;
 }
 
+// 育成入力テーブルのフィルタ・ソート・更新操作を提供する。
 export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTabProps) {
   const rootRef = useRef<HTMLElement | null>(null);
   const [searchText, setSearchText] = useState("");
@@ -105,6 +144,9 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
 
     for (let index = 0; index < masterCharacters.length; index += 1) {
       const character = masterCharacters[index];
+      if (!character) {
+        continue;
+      }
       const progress = state.progressByName[character.name];
       if (!progress) {
         continue;
@@ -277,6 +319,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     setSortDirection("asc");
   }
 
+  // ソート状態をth要素のaria-sort値に変換する。
   function getAriaSort(columnKey: SortKey): "none" | "ascending" | "descending" {
     if (sortKey !== columnKey || sortDirection === null) {
       return "none";
@@ -284,6 +327,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     return sortDirection === "asc" ? "ascending" : "descending";
   }
 
+  // ソート中の列に矢印記号を表示する。
   function renderSortIndicator(columnKey: SortKey): string {
     if (sortKey !== columnKey || sortDirection === null) {
       return "";
@@ -298,6 +342,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     );
   }
 
+  // ☆フィルタの複数選択状態を切り替える。
   function toggleStarFilter(filter: StarFilter): void {
     setStarFilters((previous) =>
       previous.includes(filter) ? previous.filter((value) => value !== filter) : [...previous, filter],
@@ -311,12 +356,14 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     );
   }
 
+  // 専用1フィルタの複数選択状態を切り替える。
   function toggleUe1Filter(filter: Ue1Filter): void {
     setUe1Filters((previous) =>
       previous.includes(filter) ? previous.filter((value) => value !== filter) : [...previous, filter],
     );
   }
 
+  // 専用2フィルタの複数選択状態を切り替える。
   function toggleUe2Filter(filter: Ue2Filter): void {
     setUe2Filters((previous) =>
       previous.includes(filter) ? previous.filter((value) => value !== filter) : [...previous, filter],
@@ -336,6 +383,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
     .join(" / ");
 
   useEffect(() => {
+    // フィルタ用ドロップダウン外クリック時に開いている一覧を閉じる。
     function handleDocumentPointerDown(event: MouseEvent): void {
       const root = rootRef.current;
       if (!root) {
@@ -365,22 +413,22 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
   }, []);
 
   return (
-    <section className="panel" ref={rootRef}>
-      <div className="input-toolbar">
-        <label className="field-group">
+    <section className={panelClass} ref={rootRef}>
+      <div className={inputToolbarClass}>
+        <label className={fieldGroupClass}>
           <span>キャラ検索</span>
           <input
-            className="text-input"
+            className={controlClass}
             value={searchText}
             onChange={(event) => setSearchText(event.target.value)}
             placeholder="例: ヒヨリ"
           />
         </label>
 
-        <label className="field-group">
+        <label className={fieldGroupClass}>
           <span>所持フィルタ</span>
           <select
-            className="select-input"
+            className={controlClass}
             value={ownedFilter}
             onChange={(event) => setOwnedFilter(event.target.value as OwnedFilter)}
           >
@@ -390,10 +438,10 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           </select>
         </label>
 
-        <label className="field-group">
+        <label className={fieldGroupClass}>
           <span>限定フィルタ</span>
           <select
-            className="select-input"
+            className={controlClass}
             value={limitedFilter}
             onChange={(event) => setLimitedFilter(event.target.value as LimitedFilter)}
           >
@@ -403,10 +451,10 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           </select>
         </label>
 
-        <label className="field-group">
+        <label className={fieldGroupClass}>
           <span>限界突破フィルタ</span>
           <select
-            className="select-input"
+            className={controlClass}
             value={limitBreakFilter}
             onChange={(event) => setLimitBreakFilter(event.target.value as LimitBreakFilter)}
           >
@@ -416,15 +464,16 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           </select>
         </label>
 
-        <div className="field-group">
+        <div className={fieldGroupClass}>
           <span>☆フィルタ</span>
-          <details className="multi-select-dropdown">
-            <summary className="select-input multi-select-summary">{starFilters.length === 0 ? "すべて" : selectedStarLabels}</summary>
-            <div className="multi-select-panel">
+          <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
+            <summary className={multiSelectSummaryClass}>{starFilters.length === 0 ? "すべて" : selectedStarLabels}</summary>
+            <div className={multiSelectPanelClass}>
               {[1, 2, 3, 4, 5, 6].map((star) => (
-                <label key={star} className="memory-source-filter-item">
+                <label key={star} className={multiSelectItemClass}>
                   <input
                     type="checkbox"
+                    className="h-3.5 w-3.5 accent-accent"
                     checked={starFilters.includes(star as CharacterProgress["star"])}
                     onChange={() => toggleStarFilter(star as CharacterProgress["star"])}
                   />
@@ -435,17 +484,18 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           </details>
         </div>
 
-        <div className="field-group">
+        <div className={fieldGroupClass}>
           <span>☆必要メモピフィルタ</span>
-          <details className="multi-select-dropdown">
-            <summary className="select-input multi-select-summary">
+          <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
+            <summary className={multiSelectSummaryClass}>
               {starMemoryNeedFilters.length === 0 ? "すべて" : selectedStarMemoryNeedLabels}
             </summary>
-            <div className="multi-select-panel">
+            <div className={multiSelectPanelClass}>
               {STAR_MEMORY_FILTER_VALUES.map((value) => (
-                <label key={value} className="memory-source-filter-item">
+                <label key={value} className={multiSelectItemClass}>
                   <input
                     type="checkbox"
+                    className="h-3.5 w-3.5 accent-accent"
                     checked={starMemoryNeedFilters.includes(value)}
                     onChange={() => toggleStarMemoryNeedFilter(value)}
                   />
@@ -456,54 +506,63 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           </details>
         </div>
 
-        <div className="field-group">
+        <div className={fieldGroupClass}>
           <span>専用1フィルタ</span>
-          <details className="multi-select-dropdown">
-            <summary className="select-input multi-select-summary">{ue1Filters.length === 0 ? "すべて" : selectedUe1Labels}</summary>
-            <div className="multi-select-panel">
-              <label className="memory-source-filter-item">
+          <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
+            <summary className={multiSelectSummaryClass}>{ue1Filters.length === 0 ? "すべて" : selectedUe1Labels}</summary>
+            <div className={multiSelectPanelClass}>
+              <label className={multiSelectItemClass}>
                 <input
                   type="checkbox"
+                  className="h-3.5 w-3.5 accent-accent"
                   checked={ue1Filters.includes("unimplemented")}
                   onChange={() => toggleUe1Filter("unimplemented")}
                 />
                 <span>未実装</span>
               </label>
               {UE1_LEVEL_VALUES.map((level) => (
-                <label key={level} className="memory-source-filter-item">
+                <label key={level} className={multiSelectItemClass}>
                   <input
                     type="checkbox"
+                    className="h-3.5 w-3.5 accent-accent"
                     checked={ue1Filters.includes(level)}
                     onChange={() => toggleUe1Filter(level)}
                   />
                   <span>{formatUeLevel(level)}</span>
                 </label>
               ))}
-              <label className="memory-source-filter-item">
-                <input type="checkbox" checked={ue1Filters.includes("sp")} onChange={() => toggleUe1Filter("sp")} />
+              <label className={multiSelectItemClass}>
+                <input
+                  type="checkbox"
+                  className="h-3.5 w-3.5 accent-accent"
+                  checked={ue1Filters.includes("sp")}
+                  onChange={() => toggleUe1Filter("sp")}
+                />
                 <span>SP</span>
               </label>
             </div>
           </details>
         </div>
 
-        <div className="field-group">
+        <div className={fieldGroupClass}>
           <span>専用2フィルタ</span>
-          <details className="multi-select-dropdown">
-            <summary className="select-input multi-select-summary">{ue2Filters.length === 0 ? "すべて" : selectedUe2Labels}</summary>
-            <div className="multi-select-panel">
-              <label className="memory-source-filter-item">
+          <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
+            <summary className={multiSelectSummaryClass}>{ue2Filters.length === 0 ? "すべて" : selectedUe2Labels}</summary>
+            <div className={multiSelectPanelClass}>
+              <label className={multiSelectItemClass}>
                 <input
                   type="checkbox"
+                  className="h-3.5 w-3.5 accent-accent"
                   checked={ue2Filters.includes("unimplemented")}
                   onChange={() => toggleUe2Filter("unimplemented")}
                 />
                 <span>未実装</span>
               </label>
               {UE2_LEVEL_VALUES.map((level) => (
-                <label key={level} className="memory-source-filter-item">
+                <label key={level} className={multiSelectItemClass}>
                   <input
                     type="checkbox"
+                    className="h-3.5 w-3.5 accent-accent"
                     checked={ue2Filters.includes(level)}
                     onChange={() => toggleUe2Filter(level)}
                   />
@@ -514,25 +573,27 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           </details>
         </div>
 
-        <div className="field-group">
+        <div className={fieldGroupClass}>
           <span>メモピ入手フィルタ</span>
-          <details className="multi-select-dropdown">
-            <summary className="select-input multi-select-summary">
+          <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
+            <summary className={multiSelectSummaryClass}>
               {memorySourceFilters.length === 0 ? "すべて" : selectedMemorySourceLabels}
             </summary>
-            <div className="multi-select-panel">
-              <label className="memory-source-filter-item">
+            <div className={multiSelectPanelClass}>
+              <label className={multiSelectItemClass}>
                 <input
                   type="checkbox"
+                  className="h-3.5 w-3.5 accent-accent"
                   checked={memorySourceFilters.includes("none")}
                   onChange={() => toggleMemorySourceFilter("none")}
                 />
                 <span>情報なし</span>
               </label>
               {Object.entries(memorySourceLabelMap).map(([source, label]) => (
-                <label key={source} className="memory-source-filter-item">
+                <label key={source} className={multiSelectItemClass}>
                   <input
                     type="checkbox"
+                    className="h-3.5 w-3.5 accent-accent"
                     checked={memorySourceFilters.includes(source as MemorySourceFilter)}
                     onChange={() => toggleMemorySourceFilter(source as MemorySourceFilter)}
                   />
@@ -543,13 +604,13 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           </details>
         </div>
 
-        <div className="memory-calc-section">
-          <p className="memory-calc-title">必要メモピ計算</p>
-          <div className="memory-calc-grid">
-            <label className="field-group">
+        <div className={memoryCalcSectionClass}>
+          <p className="mb-2.5 mt-0 text-xs text-muted">必要メモピ計算</p>
+          <div className={memoryCalcGridClass}>
+            <label className={fieldGroupClass}>
               <span>☆</span>
               <select
-                className="select-input"
+                className={controlClass}
                 value={starMemoryCalcMode}
                 onChange={(event) => setStarMemoryCalcMode(event.target.value as StarMemoryCalcMode)}
               >
@@ -558,10 +619,10 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
               </select>
             </label>
 
-            <label className="field-group">
+            <label className={fieldGroupClass}>
               <span>専用1</span>
               <select
-                className="select-input"
+                className={controlClass}
                 value={ue1MemoryCalcMode}
                 onChange={(event) => setUe1MemoryCalcMode(event.target.value as Ue1MemoryCalcMode)}
               >
@@ -573,64 +634,64 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
         </div>
       </div>
 
-      <p className="result-count">表示件数: {visibleRows.length}</p>
+      <p className="my-3.5 text-sm text-muted">表示件数: {visibleRows.length}</p>
 
-      <div className="table-wrap">
-        <table className="character-table">
+      <div className={tableWrapClass}>
+        <table className={tableClass}>
           <thead>
             <tr>
-              <th aria-sort={getAriaSort("owned")}>
-                <button type="button" className="sort-button" onClick={() => handleSort("owned")}>
-                  所持<span className="sort-indicator">{renderSortIndicator("owned")}</span>
+              <th aria-sort={getAriaSort("owned")} className={tableHeadCellClass}>
+                <button type="button" className={sortButtonClass} onClick={() => handleSort("owned")}>
+                  所持<span className={sortIndicatorClass}>{renderSortIndicator("owned")}</span>
                 </button>
               </th>
-              <th aria-sort={getAriaSort("name")}>
-                <button type="button" className="sort-button" onClick={() => handleSort("name")}>
-                  キャラ<span className="sort-indicator">{renderSortIndicator("name")}</span>
+              <th aria-sort={getAriaSort("name")} className={tableHeadCellClass}>
+                <button type="button" className={sortButtonClass} onClick={() => handleSort("name")}>
+                  キャラ<span className={sortIndicatorClass}>{renderSortIndicator("name")}</span>
                 </button>
               </th>
-              <th aria-sort={getAriaSort("limited")}>
-                <button type="button" className="sort-button" onClick={() => handleSort("limited")}>
-                  区分<span className="sort-indicator">{renderSortIndicator("limited")}</span>
+              <th aria-sort={getAriaSort("limited")} className={tableHeadCellClass}>
+                <button type="button" className={sortButtonClass} onClick={() => handleSort("limited")}>
+                  区分<span className={sortIndicatorClass}>{renderSortIndicator("limited")}</span>
                 </button>
               </th>
-              <th aria-sort={getAriaSort("limitBreak")}>
-                <button type="button" className="sort-button" onClick={() => handleSort("limitBreak")}>
-                  限界突破<span className="sort-indicator">{renderSortIndicator("limitBreak")}</span>
+              <th aria-sort={getAriaSort("limitBreak")} className={tableHeadCellClass}>
+                <button type="button" className={sortButtonClass} onClick={() => handleSort("limitBreak")}>
+                  限界突破<span className={sortIndicatorClass}>{renderSortIndicator("limitBreak")}</span>
                 </button>
               </th>
-              <th aria-sort={getAriaSort("star")}>
-                <button type="button" className="sort-button" onClick={() => handleSort("star")}>
-                  ☆<span className="sort-indicator">{renderSortIndicator("star")}</span>
+              <th aria-sort={getAriaSort("star")} className={tableHeadCellClass}>
+                <button type="button" className={sortButtonClass} onClick={() => handleSort("star")}>
+                  ☆<span className={sortIndicatorClass}>{renderSortIndicator("star")}</span>
                 </button>
               </th>
-              <th aria-sort={getAriaSort("ue1")}>
-                <button type="button" className="sort-button" onClick={() => handleSort("ue1")}>
-                  専用1<span className="sort-indicator">{renderSortIndicator("ue1")}</span>
+              <th aria-sort={getAriaSort("ue1")} className={tableHeadCellClass}>
+                <button type="button" className={sortButtonClass} onClick={() => handleSort("ue1")}>
+                  専用1<span className={sortIndicatorClass}>{renderSortIndicator("ue1")}</span>
                 </button>
               </th>
-              <th aria-sort={getAriaSort("ue2")}>
-                <button type="button" className="sort-button" onClick={() => handleSort("ue2")}>
-                  専用2<span className="sort-indicator">{renderSortIndicator("ue2")}</span>
+              <th aria-sort={getAriaSort("ue2")} className={tableHeadCellClass}>
+                <button type="button" className={sortButtonClass} onClick={() => handleSort("ue2")}>
+                  専用2<span className={sortIndicatorClass}>{renderSortIndicator("ue2")}</span>
                 </button>
               </th>
-              <th aria-sort={getAriaSort("starMemoryNeeded")}>
-                <button type="button" className="sort-button" onClick={() => handleSort("starMemoryNeeded")}>
-                  ☆必要メモピ<span className="sort-indicator">{renderSortIndicator("starMemoryNeeded")}</span>
+              <th aria-sort={getAriaSort("starMemoryNeeded")} className={tableHeadCellClass}>
+                <button type="button" className={sortButtonClass} onClick={() => handleSort("starMemoryNeeded")}>
+                  ☆必要メモピ<span className={sortIndicatorClass}>{renderSortIndicator("starMemoryNeeded")}</span>
                 </button>
               </th>
-              <th aria-sort={getAriaSort("ue1MemoryNeeded")}>
-                <button type="button" className="sort-button" onClick={() => handleSort("ue1MemoryNeeded")}>
-                  専用1必要メモピ<span className="sort-indicator">{renderSortIndicator("ue1MemoryNeeded")}</span>
+              <th aria-sort={getAriaSort("ue1MemoryNeeded")} className={tableHeadCellClass}>
+                <button type="button" className={sortButtonClass} onClick={() => handleSort("ue1MemoryNeeded")}>
+                  専用1必要メモピ<span className={sortIndicatorClass}>{renderSortIndicator("ue1MemoryNeeded")}</span>
                 </button>
               </th>
-              <th>メモピ入手</th>
+              <th className={tableHeadCellClass}>メモピ入手</th>
             </tr>
           </thead>
           <tbody>
             {visibleRows.length === 0 ? (
               <tr>
-                <td colSpan={10} className="empty-row">
+                <td colSpan={10} className="px-3 py-[18px] text-center text-muted">
                   条件に一致するキャラがいません
                 </td>
               </tr>
@@ -645,34 +706,36 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                 const ue1RemainingMemoryPiece = getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode);
 
                 return (
-                  <tr key={character.name}>
-                    <td>
-                      <label className="table-switch">
+                  <tr key={character.name} className="hover:bg-[#3a537c24]">
+                    <td className={tableBodyCellClass}>
+                      <label className={tableSwitchClass}>
                         <input
                           type="checkbox"
+                          className={tableCheckClass}
                           checked={progress.owned}
                           aria-label={`${character.name}の所持状態`}
                           onChange={(event) => onUpdateProgress(character.name, { owned: event.target.checked })}
                         />
                       </label>
                     </td>
-                    <td className="name-cell">{character.name}</td>
-                    <td>
-                      {character.limited ? <span className="badge limited">限定</span> : <span className="badge">恒常</span>}
+                    <td className={`${tableBodyCellClass} whitespace-nowrap font-bold`}>{character.name}</td>
+                    <td className={tableBodyCellClass}>
+                      {character.limited ? <span className={limitedBadgeClass}>限定</span> : <span className={badgeClass}>恒常</span>}
                     </td>
-                    <td>
-                      <label className="table-switch">
+                    <td className={tableBodyCellClass}>
+                      <label className={tableSwitchClass}>
                         <input
                           type="checkbox"
+                          className={tableCheckClass}
                           checked={progress.limitBreak}
                           aria-label={`${character.name}の限界突破状態`}
                           onChange={(event) => onUpdateProgress(character.name, { limitBreak: event.target.checked })}
                         />
                       </label>
                     </td>
-                    <td>
+                    <td className={tableBodyCellClass}>
                       <select
-                        className="select-input table-select"
+                        className={tableSelectClass}
                         value={progress.star}
                         onChange={(event) =>
                           onUpdateProgress(character.name, { star: Number(event.target.value) as CharacterProgress["star"] })
@@ -685,10 +748,10 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                         ))}
                       </select>
                     </td>
-                    <td>
+                    <td className={tableBodyCellClass}>
                       {character.implemented.ue1 ? (
                         <select
-                          className="select-input table-select"
+                          className={tableSelectClass}
                           value={ue1CompositeValue}
                           onChange={(event) => {
                             if (event.target.value === "sp") {
@@ -709,15 +772,15 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                           {character.implemented.ue1Sp ? <option value="sp">SP</option> : null}
                         </select>
                       ) : (
-                        <select className="select-input table-select table-select-disabled" value="null" disabled>
+                        <select className={disabledTableSelectClass} value="null" disabled>
                           <option value="null">-</option>
                         </select>
                       )}
                     </td>
-                    <td>
+                    <td className={tableBodyCellClass}>
                       {character.implemented.ue2 ? (
                         <select
-                          className="select-input table-select"
+                          className={tableSelectClass}
                           value={ue2Value}
                           onChange={(event) => {
                             const nextValue = (event.target.value === "null"
@@ -733,24 +796,24 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                           ))}
                         </select>
                       ) : (
-                        <select className="select-input table-select table-select-disabled" value="null" disabled>
+                        <select className={disabledTableSelectClass} value="null" disabled>
                           <option value="null">-</option>
                         </select>
                       )}
                     </td>
-                    <td>
-                      <span className="memory-piece-needed">{starRemainingMemoryPiece}</span>
+                    <td className={tableBodyCellClass}>
+                      <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{starRemainingMemoryPiece}</span>
                     </td>
-                    <td>
-                      <span className="memory-piece-needed">{ue1RemainingMemoryPiece}</span>
+                    <td className={tableBodyCellClass}>
+                      <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingMemoryPiece}</span>
                     </td>
-                    <td>
-                      <div className="table-source-list">
+                    <td className={tableBodyCellClass}>
+                      <div className="flex flex-wrap gap-1.5">
                         {character.memoryPieceSources.length === 0 ? (
-                          <span className="source-chip empty">情報なし</span>
+                          <span className={sourceChipEmptyClass}>情報なし</span>
                         ) : (
                           character.memoryPieceSources.map((source) => (
-                            <span key={source} className={`source-chip source-chip-${source}`}>
+                            <span key={source} className={sourceChipClassMap[source]}>
                               {memorySourceLabelMap[source]}
                             </span>
                           ))
