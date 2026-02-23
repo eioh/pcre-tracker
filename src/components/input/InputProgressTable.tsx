@@ -237,9 +237,6 @@ const TableRow = memo(function TableRow({
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingMemoryPiece}</span>
       </td>
       <td className={tableBodyCellClass}>
-        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingHeartFragment}</span>
-      </td>
-      <td className={tableBodyCellClass}>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{limitBreakRemainingMemoryPiece}</span>
       </td>
       <td className={tableBodyCellClass}>
@@ -257,6 +254,9 @@ const TableRow = memo(function TableRow({
             ))
           )}
         </div>
+      </td>
+      <td className={tableBodyCellClass}>
+        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingHeartFragment}</span>
       </td>
     </tr>
   );
@@ -287,10 +287,10 @@ export const InputProgressTable = memo(function InputProgressTable({
           <col className="w-[140px]" />
           <col className="w-[120px]" />
           <col className="w-[130px]" />
-          <col className="w-[170px]" />
           <col className="w-[145px]" />
           <col className="w-[120px]" />
           <col className="w-[260px]" />
+          <col className="w-[170px]" />
         </colgroup>
         <thead>
           <tr>
@@ -354,18 +354,6 @@ export const InputProgressTable = memo(function InputProgressTable({
                 <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("ue1MemoryNeeded", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("ue1HeartFragmentNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button
-                type="button"
-                className={`${sortButtonClass} relative w-full justify-center`}
-                onClick={() => onSort("ue1HeartFragmentNeeded")}
-              >
-                専用1必要ハートの欠片
-                <span className={`${sortIndicatorClass} absolute right-0`}>
-                  {renderSortIndicator("ue1HeartFragmentNeeded", sortKey, sortDirection)}
-                </span>
-              </button>
-            </th>
             <th aria-sort={getAriaSort("limitBreakMemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
               <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("limitBreakMemoryNeeded")}>
                 限界突破必要メモピ
@@ -381,6 +369,18 @@ export const InputProgressTable = memo(function InputProgressTable({
               </button>
             </th>
             <th className={`${tableHeadCellClass} text-center`}>メモピ入手</th>
+            <th aria-sort={getAriaSort("ue1HeartFragmentNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button
+                type="button"
+                className={`${sortButtonClass} relative w-full justify-center`}
+                onClick={() => onSort("ue1HeartFragmentNeeded")}
+              >
+                専用1必要ハートの欠片
+                <span className={`${sortIndicatorClass} absolute right-0`}>
+                  {renderSortIndicator("ue1HeartFragmentNeeded", sortKey, sortDirection)}
+                </span>
+              </button>
+            </th>
           </tr>
         </thead>
         <tbody>

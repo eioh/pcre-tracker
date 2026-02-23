@@ -146,7 +146,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[12]).toHaveTextContent("0");
+    expect(cells[11]).toHaveTextContent("0");
   });
 
   it("専用1必要ハートの欠片を表示する", () => {
@@ -157,7 +157,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[10]).toHaveTextContent("318");
+    expect(cells[13]).toHaveTextContent("318");
   });
 
   it("専用1必要ハートの欠片はモード切り替えで未実装キャラも表示できる", () => {
@@ -187,13 +187,13 @@ describe("InputProgressTable", () => {
     let tableRows = screen.getAllByRole("row");
     let bodyRow = tableRows[1] as HTMLTableRowElement;
     let cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[10]).toHaveTextContent("0");
+    expect(cells[13]).toHaveTextContent("0");
 
     rerender(<InputProgressTable {...allMaxProps} />);
     tableRows = screen.getAllByRole("row");
     bodyRow = tableRows[1] as HTMLTableRowElement;
     cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[10]).toHaveTextContent("318");
+    expect(cells[13]).toHaveTextContent("318");
   });
 
   it("メモピ入手列にソース名を表示する", () => {

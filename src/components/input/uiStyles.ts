@@ -14,7 +14,7 @@ export const multiSelectItemClass = "inline-flex items-center gap-1.5 whitespace
 export const filterSeparatorClass = "my-3 h-px bg-[#7a94c547]";
 export const tableSeparatorClass = "mt-4 mb-1 h-px bg-[#7a94c547]";
 export const memoryCalcSectionClass = "mt-0.5 pt-1";
-export const memoryCalcGridClass = "grid grid-cols-1 gap-3 md:grid-cols-[repeat(2,minmax(220px,300px))]";
+export const memoryCalcGridClass = "grid grid-cols-1 gap-3 md:grid-cols-3";
 export const tableWrapClass =
   "max-h-[70vh] overflow-auto rounded-[14px] border border-[#7a94c53d] bg-[#0b111bcc] [scrollbar-gutter:stable_both-edges]";
 export const tableClass = "w-full min-w-[1980px] border-collapse";
