@@ -1,6 +1,19 @@
 import { useEffect, useRef, useMemo, useState } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type { CharacterProgress, MasterCharacter, MemoryPieceSource, StoredStateV1 } from "../domain/types";
+import type {
+  InputViewSettings,
+  LimitBreakFilter,
+  LimitedFilter,
+  MemorySourceFilter,
+  OwnedFilter,
+  SortDirection,
+  SortKey,
+  StarFilter,
+  StarMemoryNeedFilter,
+  Ue1Filter,
+  Ue2Filter,
+} from "../domain/uiStorage";
 import { getLimitBreakRemainingMemoryPieceCount } from "../utils/limitBreakMemoryCost";
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
 import {
@@ -17,29 +30,9 @@ type InputTabProps = {
   masterCharacters: MasterCharacter[];
   state: StoredStateV1;
   onUpdateProgress: (name: string, patch: ProgressPatch) => void;
+  initialSettings: InputViewSettings;
+  onSettingsChange: (settings: InputViewSettings) => void;
 };
-
-type OwnedFilter = "all" | "owned" | "unowned";
-type LimitedFilter = "all" | "limited" | "normal";
-type LimitBreakFilter = "all" | "on" | "off";
-type StarFilter = CharacterProgress["star"];
-type StarMemoryNeedFilter = number;
-type Ue1Filter = "unimplemented" | "sp" | (typeof UE1_LEVEL_VALUES)[number];
-type Ue2Filter = "unimplemented" | (typeof UE2_LEVEL_VALUES)[number];
-type MemorySourceFilter = "none" | MemoryPieceSource;
-type SortKey =
-  | "owned"
-  | "name"
-  | "limited"
-  | "limitBreak"
-  | "star"
-  | "ue1"
-  | "ue2"
-  | "starMemoryNeeded"
-  | "ue1MemoryNeeded"
-  | "limitBreakMemoryNeeded"
-  | "totalMemoryNeeded";
-type SortDirection = "asc" | "desc" | null;
 
 const memorySourceLabelMap: Record<MemoryPieceSource, string> = {
   dungeon_coin: "ダンジョン",
@@ -116,21 +109,23 @@ function getUe2SortValue(character: MasterCharacter, progress: CharacterProgress
 }
 
 // 育成入力テーブルのフィルタ・ソート・更新操作を提供する。
-export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTabProps) {
+export function InputTab({ masterCharacters, state, onUpdateProgress, initialSettings, onSettingsChange }: InputTabProps) {
   const rootRef = useRef<HTMLElement | null>(null);
-  const [searchText, setSearchText] = useState("");
-  const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>("all");
-  const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>("all");
-  const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>("all");
-  const [starMemoryCalcMode, setStarMemoryCalcMode] = useState<StarMemoryCalcMode>("implemented_max");
-  const [ue1MemoryCalcMode, setUe1MemoryCalcMode] = useState<Ue1MemoryCalcMode>("implemented_max");
-  const [starFilters, setStarFilters] = useState<StarFilter[]>([]);
-  const [starMemoryNeedFilters, setStarMemoryNeedFilters] = useState<StarMemoryNeedFilter[]>([]);
-  const [ue1Filters, setUe1Filters] = useState<Ue1Filter[]>([]);
-  const [ue2Filters, setUe2Filters] = useState<Ue2Filter[]>([]);
-  const [memorySourceFilters, setMemorySourceFilters] = useState<MemorySourceFilter[]>([]);
-  const [sortKey, setSortKey] = useState<SortKey>("name");
-  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  const [searchText, setSearchText] = useState(initialSettings.searchText);
+  const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>(initialSettings.ownedFilter);
+  const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>(initialSettings.limitedFilter);
+  const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>(initialSettings.limitBreakFilter);
+  const [starMemoryCalcMode, setStarMemoryCalcMode] = useState<StarMemoryCalcMode>(initialSettings.starMemoryCalcMode);
+  const [ue1MemoryCalcMode, setUe1MemoryCalcMode] = useState<Ue1MemoryCalcMode>(initialSettings.ue1MemoryCalcMode);
+  const [starFilters, setStarFilters] = useState<StarFilter[]>(initialSettings.starFilters);
+  const [starMemoryNeedFilters, setStarMemoryNeedFilters] = useState<StarMemoryNeedFilter[]>(
+    initialSettings.starMemoryNeedFilters,
+  );
+  const [ue1Filters, setUe1Filters] = useState<Ue1Filter[]>(initialSettings.ue1Filters);
+  const [ue2Filters, setUe2Filters] = useState<Ue2Filter[]>(initialSettings.ue2Filters);
+  const [memorySourceFilters, setMemorySourceFilters] = useState<MemorySourceFilter[]>(initialSettings.memorySourceFilters);
+  const [sortKey, setSortKey] = useState<SortKey>(initialSettings.sortKey);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(initialSettings.sortDirection);
 
   const selectedStarSet = useMemo(() => new Set(starFilters), [starFilters]);
   const selectedStarMemoryNeedSet = useMemo(() => new Set(starMemoryNeedFilters), [starMemoryNeedFilters]);
@@ -401,6 +396,44 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
   const selectedUe2Labels = ue2Filters
     .map((filter) => (filter === "unimplemented" ? "未実装" : formatUeLevel(filter)))
     .join(" / ");
+
+  const currentSettings = useMemo<InputViewSettings>(
+    () => ({
+      searchText,
+      ownedFilter,
+      limitedFilter,
+      limitBreakFilter,
+      starMemoryCalcMode,
+      ue1MemoryCalcMode,
+      starFilters,
+      starMemoryNeedFilters,
+      ue1Filters,
+      ue2Filters,
+      memorySourceFilters,
+      sortKey,
+      sortDirection,
+    }),
+    [
+      searchText,
+      ownedFilter,
+      limitedFilter,
+      limitBreakFilter,
+      starMemoryCalcMode,
+      ue1MemoryCalcMode,
+      starFilters,
+      starMemoryNeedFilters,
+      ue1Filters,
+      ue2Filters,
+      memorySourceFilters,
+      sortKey,
+      sortDirection,
+    ],
+  );
+
+  useEffect(() => {
+    // 画面設定が変化したタイミングで親へ通知し、永続化対象を同期する。
+    onSettingsChange(currentSettings);
+  }, [currentSettings, onSettingsChange]);
 
   useEffect(() => {
     // フィルタ用ドロップダウン外クリック時に開いている一覧を閉じる。
