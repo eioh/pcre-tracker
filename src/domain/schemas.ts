@@ -9,6 +9,7 @@ export const memoryPieceSourceSchema = z.enum(MEMORY_PIECE_SOURCES);
 
 export const masterCharacterSchema = z.object({
   name: z.string().min(1),
+  searchTokens: z.array(z.string().min(1)).optional(),
   limited: z.boolean(),
   implemented: z.object({
     star6: z.boolean(),

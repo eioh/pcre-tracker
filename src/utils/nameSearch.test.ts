@@ -36,6 +36,10 @@ describe("nameSearch", () => {
     expect(isCharacterNameMatched("ヒヨリ", "huyori")).toBe(true);
   });
 
+  it("事前生成トークン配列を使って一致判定できる", () => {
+    expect(isCharacterNameMatched(["ヒヨリ", "ひより", "hiyori"], "huyori")).toBe(true);
+  });
+
   it("距離2相当の入力や無関係な語は一致しない", () => {
     expect(isCharacterNameMatched("ヒヨリ", "hyorii")).toBe(false);
     expect(isCharacterNameMatched("ヒヨリ", "yui")).toBe(false);

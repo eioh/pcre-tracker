@@ -156,7 +156,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
       if (!progress) {
         continue;
       }
-      if (trimmedSearchText && !isCharacterNameMatched(character.name, trimmedSearchText)) {
+      if (trimmedSearchText && !isCharacterNameMatched(character.searchTokens ?? character.name, trimmedSearchText)) {
         continue;
       }
       if (ownedFilter === "owned" && !progress.owned) {

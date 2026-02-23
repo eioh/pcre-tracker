@@ -14,6 +14,7 @@ export type MemoryPieceSource = (typeof MEMORY_PIECE_SOURCES)[number];
 
 export type MasterCharacter = {
   name: string;
+  searchTokens?: string[];
   limited: boolean;
   implemented: {
     star6: boolean;

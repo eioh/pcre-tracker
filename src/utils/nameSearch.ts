@@ -94,14 +94,28 @@ export function buildNameSearchTokens(name: string): string[] {
   return Array.from(new Set([normalizedName, hiraganaName, katakanaName, romajiName].filter((token) => token.length > 0)));
 }
 
+// 保存済みトークンを正規化し、未設定時は名前から生成する。
+function resolveSearchTokens(nameOrTokens: string | string[]): string[] {
+  if (Array.isArray(nameOrTokens)) {
+    const normalizedTokens = nameOrTokens
+      .map((token) => normalizeForSearch(token))
+      .filter((token) => token.length > 0);
+    if (normalizedTokens.length > 0) {
+      return Array.from(new Set(normalizedTokens));
+    }
+    return [];
+  }
+  return buildNameSearchTokens(nameOrTokens);
+}
+
 // クエリがキャラ名に一致するかを通常一致と距離1一致で判定する。
-export function isCharacterNameMatched(name: string, query: string): boolean {
+export function isCharacterNameMatched(nameOrTokens: string | string[], query: string): boolean {
   const normalizedQuery = normalizeForSearch(query);
   if (!normalizedQuery) {
     return true;
   }
 
-  const tokens = buildNameSearchTokens(name);
+  const tokens = resolveSearchTokens(nameOrTokens);
   if (tokens.some((token) => token.includes(normalizedQuery))) {
     return true;
   }
