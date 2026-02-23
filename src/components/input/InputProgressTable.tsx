@@ -1,5 +1,6 @@
+import { memo, useCallback } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
-import type { CharacterProgress } from "../../domain/types";
+import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { SortDirection, SortKey } from "../../domain/uiStorage";
 import { getLimitBreakRemainingMemoryPieceCount } from "../../utils/limitBreakMemoryCost";
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
@@ -49,8 +50,180 @@ function renderSortIndicator(columnKey: SortKey, sortKey: SortKey, sortDirection
   return sortDirection === "asc" ? "▲" : "▼";
 }
 
+type TableRowProps = {
+  character: MasterCharacter;
+  progress: CharacterProgress;
+  onUpdateProgress: (name: string, patch: ProgressPatch) => void;
+  starMemoryCalcMode: StarMemoryCalcMode;
+  ue1MemoryCalcMode: Ue1MemoryCalcMode;
+};
+
+// テーブル行コンポーネント。行単位でメモ化し不要な再レンダリングを防ぐ。
+const TableRow = memo(function TableRow({
+  character,
+  progress,
+  onUpdateProgress,
+  starMemoryCalcMode,
+  ue1MemoryCalcMode,
+}: TableRowProps) {
+  const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
+  const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
+  const starMax = character.implemented.star6 ? 6 : 5;
+  const ue1CompositeValue =
+    character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped ? "sp" : ue1Value;
+  const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
+  const ue1RemainingMemoryPiece = getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode);
+  const limitBreakRemainingMemoryPiece = getLimitBreakRemainingMemoryPieceCount(character, progress);
+  const totalRemainingMemoryPiece =
+    starRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
+
+  const handleOwnedChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => onUpdateProgress(character.name, { owned: event.target.checked }),
+    [onUpdateProgress, character.name],
+  );
+  const handleLimitBreakChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => onUpdateProgress(character.name, { limitBreak: event.target.checked }),
+    [onUpdateProgress, character.name],
+  );
+  const handleStarChange = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) =>
+      onUpdateProgress(character.name, { star: Number(event.target.value) as CharacterProgress["star"] }),
+    [onUpdateProgress, character.name],
+  );
+  const handleUe1Change = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      if (event.target.value === "sp") {
+        onUpdateProgress(character.name, { ue1Level: 370, ue1SpEquipped: true });
+        return;
+      }
+      const nextValue = (event.target.value === "null"
+        ? null
+        : Number(event.target.value)) as CharacterProgress["ue1Level"];
+      onUpdateProgress(character.name, { ue1Level: nextValue, ue1SpEquipped: false });
+    },
+    [onUpdateProgress, character.name],
+  );
+  const handleUe2Change = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      const nextValue = (event.target.value === "null"
+        ? null
+        : Number(event.target.value)) as CharacterProgress["ue2Level"];
+      onUpdateProgress(character.name, { ue2Level: nextValue });
+    },
+    [onUpdateProgress, character.name],
+  );
+
+  return (
+    <tr className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]">
+      <td className={tableBodyCellClass}>
+        <label className={tableSwitchClass}>
+          <input
+            type="checkbox"
+            className={tableCheckClass}
+            checked={progress.owned}
+            aria-label={`${character.name}の所持状態`}
+            onChange={handleOwnedChange}
+          />
+        </label>
+      </td>
+      <td className={`${tableBodyCellClass} whitespace-nowrap font-bold`}>{character.name}</td>
+      <td className={tableBodyCellClass}>
+        {character.limited ? <span className={limitedBadgeClass}>限定</span> : <span className={normalBadgeClass}>恒常</span>}
+      </td>
+      <td className={tableBodyCellClass}>
+        <label className={tableSwitchClass}>
+          <input
+            type="checkbox"
+            className={tableCheckClass}
+            checked={progress.limitBreak}
+            aria-label={`${character.name}の限界突破状態`}
+            onChange={handleLimitBreakChange}
+          />
+        </label>
+      </td>
+      <td className={tableBodyCellClass}>
+        <select
+          className={tableSelectClass}
+          value={progress.star}
+          onChange={handleStarChange}
+        >
+          {Array.from({ length: starMax }, (_, index) => index + 1).map((star) => (
+            <option key={star} value={star}>
+              {star}
+            </option>
+          ))}
+        </select>
+      </td>
+      <td className={tableBodyCellClass}>
+        {character.implemented.ue1 ? (
+          <select
+            className={tableSelectClass}
+            value={ue1CompositeValue}
+            onChange={handleUe1Change}
+          >
+            {UE1_LEVEL_VALUES.map((level) => (
+              <option key={level} value={level}>
+                {formatUeLevel(level)}
+              </option>
+            ))}
+            {character.implemented.ue1Sp ? <option value="sp">SP</option> : null}
+          </select>
+        ) : (
+          <select className={disabledTableSelectClass} value="null" disabled>
+            <option value="null">-</option>
+          </select>
+        )}
+      </td>
+      <td className={tableBodyCellClass}>
+        {character.implemented.ue2 ? (
+          <select
+            className={tableSelectClass}
+            value={ue2Value}
+            onChange={handleUe2Change}
+          >
+            {UE2_LEVEL_VALUES.map((level) => (
+              <option key={level} value={level}>
+                {formatUeLevel(level)}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <select className={disabledTableSelectClass} value="null" disabled>
+            <option value="null">-</option>
+          </select>
+        )}
+      </td>
+      <td className={tableBodyCellClass}>
+        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{starRemainingMemoryPiece}</span>
+      </td>
+      <td className={tableBodyCellClass}>
+        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingMemoryPiece}</span>
+      </td>
+      <td className={tableBodyCellClass}>
+        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{limitBreakRemainingMemoryPiece}</span>
+      </td>
+      <td className={tableBodyCellClass}>
+        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{totalRemainingMemoryPiece}</span>
+      </td>
+      <td className={tableBodyCellClass}>
+        <div className="flex flex-wrap gap-1.5">
+          {character.memoryPieceSources.length === 0 ? (
+            <span className={sourceChipEmptyClass}>情報なし</span>
+          ) : (
+            character.memoryPieceSources.map((source) => (
+              <span key={source} className={sourceChipClassMap[source]}>
+                {memorySourceLabelMap[source]}
+              </span>
+            ))
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+});
+
 // 育成入力テーブル本体を表示し、各行の進捗編集を受け付ける。
-export function InputProgressTable({
+export const InputProgressTable = memo(function InputProgressTable({
   visibleRows,
   sortKey,
   sortDirection,
@@ -145,145 +318,19 @@ export function InputProgressTable({
               </td>
             </tr>
           ) : (
-            visibleRows.map(({ character, progress }) => {
-              const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
-              const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
-              const starMax = character.implemented.star6 ? 6 : 5;
-              const ue1CompositeValue =
-                character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped ? "sp" : ue1Value;
-              const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
-              const ue1RemainingMemoryPiece = getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode);
-              const limitBreakRemainingMemoryPiece = getLimitBreakRemainingMemoryPieceCount(character, progress);
-              const totalRemainingMemoryPiece =
-                starRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
-
-              return (
-                <tr key={character.name} className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]">
-                  <td className={tableBodyCellClass}>
-                    <label className={tableSwitchClass}>
-                      <input
-                        type="checkbox"
-                        className={tableCheckClass}
-                        checked={progress.owned}
-                        aria-label={`${character.name}の所持状態`}
-                        onChange={(event) => onUpdateProgress(character.name, { owned: event.target.checked })}
-                      />
-                    </label>
-                  </td>
-                  <td className={`${tableBodyCellClass} whitespace-nowrap font-bold`}>{character.name}</td>
-                  <td className={tableBodyCellClass}>
-                    {character.limited ? <span className={limitedBadgeClass}>限定</span> : <span className={normalBadgeClass}>恒常</span>}
-                  </td>
-                  <td className={tableBodyCellClass}>
-                    <label className={tableSwitchClass}>
-                      <input
-                        type="checkbox"
-                        className={tableCheckClass}
-                        checked={progress.limitBreak}
-                        aria-label={`${character.name}の限界突破状態`}
-                        onChange={(event) => onUpdateProgress(character.name, { limitBreak: event.target.checked })}
-                      />
-                    </label>
-                  </td>
-                  <td className={tableBodyCellClass}>
-                    <select
-                      className={tableSelectClass}
-                      value={progress.star}
-                      onChange={(event) =>
-                        onUpdateProgress(character.name, { star: Number(event.target.value) as CharacterProgress["star"] })
-                      }
-                    >
-                      {Array.from({ length: starMax }, (_, index) => index + 1).map((star) => (
-                        <option key={star} value={star}>
-                          {star}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className={tableBodyCellClass}>
-                    {character.implemented.ue1 ? (
-                      <select
-                        className={tableSelectClass}
-                        value={ue1CompositeValue}
-                        onChange={(event) => {
-                          if (event.target.value === "sp") {
-                            onUpdateProgress(character.name, { ue1Level: 370, ue1SpEquipped: true });
-                            return;
-                          }
-                          const nextValue = (event.target.value === "null"
-                            ? null
-                            : Number(event.target.value)) as CharacterProgress["ue1Level"];
-                          onUpdateProgress(character.name, { ue1Level: nextValue, ue1SpEquipped: false });
-                        }}
-                      >
-                        {UE1_LEVEL_VALUES.map((level) => (
-                          <option key={level} value={level}>
-                            {formatUeLevel(level)}
-                          </option>
-                        ))}
-                        {character.implemented.ue1Sp ? <option value="sp">SP</option> : null}
-                      </select>
-                    ) : (
-                      <select className={disabledTableSelectClass} value="null" disabled>
-                        <option value="null">-</option>
-                      </select>
-                    )}
-                  </td>
-                  <td className={tableBodyCellClass}>
-                    {character.implemented.ue2 ? (
-                      <select
-                        className={tableSelectClass}
-                        value={ue2Value}
-                        onChange={(event) => {
-                          const nextValue = (event.target.value === "null"
-                            ? null
-                            : Number(event.target.value)) as CharacterProgress["ue2Level"];
-                          onUpdateProgress(character.name, { ue2Level: nextValue });
-                        }}
-                      >
-                        {UE2_LEVEL_VALUES.map((level) => (
-                          <option key={level} value={level}>
-                            {formatUeLevel(level)}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <select className={disabledTableSelectClass} value="null" disabled>
-                        <option value="null">-</option>
-                      </select>
-                    )}
-                  </td>
-                  <td className={tableBodyCellClass}>
-                    <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{starRemainingMemoryPiece}</span>
-                  </td>
-                  <td className={tableBodyCellClass}>
-                    <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingMemoryPiece}</span>
-                  </td>
-                  <td className={tableBodyCellClass}>
-                    <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{limitBreakRemainingMemoryPiece}</span>
-                  </td>
-                  <td className={tableBodyCellClass}>
-                    <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{totalRemainingMemoryPiece}</span>
-                  </td>
-                  <td className={tableBodyCellClass}>
-                    <div className="flex flex-wrap gap-1.5">
-                      {character.memoryPieceSources.length === 0 ? (
-                        <span className={sourceChipEmptyClass}>情報なし</span>
-                      ) : (
-                        character.memoryPieceSources.map((source) => (
-                          <span key={source} className={sourceChipClassMap[source]}>
-                            {memorySourceLabelMap[source]}
-                          </span>
-                        ))
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })
+            visibleRows.map(({ character, progress }) => (
+              <TableRow
+                key={character.name}
+                character={character}
+                progress={progress}
+                onUpdateProgress={onUpdateProgress}
+                starMemoryCalcMode={starMemoryCalcMode}
+                ue1MemoryCalcMode={ue1MemoryCalcMode}
+              />
+            ))
           )}
         </tbody>
       </table>
     </div>
   );
-}
+});

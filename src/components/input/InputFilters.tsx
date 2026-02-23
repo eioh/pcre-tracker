@@ -1,5 +1,5 @@
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
-import type { Dispatch, SetStateAction } from "react";
+import { memo, type Dispatch, type SetStateAction } from "react";
 import type { CharacterProgress } from "../../domain/types";
 import type {
   LimitBreakFilter,
@@ -48,7 +48,7 @@ type InputFiltersProps = {
 };
 
 // 育成入力画面の検索・フィルタ操作 UI を表示する。
-export function InputFilters({
+export const InputFilters = memo(function InputFilters({
   searchText,
   onSearchTextChange,
   ownedFilter,
@@ -301,4 +301,4 @@ export function InputFilters({
       </div>
     </>
   );
-}
+});

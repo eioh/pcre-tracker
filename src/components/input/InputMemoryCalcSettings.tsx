@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../../utils/starMemoryCost";
 import { controlClass, fieldGroupClass, memoryCalcGridClass, memoryCalcSectionClass } from "./uiStyles";
@@ -10,7 +11,7 @@ type InputMemoryCalcSettingsProps = {
 };
 
 // 必要メモピ計算の対象モードを切り替える UI を表示する。
-export function InputMemoryCalcSettings({
+export const InputMemoryCalcSettings = memo(function InputMemoryCalcSettings({
   starMemoryCalcMode,
   onStarMemoryCalcModeChange,
   ue1MemoryCalcMode,
@@ -46,4 +47,4 @@ export function InputMemoryCalcSettings({
       </div>
     </div>
   );
-}
+});

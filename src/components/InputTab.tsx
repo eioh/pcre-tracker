@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type { CharacterProgress, MasterCharacter, StoredStateV1 } from "../domain/types";
 import type {
   InputViewSettings,
@@ -49,10 +49,13 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
   const [sortKey, setSortKey] = useState<SortKey>(initialSettings.sortKey);
   const [sortDirection, setSortDirection] = useState<SortDirection>(initialSettings.sortDirection);
 
+  // 検索テキストの遅延値を使い、入力中のブロッキングを防ぐ。
+  const deferredSearchText = useDeferredValue(searchText);
+
   const visibleRows = useVisibleRows({
     masterCharacters,
     progressByName: state.progressByName,
-    searchText,
+    searchText: deferredSearchText,
     ownedFilter,
     limitedFilter,
     limitBreakFilter,
@@ -68,22 +71,25 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
   });
 
   // テーブルヘッダークリック時のソート状態遷移を管理する。
-  function handleSort(nextSortKey: SortKey): void {
-    if (sortKey !== nextSortKey) {
-      setSortKey(nextSortKey);
+  const handleSort = useCallback(
+    (nextSortKey: SortKey): void => {
+      if (sortKey !== nextSortKey) {
+        setSortKey(nextSortKey);
+        setSortDirection("asc");
+        return;
+      }
+      if (sortDirection === "asc") {
+        setSortDirection("desc");
+        return;
+      }
+      if (sortDirection === "desc") {
+        setSortDirection(null);
+        return;
+      }
       setSortDirection("asc");
-      return;
-    }
-    if (sortDirection === "asc") {
-      setSortDirection("desc");
-      return;
-    }
-    if (sortDirection === "desc") {
-      setSortDirection(null);
-      return;
-    }
-    setSortDirection("asc");
-  }
+    },
+    [sortKey, sortDirection],
+  );
 
   const currentSettings = useMemo<InputViewSettings>(
     () => ({
