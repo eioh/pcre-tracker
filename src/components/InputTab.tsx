@@ -15,6 +15,7 @@ import type {
   Ue2Filter,
 } from "../domain/uiStorage";
 import { getLimitBreakRemainingMemoryPieceCount } from "../utils/limitBreakMemoryCost";
+import { isCharacterNameMatched } from "../utils/nameSearch";
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
 import {
   getStarRemainingMemoryPieceCount,
@@ -152,7 +153,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
       if (!progress) {
         continue;
       }
-      if (trimmedSearchText && !character.name.includes(trimmedSearchText)) {
+      if (trimmedSearchText && !isCharacterNameMatched(character.name, trimmedSearchText)) {
         continue;
       }
       if (ownedFilter === "owned" && !progress.owned) {
