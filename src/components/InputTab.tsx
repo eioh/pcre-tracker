@@ -63,19 +63,22 @@ const multiSelectPanelClass =
 const multiSelectItemClass = "inline-flex items-center gap-1.5 whitespace-nowrap text-sm text-main";
 const memoryCalcSectionClass = "col-span-full mt-0.5 border-t border-[#7a94c547] pt-3.5";
 const memoryCalcGridClass = "grid grid-cols-1 gap-3 md:grid-cols-[repeat(2,minmax(220px,300px))]";
-const tableWrapClass = "overflow-auto rounded-[14px] border border-[#7a94c53d] bg-[#0b111bcc]";
-const tableClass = "w-full min-w-[1200px] border-collapse";
-const tableHeadCellClass = "sticky top-0 z-[1] border-b border-[#7a94c533] bg-[#101825f5] px-3 py-2.5 align-middle text-xs tracking-[0.04em] text-[#c8d8f6]";
+const tableWrapClass =
+  "overflow-auto rounded-[14px] border border-[#7a94c53d] bg-[#0b111bcc] [scrollbar-gutter:stable_both-edges]";
+const tableClass = "w-full min-w-[1840px] border-collapse";
+const tableHeadCellClass =
+  "sticky top-0 z-[1] whitespace-nowrap border-b border-[#7a94c533] bg-[#101825f5] px-3 py-2.5 align-middle text-xs tracking-[0.04em] text-[#c8d8f6]";
 const tableBodyCellClass = "border-b border-[#7a94c533] px-3 py-2.5 align-middle";
-const sortButtonClass = "inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-inherit hover:text-[#dff8ff]";
+const sortButtonClass =
+  "inline-flex cursor-pointer items-center gap-1.5 whitespace-nowrap border-0 bg-transparent p-0 text-inherit hover:text-[#dff8ff]";
 const sortIndicatorClass = "min-w-[0.85em] text-[0.72rem] text-accent";
 const tableSwitchClass = "inline-flex items-center gap-2 whitespace-nowrap text-sm";
 const tableCheckClass = "h-4 w-4 accent-accent";
 const tableSelectClass = `${controlClass} min-w-32 px-2.5 py-2`;
 const disabledTableSelectClass =
   "w-full min-w-32 cursor-default appearance-none rounded-[12px] border border-[#788aad38] bg-[#070b12bf] px-2.5 py-2 text-sm text-[#9fb0cf] opacity-100 outline-none [box-shadow:inset_0_0_0_1px_rgba(9,14,23,0.35)]";
-const badgeClass = "rounded-full border border-white/20 px-2 py-0.5 text-[0.7rem] text-muted";
-const limitedBadgeClass = `${badgeClass} border-[#ff7e63b3] text-[#ff9e8a]`;
+const normalBadgeClass = "rounded-full border border-[#67b8ffa6] bg-[#1c4e7a4f] px-2 py-0.5 text-[0.7rem] text-[#a9ddff]";
+const limitedBadgeClass = "rounded-full border border-[#ff7e63b3] bg-[#7b2c2552] px-2 py-0.5 text-[0.7rem] text-[#ffb19f]";
 const sourceChipBaseClass = "rounded-full border px-2 py-0.5 text-[0.72rem]";
 const sourceChipEmptyClass = `${sourceChipBaseClass} border-white/20 text-muted`;
 const sourceChipClassMap: Record<MemoryPieceSource, string> = {
@@ -655,6 +658,20 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
 
       <div className={tableWrapClass}>
         <table className={tableClass}>
+          <colgroup>
+            <col className="w-20" />
+            <col className="w-[200px]" />
+            <col className="w-[90px]" />
+            <col className="w-[95px]" />
+            <col className="w-[130px]" />
+            <col className="w-[150px]" />
+            <col className="w-[150px]" />
+            <col className="w-[120px]" />
+            <col className="w-[130px]" />
+            <col className="w-[145px]" />
+            <col className="w-[120px]" />
+            <col className="w-[260px]" />
+          </colgroup>
           <thead>
             <tr>
               <th aria-sort={getAriaSort("owned")} className={tableHeadCellClass}>
@@ -736,7 +753,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                   starRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
 
                 return (
-                  <tr key={character.name} className="hover:bg-[#3a537c24]">
+                  <tr key={character.name} className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]">
                     <td className={tableBodyCellClass}>
                       <label className={tableSwitchClass}>
                         <input
@@ -750,7 +767,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                     </td>
                     <td className={`${tableBodyCellClass} whitespace-nowrap font-bold`}>{character.name}</td>
                     <td className={tableBodyCellClass}>
-                      {character.limited ? <span className={limitedBadgeClass}>限定</span> : <span className={badgeClass}>恒常</span>}
+                      {character.limited ? <span className={limitedBadgeClass}>限定</span> : <span className={normalBadgeClass}>恒常</span>}
                     </td>
                     <td className={tableBodyCellClass}>
                       <label className={tableSwitchClass}>
