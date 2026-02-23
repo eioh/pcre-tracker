@@ -171,7 +171,7 @@ export default function App() {
           type="button"
           className={
             safeUiState.activeTab === "input"
-              ? "rounded-full bg-linear-to-r from-accent to-accent-strong px-5 py-2.5 text-sm font-extrabold text-[#05313b]"
+              ? "rounded-full bg-linear-to-r from-accent to-accent-strong px-5 py-2.5 text-sm font-extrabold text-[#e8fffb] [text-shadow:0_1px_0_rgba(0,0,0,0.28)]"
               : "cursor-pointer rounded-full bg-transparent px-5 py-2.5 text-sm font-bold text-muted transition hover:text-main"
           }
           onClick={() => setUiState((previous) => ({ ...previous, activeTab: "input" }))}
@@ -182,7 +182,7 @@ export default function App() {
           type="button"
           className={
             safeUiState.activeTab === "dashboard"
-              ? "rounded-full bg-linear-to-r from-accent to-accent-strong px-5 py-2.5 text-sm font-extrabold text-[#05313b]"
+              ? "rounded-full bg-linear-to-r from-accent to-accent-strong px-5 py-2.5 text-sm font-extrabold text-[#e8fffb] [text-shadow:0_1px_0_rgba(0,0,0,0.28)]"
               : "cursor-pointer rounded-full bg-transparent px-5 py-2.5 text-sm font-bold text-muted transition hover:text-main"
           }
           onClick={() => setUiState((previous) => ({ ...previous, activeTab: "dashboard" }))}
@@ -191,7 +191,7 @@ export default function App() {
         </button>
       </nav>
 
-      {safeUiState.activeTab === "input" ? (
+      <div className={safeUiState.activeTab === "input" ? "block" : "hidden"} aria-hidden={safeUiState.activeTab !== "input"}>
         <InputTab
           masterCharacters={masterCharacters}
           state={state}
@@ -199,9 +199,9 @@ export default function App() {
           initialSettings={safeUiState.input}
           onSettingsChange={handleInputSettingsChange}
         />
-      ) : (
-        <DashboardTab masterCharacters={masterCharacters} state={state} />
-      )}
+      </div>
+
+      {safeUiState.activeTab === "dashboard" ? <DashboardTab masterCharacters={masterCharacters} state={state} /> : null}
     </div>
   );
 }

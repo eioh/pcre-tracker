@@ -50,6 +50,8 @@ const panelClass =
 const inputToolbarClass = "grid grid-cols-1 gap-3 lg:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]";
 const sectionLabelClass = "mb-2 text-sm font-semibold text-[#c8d8f6]";
 const fieldGroupClass = "grid gap-1.5 text-sm text-muted";
+const resetButtonClass =
+  "cursor-pointer rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-main transition hover:border-accent hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50";
 const controlClass =
   "w-full rounded-[12px] border border-white/20 bg-[#090e17d9] px-3 py-2.5 text-sm text-main outline-none transition focus:border-accent-strong focus:ring-2 focus:ring-accent-strong/40";
 const multiSelectSummaryClass = `${controlClass} cursor-pointer list-none select-none overflow-hidden text-ellipsis whitespace-nowrap [&::-webkit-details-marker]:hidden`;
@@ -389,6 +391,23 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
     );
   }
 
+  // キャラ検索入力を初期化する。
+  function resetSearchText(): void {
+    setSearchText("");
+  }
+
+  // フィルタ条件を既定値へ戻す。
+  function resetFilters(): void {
+    setOwnedFilter("all");
+    setLimitedFilter("all");
+    setLimitBreakFilter("all");
+    setStarFilters([]);
+    setStarMemoryNeedFilters([]);
+    setUe1Filters([]);
+    setUe2Filters([]);
+    setMemorySourceFilters([]);
+  }
+
   const selectedMemorySourceLabels = memorySourceFilters
     .map((filter) => (filter === "none" ? "情報なし" : memorySourceLabelMap[filter]))
     .join(" / ");
@@ -473,17 +492,27 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
     <section className={panelClass} ref={rootRef}>
       <label className={`${fieldGroupClass} mb-3`}>
         <span>キャラ検索</span>
-        <input
-          className={controlClass}
-          value={searchText}
-          onChange={(event) => setSearchText(event.target.value)}
-          placeholder="例: ヒヨリ"
-        />
+        <span className="flex items-center gap-2">
+          <input
+            className={controlClass}
+            value={searchText}
+            onChange={(event) => setSearchText(event.target.value)}
+            placeholder="例: ヒヨリ"
+          />
+          <button type="button" className={`${resetButtonClass} shrink-0`} onClick={resetSearchText}>
+            リセット
+          </button>
+        </span>
       </label>
 
       <div className={filterSeparatorClass} role="separator" aria-label="キャラ検索とフィルタの区切り" />
 
-      <p className={sectionLabelClass}>フィルタ</p>
+      <p className={`${sectionLabelClass} mb-1`}>フィルタ</p>
+      <div className="mb-2">
+        <button type="button" className={resetButtonClass} onClick={resetFilters}>
+          リセット
+        </button>
+      </div>
       <div className={inputToolbarClass}>
         <label className={fieldGroupClass}>
           <span>所持</span>
