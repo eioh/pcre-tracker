@@ -17,7 +17,7 @@ export const memoryCalcSectionClass = "mt-0.5 pt-1";
 export const memoryCalcGridClass = "grid grid-cols-1 gap-3 md:grid-cols-[repeat(2,minmax(220px,300px))]";
 export const tableWrapClass =
   "overflow-auto rounded-[14px] border border-[#7a94c53d] bg-[#0b111bcc] [scrollbar-gutter:stable_both-edges]";
-export const tableClass = "w-full min-w-[1840px] border-collapse";
+export const tableClass = "w-full min-w-[1980px] border-collapse";
 export const tableHeadCellClass =
   "sticky top-0 z-[1] whitespace-nowrap border-b border-[#7a94c533] bg-[#101825f5] px-3 py-2.5 align-middle text-xs tracking-[0.04em] text-[#c8d8f6]";
 export const tableBodyCellClass = "border-b border-[#7a94c533] px-3 py-2.5 align-middle";

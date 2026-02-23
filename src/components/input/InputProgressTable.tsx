@@ -76,6 +76,7 @@ const TableRow = memo(function TableRow({
   const limitBreakRemainingMemoryPiece = getLimitBreakRemainingMemoryPieceCount(character, progress);
   const totalRemainingMemoryPiece =
     starRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
+  const adjustedTotalRemainingMemoryPiece = Math.max(0, totalRemainingMemoryPiece - progress.ownedMemoryPiece);
 
   const handleOwnedChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => onUpdateProgress(character.name, { owned: event.target.checked }),
@@ -109,6 +110,13 @@ const TableRow = memo(function TableRow({
         ? null
         : Number(event.target.value)) as CharacterProgress["ue2Level"];
       onUpdateProgress(character.name, { ue2Level: nextValue });
+    },
+    [onUpdateProgress, character.name],
+  );
+  const handleOwnedMemoryPieceChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const nextOwnedMemoryPiece = Math.max(0, Math.floor(Number(event.target.value) || 0));
+      onUpdateProgress(character.name, { ownedMemoryPiece: nextOwnedMemoryPiece });
     },
     [onUpdateProgress, character.name],
   );
@@ -194,6 +202,18 @@ const TableRow = memo(function TableRow({
         )}
       </td>
       <td className={tableBodyCellClass}>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={0}
+          step={1}
+          className={tableSelectClass}
+          value={progress.ownedMemoryPiece}
+          aria-label={`${character.name}の所持メモピ数`}
+          onChange={handleOwnedMemoryPieceChange}
+        />
+      </td>
+      <td className={tableBodyCellClass}>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{starRemainingMemoryPiece}</span>
       </td>
       <td className={tableBodyCellClass}>
@@ -203,7 +223,7 @@ const TableRow = memo(function TableRow({
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{limitBreakRemainingMemoryPiece}</span>
       </td>
       <td className={tableBodyCellClass}>
-        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{totalRemainingMemoryPiece}</span>
+        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{adjustedTotalRemainingMemoryPiece}</span>
       </td>
       <td className={tableBodyCellClass}>
         <div className="flex flex-wrap gap-1.5">
@@ -242,7 +262,8 @@ export const InputProgressTable = memo(function InputProgressTable({
           <col className="w-[95px]" />
           <col className="w-[130px]" />
           <col className="w-[150px]" />
-          <col className="w-[150px]" />
+        <col className="w-[150px]" />
+          <col className="w-[140px]" />
           <col className="w-[120px]" />
           <col className="w-[130px]" />
           <col className="w-[145px]" />
@@ -286,6 +307,11 @@ export const InputProgressTable = memo(function InputProgressTable({
                 専用2<span className={sortIndicatorClass}>{renderSortIndicator("ue2", sortKey, sortDirection)}</span>
               </button>
             </th>
+            <th aria-sort={getAriaSort("ownedMemoryPiece", sortKey, sortDirection)} className={tableHeadCellClass}>
+              <button type="button" className={sortButtonClass} onClick={() => onSort("ownedMemoryPiece")}>
+                所持メモピ<span className={sortIndicatorClass}>{renderSortIndicator("ownedMemoryPiece", sortKey, sortDirection)}</span>
+              </button>
+            </th>
             <th aria-sort={getAriaSort("starMemoryNeeded", sortKey, sortDirection)} className={tableHeadCellClass}>
               <button type="button" className={sortButtonClass} onClick={() => onSort("starMemoryNeeded")}>
                 ☆必要メモピ<span className={sortIndicatorClass}>{renderSortIndicator("starMemoryNeeded", sortKey, sortDirection)}</span>
@@ -313,7 +339,7 @@ export const InputProgressTable = memo(function InputProgressTable({
         <tbody>
           {visibleRows.length === 0 ? (
             <tr>
-              <td colSpan={12} className="px-3 py-[18px] text-center text-muted">
+              <td colSpan={13} className="px-3 py-[18px] text-center text-muted">
                 条件に一致するキャラがいません
               </td>
             </tr>

@@ -24,6 +24,7 @@ export type SortKey =
   | "star"
   | "ue1"
   | "ue2"
+  | "ownedMemoryPiece"
   | "starMemoryNeeded"
   | "ue1MemoryNeeded"
   | "limitBreakMemoryNeeded"
@@ -66,6 +67,7 @@ const SORT_KEY_VALUES: SortKey[] = [
   "star",
   "ue1",
   "ue2",
+  "ownedMemoryPiece",
   "starMemoryNeeded",
   "ue1MemoryNeeded",
   "limitBreakMemoryNeeded",

@@ -31,6 +31,7 @@ function buildProgress(overrides?: Partial<CharacterProgress>): CharacterProgres
     ue1Level: 0,
     ue1SpEquipped: false,
     ue2Level: 0,
+    ownedMemoryPiece: 0,
     updatedAt: "2026-02-23T00:00:00.000Z",
     ...overrides,
   };
@@ -72,6 +73,15 @@ describe("InputProgressTable", () => {
     expect(props.onSort).toHaveBeenCalledWith("totalMemoryNeeded");
   });
 
+  it("所持メモピ列ヘッダー押下でソートキーを親へ通知できる", () => {
+    const props = buildProps();
+    render(<InputProgressTable {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /所持メモピ/ }));
+
+    expect(props.onSort).toHaveBeenCalledWith("ownedMemoryPiece");
+  });
+
   it("所持チェック変更で進捗更新を通知する", () => {
     const onUpdateProgress = vi.fn();
     const props = buildProps({ onUpdateProgress });
@@ -102,6 +112,31 @@ describe("InputProgressTable", () => {
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { star: 6 });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 370, ue1SpEquipped: true });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue2Level: 5 });
+  });
+
+  it("所持メモピ入力の変更を進捗更新として通知する", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({ onUpdateProgress });
+    render(<InputProgressTable {...props} />);
+
+    fireEvent.change(screen.getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" }), { target: { value: "42" } });
+
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ownedMemoryPiece: 42 });
+  });
+
+  it("必要メモピ合計は所持メモピ数を引いた下限0の値を表示する", () => {
+    const row: VisibleRow = {
+      character: buildCharacter(),
+      progress: buildProgress({ ownedMemoryPiece: 999999 }),
+    };
+    const props = buildProps({ visibleRows: [row] });
+    render(<InputProgressTable {...props} />);
+
+    const tableRows = screen.getAllByRole("row");
+    const bodyRow = tableRows[1] as HTMLTableRowElement;
+    const cells = within(bodyRow).getAllByRole("cell");
+
+    expect(cells[11]).toHaveTextContent("0");
   });
 
   it("メモピ入手列にソース名を表示する", () => {

@@ -41,5 +41,32 @@ describe("loadStoredState", () => {
     expect(hiyori?.ue1Level).toBe(140);
     expect(hiyori?.ue1SpEquipped).toBe(false);
     expect(hiyori?.ue2Level).toBeNull();
+    expect(hiyori?.ownedMemoryPiece).toBe(0);
+  });
+
+  it("所持メモピ数を0以上の整数へ正規化する", () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: 1,
+        progressByName: {
+          ヒヨリ: {
+            owned: true,
+            limitBreak: false,
+            star: 3,
+            ue1Level: 0,
+            ue1SpEquipped: false,
+            ue2Level: null,
+            ownedMemoryPiece: -12.8,
+            updatedAt: "2026-02-22T00:00:00.000Z",
+          },
+        },
+      }),
+    );
+
+    const loaded = loadStoredState(masterCharacters);
+    const hiyori = loaded.progressByName["ヒヨリ"];
+    expect(hiyori).toBeDefined();
+    expect(hiyori?.ownedMemoryPiece).toBe(0);
   });
 });

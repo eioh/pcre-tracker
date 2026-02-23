@@ -22,6 +22,7 @@ function createDefaultProgress(character: MasterCharacter): CharacterProgress {
     ue1Level: character.implemented.ue1 ? 0 : null,
     ue1SpEquipped: false,
     ue2Level: character.implemented.ue2 ? 0 : null,
+    ownedMemoryPiece: 0,
     updatedAt: new Date().toISOString(),
   };
 }
@@ -55,6 +56,14 @@ function toUe2Level(value: number | null): CharacterProgress["ue2Level"] {
     : 0;
 }
 
+// 所持メモピ入力値を0以上の整数へ正規化する。
+function toOwnedMemoryPiece(value: number): CharacterProgress["ownedMemoryPiece"] {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+  return Math.max(0, Math.floor(value));
+}
+
 function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): CharacterProgress {
   const defaultProgress = createDefaultProgress(character);
   const normalizedRawProgress =
@@ -73,6 +82,7 @@ function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): Cha
     ue1Level: toUe1Level(parsed.data.ue1Level),
     ue1SpEquipped: parsed.data.ue1SpEquipped,
     ue2Level: toUe2Level(parsed.data.ue2Level),
+    ownedMemoryPiece: toOwnedMemoryPiece(parsed.data.ownedMemoryPiece),
     updatedAt: parsed.data.updatedAt,
   };
 

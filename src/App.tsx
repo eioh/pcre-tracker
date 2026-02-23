@@ -12,7 +12,7 @@ import { buildInitialState, loadStoredState, saveStoredState } from "./domain/st
 import type { CharacterProgress, StoredStateV1 } from "./domain/types";
 import { buildDefaultUiState, loadUiState, saveUiState, type InputViewSettings } from "./domain/uiStorage";
 type ProgressPatch = Partial<
-  Pick<CharacterProgress, "owned" | "limitBreak" | "star" | "ue1Level" | "ue1SpEquipped" | "ue2Level">
+  Pick<CharacterProgress, "owned" | "limitBreak" | "star" | "ue1Level" | "ue1SpEquipped" | "ue2Level" | "ownedMemoryPiece">
 >;
 
 // 最終更新日時の文字列を表示用フォーマットへ変換する。

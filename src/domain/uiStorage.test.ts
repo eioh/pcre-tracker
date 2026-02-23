@@ -33,7 +33,7 @@ describe("uiStorage", () => {
         ue1Filters: [370, "sp"],
         ue2Filters: [5],
         memorySourceFilters: ["hard_quest", "none"],
-        sortKey: "totalMemoryNeeded",
+        sortKey: "ownedMemoryPiece",
         sortDirection: "desc",
       },
     };
@@ -70,6 +70,7 @@ describe("uiStorage", () => {
     expect(loaded.input.ue1Filters).toEqual([370, "sp"]);
     expect(loaded.input.ue2Filters).toEqual([5]);
     expect(loaded.input.memorySourceFilters).toEqual(["hard_quest"]);
+    expect(loaded.input.sortKey).toBe("name");
     expect(loaded.input.sortDirection).toBeNull();
   });
 

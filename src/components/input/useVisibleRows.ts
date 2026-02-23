@@ -55,6 +55,20 @@ function getUe2SortValue(character: MasterCharacter, progress: CharacterProgress
   return progress.ue2Level ?? 0;
 }
 
+// 所持メモピ数を反映した必要メモピ合計を算出する。
+function getAdjustedTotalMemoryNeeded(
+  character: MasterCharacter,
+  progress: CharacterProgress,
+  starMemoryCalcMode: StarMemoryCalcMode,
+  ue1MemoryCalcMode: Ue1MemoryCalcMode,
+): number {
+  const totalNeeded =
+    getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode) +
+    getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode) +
+    getLimitBreakRemainingMemoryPieceCount(character, progress);
+  return Math.max(0, totalNeeded - progress.ownedMemoryPiece);
+}
+
 // 育成入力テーブルの表示行をフィルタ・ソート条件から算出する。
 export function useVisibleRows({
   masterCharacters,
@@ -204,6 +218,9 @@ export function useVisibleRows({
         case "ue2":
           baseComparison = getUe2SortValue(aCharacter, aProgress) - getUe2SortValue(bCharacter, bProgress);
           break;
+        case "ownedMemoryPiece":
+          baseComparison = aProgress.ownedMemoryPiece - bProgress.ownedMemoryPiece;
+          break;
         case "starMemoryNeeded":
           baseComparison =
             getStarRemainingMemoryPieceCount(aCharacter, aProgress, starMemoryCalcMode) -
@@ -221,12 +238,8 @@ export function useVisibleRows({
           break;
         case "totalMemoryNeeded":
           baseComparison =
-            getStarRemainingMemoryPieceCount(aCharacter, aProgress, starMemoryCalcMode) +
-            getUe1RemainingMemoryPieceCount(aCharacter, aProgress, ue1MemoryCalcMode) +
-            getLimitBreakRemainingMemoryPieceCount(aCharacter, aProgress) -
-            (getStarRemainingMemoryPieceCount(bCharacter, bProgress, starMemoryCalcMode) +
-              getUe1RemainingMemoryPieceCount(bCharacter, bProgress, ue1MemoryCalcMode) +
-              getLimitBreakRemainingMemoryPieceCount(bCharacter, bProgress));
+            getAdjustedTotalMemoryNeeded(aCharacter, aProgress, starMemoryCalcMode, ue1MemoryCalcMode) -
+            getAdjustedTotalMemoryNeeded(bCharacter, bProgress, starMemoryCalcMode, ue1MemoryCalcMode);
           break;
       }
 

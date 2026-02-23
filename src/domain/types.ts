@@ -32,6 +32,7 @@ export type CharacterProgress = {
   ue1Level: Ue1Level;
   ue1SpEquipped: boolean;
   ue2Level: Ue2Level;
+  ownedMemoryPiece: number;
   updatedAt: string;
 };
 
