@@ -13,6 +13,10 @@ import type {
 } from "../../domain/uiStorage";
 import { getLimitBreakRemainingMemoryPieceCount } from "../../utils/limitBreakMemoryCost";
 import { isCharacterNameMatched } from "../../utils/nameSearch";
+import {
+  getUe1RemainingHeartFragmentCountByMode,
+  type Ue1HeartFragmentCalcMode,
+} from "../../utils/ue1HeartFragmentCost";
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import { getStarRemainingMemoryPieceCount, type StarMemoryCalcMode } from "../../utils/starMemoryCost";
 import type { VisibleRow } from "./types";
@@ -26,6 +30,7 @@ type UseVisibleRowsParams = {
   limitBreakFilter: LimitBreakFilter;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
+  ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
   starFilters: StarFilter[];
   ue1Filters: Ue1Filter[];
   ue2Filters: Ue2Filter[];
@@ -77,6 +82,7 @@ export function useVisibleRows({
   limitBreakFilter,
   starMemoryCalcMode,
   ue1MemoryCalcMode,
+  ue1HeartFragmentCalcMode,
   starFilters,
   ue1Filters,
   ue2Filters,
@@ -220,6 +226,11 @@ export function useVisibleRows({
             getUe1RemainingMemoryPieceCount(aCharacter, aProgress, ue1MemoryCalcMode) -
             getUe1RemainingMemoryPieceCount(bCharacter, bProgress, ue1MemoryCalcMode);
           break;
+        case "ue1HeartFragmentNeeded":
+          baseComparison =
+            getUe1RemainingHeartFragmentCountByMode(aCharacter, aProgress, ue1HeartFragmentCalcMode) -
+            getUe1RemainingHeartFragmentCountByMode(bCharacter, bProgress, ue1HeartFragmentCalcMode);
+          break;
         case "limitBreakMemoryNeeded":
           baseComparison =
             getLimitBreakRemainingMemoryPieceCount(aCharacter, aProgress) -
@@ -258,6 +269,7 @@ export function useVisibleRows({
     sortDirection,
     sortKey,
     starMemoryCalcMode,
+    ue1HeartFragmentCalcMode,
     ue1MemoryCalcMode,
   ]);
 }

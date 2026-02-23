@@ -2,6 +2,7 @@ import { z } from "zod";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "./levels";
 import { MEMORY_PIECE_SOURCES, type MemoryPieceSource } from "./types";
 import type { StarMemoryCalcMode } from "../utils/starMemoryCost";
+import type { Ue1HeartFragmentCalcMode } from "../utils/ue1HeartFragmentCost";
 import type { Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
 
 export const UI_STORAGE_KEY = "pcr_growth_tracker_ui";
@@ -26,6 +27,7 @@ export type SortKey =
   | "ownedMemoryPiece"
   | "starMemoryNeeded"
   | "ue1MemoryNeeded"
+  | "ue1HeartFragmentNeeded"
   | "limitBreakMemoryNeeded"
   | "totalMemoryNeeded";
 export type SortDirection = "asc" | "desc" | null;
@@ -37,6 +39,7 @@ export type InputViewSettings = {
   limitBreakFilter: LimitBreakFilter;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
+  ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
   starFilters: StarFilter[];
   ue1Filters: Ue1Filter[];
   ue2Filters: Ue2Filter[];
@@ -57,6 +60,7 @@ const LIMITED_FILTER_VALUES: LimitedFilter[] = ["all", "limited", "normal"];
 const LIMIT_BREAK_FILTER_VALUES: LimitBreakFilter[] = ["all", "on", "off"];
 const STAR_MEMORY_CALC_MODE_VALUES: StarMemoryCalcMode[] = ["implemented_max", "star6_max"];
 const UE1_MEMORY_CALC_MODE_VALUES: Ue1MemoryCalcMode[] = ["implemented_max", "sp_max"];
+const UE1_HEART_FRAGMENT_CALC_MODE_VALUES: Ue1HeartFragmentCalcMode[] = ["implemented_max", "all_max"];
 const SORT_KEY_VALUES: SortKey[] = [
   "owned",
   "name",
@@ -68,6 +72,7 @@ const SORT_KEY_VALUES: SortKey[] = [
   "ownedMemoryPiece",
   "starMemoryNeeded",
   "ue1MemoryNeeded",
+  "ue1HeartFragmentNeeded",
   "limitBreakMemoryNeeded",
   "totalMemoryNeeded",
 ];
@@ -85,6 +90,7 @@ const defaultInputViewSettings: InputViewSettings = {
   limitBreakFilter: "all",
   starMemoryCalcMode: "implemented_max",
   ue1MemoryCalcMode: "implemented_max",
+  ue1HeartFragmentCalcMode: "implemented_max",
   starFilters: [],
   ue1Filters: [],
   ue2Filters: [],
@@ -101,6 +107,7 @@ const looseInputSettingsSchema = z
     limitBreakFilter: z.unknown().optional(),
     starMemoryCalcMode: z.unknown().optional(),
     ue1MemoryCalcMode: z.unknown().optional(),
+    ue1HeartFragmentCalcMode: z.unknown().optional(),
     starFilters: z.array(z.unknown()).optional(),
     ue1Filters: z.array(z.unknown()).optional(),
     ue2Filters: z.array(z.unknown()).optional(),
@@ -184,6 +191,11 @@ function normalizeInputSettings(rawInput: unknown): InputViewSettings {
       raw.ue1MemoryCalcMode,
       UE1_MEMORY_CALC_MODE_VALUES,
       defaultInputViewSettings.ue1MemoryCalcMode,
+    ),
+    ue1HeartFragmentCalcMode: normalizeEnumValue(
+      raw.ue1HeartFragmentCalcMode,
+      UE1_HEART_FRAGMENT_CALC_MODE_VALUES,
+      defaultInputViewSettings.ue1HeartFragmentCalcMode,
     ),
     starFilters: normalizeArrayWithSet(raw.starFilters, new Set<StarFilter>(STAR_VALUES)),
     ue1Filters: normalizeArrayWithSet(raw.ue1Filters, allowedUe1FilterSet),

@@ -52,6 +52,7 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputProgressTable
     onUpdateProgress: vi.fn(),
     starMemoryCalcMode: "implemented_max",
     ue1MemoryCalcMode: "implemented_max",
+    ue1HeartFragmentCalcMode: "implemented_max",
     ...overrides,
   };
 }
@@ -80,6 +81,15 @@ describe("InputProgressTable", () => {
     fireEvent.click(screen.getByRole("button", { name: /所持メモピ/ }));
 
     expect(props.onSort).toHaveBeenCalledWith("ownedMemoryPiece");
+  });
+
+  it("専用1必要ハートの欠片列ヘッダー押下でソートキーを親へ通知できる", () => {
+    const props = buildProps();
+    render(<InputProgressTable {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /専用1必要ハートの欠片/ }));
+
+    expect(props.onSort).toHaveBeenCalledWith("ue1HeartFragmentNeeded");
   });
 
   it("所持チェック変更で進捗更新を通知する", () => {
@@ -136,7 +146,54 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[11]).toHaveTextContent("0");
+    expect(cells[12]).toHaveTextContent("0");
+  });
+
+  it("専用1必要ハートの欠片を表示する", () => {
+    const props = buildProps();
+    render(<InputProgressTable {...props} />);
+
+    const tableRows = screen.getAllByRole("row");
+    const bodyRow = tableRows[1] as HTMLTableRowElement;
+    const cells = within(bodyRow).getAllByRole("cell");
+
+    expect(cells[10]).toHaveTextContent("318");
+  });
+
+  it("専用1必要ハートの欠片はモード切り替えで未実装キャラも表示できる", () => {
+    const row: VisibleRow = {
+      character: buildCharacter({
+        name: "ユイ",
+        implemented: {
+          star6: true,
+          ue1: false,
+          ue1Sp: false,
+          ue2: false,
+        },
+      }),
+      progress: buildProgress({ ue1Level: null }),
+    };
+
+    const implementedOnlyProps = buildProps({
+      visibleRows: [row],
+      ue1HeartFragmentCalcMode: "implemented_max",
+    });
+    const allMaxProps = buildProps({
+      visibleRows: [row],
+      ue1HeartFragmentCalcMode: "all_max",
+    });
+
+    const { rerender } = render(<InputProgressTable {...implementedOnlyProps} />);
+    let tableRows = screen.getAllByRole("row");
+    let bodyRow = tableRows[1] as HTMLTableRowElement;
+    let cells = within(bodyRow).getAllByRole("cell");
+    expect(cells[10]).toHaveTextContent("0");
+
+    rerender(<InputProgressTable {...allMaxProps} />);
+    tableRows = screen.getAllByRole("row");
+    bodyRow = tableRows[1] as HTMLTableRowElement;
+    cells = within(bodyRow).getAllByRole("cell");
+    expect(cells[10]).toHaveTextContent("318");
   });
 
   it("メモピ入手列にソース名を表示する", () => {

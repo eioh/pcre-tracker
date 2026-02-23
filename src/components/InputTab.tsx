@@ -12,6 +12,7 @@ import type {
   Ue1Filter,
   Ue2Filter,
 } from "../domain/uiStorage";
+import type { Ue1HeartFragmentCalcMode } from "../utils/ue1HeartFragmentCost";
 import type { Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../utils/starMemoryCost";
 import { InputFilters } from "./input/InputFilters";
@@ -38,6 +39,9 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
   const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>(initialSettings.limitBreakFilter);
   const [starMemoryCalcMode, setStarMemoryCalcMode] = useState<StarMemoryCalcMode>(initialSettings.starMemoryCalcMode);
   const [ue1MemoryCalcMode, setUe1MemoryCalcMode] = useState<Ue1MemoryCalcMode>(initialSettings.ue1MemoryCalcMode);
+  const [ue1HeartFragmentCalcMode, setUe1HeartFragmentCalcMode] = useState<Ue1HeartFragmentCalcMode>(
+    initialSettings.ue1HeartFragmentCalcMode,
+  );
   const [starFilters, setStarFilters] = useState<StarFilter[]>(initialSettings.starFilters);
   const [ue1Filters, setUe1Filters] = useState<Ue1Filter[]>(initialSettings.ue1Filters);
   const [ue2Filters, setUe2Filters] = useState<Ue2Filter[]>(initialSettings.ue2Filters);
@@ -57,6 +61,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
     limitBreakFilter,
     starMemoryCalcMode,
     ue1MemoryCalcMode,
+    ue1HeartFragmentCalcMode,
     starFilters,
     ue1Filters,
     ue2Filters,
@@ -94,6 +99,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
       limitBreakFilter,
       starMemoryCalcMode,
       ue1MemoryCalcMode,
+      ue1HeartFragmentCalcMode,
       starFilters,
       ue1Filters,
       ue2Filters,
@@ -108,6 +114,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
       limitBreakFilter,
       starMemoryCalcMode,
       ue1MemoryCalcMode,
+      ue1HeartFragmentCalcMode,
       starFilters,
       ue1Filters,
       ue2Filters,
@@ -173,16 +180,18 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         setMemorySourceFilters={setMemorySourceFilters}
       />
 
-      <div className={filterSeparatorClass} role="separator" aria-label="フィルタと必要メモピ計算の区切り" />
+      <div className={filterSeparatorClass} role="separator" aria-label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
 
       <InputMemoryCalcSettings
         starMemoryCalcMode={starMemoryCalcMode}
         onStarMemoryCalcModeChange={setStarMemoryCalcMode}
         ue1MemoryCalcMode={ue1MemoryCalcMode}
         onUe1MemoryCalcModeChange={setUe1MemoryCalcMode}
+        ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
+        onUe1HeartFragmentCalcModeChange={setUe1HeartFragmentCalcMode}
       />
 
-      <div className={tableSeparatorClass} role="separator" aria-label="必要メモピ計算とテーブルの区切り" />
+      <div className={tableSeparatorClass} role="separator" aria-label="必要メモピ/ハートの欠片計算とテーブルの区切り" />
 
       <p className="my-3.5 text-sm text-muted">表示件数: {visibleRows.length}</p>
 
@@ -194,6 +203,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         onUpdateProgress={onUpdateProgress}
         starMemoryCalcMode={starMemoryCalcMode}
         ue1MemoryCalcMode={ue1MemoryCalcMode}
+        ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
       />
     </section>
   );

@@ -1,5 +1,9 @@
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type { MasterCharacter, StoredStateV1 } from "../domain/types";
+import {
+  getUe1RemainingHeartFragmentCount,
+  getUe1RemainingHeartFragmentCountToMaxAssumed,
+} from "./ue1HeartFragmentCost";
 
 export type DistributionItem = {
   label: string;
@@ -23,16 +27,21 @@ export type DashboardSummary = {
     unequipped: number;
     unimplemented: number;
   };
+  ue1HeartFragmentNeededImplementedTotal: number;
+  ue1HeartFragmentNeededAssumedMaxTotal: number;
 };
 
+// 専用1レベル表示用のラベルを生成する。
 function formatUe1Label(level: number): string {
   return level === 0 ? "未装備(0)" : `Lv${level}`;
 }
 
+// 専用2レベル表示用のラベルを生成する。
 function formatUe2Label(level: number): string {
   return level === 0 ? "未装備(0)" : `Lv${level}`;
 }
 
+// マスターと進捗からダッシュボード用の集計結果を生成する。
 export function buildDashboardSummary(
   masterCharacters: MasterCharacter[],
   state: StoredStateV1,
@@ -53,6 +62,8 @@ export function buildDashboardSummary(
   let ue1SpEquipped = 0;
   let ue1SpUnequipped = 0;
   let ue1SpUnimplemented = 0;
+  let ue1HeartFragmentNeededImplementedTotal = 0;
+  let ue1HeartFragmentNeededAssumedMaxTotal = 0;
 
   for (const character of masterCharacters) {
     const progress = state.progressByName[character.name];
@@ -87,14 +98,17 @@ export function buildDashboardSummary(
 
     if (!character.implemented.ue1Sp) {
       ue1SpUnimplemented += 1;
-      continue;
-    }
-
-    ue1SpImplemented += 1;
-    if (progress?.ue1SpEquipped) {
-      ue1SpEquipped += 1;
     } else {
-      ue1SpUnequipped += 1;
+      ue1SpImplemented += 1;
+      if (progress?.ue1SpEquipped) {
+        ue1SpEquipped += 1;
+      } else {
+        ue1SpUnequipped += 1;
+      }
+    }
+    if (progress) {
+      ue1HeartFragmentNeededImplementedTotal += getUe1RemainingHeartFragmentCount(character, progress);
+      ue1HeartFragmentNeededAssumedMaxTotal += getUe1RemainingHeartFragmentCountToMaxAssumed(progress);
     }
   }
 
@@ -115,5 +129,7 @@ export function buildDashboardSummary(
       unequipped: ue1SpUnequipped,
       unimplemented: ue1SpUnimplemented,
     },
+    ue1HeartFragmentNeededImplementedTotal,
+    ue1HeartFragmentNeededAssumedMaxTotal,
   };
 }

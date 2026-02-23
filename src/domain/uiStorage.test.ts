@@ -28,11 +28,12 @@ describe("uiStorage", () => {
         limitBreakFilter: "on",
         starMemoryCalcMode: "star6_max",
         ue1MemoryCalcMode: "sp_max",
+        ue1HeartFragmentCalcMode: "all_max",
         starFilters: [4, 6],
         ue1Filters: [370, "sp"],
         ue2Filters: [5],
         memorySourceFilters: ["hard_quest", "none"],
-        sortKey: "ownedMemoryPiece",
+        sortKey: "ue1HeartFragmentNeeded",
         sortDirection: "desc",
       },
     };
@@ -63,6 +64,7 @@ describe("uiStorage", () => {
     expect(loaded.activeTab).toBe("input");
     expect(loaded.input.searchText).toBe("");
     expect(loaded.input.ownedFilter).toBe("all");
+    expect(loaded.input.ue1HeartFragmentCalcMode).toBe("implemented_max");
     expect(loaded.input.starFilters).toEqual([1]);
     expect(loaded.input.ue1Filters).toEqual([370, "sp"]);
     expect(loaded.input.ue2Filters).toEqual([5]);

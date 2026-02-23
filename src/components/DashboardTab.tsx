@@ -84,6 +84,14 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
           </p>
           <small className="text-sm text-muted">達成率 {star6Rate.toFixed(1)}%</small>
         </article>
+
+        <article className="rounded-2xl border border-[#6180b359] bg-[#090f19cc] p-4">
+          <h3 className="m-0 text-sm text-muted">専用1必要ハート欠片</h3>
+          <p className="mb-1.5 mt-2.5 font-orbitron text-[clamp(1.1rem,2.4vw,1.6rem)]">
+            {summary.ue1HeartFragmentNeededImplementedTotal} / {summary.ue1HeartFragmentNeededAssumedMaxTotal}
+          </p>
+          <small className="block text-sm text-muted">実装キャラ分 / 未実装も含む想定</small>
+        </article>
       </div>
 
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">

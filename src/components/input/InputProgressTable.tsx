@@ -3,6 +3,10 @@ import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { SortDirection, SortKey } from "../../domain/uiStorage";
 import { getLimitBreakRemainingMemoryPieceCount } from "../../utils/limitBreakMemoryCost";
+import {
+  getUe1RemainingHeartFragmentCountByMode,
+  type Ue1HeartFragmentCalcMode,
+} from "../../utils/ue1HeartFragmentCost";
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import { getStarRemainingMemoryPieceCount, type StarMemoryCalcMode } from "../../utils/starMemoryCost";
 import { memorySourceLabelMap, sourceChipClassMap } from "./constants";
@@ -32,6 +36,7 @@ type InputProgressTableProps = {
   onUpdateProgress: (name: string, patch: ProgressPatch) => void;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
+  ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
 };
 
 // ソート状態をth要素のaria-sort値に変換する。
@@ -56,6 +61,7 @@ type TableRowProps = {
   onUpdateProgress: (name: string, patch: ProgressPatch) => void;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
+  ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
 };
 
 // テーブル行コンポーネント。行単位でメモ化し不要な再レンダリングを防ぐ。
@@ -65,6 +71,7 @@ const TableRow = memo(function TableRow({
   onUpdateProgress,
   starMemoryCalcMode,
   ue1MemoryCalcMode,
+  ue1HeartFragmentCalcMode,
 }: TableRowProps) {
   const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
   const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
@@ -80,6 +87,7 @@ const TableRow = memo(function TableRow({
     character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped ? "sp" : ue1Value;
   const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
   const ue1RemainingMemoryPiece = getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode);
+  const ue1RemainingHeartFragment = getUe1RemainingHeartFragmentCountByMode(character, progress, ue1HeartFragmentCalcMode);
   const limitBreakRemainingMemoryPiece = getLimitBreakRemainingMemoryPieceCount(character, progress);
   const totalRemainingMemoryPiece =
     starRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
@@ -229,6 +237,9 @@ const TableRow = memo(function TableRow({
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingMemoryPiece}</span>
       </td>
       <td className={tableBodyCellClass}>
+        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingHeartFragment}</span>
+      </td>
+      <td className={tableBodyCellClass}>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{limitBreakRemainingMemoryPiece}</span>
       </td>
       <td className={tableBodyCellClass}>
@@ -260,6 +271,7 @@ export const InputProgressTable = memo(function InputProgressTable({
   onUpdateProgress,
   starMemoryCalcMode,
   ue1MemoryCalcMode,
+  ue1HeartFragmentCalcMode,
 }: InputProgressTableProps) {
   return (
     <div className={tableWrapClass}>
@@ -275,6 +287,7 @@ export const InputProgressTable = memo(function InputProgressTable({
           <col className="w-[140px]" />
           <col className="w-[120px]" />
           <col className="w-[130px]" />
+          <col className="w-[170px]" />
           <col className="w-[145px]" />
           <col className="w-[120px]" />
           <col className="w-[260px]" />
@@ -341,6 +354,18 @@ export const InputProgressTable = memo(function InputProgressTable({
                 <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("ue1MemoryNeeded", sortKey, sortDirection)}</span>
               </button>
             </th>
+            <th aria-sort={getAriaSort("ue1HeartFragmentNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button
+                type="button"
+                className={`${sortButtonClass} relative w-full justify-center`}
+                onClick={() => onSort("ue1HeartFragmentNeeded")}
+              >
+                専用1必要ハートの欠片
+                <span className={`${sortIndicatorClass} absolute right-0`}>
+                  {renderSortIndicator("ue1HeartFragmentNeeded", sortKey, sortDirection)}
+                </span>
+              </button>
+            </th>
             <th aria-sort={getAriaSort("limitBreakMemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
               <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("limitBreakMemoryNeeded")}>
                 限界突破必要メモピ
@@ -361,7 +386,7 @@ export const InputProgressTable = memo(function InputProgressTable({
         <tbody>
           {visibleRows.length === 0 ? (
             <tr>
-              <td colSpan={13} className="px-3 py-[18px] text-center text-muted">
+              <td colSpan={14} className="px-3 py-[18px] text-center text-muted">
                 条件に一致するキャラがいません
               </td>
             </tr>
@@ -374,6 +399,7 @@ export const InputProgressTable = memo(function InputProgressTable({
                 onUpdateProgress={onUpdateProgress}
                 starMemoryCalcMode={starMemoryCalcMode}
                 ue1MemoryCalcMode={ue1MemoryCalcMode}
+                ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
               />
             ))
           )}

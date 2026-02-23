@@ -27,6 +27,7 @@ const state: StoredStateV1 = {
       ue1Level: 370,
       ue1SpEquipped: true,
       ue2Level: 2,
+      ownedMemoryPiece: 0,
       updatedAt: "2026-02-22T00:00:00.000Z",
     },
     ユイ: {
@@ -36,6 +37,7 @@ const state: StoredStateV1 = {
       ue1Level: null,
       ue1SpEquipped: false,
       ue2Level: null,
+      ownedMemoryPiece: 0,
       updatedAt: "2026-02-22T00:00:00.000Z",
     },
   },
@@ -53,6 +55,8 @@ describe("buildDashboardSummary", () => {
     expect(summary.ue1Sp.implemented).toBe(1);
     expect(summary.ue1Sp.equipped).toBe(1);
     expect(summary.ue1Sp.unimplemented).toBe(1);
+    expect(summary.ue1HeartFragmentNeededImplementedTotal).toBe(0);
+    expect(summary.ue1HeartFragmentNeededAssumedMaxTotal).toBe(318);
 
     const ue1Sp = summary.ue1Distribution.find((item) => item.label === "SP");
     const ue1Unimplemented = summary.ue1Distribution.find((item) => item.label === "未実装");
