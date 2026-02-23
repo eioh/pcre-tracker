@@ -48,6 +48,7 @@ const memorySourceLabelMap: Record<MemoryPieceSource, string> = {
 const panelClass =
   "rounded-[18px] border border-white/30 bg-linear-to-br from-[#131a27cc] to-[#0d1421f2] p-5 shadow-panel";
 const inputToolbarClass = "grid grid-cols-1 gap-3 lg:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]";
+const sectionLabelClass = "mb-2 text-sm font-semibold text-[#c8d8f6]";
 const fieldGroupClass = "grid gap-1.5 text-sm text-muted";
 const controlClass =
   "w-full rounded-[12px] border border-white/20 bg-[#090e17d9] px-3 py-2.5 text-sm text-main outline-none transition focus:border-accent-strong focus:ring-2 focus:ring-accent-strong/40";
@@ -55,7 +56,9 @@ const multiSelectSummaryClass = `${controlClass} cursor-pointer list-none select
 const multiSelectPanelClass =
   "absolute left-0 top-[calc(100%+6px)] z-10 grid max-h-60 w-full gap-2 overflow-auto rounded-[12px] border border-white/20 bg-[#090e17f5] px-2.5 py-2 shadow-panel";
 const multiSelectItemClass = "inline-flex items-center gap-1.5 whitespace-nowrap text-sm text-main";
-const memoryCalcSectionClass = "col-span-full mt-0.5 border-t border-[#7a94c547] pt-3.5";
+const filterSeparatorClass = "my-3 h-px bg-[#7a94c547]";
+const tableSeparatorClass = "mt-4 mb-1 h-px bg-[#7a94c547]";
+const memoryCalcSectionClass = "mt-0.5 pt-1";
 const memoryCalcGridClass = "grid grid-cols-1 gap-3 md:grid-cols-[repeat(2,minmax(220px,300px))]";
 const tableWrapClass =
   "overflow-auto rounded-[14px] border border-[#7a94c53d] bg-[#0b111bcc] [scrollbar-gutter:stable_both-edges]";
@@ -468,19 +471,22 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
 
   return (
     <section className={panelClass} ref={rootRef}>
+      <label className={`${fieldGroupClass} mb-3`}>
+        <span>キャラ検索</span>
+        <input
+          className={controlClass}
+          value={searchText}
+          onChange={(event) => setSearchText(event.target.value)}
+          placeholder="例: ヒヨリ"
+        />
+      </label>
+
+      <div className={filterSeparatorClass} role="separator" aria-label="キャラ検索とフィルタの区切り" />
+
+      <p className={sectionLabelClass}>フィルタ</p>
       <div className={inputToolbarClass}>
         <label className={fieldGroupClass}>
-          <span>キャラ検索</span>
-          <input
-            className={controlClass}
-            value={searchText}
-            onChange={(event) => setSearchText(event.target.value)}
-            placeholder="例: ヒヨリ"
-          />
-        </label>
-
-        <label className={fieldGroupClass}>
-          <span>所持フィルタ</span>
+          <span>所持</span>
           <select
             className={controlClass}
             value={ownedFilter}
@@ -493,7 +499,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         </label>
 
         <label className={fieldGroupClass}>
-          <span>限定フィルタ</span>
+          <span>限定</span>
           <select
             className={controlClass}
             value={limitedFilter}
@@ -506,7 +512,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         </label>
 
         <label className={fieldGroupClass}>
-          <span>限界突破フィルタ</span>
+          <span>限界突破</span>
           <select
             className={controlClass}
             value={limitBreakFilter}
@@ -519,7 +525,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         </label>
 
         <div className={fieldGroupClass}>
-          <span>☆フィルタ</span>
+          <span>☆</span>
           <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
             <summary className={multiSelectSummaryClass}>{starFilters.length === 0 ? "すべて" : selectedStarLabels}</summary>
             <div className={multiSelectPanelClass}>
@@ -539,7 +545,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         </div>
 
         <div className={fieldGroupClass}>
-          <span>☆必要メモピフィルタ</span>
+          <span>☆必要メモピ</span>
           <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
             <summary className={multiSelectSummaryClass}>
               {starMemoryNeedFilters.length === 0 ? "すべて" : selectedStarMemoryNeedLabels}
@@ -561,7 +567,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         </div>
 
         <div className={fieldGroupClass}>
-          <span>専用1フィルタ</span>
+          <span>専用1</span>
           <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
             <summary className={multiSelectSummaryClass}>{ue1Filters.length === 0 ? "すべて" : selectedUe1Labels}</summary>
             <div className={multiSelectPanelClass}>
@@ -599,7 +605,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         </div>
 
         <div className={fieldGroupClass}>
-          <span>専用2フィルタ</span>
+          <span>専用2</span>
           <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
             <summary className={multiSelectSummaryClass}>{ue2Filters.length === 0 ? "すべて" : selectedUe2Labels}</summary>
             <div className={multiSelectPanelClass}>
@@ -628,7 +634,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         </div>
 
         <div className={fieldGroupClass}>
-          <span>メモピ入手フィルタ</span>
+          <span>メモピ入手</span>
           <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
             <summary className={multiSelectSummaryClass}>
               {memorySourceFilters.length === 0 ? "すべて" : selectedMemorySourceLabels}
@@ -658,35 +664,40 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
           </details>
         </div>
 
-        <div className={memoryCalcSectionClass}>
-          <p className="mb-2.5 mt-0 text-xs text-muted">必要メモピ計算</p>
-          <div className={memoryCalcGridClass}>
-            <label className={fieldGroupClass}>
-              <span>☆</span>
-              <select
-                className={controlClass}
-                value={starMemoryCalcMode}
-                onChange={(event) => setStarMemoryCalcMode(event.target.value as StarMemoryCalcMode)}
-              >
-                <option value="implemented_max">実装段階の最大まで</option>
-                <option value="star6_max">☆6最大まで（仮定）</option>
-              </select>
-            </label>
+      </div>
 
-            <label className={fieldGroupClass}>
-              <span>専用1</span>
-              <select
-                className={controlClass}
-                value={ue1MemoryCalcMode}
-                onChange={(event) => setUe1MemoryCalcMode(event.target.value as Ue1MemoryCalcMode)}
-              >
-                <option value="implemented_max">実装段階の最大まで</option>
-                <option value="sp_max">SP最大まで（仮定）</option>
-              </select>
-            </label>
-          </div>
+      <div className={filterSeparatorClass} role="separator" aria-label="フィルタと必要メモピ計算の区切り" />
+
+      <div className={memoryCalcSectionClass}>
+        <p className="mb-2.5 mt-0 text-sm font-semibold text-[#c8d8f6]">必要メモピ計算</p>
+        <div className={memoryCalcGridClass}>
+          <label className={fieldGroupClass}>
+            <span>☆</span>
+            <select
+              className={controlClass}
+              value={starMemoryCalcMode}
+              onChange={(event) => setStarMemoryCalcMode(event.target.value as StarMemoryCalcMode)}
+            >
+              <option value="implemented_max">実装段階の最大まで</option>
+              <option value="star6_max">☆6最大まで（仮定）</option>
+            </select>
+          </label>
+
+          <label className={fieldGroupClass}>
+            <span>専用1</span>
+            <select
+              className={controlClass}
+              value={ue1MemoryCalcMode}
+              onChange={(event) => setUe1MemoryCalcMode(event.target.value as Ue1MemoryCalcMode)}
+            >
+              <option value="implemented_max">実装段階の最大まで</option>
+              <option value="sp_max">SP最大まで（仮定）</option>
+            </select>
+          </label>
         </div>
       </div>
+
+      <div className={tableSeparatorClass} role="separator" aria-label="必要メモピ計算とテーブルの区切り" />
 
       <p className="my-3.5 text-sm text-muted">表示件数: {visibleRows.length}</p>
 

@@ -171,7 +171,7 @@ export default function App() {
           type="button"
           className={
             safeUiState.activeTab === "input"
-              ? "rounded-full bg-linear-to-r from-accent to-accent-strong px-5 py-2.5 text-sm font-bold text-bg-start"
+              ? "rounded-full bg-linear-to-r from-accent to-accent-strong px-5 py-2.5 text-sm font-extrabold text-[#05313b]"
               : "cursor-pointer rounded-full bg-transparent px-5 py-2.5 text-sm font-bold text-muted transition hover:text-main"
           }
           onClick={() => setUiState((previous) => ({ ...previous, activeTab: "input" }))}
@@ -182,7 +182,7 @@ export default function App() {
           type="button"
           className={
             safeUiState.activeTab === "dashboard"
-              ? "rounded-full bg-linear-to-r from-accent to-accent-strong px-5 py-2.5 text-sm font-bold text-bg-start"
+              ? "rounded-full bg-linear-to-r from-accent to-accent-strong px-5 py-2.5 text-sm font-extrabold text-[#05313b]"
               : "cursor-pointer rounded-full bg-transparent px-5 py-2.5 text-sm font-bold text-muted transition hover:text-main"
           }
           onClick={() => setUiState((previous) => ({ ...previous, activeTab: "dashboard" }))}
