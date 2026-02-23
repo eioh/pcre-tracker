@@ -7,6 +7,8 @@ function createCharacter(limited: boolean): MasterCharacter {
   return {
     name: "ヒヨリ",
     limited,
+    attribute: "火",
+    role: "アタッカー",
     implemented: { star6: true, ue1: true, ue1Sp: true, ue2: true },
     memoryPieceSources: [],
   };

@@ -1,16 +1,20 @@
 import { z } from "zod";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "./levels";
-import { MEMORY_PIECE_SOURCES } from "./types";
+import { ATTRIBUTE_VALUES, MEMORY_PIECE_SOURCES, ROLE_VALUES } from "./types";
 
 const ue1LevelValueSet = new Set<number>(UE1_LEVEL_VALUES);
 const ue2LevelValueSet = new Set<number>(UE2_LEVEL_VALUES);
 
 export const memoryPieceSourceSchema = z.enum(MEMORY_PIECE_SOURCES);
+export const attributeSchema = z.enum(ATTRIBUTE_VALUES);
+export const roleSchema = z.enum(ROLE_VALUES);
 
 export const masterCharacterSchema = z.object({
   name: z.string().min(1),
   searchTokens: z.array(z.string().min(1)).optional(),
   limited: z.boolean(),
+  attribute: attributeSchema,
+  role: roleSchema,
   implemented: z.object({
     star6: z.boolean(),
     ue1: z.boolean(),

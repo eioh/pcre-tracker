@@ -7,6 +7,8 @@ function createCharacter(implemented: MasterCharacter["implemented"]): MasterCha
   return {
     name: "ヒヨリ",
     limited: false,
+    attribute: "火",
+    role: "アタッカー",
     implemented,
     memoryPieceSources: [],
   };

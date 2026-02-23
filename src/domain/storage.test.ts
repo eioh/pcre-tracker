@@ -6,6 +6,8 @@ const masterCharacters: MasterCharacter[] = [
   {
     name: "ヒヨリ",
     limited: false,
+    attribute: "火",
+    role: "アタッカー",
     implemented: { star6: true, ue1: true, ue1Sp: true, ue2: false },
     memoryPieceSources: [],
   },

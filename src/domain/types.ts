@@ -11,11 +11,27 @@ export const MEMORY_PIECE_SOURCES = [
 ] as const;
 
 export type MemoryPieceSource = (typeof MEMORY_PIECE_SOURCES)[number];
+export const ATTRIBUTE_VALUES = ["火", "水", "風", "光", "闇"] as const;
+export type Attribute = (typeof ATTRIBUTE_VALUES)[number];
+
+export const ROLE_VALUES = [
+  "アタッカー",
+  "ブレイカー",
+  "バッファー",
+  "デバッファー",
+  "ブースター",
+  "ヒーラー",
+  "タンク",
+  "ジャマー",
+] as const;
+export type Role = (typeof ROLE_VALUES)[number];
 
 export type MasterCharacter = {
   name: string;
   searchTokens?: string[];
   limited: boolean;
+  attribute: Attribute;
+  role: Role;
   implemented: {
     star6: boolean;
     ue1: boolean;

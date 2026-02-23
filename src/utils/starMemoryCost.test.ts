@@ -10,6 +10,8 @@ function createCharacter(params: {
   return {
     name: "ヒヨリ",
     limited: params.limited,
+    attribute: "火",
+    role: "アタッカー",
     implemented: params.implemented,
     memoryPieceSources: [],
   };

@@ -11,6 +11,8 @@ function buildCharacter(overrides?: Partial<MasterCharacter>): MasterCharacter {
   return {
     name: "ヒヨリ",
     limited: false,
+    attribute: "火",
+    role: "アタッカー",
     implemented: {
       star6: true,
       ue1: true,
