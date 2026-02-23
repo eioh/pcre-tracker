@@ -69,6 +69,13 @@ const TableRow = memo(function TableRow({
   const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
   const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
   const starMax = character.implemented.star6 ? 6 : 5;
+  const ue1MaxLevel = UE1_LEVEL_VALUES[UE1_LEVEL_VALUES.length - 1];
+  const ue2MaxLevel = UE2_LEVEL_VALUES[UE2_LEVEL_VALUES.length - 1];
+  const isStarAtMax = progress.star === starMax;
+  const isUe1AtMax =
+    character.implemented.ue1 &&
+    (character.implemented.ue1Sp ? progress.ue1SpEquipped : progress.ue1Level === ue1MaxLevel);
+  const isUe2AtMax = character.implemented.ue2 && progress.ue2Level === ue2MaxLevel;
   const ue1CompositeValue =
     character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped ? "sp" : ue1Value;
   const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
@@ -123,8 +130,8 @@ const TableRow = memo(function TableRow({
 
   return (
     <tr className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]">
-      <td className={tableBodyCellClass}>
-        <label className={tableSwitchClass}>
+      <td className={`${tableBodyCellClass} text-center`}>
+        <label className={`${tableSwitchClass} w-full justify-center`}>
           <input
             type="checkbox"
             className={tableCheckClass}
@@ -135,11 +142,13 @@ const TableRow = memo(function TableRow({
         </label>
       </td>
       <td className={`${tableBodyCellClass} whitespace-nowrap font-bold`}>{character.name}</td>
-      <td className={tableBodyCellClass}>
-        {character.limited ? <span className={limitedBadgeClass}>限定</span> : <span className={normalBadgeClass}>恒常</span>}
+      <td className={`${tableBodyCellClass} text-center`}>
+        <div className="flex justify-center">
+          {character.limited ? <span className={limitedBadgeClass}>限定</span> : <span className={normalBadgeClass}>恒常</span>}
+        </div>
       </td>
-      <td className={tableBodyCellClass}>
-        <label className={tableSwitchClass}>
+      <td className={`${tableBodyCellClass} text-center`}>
+        <label className={`${tableSwitchClass} w-full justify-center`}>
           <input
             type="checkbox"
             className={tableCheckClass}
@@ -151,7 +160,7 @@ const TableRow = memo(function TableRow({
       </td>
       <td className={tableBodyCellClass}>
         <select
-          className={tableSelectClass}
+          className={`${tableSelectClass} ${isStarAtMax ? "border-[#74d6c6] bg-[#0b1a22] text-[#d9fff7] ring-1 ring-[#74d6c6]/70" : ""}`}
           value={progress.star}
           onChange={handleStarChange}
         >
@@ -165,7 +174,7 @@ const TableRow = memo(function TableRow({
       <td className={tableBodyCellClass}>
         {character.implemented.ue1 ? (
           <select
-            className={tableSelectClass}
+            className={`${tableSelectClass} ${isUe1AtMax ? "border-[#74d6c6] bg-[#0b1a22] text-[#d9fff7] ring-1 ring-[#74d6c6]/70" : ""}`}
             value={ue1CompositeValue}
             onChange={handleUe1Change}
           >
@@ -185,7 +194,7 @@ const TableRow = memo(function TableRow({
       <td className={tableBodyCellClass}>
         {character.implemented.ue2 ? (
           <select
-            className={tableSelectClass}
+            className={`${tableSelectClass} ${isUe2AtMax ? "border-[#74d6c6] bg-[#0b1a22] text-[#d9fff7] ring-1 ring-[#74d6c6]/70" : ""}`}
             value={ue2Value}
             onChange={handleUe2Change}
           >
@@ -262,7 +271,7 @@ export const InputProgressTable = memo(function InputProgressTable({
           <col className="w-[95px]" />
           <col className="w-[130px]" />
           <col className="w-[150px]" />
-        <col className="w-[150px]" />
+          <col className="w-[150px]" />
           <col className="w-[140px]" />
           <col className="w-[120px]" />
           <col className="w-[130px]" />
@@ -272,68 +281,81 @@ export const InputProgressTable = memo(function InputProgressTable({
         </colgroup>
         <thead>
           <tr>
-            <th aria-sort={getAriaSort("owned", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("owned")}>
-                所持<span className={sortIndicatorClass}>{renderSortIndicator("owned", sortKey, sortDirection)}</span>
+            <th aria-sort={getAriaSort("owned", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("owned")}>
+                所持
+                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("owned", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("name", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("name")}>
-                キャラ<span className={sortIndicatorClass}>{renderSortIndicator("name", sortKey, sortDirection)}</span>
+            <th aria-sort={getAriaSort("name", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("name")}>
+                キャラ
+                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("name", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("limited", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("limited")}>
-                区分<span className={sortIndicatorClass}>{renderSortIndicator("limited", sortKey, sortDirection)}</span>
+            <th aria-sort={getAriaSort("limited", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("limited")}>
+                区分
+                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("limited", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("limitBreak", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("limitBreak")}>
-                限界突破<span className={sortIndicatorClass}>{renderSortIndicator("limitBreak", sortKey, sortDirection)}</span>
+            <th aria-sort={getAriaSort("limitBreak", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("limitBreak")}>
+                限界突破
+                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("limitBreak", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("star", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("star")}>
-                ☆<span className={sortIndicatorClass}>{renderSortIndicator("star", sortKey, sortDirection)}</span>
+            <th aria-sort={getAriaSort("star", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("star")}>
+                ☆
+                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("star", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("ue1", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("ue1")}>
-                専用1<span className={sortIndicatorClass}>{renderSortIndicator("ue1", sortKey, sortDirection)}</span>
+            <th aria-sort={getAriaSort("ue1", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("ue1")}>
+                専用1
+                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("ue1", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("ue2", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("ue2")}>
-                専用2<span className={sortIndicatorClass}>{renderSortIndicator("ue2", sortKey, sortDirection)}</span>
+            <th aria-sort={getAriaSort("ue2", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("ue2")}>
+                専用2
+                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("ue2", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("ownedMemoryPiece", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("ownedMemoryPiece")}>
-                所持メモピ<span className={sortIndicatorClass}>{renderSortIndicator("ownedMemoryPiece", sortKey, sortDirection)}</span>
+            <th aria-sort={getAriaSort("ownedMemoryPiece", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("ownedMemoryPiece")}>
+                所持メモピ
+                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("ownedMemoryPiece", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("starMemoryNeeded", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("starMemoryNeeded")}>
-                ☆必要メモピ<span className={sortIndicatorClass}>{renderSortIndicator("starMemoryNeeded", sortKey, sortDirection)}</span>
+            <th aria-sort={getAriaSort("starMemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("starMemoryNeeded")}>
+                ☆必要メモピ
+                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("starMemoryNeeded", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("ue1MemoryNeeded", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("ue1MemoryNeeded")}>
-                専用1必要メモピ<span className={sortIndicatorClass}>{renderSortIndicator("ue1MemoryNeeded", sortKey, sortDirection)}</span>
+            <th aria-sort={getAriaSort("ue1MemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("ue1MemoryNeeded")}>
+                専用1必要メモピ
+                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("ue1MemoryNeeded", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("limitBreakMemoryNeeded", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("limitBreakMemoryNeeded")}>
+            <th aria-sort={getAriaSort("limitBreakMemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("limitBreakMemoryNeeded")}>
                 限界突破必要メモピ
-                <span className={sortIndicatorClass}>{renderSortIndicator("limitBreakMemoryNeeded", sortKey, sortDirection)}</span>
+                <span className={`${sortIndicatorClass} absolute right-0`}>
+                  {renderSortIndicator("limitBreakMemoryNeeded", sortKey, sortDirection)}
+                </span>
               </button>
             </th>
-            <th aria-sort={getAriaSort("totalMemoryNeeded", sortKey, sortDirection)} className={tableHeadCellClass}>
-              <button type="button" className={sortButtonClass} onClick={() => onSort("totalMemoryNeeded")}>
-                必要メモピ合計<span className={sortIndicatorClass}>{renderSortIndicator("totalMemoryNeeded", sortKey, sortDirection)}</span>
+            <th aria-sort={getAriaSort("totalMemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("totalMemoryNeeded")}>
+                必要メモピ合計
+                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("totalMemoryNeeded", sortKey, sortDirection)}</span>
               </button>
             </th>
-            <th className={tableHeadCellClass}>メモピ入手</th>
+            <th className={`${tableHeadCellClass} text-center`}>メモピ入手</th>
           </tr>
         </thead>
         <tbody>

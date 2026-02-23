@@ -9,7 +9,6 @@ import type {
   SortDirection,
   SortKey,
   StarFilter,
-  StarMemoryNeedFilter,
   Ue1Filter,
   Ue2Filter,
 } from "../domain/uiStorage";
@@ -40,9 +39,6 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
   const [starMemoryCalcMode, setStarMemoryCalcMode] = useState<StarMemoryCalcMode>(initialSettings.starMemoryCalcMode);
   const [ue1MemoryCalcMode, setUe1MemoryCalcMode] = useState<Ue1MemoryCalcMode>(initialSettings.ue1MemoryCalcMode);
   const [starFilters, setStarFilters] = useState<StarFilter[]>(initialSettings.starFilters);
-  const [starMemoryNeedFilters, setStarMemoryNeedFilters] = useState<StarMemoryNeedFilter[]>(
-    initialSettings.starMemoryNeedFilters,
-  );
   const [ue1Filters, setUe1Filters] = useState<Ue1Filter[]>(initialSettings.ue1Filters);
   const [ue2Filters, setUe2Filters] = useState<Ue2Filter[]>(initialSettings.ue2Filters);
   const [memorySourceFilters, setMemorySourceFilters] = useState<MemorySourceFilter[]>(initialSettings.memorySourceFilters);
@@ -62,7 +58,6 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
     starMemoryCalcMode,
     ue1MemoryCalcMode,
     starFilters,
-    starMemoryNeedFilters,
     ue1Filters,
     ue2Filters,
     memorySourceFilters,
@@ -100,7 +95,6 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
       starMemoryCalcMode,
       ue1MemoryCalcMode,
       starFilters,
-      starMemoryNeedFilters,
       ue1Filters,
       ue2Filters,
       memorySourceFilters,
@@ -115,7 +109,6 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
       starMemoryCalcMode,
       ue1MemoryCalcMode,
       starFilters,
-      starMemoryNeedFilters,
       ue1Filters,
       ue2Filters,
       memorySourceFilters,
@@ -172,8 +165,6 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         onLimitBreakFilterChange={setLimitBreakFilter}
         starFilters={starFilters}
         setStarFilters={setStarFilters}
-        starMemoryNeedFilters={starMemoryNeedFilters}
-        setStarMemoryNeedFilters={setStarMemoryNeedFilters}
         ue1Filters={ue1Filters}
         setUe1Filters={setUe1Filters}
         ue2Filters={ue2Filters}

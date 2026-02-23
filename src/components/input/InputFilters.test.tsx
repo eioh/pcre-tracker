@@ -6,7 +6,6 @@ import type {
   MemorySourceFilter,
   OwnedFilter,
   StarFilter,
-  StarMemoryNeedFilter,
   Ue1Filter,
   Ue2Filter,
 } from "../../domain/uiStorage";
@@ -26,8 +25,6 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputFilters>>): C
     onLimitBreakFilterChange: vi.fn<(value: LimitBreakFilter) => void>(),
     starFilters: [],
     setStarFilters: vi.fn(),
-    starMemoryNeedFilters: [],
-    setStarMemoryNeedFilters: vi.fn(),
     ue1Filters: [],
     setUe1Filters: vi.fn(),
     ue2Filters: [],
@@ -64,7 +61,6 @@ describe("InputFilters", () => {
       limitedFilter: "limited",
       limitBreakFilter: "on",
       starFilters: [6],
-      starMemoryNeedFilters: [120],
       ue1Filters: ["sp"],
       ue2Filters: [5],
       memorySourceFilters: ["hard_quest"],
@@ -78,7 +74,6 @@ describe("InputFilters", () => {
     expect(props.onLimitedFilterChange).toHaveBeenCalledWith("all");
     expect(props.onLimitBreakFilterChange).toHaveBeenCalledWith("all");
     expect(props.setStarFilters).toHaveBeenCalledWith([]);
-    expect(props.setStarMemoryNeedFilters).toHaveBeenCalledWith([]);
     expect(props.setUe1Filters).toHaveBeenCalledWith([]);
     expect(props.setUe2Filters).toHaveBeenCalledWith([]);
     expect(props.setMemorySourceFilters).toHaveBeenCalledWith([]);

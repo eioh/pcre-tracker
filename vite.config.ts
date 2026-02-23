@@ -9,4 +9,7 @@ const isGitHubPages =
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: isGitHubPages ? "/pcr-my-data/" : "/",
+  server: {
+    port: 5273,
+  },
 });

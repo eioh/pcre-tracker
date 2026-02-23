@@ -29,7 +29,6 @@ describe("uiStorage", () => {
         starMemoryCalcMode: "star6_max",
         ue1MemoryCalcMode: "sp_max",
         starFilters: [4, 6],
-        starMemoryNeedFilters: [0, 450],
         ue1Filters: [370, "sp"],
         ue2Filters: [5],
         memorySourceFilters: ["hard_quest", "none"],
@@ -52,7 +51,6 @@ describe("uiStorage", () => {
           searchText: 123,
           ownedFilter: "foo",
           starFilters: [1, 99, 1, "x"],
-          starMemoryNeedFilters: [450, -1, 999],
           ue1Filters: [370, 999, "sp"],
           ue2Filters: [5, 99],
           memorySourceFilters: ["hard_quest", "unknown", "hard_quest"],
@@ -66,7 +64,6 @@ describe("uiStorage", () => {
     expect(loaded.input.searchText).toBe("");
     expect(loaded.input.ownedFilter).toBe("all");
     expect(loaded.input.starFilters).toEqual([1]);
-    expect(loaded.input.starMemoryNeedFilters).toEqual([450]);
     expect(loaded.input.ue1Filters).toEqual([370, "sp"]);
     expect(loaded.input.ue2Filters).toEqual([5]);
     expect(loaded.input.memorySourceFilters).toEqual(["hard_quest"]);

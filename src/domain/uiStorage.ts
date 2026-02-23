@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "./levels";
 import { MEMORY_PIECE_SOURCES, type MemoryPieceSource } from "./types";
-import { STAR_MEMORY_FILTER_VALUES, type StarMemoryCalcMode } from "../utils/starMemoryCost";
+import type { StarMemoryCalcMode } from "../utils/starMemoryCost";
 import type { Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
 
 export const UI_STORAGE_KEY = "pcr_growth_tracker_ui";
@@ -12,7 +12,6 @@ export type OwnedFilter = "all" | "owned" | "unowned";
 export type LimitedFilter = "all" | "limited" | "normal";
 export type LimitBreakFilter = "all" | "on" | "off";
 export type StarFilter = 1 | 2 | 3 | 4 | 5 | 6;
-export type StarMemoryNeedFilter = number;
 export type Ue1Filter = "unimplemented" | "sp" | (typeof UE1_LEVEL_VALUES)[number];
 export type Ue2Filter = "unimplemented" | (typeof UE2_LEVEL_VALUES)[number];
 export type MemorySourceFilter = "none" | MemoryPieceSource;
@@ -39,7 +38,6 @@ export type InputViewSettings = {
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
   starFilters: StarFilter[];
-  starMemoryNeedFilters: StarMemoryNeedFilter[];
   ue1Filters: Ue1Filter[];
   ue2Filters: Ue2Filter[];
   memorySourceFilters: MemorySourceFilter[];
@@ -79,7 +77,6 @@ const STAR_VALUES: StarFilter[] = [1, 2, 3, 4, 5, 6];
 const allowedUe1FilterSet = new Set<Ue1Filter>(["unimplemented", "sp", ...UE1_LEVEL_VALUES]);
 const allowedUe2FilterSet = new Set<Ue2Filter>(["unimplemented", ...UE2_LEVEL_VALUES]);
 const allowedMemorySourceFilterSet = new Set<MemorySourceFilter>(["none", ...MEMORY_PIECE_SOURCES]);
-const allowedStarMemoryNeedFilterSet = new Set<number>(STAR_MEMORY_FILTER_VALUES);
 
 const defaultInputViewSettings: InputViewSettings = {
   searchText: "",
@@ -89,7 +86,6 @@ const defaultInputViewSettings: InputViewSettings = {
   starMemoryCalcMode: "implemented_max",
   ue1MemoryCalcMode: "implemented_max",
   starFilters: [],
-  starMemoryNeedFilters: [],
   ue1Filters: [],
   ue2Filters: [],
   memorySourceFilters: [],
@@ -106,7 +102,6 @@ const looseInputSettingsSchema = z
     starMemoryCalcMode: z.unknown().optional(),
     ue1MemoryCalcMode: z.unknown().optional(),
     starFilters: z.array(z.unknown()).optional(),
-    starMemoryNeedFilters: z.array(z.unknown()).optional(),
     ue1Filters: z.array(z.unknown()).optional(),
     ue2Filters: z.array(z.unknown()).optional(),
     memorySourceFilters: z.array(z.unknown()).optional(),
@@ -128,7 +123,6 @@ export function buildDefaultInputViewSettings(): InputViewSettings {
   return {
     ...defaultInputViewSettings,
     starFilters: [],
-    starMemoryNeedFilters: [],
     ue1Filters: [],
     ue2Filters: [],
     memorySourceFilters: [],
@@ -192,7 +186,6 @@ function normalizeInputSettings(rawInput: unknown): InputViewSettings {
       defaultInputViewSettings.ue1MemoryCalcMode,
     ),
     starFilters: normalizeArrayWithSet(raw.starFilters, new Set<StarFilter>(STAR_VALUES)),
-    starMemoryNeedFilters: normalizeArrayWithSet(raw.starMemoryNeedFilters, allowedStarMemoryNeedFilterSet),
     ue1Filters: normalizeArrayWithSet(raw.ue1Filters, allowedUe1FilterSet),
     ue2Filters: normalizeArrayWithSet(raw.ue2Filters, allowedUe2FilterSet),
     memorySourceFilters: normalizeArrayWithSet(raw.memorySourceFilters, allowedMemorySourceFilterSet),

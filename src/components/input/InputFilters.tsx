@@ -7,11 +7,9 @@ import type {
   MemorySourceFilter,
   OwnedFilter,
   StarFilter,
-  StarMemoryNeedFilter,
   Ue1Filter,
   Ue2Filter,
 } from "../../domain/uiStorage";
-import { STAR_MEMORY_FILTER_VALUES } from "../../utils/starMemoryCost";
 import { memorySourceLabelMap } from "./constants";
 import { formatUeLevel } from "./formatters";
 import {
@@ -37,8 +35,6 @@ type InputFiltersProps = {
   onLimitBreakFilterChange: (value: LimitBreakFilter) => void;
   starFilters: StarFilter[];
   setStarFilters: Dispatch<SetStateAction<StarFilter[]>>;
-  starMemoryNeedFilters: StarMemoryNeedFilter[];
-  setStarMemoryNeedFilters: Dispatch<SetStateAction<StarMemoryNeedFilter[]>>;
   ue1Filters: Ue1Filter[];
   setUe1Filters: Dispatch<SetStateAction<Ue1Filter[]>>;
   ue2Filters: Ue2Filter[];
@@ -59,8 +55,6 @@ export const InputFilters = memo(function InputFilters({
   onLimitBreakFilterChange,
   starFilters,
   setStarFilters,
-  starMemoryNeedFilters,
-  setStarMemoryNeedFilters,
   ue1Filters,
   setUe1Filters,
   ue2Filters,
@@ -72,7 +66,6 @@ export const InputFilters = memo(function InputFilters({
     .map((filter) => (filter === "none" ? "情報なし" : memorySourceLabelMap[filter]))
     .join(" / ");
   const selectedStarLabels = starFilters.map((star) => `☆${star}`).join(" / ");
-  const selectedStarMemoryNeedLabels = starMemoryNeedFilters.map((value) => String(value)).join(" / ");
   const selectedUe1Labels = ue1Filters
     .map((filter) => (filter === "unimplemented" ? "未実装" : filter === "sp" ? "SP" : formatUeLevel(filter)))
     .join(" / ");
@@ -96,7 +89,6 @@ export const InputFilters = memo(function InputFilters({
     onLimitedFilterChange("all");
     onLimitBreakFilterChange("all");
     setStarFilters([]);
-    setStarMemoryNeedFilters([]);
     setUe1Filters([]);
     setUe2Filters([]);
     setMemorySourceFilters([]);
@@ -173,28 +165,6 @@ export const InputFilters = memo(function InputFilters({
                     onChange={() => toggleFilter(star as CharacterProgress["star"], setStarFilters)}
                   />
                   <span>☆{star}</span>
-                </label>
-              ))}
-            </div>
-          </details>
-        </div>
-
-        <div className={fieldGroupClass}>
-          <span>☆必要メモピ</span>
-          <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
-            <summary className={multiSelectSummaryClass}>
-              {starMemoryNeedFilters.length === 0 ? "すべて" : selectedStarMemoryNeedLabels}
-            </summary>
-            <div className={multiSelectPanelClass}>
-              {STAR_MEMORY_FILTER_VALUES.map((value) => (
-                <label key={value} className={multiSelectItemClass}>
-                  <input
-                    type="checkbox"
-                    className="h-3.5 w-3.5 accent-accent"
-                    checked={starMemoryNeedFilters.includes(value)}
-                    onChange={() => toggleFilter(value, setStarMemoryNeedFilters)}
-                  />
-                  <span>{value}</span>
                 </label>
               ))}
             </div>

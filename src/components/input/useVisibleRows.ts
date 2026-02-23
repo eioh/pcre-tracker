@@ -8,7 +8,6 @@ import type {
   SortDirection,
   SortKey,
   StarFilter,
-  StarMemoryNeedFilter,
   Ue1Filter,
   Ue2Filter,
 } from "../../domain/uiStorage";
@@ -28,7 +27,6 @@ type UseVisibleRowsParams = {
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
   starFilters: StarFilter[];
-  starMemoryNeedFilters: StarMemoryNeedFilter[];
   ue1Filters: Ue1Filter[];
   ue2Filters: Ue2Filter[];
   memorySourceFilters: MemorySourceFilter[];
@@ -80,7 +78,6 @@ export function useVisibleRows({
   starMemoryCalcMode,
   ue1MemoryCalcMode,
   starFilters,
-  starMemoryNeedFilters,
   ue1Filters,
   ue2Filters,
   memorySourceFilters,
@@ -88,7 +85,6 @@ export function useVisibleRows({
   sortDirection,
 }: UseVisibleRowsParams): VisibleRow[] {
   const selectedStarSet = useMemo(() => new Set(starFilters), [starFilters]);
-  const selectedStarMemoryNeedSet = useMemo(() => new Set(starMemoryNeedFilters), [starMemoryNeedFilters]);
   const selectedUe1Set = useMemo(() => new Set(ue1Filters), [ue1Filters]);
   const selectedUe2Set = useMemo(() => new Set(ue2Filters), [ue2Filters]);
   const selectedMemorySourceSet = useMemo(() => new Set(memorySourceFilters), [memorySourceFilters]);
@@ -99,7 +95,6 @@ export function useVisibleRows({
     const hasStarFilter = selectedStarSet.size > 0;
     const hasUe1Filter = selectedUe1Set.size > 0;
     const hasUe2Filter = selectedUe2Set.size > 0;
-    const hasStarMemoryNeedFilter = selectedStarMemoryNeedSet.size > 0;
     const hasMemorySourceFilter = selectedMemorySourceSet.size > 0;
     const hasNoneSourceFilter = selectedMemorySourceSet.has("none");
 
@@ -159,12 +154,6 @@ export function useVisibleRows({
           isUe2Matched = true;
         }
         if (!isUe2Matched) {
-          continue;
-        }
-      }
-      if (hasStarMemoryNeedFilter) {
-        const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
-        if (!selectedStarMemoryNeedSet.has(starRemainingMemoryPiece)) {
           continue;
         }
       }
@@ -263,7 +252,6 @@ export function useVisibleRows({
     progressByName,
     searchText,
     selectedMemorySourceSet,
-    selectedStarMemoryNeedSet,
     selectedStarSet,
     selectedUe1Set,
     selectedUe2Set,
