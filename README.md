@@ -16,18 +16,9 @@ npm install
 npm run dev
 ```
 
-マスターデータ変換のみ実行:
-
-```bash
-npm run convert-master
-```
-
 ## データ構成
 
-- 元データ: `character_data.json`
-- 変換後マスター: `src/data/characterMaster.json`
-
-`npm run build` の前に `npm run convert-master` が自動実行されます。
+- マスター: `src/data/characterMaster.json`
 
 ## 保存先
 

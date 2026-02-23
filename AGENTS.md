@@ -5,14 +5,12 @@
 - `src/components/`: UI タブや React コンポーネント（`DashboardTab.tsx`、`InputTab.tsx` など）
 - `src/domain/`: ドメインモデル、スキーマ、保存処理、レベル計算ロジック
 - `src/utils/`: 画面表示向けの補助処理
-- `src/data/characterMaster.json`: 変換後のマスターデータ
+- `src/data/characterMaster.json`: アプリで利用するマスターデータ
 - `src/test/setup.ts`: Vitest の共通セットアップ
-元データは `character_data.json`、変換スクリプトは `scripts/convert-master.mjs` です。
 
 ## ビルド・テスト・開発コマンド
 - `npm run dev`: Vite 開発サーバーを起動
-- `npm run convert-master`: `character_data.json` から `src/data/characterMaster.json` を再生成
-- `npm run build`: データ変換 → TypeScript ビルド → 本番バンドル作成
+- `npm run build`: TypeScript ビルド → 本番バンドル作成
 - `npm run preview`: ビルド成果物をローカル確認
 - `npm run typecheck`: 型チェックのみ実行（出力なし）
 - `npm test`: Vitest を 1 回実行
