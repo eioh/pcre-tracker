@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo, useState } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type { CharacterProgress, MasterCharacter, MemoryPieceSource, StoredStateV1 } from "../domain/types";
+import { getLimitBreakRemainingMemoryPieceCount } from "../utils/limitBreakMemoryCost";
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
 import {
   getStarRemainingMemoryPieceCount,
@@ -35,7 +36,9 @@ type SortKey =
   | "ue1"
   | "ue2"
   | "starMemoryNeeded"
-  | "ue1MemoryNeeded";
+  | "ue1MemoryNeeded"
+  | "limitBreakMemoryNeeded"
+  | "totalMemoryNeeded";
 type SortDirection = "asc" | "desc" | null;
 
 const memorySourceLabelMap: Record<MemoryPieceSource, string> = {
@@ -266,6 +269,20 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
           baseComparison =
             getUe1RemainingMemoryPieceCount(aCharacter, aProgress, ue1MemoryCalcMode) -
             getUe1RemainingMemoryPieceCount(bCharacter, bProgress, ue1MemoryCalcMode);
+          break;
+        case "limitBreakMemoryNeeded":
+          baseComparison =
+            getLimitBreakRemainingMemoryPieceCount(aCharacter, aProgress) -
+            getLimitBreakRemainingMemoryPieceCount(bCharacter, bProgress);
+          break;
+        case "totalMemoryNeeded":
+          baseComparison =
+            getStarRemainingMemoryPieceCount(aCharacter, aProgress, starMemoryCalcMode) +
+            getUe1RemainingMemoryPieceCount(aCharacter, aProgress, ue1MemoryCalcMode) +
+            getLimitBreakRemainingMemoryPieceCount(aCharacter, aProgress) -
+            (getStarRemainingMemoryPieceCount(bCharacter, bProgress, starMemoryCalcMode) +
+              getUe1RemainingMemoryPieceCount(bCharacter, bProgress, ue1MemoryCalcMode) +
+              getLimitBreakRemainingMemoryPieceCount(bCharacter, bProgress));
           break;
       }
 
@@ -685,13 +702,23 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                   専用1必要メモピ<span className={sortIndicatorClass}>{renderSortIndicator("ue1MemoryNeeded")}</span>
                 </button>
               </th>
+              <th aria-sort={getAriaSort("limitBreakMemoryNeeded")} className={tableHeadCellClass}>
+                <button type="button" className={sortButtonClass} onClick={() => handleSort("limitBreakMemoryNeeded")}>
+                  限界突破必要メモピ<span className={sortIndicatorClass}>{renderSortIndicator("limitBreakMemoryNeeded")}</span>
+                </button>
+              </th>
+              <th aria-sort={getAriaSort("totalMemoryNeeded")} className={tableHeadCellClass}>
+                <button type="button" className={sortButtonClass} onClick={() => handleSort("totalMemoryNeeded")}>
+                  必要メモピ合計<span className={sortIndicatorClass}>{renderSortIndicator("totalMemoryNeeded")}</span>
+                </button>
+              </th>
               <th className={tableHeadCellClass}>メモピ入手</th>
             </tr>
           </thead>
           <tbody>
             {visibleRows.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-3 py-[18px] text-center text-muted">
+                <td colSpan={12} className="px-3 py-[18px] text-center text-muted">
                   条件に一致するキャラがいません
                 </td>
               </tr>
@@ -704,6 +731,9 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                   character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped ? "sp" : ue1Value;
                 const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
                 const ue1RemainingMemoryPiece = getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode);
+                const limitBreakRemainingMemoryPiece = getLimitBreakRemainingMemoryPieceCount(character, progress);
+                const totalRemainingMemoryPiece =
+                  starRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
 
                 return (
                   <tr key={character.name} className="hover:bg-[#3a537c24]">
@@ -806,6 +836,16 @@ export function InputTab({ masterCharacters, state, onUpdateProgress }: InputTab
                     </td>
                     <td className={tableBodyCellClass}>
                       <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingMemoryPiece}</span>
+                    </td>
+                    <td className={tableBodyCellClass}>
+                      <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">
+                        {limitBreakRemainingMemoryPiece}
+                      </span>
+                    </td>
+                    <td className={tableBodyCellClass}>
+                      <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">
+                        {totalRemainingMemoryPiece}
+                      </span>
                     </td>
                     <td className={tableBodyCellClass}>
                       <div className="flex flex-wrap gap-1.5">
