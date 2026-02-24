@@ -13,6 +13,7 @@ import type {
 } from "../../domain/uiStorage";
 import { getLimitBreakRemainingMemoryPieceCount } from "../../utils/limitBreakMemoryCost";
 import { isCharacterNameMatched } from "../../utils/nameSearch";
+import { getConnectRankRemainingMemoryPieceCount } from "../../utils/connectRankMemoryCost";
 import {
   getUe1RemainingHeartFragmentCountByMode,
   type Ue1HeartFragmentCalcMode,
@@ -67,6 +68,7 @@ function getAdjustedTotalMemoryNeeded(
 ): number {
   const totalNeeded =
     getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode) +
+    getConnectRankRemainingMemoryPieceCount(progress) +
     getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode) +
     getLimitBreakRemainingMemoryPieceCount(character, progress);
   return Math.max(0, totalNeeded - progress.ownedMemoryPiece);
@@ -207,6 +209,9 @@ export function useVisibleRows({
         case "star":
           baseComparison = aProgress.star - bProgress.star;
           break;
+        case "connectRank":
+          baseComparison = aProgress.connectRank - bProgress.connectRank;
+          break;
         case "ue1":
           baseComparison = getUe1SortValue(aCharacter, aProgress) - getUe1SortValue(bCharacter, bProgress);
           break;
@@ -220,6 +225,10 @@ export function useVisibleRows({
           baseComparison =
             getStarRemainingMemoryPieceCount(aCharacter, aProgress, starMemoryCalcMode) -
             getStarRemainingMemoryPieceCount(bCharacter, bProgress, starMemoryCalcMode);
+          break;
+        case "connectRankMemoryNeeded":
+          baseComparison =
+            getConnectRankRemainingMemoryPieceCount(aProgress) - getConnectRankRemainingMemoryPieceCount(bProgress);
           break;
         case "ue1MemoryNeeded":
           baseComparison =

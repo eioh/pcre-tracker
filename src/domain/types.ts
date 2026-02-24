@@ -45,6 +45,7 @@ export type CharacterProgress = {
   owned: boolean;
   limitBreak: boolean;
   star: 1 | 2 | 3 | 4 | 5 | 6;
+  connectRank: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
   ue1Level: Ue1Level;
   ue1SpEquipped: boolean;
   ue2Level: Ue2Level;

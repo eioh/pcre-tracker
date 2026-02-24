@@ -30,6 +30,7 @@ function buildProgress(overrides?: Partial<CharacterProgress>): CharacterProgres
     owned: true,
     limitBreak: false,
     star: 3,
+    connectRank: 1,
     ue1Level: 0,
     ue1SpEquipped: false,
     ue2Level: 0,
@@ -118,10 +119,12 @@ describe("InputProgressTable", () => {
     const combos = within(bodyRow).getAllByRole("combobox");
 
     fireEvent.change(combos[0] as HTMLSelectElement, { target: { value: "6" } });
-    fireEvent.change(combos[1] as HTMLSelectElement, { target: { value: "sp" } });
-    fireEvent.change(combos[2] as HTMLSelectElement, { target: { value: "5" } });
+    fireEvent.change(combos[1] as HTMLSelectElement, { target: { value: "10" } });
+    fireEvent.change(combos[2] as HTMLSelectElement, { target: { value: "sp" } });
+    fireEvent.change(combos[3] as HTMLSelectElement, { target: { value: "5" } });
 
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { star: 6 });
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { connectRank: 10 });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 370, ue1SpEquipped: true });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue2Level: 5 });
   });
@@ -148,7 +151,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[11]).toHaveTextContent("0");
+    expect(cells[13]).toHaveTextContent("0");
   });
 
   it("専用1必要ハートの欠片を表示する", () => {
@@ -159,7 +162,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[13]).toHaveTextContent("318");
+    expect(cells[15]).toHaveTextContent("318");
   });
 
   it("専用1必要ハートの欠片はモード切り替えで未実装キャラも表示できる", () => {
@@ -189,13 +192,13 @@ describe("InputProgressTable", () => {
     let tableRows = screen.getAllByRole("row");
     let bodyRow = tableRows[1] as HTMLTableRowElement;
     let cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[13]).toHaveTextContent("0");
+    expect(cells[15]).toHaveTextContent("0");
 
     rerender(<InputProgressTable {...allMaxProps} />);
     tableRows = screen.getAllByRole("row");
     bodyRow = tableRows[1] as HTMLTableRowElement;
     cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[13]).toHaveTextContent("318");
+    expect(cells[15]).toHaveTextContent("318");
   });
 
   it("メモピ入手列にソース名を表示する", () => {
@@ -229,7 +232,16 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const combos = within(bodyRow).getAllByRole("combobox");
 
-    expect(combos[1]).toBeDisabled();
     expect(combos[2]).toBeDisabled();
+    expect(combos[3]).toBeDisabled();
+  });
+
+  it("コネクトRANK必要メモピ列ヘッダー押下でソートキーを親へ通知できる", () => {
+    const props = buildProps();
+    render(<InputProgressTable {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /コネクトRANK必要メモピ/ }));
+
+    expect(props.onSort).toHaveBeenCalledWith("connectRankMemoryNeeded");
   });
 });

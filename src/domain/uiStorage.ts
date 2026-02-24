@@ -22,10 +22,12 @@ export type SortKey =
   | "limited"
   | "limitBreak"
   | "star"
+  | "connectRank"
   | "ue1"
   | "ue2"
   | "ownedMemoryPiece"
   | "starMemoryNeeded"
+  | "connectRankMemoryNeeded"
   | "ue1MemoryNeeded"
   | "ue1HeartFragmentNeeded"
   | "limitBreakMemoryNeeded"
@@ -67,10 +69,12 @@ const SORT_KEY_VALUES: SortKey[] = [
   "limited",
   "limitBreak",
   "star",
+  "connectRank",
   "ue1",
   "ue2",
   "ownedMemoryPiece",
   "starMemoryNeeded",
+  "connectRankMemoryNeeded",
   "ue1MemoryNeeded",
   "ue1HeartFragmentNeeded",
   "limitBreakMemoryNeeded",

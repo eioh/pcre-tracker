@@ -2,6 +2,7 @@ import { memo, useCallback } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { SortDirection, SortKey } from "../../domain/uiStorage";
+import { getConnectRankRemainingMemoryPieceCount } from "../../utils/connectRankMemoryCost";
 import { getLimitBreakRemainingMemoryPieceCount } from "../../utils/limitBreakMemoryCost";
 import {
   getUe1RemainingHeartFragmentCountByMode,
@@ -78,7 +79,9 @@ const TableRow = memo(function TableRow({
   const starMax = character.implemented.star6 ? 6 : 5;
   const ue1MaxLevel = UE1_LEVEL_VALUES[UE1_LEVEL_VALUES.length - 1];
   const ue2MaxLevel = UE2_LEVEL_VALUES[UE2_LEVEL_VALUES.length - 1];
+  const connectRankMax = 15;
   const isStarAtMax = progress.star === starMax;
+  const isConnectRankAtMax = progress.connectRank === connectRankMax;
   const isUe1AtMax =
     character.implemented.ue1 &&
     (character.implemented.ue1Sp ? progress.ue1SpEquipped : progress.ue1Level === ue1MaxLevel);
@@ -86,11 +89,12 @@ const TableRow = memo(function TableRow({
   const ue1CompositeValue =
     character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped ? "sp" : ue1Value;
   const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
+  const connectRankRemainingMemoryPiece = getConnectRankRemainingMemoryPieceCount(progress);
   const ue1RemainingMemoryPiece = getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode);
   const ue1RemainingHeartFragment = getUe1RemainingHeartFragmentCountByMode(character, progress, ue1HeartFragmentCalcMode);
   const limitBreakRemainingMemoryPiece = getLimitBreakRemainingMemoryPieceCount(character, progress);
   const totalRemainingMemoryPiece =
-    starRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
+    starRemainingMemoryPiece + connectRankRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
   const adjustedTotalRemainingMemoryPiece = Math.max(0, totalRemainingMemoryPiece - progress.ownedMemoryPiece);
 
   const handleOwnedChange = useCallback(
@@ -117,6 +121,11 @@ const TableRow = memo(function TableRow({
         : Number(event.target.value)) as CharacterProgress["ue1Level"];
       onUpdateProgress(character.name, { ue1Level: nextValue, ue1SpEquipped: false });
     },
+    [onUpdateProgress, character.name],
+  );
+  const handleConnectRankChange = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) =>
+      onUpdateProgress(character.name, { connectRank: Number(event.target.value) as CharacterProgress["connectRank"] }),
     [onUpdateProgress, character.name],
   );
   const handleUe2Change = useCallback(
@@ -180,6 +189,19 @@ const TableRow = memo(function TableRow({
         </select>
       </td>
       <td className={tableBodyCellClass}>
+        <select
+          className={`${tableSelectClass} ${isConnectRankAtMax ? "border-[#74d6c6] bg-[#0b1a22] text-[#d9fff7] ring-1 ring-[#74d6c6]/70" : ""}`}
+          value={progress.connectRank}
+          onChange={handleConnectRankChange}
+        >
+          {Array.from({ length: 15 }, (_, index) => index + 1).map((rank) => (
+            <option key={rank} value={rank}>
+              {rank}
+            </option>
+          ))}
+        </select>
+      </td>
+      <td className={tableBodyCellClass}>
         {character.implemented.ue1 ? (
           <select
             className={`${tableSelectClass} ${isUe1AtMax ? "border-[#74d6c6] bg-[#0b1a22] text-[#d9fff7] ring-1 ring-[#74d6c6]/70" : ""}`}
@@ -234,6 +256,9 @@ const TableRow = memo(function TableRow({
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{starRemainingMemoryPiece}</span>
       </td>
       <td className={tableBodyCellClass}>
+        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{connectRankRemainingMemoryPiece}</span>
+      </td>
+      <td className={tableBodyCellClass}>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingMemoryPiece}</span>
       </td>
       <td className={tableBodyCellClass}>
@@ -282,10 +307,12 @@ export const InputProgressTable = memo(function InputProgressTable({
           <col className="w-[90px]" />
           <col className="w-[95px]" />
           <col className="w-[130px]" />
+          <col className="w-[130px]" />
           <col className="w-[150px]" />
           <col className="w-[150px]" />
           <col className="w-[140px]" />
           <col className="w-[120px]" />
+          <col className="w-[155px]" />
           <col className="w-[130px]" />
           <col className="w-[145px]" />
           <col className="w-[120px]" />
@@ -324,6 +351,18 @@ export const InputProgressTable = memo(function InputProgressTable({
                 <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("star", sortKey, sortDirection)}</span>
               </button>
             </th>
+            <th aria-sort={getAriaSort("connectRank", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button
+                type="button"
+                className={`${sortButtonClass} relative w-full justify-center`}
+                onClick={() => onSort("connectRank")}
+              >
+                コネクトRANK
+                <span className={`${sortIndicatorClass} absolute right-0`}>
+                  {renderSortIndicator("connectRank", sortKey, sortDirection)}
+                </span>
+              </button>
+            </th>
             <th aria-sort={getAriaSort("ue1", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
               <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("ue1")}>
                 専用1
@@ -346,6 +385,18 @@ export const InputProgressTable = memo(function InputProgressTable({
               <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("starMemoryNeeded")}>
                 ☆必要メモピ
                 <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("starMemoryNeeded", sortKey, sortDirection)}</span>
+              </button>
+            </th>
+            <th aria-sort={getAriaSort("connectRankMemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
+              <button
+                type="button"
+                className={`${sortButtonClass} relative w-full justify-center`}
+                onClick={() => onSort("connectRankMemoryNeeded")}
+              >
+                コネクトRANK必要メモピ
+                <span className={`${sortIndicatorClass} absolute right-0`}>
+                  {renderSortIndicator("connectRankMemoryNeeded", sortKey, sortDirection)}
+                </span>
               </button>
             </th>
             <th aria-sort={getAriaSort("ue1MemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
@@ -386,7 +437,7 @@ export const InputProgressTable = memo(function InputProgressTable({
         <tbody>
           {visibleRows.length === 0 ? (
             <tr>
-              <td colSpan={14} className="px-3 py-[18px] text-center text-muted">
+              <td colSpan={16} className="px-3 py-[18px] text-center text-muted">
                 条件に一致するキャラがいません
               </td>
             </tr>

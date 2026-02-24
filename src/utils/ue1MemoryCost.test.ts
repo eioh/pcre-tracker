@@ -20,6 +20,7 @@ function createProgress(partial: Partial<CharacterProgress>): CharacterProgress 
     owned: true,
     limitBreak: false,
     star: 1,
+    connectRank: 1,
     ue1Level: 0,
     ue1SpEquipped: false,
     ue2Level: null,

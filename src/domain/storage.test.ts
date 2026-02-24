@@ -40,6 +40,7 @@ describe("loadStoredState", () => {
     expect(hiyori).toBeDefined();
     expect(hiyori?.limitBreak).toBe(false);
     expect(hiyori?.star).toBe(1);
+    expect(hiyori?.connectRank).toBe(1);
     expect(hiyori?.ue1Level).toBe(140);
     expect(hiyori?.ue1SpEquipped).toBe(false);
     expect(hiyori?.ue2Level).toBeNull();
@@ -56,6 +57,7 @@ describe("loadStoredState", () => {
             owned: true,
             limitBreak: false,
             star: 3,
+            connectRank: 15,
             ue1Level: 0,
             ue1SpEquipped: false,
             ue2Level: null,

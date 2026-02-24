@@ -28,6 +28,7 @@ const state: StoredStateV1 = {
       owned: true,
       limitBreak: true,
       star: 6,
+      connectRank: 15,
       ue1Level: 370,
       ue1SpEquipped: true,
       ue2Level: 2,
@@ -38,6 +39,7 @@ const state: StoredStateV1 = {
       owned: false,
       limitBreak: false,
       star: 1,
+      connectRank: 1,
       ue1Level: null,
       ue1SpEquipped: false,
       ue2Level: null,
@@ -61,6 +63,11 @@ describe("buildDashboardSummary", () => {
     expect(summary.ue1Sp.unimplemented).toBe(1);
     expect(summary.ue1HeartFragmentNeededImplementedTotal).toBe(0);
     expect(summary.ue1HeartFragmentNeededAssumedMaxTotal).toBe(318);
+    expect(summary.memoryPieceNeeded.star).toBe(450);
+    expect(summary.memoryPieceNeeded.connectRank).toBe(20);
+    expect(summary.memoryPieceNeeded.ue1).toBe(0);
+    expect(summary.memoryPieceNeeded.limitBreak).toBe(120);
+    expect(summary.memoryPieceNeeded.total).toBe(590);
 
     const ue1Sp = summary.ue1Distribution.find((item) => item.label === "SP");
     const ue1Unimplemented = summary.ue1Distribution.find((item) => item.label === "未実装");

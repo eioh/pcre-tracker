@@ -92,6 +92,15 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
           </p>
           <small className="block text-sm text-muted">実装キャラ分 / 未実装も含む想定</small>
         </article>
+
+        <article className="rounded-2xl border border-[#6180b359] bg-[#090f19cc] p-4">
+          <h3 className="m-0 text-sm text-muted">必要メモピ合計</h3>
+          <p className="mb-1.5 mt-2.5 font-orbitron text-[clamp(1.1rem,2.4vw,1.6rem)]">{summary.memoryPieceNeeded.total}</p>
+          <small className="block text-sm text-muted">
+            ☆{summary.memoryPieceNeeded.star} / CR{summary.memoryPieceNeeded.connectRank} / 専1{summary.memoryPieceNeeded.ue1}
+            {" / "}限凸{summary.memoryPieceNeeded.limitBreak}
+          </small>
+        </article>
       </div>
 
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">

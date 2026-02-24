@@ -1,9 +1,13 @@
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type { MasterCharacter, StoredStateV1 } from "../domain/types";
+import { getConnectRankRemainingMemoryPieceCount } from "./connectRankMemoryCost";
+import { getLimitBreakRemainingMemoryPieceCount } from "./limitBreakMemoryCost";
+import { getStarRemainingMemoryPieceCount } from "./starMemoryCost";
 import {
   getUe1RemainingHeartFragmentCount,
   getUe1RemainingHeartFragmentCountToMaxAssumed,
 } from "./ue1HeartFragmentCost";
+import { getUe1RemainingMemoryPieceCount } from "./ue1MemoryCost";
 
 export type DistributionItem = {
   label: string;
@@ -29,6 +33,13 @@ export type DashboardSummary = {
   };
   ue1HeartFragmentNeededImplementedTotal: number;
   ue1HeartFragmentNeededAssumedMaxTotal: number;
+  memoryPieceNeeded: {
+    star: number;
+    connectRank: number;
+    ue1: number;
+    limitBreak: number;
+    total: number;
+  };
 };
 
 // 専用1レベル表示用のラベルを生成する。
@@ -64,6 +75,10 @@ export function buildDashboardSummary(
   let ue1SpUnimplemented = 0;
   let ue1HeartFragmentNeededImplementedTotal = 0;
   let ue1HeartFragmentNeededAssumedMaxTotal = 0;
+  let starMemoryNeededTotal = 0;
+  let connectRankMemoryNeededTotal = 0;
+  let ue1MemoryNeededTotal = 0;
+  let limitBreakMemoryNeededTotal = 0;
 
   for (const character of masterCharacters) {
     const progress = state.progressByName[character.name];
@@ -107,6 +122,10 @@ export function buildDashboardSummary(
       }
     }
     if (progress) {
+      starMemoryNeededTotal += getStarRemainingMemoryPieceCount(character, progress, "implemented_max");
+      connectRankMemoryNeededTotal += getConnectRankRemainingMemoryPieceCount(progress);
+      ue1MemoryNeededTotal += getUe1RemainingMemoryPieceCount(character, progress, "implemented_max");
+      limitBreakMemoryNeededTotal += getLimitBreakRemainingMemoryPieceCount(character, progress);
       ue1HeartFragmentNeededImplementedTotal += getUe1RemainingHeartFragmentCount(character, progress);
       ue1HeartFragmentNeededAssumedMaxTotal += getUe1RemainingHeartFragmentCountToMaxAssumed(progress);
     }
@@ -131,5 +150,12 @@ export function buildDashboardSummary(
     },
     ue1HeartFragmentNeededImplementedTotal,
     ue1HeartFragmentNeededAssumedMaxTotal,
+    memoryPieceNeeded: {
+      star: starMemoryNeededTotal,
+      connectRank: connectRankMemoryNeededTotal,
+      ue1: ue1MemoryNeededTotal,
+      limitBreak: limitBreakMemoryNeededTotal,
+      total: starMemoryNeededTotal + connectRankMemoryNeededTotal + ue1MemoryNeededTotal + limitBreakMemoryNeededTotal,
+    },
   };
 }

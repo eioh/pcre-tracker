@@ -19,12 +19,24 @@ function createDefaultProgress(character: MasterCharacter): CharacterProgress {
     owned: false,
     limitBreak: false,
     star: 1,
+    connectRank: 1,
     ue1Level: character.implemented.ue1 ? 0 : null,
     ue1SpEquipped: false,
     ue2Level: character.implemented.ue2 ? 0 : null,
     ownedMemoryPiece: 0,
     updatedAt: new Date().toISOString(),
   };
+}
+
+// コネクトRANK入力値を1〜15の整数へ正規化する。
+function toConnectRank(value: number): CharacterProgress["connectRank"] {
+  if (!Number.isInteger(value) || value < 1) {
+    return 1;
+  }
+  if (value > 15) {
+    return 15;
+  }
+  return value as CharacterProgress["connectRank"];
 }
 
 function toStar(value: number, isStar6Implemented: boolean): CharacterProgress["star"] {
@@ -79,6 +91,7 @@ function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): Cha
     owned: parsed.data.owned,
     limitBreak: parsed.data.limitBreak,
     star: toStar(parsed.data.star, character.implemented.star6),
+    connectRank: toConnectRank(parsed.data.connectRank),
     ue1Level: toUe1Level(parsed.data.ue1Level),
     ue1SpEquipped: parsed.data.ue1SpEquipped,
     ue2Level: toUe2Level(parsed.data.ue2Level),
