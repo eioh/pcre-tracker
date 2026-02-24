@@ -31,7 +31,7 @@ export const disabledTableSelectClass =
   "w-full min-w-32 cursor-default appearance-none rounded-[12px] border border-[#788aad38] bg-[#070b12bf] px-2.5 py-2 text-sm text-[#9fb0cf] opacity-100 outline-none [box-shadow:inset_0_0_0_1px_rgba(9,14,23,0.35)]";
 export const normalBadgeClass = "rounded-full border border-[#67b8ffa6] bg-[#1c4e7a4f] px-2 py-0.5 text-[0.7rem] text-[#a9ddff]";
 export const limitedBadgeClass = "rounded-full border border-[#ff7e63b3] bg-[#7b2c2552] px-2 py-0.5 text-[0.7rem] text-[#ffb19f]";
-export const sourceChipBaseClass = "rounded-full border px-2 py-0.5 text-[0.72rem]";
+export const sourceChipBaseClass = "rounded-full border px-2 py-0.5 text-[0.72rem] whitespace-nowrap";
 export const sourceChipEmptyClass = `${sourceChipBaseClass} border-white/20 text-muted`;
 export const characterNameCellLayoutClass = "grid gap-1";
 export const characterTagLineClass = "flex flex-wrap items-center gap-2 text-[0.72rem] font-semibold leading-none";
