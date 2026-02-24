@@ -10,19 +10,13 @@ import type {
   Ue1Filter,
   Ue2Filter,
 } from "../../domain/uiStorage";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { MultiSelectFilter } from "../ui/multi-select-filter";
+import { Select } from "../ui/select";
 import { memorySourceLabelMap } from "./constants";
 import { formatUeLevel } from "./formatters";
-import {
-  controlClass,
-  fieldGroupClass,
-  filterSeparatorClass,
-  inputToolbarClass,
-  multiSelectItemClass,
-  multiSelectPanelClass,
-  multiSelectSummaryClass,
-  resetButtonClass,
-  sectionLabelClass,
-} from "./uiStyles";
+import { fieldGroupClass, filterSeparatorClass, inputToolbarClass, sectionLabelClass } from "./uiStyles";
 
 type InputFiltersProps = {
   searchText: string;
@@ -43,6 +37,11 @@ type InputFiltersProps = {
   setMemorySourceFilters: Dispatch<SetStateAction<MemorySourceFilter[]>>;
 };
 
+// ラベル配列をスラッシュ区切りの文字列へ整形する。
+function buildSummary(labels: string[]): string {
+  return labels.join(" / ");
+}
+
 // 育成入力画面の検索・フィルタ操作 UI を表示する。
 export const InputFilters = memo(function InputFilters({
   searchText,
@@ -62,16 +61,16 @@ export const InputFilters = memo(function InputFilters({
   memorySourceFilters,
   setMemorySourceFilters,
 }: InputFiltersProps) {
-  const selectedMemorySourceLabels = memorySourceFilters
-    .map((filter) => (filter === "none" ? "情報なし" : memorySourceLabelMap[filter]))
-    .join(" / ");
-  const selectedStarLabels = starFilters.map((star) => `☆${star}`).join(" / ");
-  const selectedUe1Labels = ue1Filters
-    .map((filter) => (filter === "unimplemented" ? "未実装" : filter === "sp" ? "SP" : formatUeLevel(filter)))
-    .join(" / ");
-  const selectedUe2Labels = ue2Filters
-    .map((filter) => (filter === "unimplemented" ? "未実装" : formatUeLevel(filter)))
-    .join(" / ");
+  const selectedMemorySourceLabels = buildSummary(
+    memorySourceFilters.map((filter) => (filter === "none" ? "情報なし" : memorySourceLabelMap[filter])),
+  );
+  const selectedStarLabels = buildSummary(starFilters.map((star) => `☆${star}`));
+  const selectedUe1Labels = buildSummary(
+    ue1Filters.map((filter) => (filter === "unimplemented" ? "未実装" : filter === "sp" ? "SP" : formatUeLevel(filter))),
+  );
+  const selectedUe2Labels = buildSummary(
+    ue2Filters.map((filter) => (filter === "unimplemented" ? "未実装" : formatUeLevel(filter))),
+  );
 
   // 指定フィルタの選択状態を配列内でトグルする。
   function toggleFilter<T>(filter: T, setFilters: Dispatch<SetStateAction<T[]>>): void {
@@ -99,15 +98,10 @@ export const InputFilters = memo(function InputFilters({
       <label className={`${fieldGroupClass} mb-3`}>
         <span>キャラ検索</span>
         <span className="flex items-center gap-2">
-          <input
-            className={controlClass}
-            value={searchText}
-            onChange={(event) => onSearchTextChange(event.target.value)}
-            placeholder="例: ヒヨリ"
-          />
-          <button type="button" className={`${resetButtonClass} shrink-0`} onClick={resetSearchText}>
+          <Input value={searchText} onChange={(event) => onSearchTextChange(event.target.value)} placeholder="例: ヒヨリ" />
+          <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={resetSearchText}>
             リセット
-          </button>
+          </Button>
         </span>
       </label>
 
@@ -115,159 +109,83 @@ export const InputFilters = memo(function InputFilters({
 
       <p className={`${sectionLabelClass} mb-1`}>フィルタ</p>
       <div className="mb-2">
-        <button type="button" className={resetButtonClass} onClick={resetFilters}>
+        <Button type="button" variant="outline" size="sm" onClick={resetFilters}>
           リセット
-        </button>
+        </Button>
       </div>
       <div className={inputToolbarClass}>
         <label className={fieldGroupClass}>
           <span>所持</span>
-          <select className={controlClass} value={ownedFilter} onChange={(event) => onOwnedFilterChange(event.target.value as OwnedFilter)}>
+          <Select value={ownedFilter} onChange={(event) => onOwnedFilterChange(event.target.value as OwnedFilter)}>
             <option value="all">すべて</option>
             <option value="owned">所持のみ</option>
             <option value="unowned">未所持のみ</option>
-          </select>
+          </Select>
         </label>
 
         <label className={fieldGroupClass}>
           <span>限定</span>
-          <select className={controlClass} value={limitedFilter} onChange={(event) => onLimitedFilterChange(event.target.value as LimitedFilter)}>
+          <Select value={limitedFilter} onChange={(event) => onLimitedFilterChange(event.target.value as LimitedFilter)}>
             <option value="all">すべて</option>
             <option value="limited">限定のみ</option>
             <option value="normal">恒常のみ</option>
-          </select>
+          </Select>
         </label>
 
         <label className={fieldGroupClass}>
           <span>限界突破</span>
-          <select
-            className={controlClass}
-            value={limitBreakFilter}
-            onChange={(event) => onLimitBreakFilterChange(event.target.value as LimitBreakFilter)}
-          >
+          <Select value={limitBreakFilter} onChange={(event) => onLimitBreakFilterChange(event.target.value as LimitBreakFilter)}>
             <option value="all">すべて</option>
             <option value="on">限界突破済み</option>
             <option value="off">未限界突破</option>
-          </select>
+          </Select>
         </label>
 
-        <div className={fieldGroupClass}>
-          <span>☆</span>
-          <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
-            <summary className={multiSelectSummaryClass}>{starFilters.length === 0 ? "すべて" : selectedStarLabels}</summary>
-            <div className={multiSelectPanelClass}>
-              {[1, 2, 3, 4, 5, 6].map((star) => (
-                <label key={star} className={multiSelectItemClass}>
-                  <input
-                    type="checkbox"
-                    className="h-3.5 w-3.5 accent-accent"
-                    checked={starFilters.includes(star as CharacterProgress["star"])}
-                    onChange={() => toggleFilter(star as CharacterProgress["star"], setStarFilters)}
-                  />
-                  <span>☆{star}</span>
-                </label>
-              ))}
-            </div>
-          </details>
-        </div>
+        <MultiSelectFilter
+          title="☆"
+          selectedValues={starFilters}
+          options={[1, 2, 3, 4, 5, 6].map((star) => ({ value: star as CharacterProgress["star"], label: `☆${star}` }))}
+          emptyLabel="すべて"
+          summary={selectedStarLabels}
+          onToggle={(value) => toggleFilter(value, setStarFilters)}
+        />
 
-        <div className={fieldGroupClass}>
-          <span>専用1</span>
-          <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
-            <summary className={multiSelectSummaryClass}>{ue1Filters.length === 0 ? "すべて" : selectedUe1Labels}</summary>
-            <div className={multiSelectPanelClass}>
-              <label className={multiSelectItemClass}>
-                <input
-                  type="checkbox"
-                  className="h-3.5 w-3.5 accent-accent"
-                  checked={ue1Filters.includes("unimplemented")}
-                  onChange={() => toggleFilter("unimplemented", setUe1Filters)}
-                />
-                <span>未実装</span>
-              </label>
-              {UE1_LEVEL_VALUES.map((level) => (
-                <label key={level} className={multiSelectItemClass}>
-                  <input
-                    type="checkbox"
-                    className="h-3.5 w-3.5 accent-accent"
-                    checked={ue1Filters.includes(level)}
-                    onChange={() => toggleFilter(level, setUe1Filters)}
-                  />
-                  <span>{formatUeLevel(level)}</span>
-                </label>
-              ))}
-              <label className={multiSelectItemClass}>
-                <input
-                  type="checkbox"
-                  className="h-3.5 w-3.5 accent-accent"
-                  checked={ue1Filters.includes("sp")}
-                  onChange={() => toggleFilter("sp", setUe1Filters)}
-                />
-                <span>SP</span>
-              </label>
-            </div>
-          </details>
-        </div>
+        <MultiSelectFilter
+          title="専用1"
+          selectedValues={ue1Filters}
+          options={[
+            { value: "unimplemented", label: "未実装" },
+            ...UE1_LEVEL_VALUES.map((level) => ({ value: level as Ue1Filter, label: formatUeLevel(level) })),
+            { value: "sp", label: "SP" },
+          ]}
+          emptyLabel="すべて"
+          summary={selectedUe1Labels}
+          onToggle={(value) => toggleFilter(value, setUe1Filters)}
+        />
 
-        <div className={fieldGroupClass}>
-          <span>専用2</span>
-          <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
-            <summary className={multiSelectSummaryClass}>{ue2Filters.length === 0 ? "すべて" : selectedUe2Labels}</summary>
-            <div className={multiSelectPanelClass}>
-              <label className={multiSelectItemClass}>
-                <input
-                  type="checkbox"
-                  className="h-3.5 w-3.5 accent-accent"
-                  checked={ue2Filters.includes("unimplemented")}
-                  onChange={() => toggleFilter("unimplemented", setUe2Filters)}
-                />
-                <span>未実装</span>
-              </label>
-              {UE2_LEVEL_VALUES.map((level) => (
-                <label key={level} className={multiSelectItemClass}>
-                  <input
-                    type="checkbox"
-                    className="h-3.5 w-3.5 accent-accent"
-                    checked={ue2Filters.includes(level)}
-                    onChange={() => toggleFilter(level, setUe2Filters)}
-                  />
-                  <span>{formatUeLevel(level)}</span>
-                </label>
-              ))}
-            </div>
-          </details>
-        </div>
+        <MultiSelectFilter
+          title="専用2"
+          selectedValues={ue2Filters}
+          options={[
+            { value: "unimplemented", label: "未実装" },
+            ...UE2_LEVEL_VALUES.map((level) => ({ value: level as Ue2Filter, label: formatUeLevel(level) })),
+          ]}
+          emptyLabel="すべて"
+          summary={selectedUe2Labels}
+          onToggle={(value) => toggleFilter(value, setUe2Filters)}
+        />
 
-        <div className={fieldGroupClass}>
-          <span>メモピ入手</span>
-          <details className="multi-select-dropdown relative open:[&>summary]:border-accent-strong">
-            <summary className={multiSelectSummaryClass}>
-              {memorySourceFilters.length === 0 ? "すべて" : selectedMemorySourceLabels}
-            </summary>
-            <div className={multiSelectPanelClass}>
-              <label className={multiSelectItemClass}>
-                <input
-                  type="checkbox"
-                  className="h-3.5 w-3.5 accent-accent"
-                  checked={memorySourceFilters.includes("none")}
-                  onChange={() => toggleFilter("none", setMemorySourceFilters)}
-                />
-                <span>情報なし</span>
-              </label>
-              {Object.entries(memorySourceLabelMap).map(([source, label]) => (
-                <label key={source} className={multiSelectItemClass}>
-                  <input
-                    type="checkbox"
-                    className="h-3.5 w-3.5 accent-accent"
-                    checked={memorySourceFilters.includes(source as MemorySourceFilter)}
-                    onChange={() => toggleFilter(source as MemorySourceFilter, setMemorySourceFilters)}
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
-            </div>
-          </details>
-        </div>
+        <MultiSelectFilter
+          title="メモピ入手"
+          selectedValues={memorySourceFilters}
+          options={[
+            { value: "none", label: "情報なし" },
+            ...Object.entries(memorySourceLabelMap).map(([source, label]) => ({ value: source as MemorySourceFilter, label })),
+          ]}
+          emptyLabel="すべて"
+          summary={selectedMemorySourceLabels}
+          onToggle={(value) => toggleFilter(value, setMemorySourceFilters)}
+        />
       </div>
     </>
   );

@@ -15,6 +15,26 @@
   --shadow-panel: 0 20px 48px rgba(0, 0, 0, 0.45);
 }
 
+:root {
+  --background: 222 40% 8%;
+  --foreground: 213 100% 96%;
+  --card: 220 38% 11%;
+  --card-foreground: 213 100% 96%;
+  --popover: 220 38% 11%;
+  --popover-foreground: 213 100% 96%;
+  --primary: 164 56% 51%;
+  --primary-foreground: 165 100% 96%;
+  --secondary: 219 31% 23%;
+  --secondary-foreground: 213 100% 96%;
+  --muted: 220 28% 23%;
+  --muted-foreground: 218 33% 72%;
+  --accent: 165 100% 48%;
+  --accent-foreground: 165 100% 96%;
+  --border: 216 29% 60%;
+  --input: 219 34% 20%;
+  --ring: 165 100% 48%;
+}
+
 @layer base {
   * {
     box-sizing: border-box;

@@ -20,7 +20,8 @@ import { InputMemoryCalcSettings } from "./input/InputMemoryCalcSettings";
 import { InputProgressTable } from "./input/InputProgressTable";
 import type { ProgressPatch } from "./input/types";
 import { useVisibleRows } from "./input/useVisibleRows";
-import { filterSeparatorClass, panelClass, tableSeparatorClass } from "./input/uiStyles";
+import { panelClass } from "./input/uiStyles";
+import { Separator } from "./ui/separator";
 
 type InputTabProps = {
   masterCharacters: MasterCharacter[];
@@ -180,7 +181,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         setMemorySourceFilters={setMemorySourceFilters}
       />
 
-      <div className={filterSeparatorClass} role="separator" aria-label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
+      <Separator label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
 
       <InputMemoryCalcSettings
         starMemoryCalcMode={starMemoryCalcMode}
@@ -191,7 +192,7 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
         onUe1HeartFragmentCalcModeChange={setUe1HeartFragmentCalcMode}
       />
 
-      <div className={tableSeparatorClass} role="separator" aria-label="必要メモピ/ハートの欠片計算とテーブルの区切り" />
+      <Separator className="mt-4 mb-1" label="必要メモピ/ハートの欠片計算とテーブルの区切り" />
 
       <p className="my-3.5 text-sm text-muted">表示件数: {visibleRows.length}</p>
 

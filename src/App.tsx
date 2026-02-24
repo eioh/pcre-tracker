@@ -11,6 +11,8 @@ import {
 import { buildInitialState, loadStoredState, saveStoredState } from "./domain/storage";
 import type { CharacterProgress, StoredStateV1 } from "./domain/types";
 import { buildDefaultUiState, loadUiState, saveUiState, type InputViewSettings } from "./domain/uiStorage";
+import { Button } from "./components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 type ProgressPatch = Partial<
   Pick<
     CharacterProgress,
@@ -124,23 +126,14 @@ export default function App() {
 
         <div className="flex w-full flex-col items-start gap-2.5 lg:w-auto lg:items-end">
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              className="cursor-pointer rounded-full border border-white/20 bg-white/5 px-4 py-2.5 text-sm text-main transition hover:-translate-y-0.5 hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
-              onClick={handleExportBackup}
-            >
+            <Button variant="outline" onClick={handleExportBackup}>
               エクスポート
-            </button>
-            <button
-              type="button"
-              className="cursor-pointer rounded-full border border-white/20 bg-white/5 px-4 py-2.5 text-sm text-main transition hover:-translate-y-0.5 hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
-              onClick={() => fileInputRef.current?.click()}
-            >
+            </Button>
+            <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
               インポート
-            </button>
-            <button
-              type="button"
-              className="cursor-pointer rounded-full border border-white/20 bg-white/5 px-4 py-2.5 text-sm text-main transition hover:-translate-y-0.5 hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => {
                 const shouldReset = window.confirm("保存データを初期化します。よろしいですか？");
                 if (!shouldReset) {
@@ -151,7 +144,7 @@ export default function App() {
               }}
             >
               保存データを初期化
-            </button>
+            </Button>
             <input
               ref={fileInputRef}
               type="file"
@@ -166,45 +159,33 @@ export default function App() {
         </div>
       </header>
 
-      <nav
-        className="mb-5 inline-flex gap-2 rounded-full border border-white/20 bg-white/5 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-        aria-label="画面切り替え"
+      <Tabs
+        value={safeUiState.activeTab}
+        onValueChange={(value) => {
+          if (value !== "input" && value !== "dashboard") {
+            return;
+          }
+          setUiState((previous) => ({ ...previous, activeTab: value }));
+        }}
       >
-        <button
-          type="button"
-          className={
-            safeUiState.activeTab === "input"
-              ? "rounded-full bg-linear-to-r from-accent to-accent-strong px-5 py-2.5 text-sm font-extrabold text-[#e8fffb] [text-shadow:0_1px_0_rgba(0,0,0,0.28)]"
-              : "cursor-pointer rounded-full bg-transparent px-5 py-2.5 text-sm font-bold text-muted transition hover:text-main"
-          }
-          onClick={() => setUiState((previous) => ({ ...previous, activeTab: "input" }))}
-        >
-          育成入力
-        </button>
-        <button
-          type="button"
-          className={
-            safeUiState.activeTab === "dashboard"
-              ? "rounded-full bg-linear-to-r from-accent to-accent-strong px-5 py-2.5 text-sm font-extrabold text-[#e8fffb] [text-shadow:0_1px_0_rgba(0,0,0,0.28)]"
-              : "cursor-pointer rounded-full bg-transparent px-5 py-2.5 text-sm font-bold text-muted transition hover:text-main"
-          }
-          onClick={() => setUiState((previous) => ({ ...previous, activeTab: "dashboard" }))}
-        >
-          ダッシュボード
-        </button>
-      </nav>
+        <TabsList className="mb-5">
+          <TabsTrigger value="input">育成入力</TabsTrigger>
+          <TabsTrigger value="dashboard">ダッシュボード</TabsTrigger>
+        </TabsList>
 
-      <div className={safeUiState.activeTab === "input" ? "block" : "hidden"} aria-hidden={safeUiState.activeTab !== "input"}>
-        <InputTab
-          masterCharacters={masterCharacters}
-          state={state}
-          onUpdateProgress={handleUpdateProgress}
-          initialSettings={safeUiState.input}
-          onSettingsChange={handleInputSettingsChange}
-        />
-      </div>
-
-      {safeUiState.activeTab === "dashboard" ? <DashboardTab masterCharacters={masterCharacters} state={state} /> : null}
+        <TabsContent value="input">
+          <InputTab
+            masterCharacters={masterCharacters}
+            state={state}
+            onUpdateProgress={handleUpdateProgress}
+            initialSettings={safeUiState.input}
+            onSettingsChange={handleInputSettingsChange}
+          />
+        </TabsContent>
+        <TabsContent value="dashboard">
+          <DashboardTab masterCharacters={masterCharacters} state={state} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

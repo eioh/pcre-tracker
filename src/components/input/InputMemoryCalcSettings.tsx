@@ -2,7 +2,8 @@ import { memo } from "react";
 import type { Ue1HeartFragmentCalcMode } from "../../utils/ue1HeartFragmentCost";
 import type { Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../../utils/starMemoryCost";
-import { controlClass, fieldGroupClass, memoryCalcGridClass, memoryCalcSectionClass } from "./uiStyles";
+import { Select } from "../ui/select";
+import { fieldGroupClass, memoryCalcGridClass, memoryCalcSectionClass } from "./uiStyles";
 
 type InputMemoryCalcSettingsProps = {
   starMemoryCalcMode: StarMemoryCalcMode;
@@ -28,38 +29,29 @@ export const InputMemoryCalcSettings = memo(function InputMemoryCalcSettings({
       <div className={memoryCalcGridClass}>
         <label className={fieldGroupClass}>
           <span>☆</span>
-          <select
-            className={controlClass}
-            value={starMemoryCalcMode}
-            onChange={(event) => onStarMemoryCalcModeChange(event.target.value as StarMemoryCalcMode)}
-          >
+          <Select value={starMemoryCalcMode} onChange={(event) => onStarMemoryCalcModeChange(event.target.value as StarMemoryCalcMode)}>
             <option value="implemented_max">実装段階の最大まで</option>
             <option value="star6_max">☆6最大まで(☆6未実装含む)</option>
-          </select>
+          </Select>
         </label>
 
         <label className={fieldGroupClass}>
           <span>専用1(メモピ)</span>
-          <select
-            className={controlClass}
-            value={ue1MemoryCalcMode}
-            onChange={(event) => onUe1MemoryCalcModeChange(event.target.value as Ue1MemoryCalcMode)}
-          >
+          <Select value={ue1MemoryCalcMode} onChange={(event) => onUe1MemoryCalcModeChange(event.target.value as Ue1MemoryCalcMode)}>
             <option value="implemented_max">実装段階の最大まで</option>
             <option value="sp_max">SP最大まで(SP未実装含む)</option>
-          </select>
+          </Select>
         </label>
 
         <label className={fieldGroupClass}>
           <span>専用1(ハート)</span>
-          <select
-            className={controlClass}
+          <Select
             value={ue1HeartFragmentCalcMode}
             onChange={(event) => onUe1HeartFragmentCalcModeChange(event.target.value as Ue1HeartFragmentCalcMode)}
           >
             <option value="implemented_max">実装段階の最大まで</option>
             <option value="all_max">専用1最大まで(専用1未実装含む)</option>
-          </select>
+          </Select>
         </label>
       </div>
     </div>
