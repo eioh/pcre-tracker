@@ -14,20 +14,20 @@ import { attributeTextClassMap, memorySourceLabelMap, roleTextClassMap, sourceCh
 import { formatUeLevel } from "./formatters";
 import type { ProgressPatch, VisibleRow } from "./types";
 import {
-  disabledTableSelectClass,
   characterNameCellLayoutClass,
   characterTagLineClass,
   sortButtonClass,
   sortIndicatorClass,
   sourceChipEmptyClass,
   tableBodyCellClass,
-  tableCheckClass,
   tableClass,
   tableHeadCellClass,
-  tableSelectClass,
   tableSwitchClass,
   tableWrapClass,
 } from "./uiStyles";
+import { TableCheckbox } from "../ui/table-checkbox";
+import { TableNumberInput } from "../ui/table-number-input";
+import { TableSelect } from "../ui/table-select";
 
 type InputProgressTableProps = {
   visibleRows: VisibleRow[];
@@ -149,13 +149,7 @@ const TableRow = memo(function TableRow({
     <tr className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]">
       <td className={`${tableBodyCellClass} text-center`}>
         <label className={`${tableSwitchClass} w-full justify-center`}>
-          <input
-            type="checkbox"
-            className={tableCheckClass}
-            checked={progress.owned}
-            aria-label={`${character.name}の所持状態`}
-            onChange={handleOwnedChange}
-          />
+          <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onChange={handleOwnedChange} />
         </label>
       </td>
       <td className={`${tableBodyCellClass} whitespace-nowrap font-bold`}>
@@ -172,32 +166,22 @@ const TableRow = memo(function TableRow({
       </td>
       <td className={`${tableBodyCellClass} text-center`}>
         <label className={`${tableSwitchClass} w-full justify-center`}>
-          <input
-            type="checkbox"
-            className={tableCheckClass}
-            checked={progress.limitBreak}
-            aria-label={`${character.name}の限界突破状態`}
-            onChange={handleLimitBreakChange}
-          />
+          <TableCheckbox checked={progress.limitBreak} aria-label={`${character.name}の限界突破状態`} onChange={handleLimitBreakChange} />
         </label>
       </td>
       <td className={tableBodyCellClass}>
-        <select
-          className={`${tableSelectClass} ${isStarAtMax ? "border-[#74d6c6] bg-[#0b1a22] text-[#d9fff7] ring-1 ring-[#74d6c6]/70" : ""}`}
-          value={progress.star}
-          onChange={handleStarChange}
-        >
+        <TableSelect value={progress.star} appearance={isStarAtMax ? "maxed" : "default"} onChange={handleStarChange}>
           {Array.from({ length: starMax }, (_, index) => index + 1).map((star) => (
             <option key={star} value={star}>
               {star}
             </option>
           ))}
-        </select>
+        </TableSelect>
       </td>
       <td className={tableBodyCellClass}>
-        <select
-          className={`${tableSelectClass} ${isConnectRankAtMax ? "border-[#74d6c6] bg-[#0b1a22] text-[#d9fff7] ring-1 ring-[#74d6c6]/70" : ""}`}
+        <TableSelect
           value={progress.connectRank}
+          appearance={isConnectRankAtMax ? "maxed" : "default"}
           onChange={handleConnectRankChange}
         >
           {Array.from({ length: 15 }, (_, index) => index + 1).map((rank) => (
@@ -205,54 +189,45 @@ const TableRow = memo(function TableRow({
               {rank}
             </option>
           ))}
-        </select>
+        </TableSelect>
       </td>
       <td className={tableBodyCellClass}>
         {character.implemented.ue1 ? (
-          <select
-            className={`${tableSelectClass} ${isUe1AtMax ? "border-[#74d6c6] bg-[#0b1a22] text-[#d9fff7] ring-1 ring-[#74d6c6]/70" : ""}`}
-            value={ue1CompositeValue}
-            onChange={handleUe1Change}
-          >
+          <TableSelect value={ue1CompositeValue} appearance={isUe1AtMax ? "maxed" : "default"} onChange={handleUe1Change}>
             {UE1_LEVEL_VALUES.map((level) => (
               <option key={level} value={level}>
                 {formatUeLevel(level)}
               </option>
             ))}
             {character.implemented.ue1Sp ? <option value="sp">SP</option> : null}
-          </select>
+          </TableSelect>
         ) : (
-          <select className={disabledTableSelectClass} value="null" disabled>
+          <TableSelect value="null" appearance="disabled" disabled>
             <option value="null">-</option>
-          </select>
+          </TableSelect>
         )}
       </td>
       <td className={tableBodyCellClass}>
         {character.implemented.ue2 ? (
-          <select
-            className={`${tableSelectClass} ${isUe2AtMax ? "border-[#74d6c6] bg-[#0b1a22] text-[#d9fff7] ring-1 ring-[#74d6c6]/70" : ""}`}
-            value={ue2Value}
-            onChange={handleUe2Change}
-          >
+          <TableSelect value={ue2Value} appearance={isUe2AtMax ? "maxed" : "default"} onChange={handleUe2Change}>
             {UE2_LEVEL_VALUES.map((level) => (
               <option key={level} value={level}>
                 {formatUeLevel(level)}
               </option>
             ))}
-          </select>
+          </TableSelect>
         ) : (
-          <select className={disabledTableSelectClass} value="null" disabled>
+          <TableSelect value="null" appearance="disabled" disabled>
             <option value="null">-</option>
-          </select>
+          </TableSelect>
         )}
       </td>
       <td className={tableBodyCellClass}>
-        <input
+        <TableNumberInput
           type="number"
           inputMode="numeric"
           min={0}
           step={1}
-          className={tableSelectClass}
           value={progress.ownedMemoryPiece}
           aria-label={`${character.name}の所持メモピ数`}
           onChange={handleOwnedMemoryPieceChange}

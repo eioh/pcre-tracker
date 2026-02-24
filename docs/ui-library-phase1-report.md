@@ -34,3 +34,7 @@
 1. `InputProgressTable` の `select` / `checkbox` / `number input` を段階的に `src/components/ui` へ寄せる。
 2. `DashboardTab` のカード/分布表示を共通レイアウト部品へ抽象化する。
 3. `uiStyles.ts` の不要定義を削除し、variants 中心のスタイル設計へ移行する。
+
+## 追記（2026-02-24）
+- Phase 2 / Phase 3 を継続実施し、当初の残課題は解消済み。
+- 現在の進行管理は `docs/ui-library-phase2-report.md` / `docs/ui-library-phase3-report.md` を参照。

@@ -10,15 +10,16 @@
 - `uiStyles.ts` の役割がテーブル固有または廃止可能な範囲まで縮小されている。
 - `npm run typecheck` と `npm test` が継続的に通る。
 
-## 対象範囲
-- 共通部品: Button / Input / Checkbox / Select / Tabs / Separator / 複数選択UI
+## 達成状況（2026-02-24）
+- 達成済み
+- Phase 1: 完了（ヘッダー + 入力画面フィルタ/設定の共通部品化）
+- Phase 2: 完了（テーブル操作UIの共通化）
+- Phase 3: 完了（ダッシュボードカード/分布表示の共通化とスタイル集約）
+
+## 最終構成
+- 共通部品: Button / Input / Checkbox / Select / Tabs / Separator / 複数選択UI / Table操作UI / StatCard / DistributionChart
 - 画面: ヘッダー、タブ、フィルタ、計算設定、テーブル操作UI、ダッシュボードカード
 
 ## 非対象
 - ドメインロジック（`src/domain`）
 - 集計ロジック（`src/utils`）
-
-## フェーズ分割
-1. Phase 1: ヘッダー + 入力画面フィルタ/設定の共通部品化
-2. Phase 2: テーブル操作UI（セレクト・チェックボックス）の共通部品化
-3. Phase 3: ダッシュボードカード/分布表示の共通部品化とスタイル集約

@@ -255,4 +255,33 @@ describe("InputProgressTable", () => {
 
     expect(props.onSort).toHaveBeenCalledWith("connectRankMemoryNeeded");
   });
+
+  it("専用1のSP選択後に通常レベルへ戻せる", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({ onUpdateProgress });
+    render(<InputProgressTable {...props} />);
+
+    const tableRows = screen.getAllByRole("row");
+    const bodyRow = tableRows[1] as HTMLTableRowElement;
+    const combos = within(bodyRow).getAllByRole("combobox");
+
+    fireEvent.change(combos[2] as HTMLSelectElement, { target: { value: "sp" } });
+    fireEvent.change(combos[2] as HTMLSelectElement, { target: { value: "130" } });
+
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 370, ue1SpEquipped: true });
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 130, ue1SpEquipped: false });
+  });
+
+  it("所持メモピ入力は負値と小数を補正して通知する", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({ onUpdateProgress });
+    render(<InputProgressTable {...props} />);
+
+    const input = screen.getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" });
+    fireEvent.change(input, { target: { value: "-3.8" } });
+    fireEvent.change(input, { target: { value: "12.9" } });
+
+    expect(onUpdateProgress).toHaveBeenNthCalledWith(1, "ヒヨリ", { ownedMemoryPiece: 0 });
+    expect(onUpdateProgress).toHaveBeenNthCalledWith(2, "ヒヨリ", { ownedMemoryPiece: 12 });
+  });
 });
