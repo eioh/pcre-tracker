@@ -10,15 +10,13 @@ import {
 } from "../../utils/ue1HeartFragmentCost";
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import { getStarRemainingMemoryPieceCount, type StarMemoryCalcMode } from "../../utils/starMemoryCost";
-import { attributeChipClassMap, memorySourceLabelMap, roleChipClassMap, sourceChipClassMap } from "./constants";
+import { attributeTextClassMap, memorySourceLabelMap, roleTextClassMap, sourceChipClassMap } from "./constants";
 import { formatUeLevel } from "./formatters";
 import type { ProgressPatch, VisibleRow } from "./types";
 import {
   disabledTableSelectClass,
   characterNameCellLayoutClass,
-  characterTagStackClass,
-  limitedBadgeClass,
-  normalBadgeClass,
+  characterTagLineClass,
   sortButtonClass,
   sortIndicatorClass,
   sourceChipEmptyClass,
@@ -162,16 +160,14 @@ const TableRow = memo(function TableRow({
       </td>
       <td className={`${tableBodyCellClass} whitespace-nowrap font-bold`}>
         <div className={characterNameCellLayoutClass}>
-          <div className={characterTagStackClass}>
-            <span className={attributeChipClassMap[character.attribute]}>{character.attribute}</span>
-            <span className={roleChipClassMap[character.role]}>{character.role}</span>
+          <div className={characterTagLineClass}>
+            <span className={character.limited ? "text-[#d8aeb3]" : "text-[#9ec8df]"}>{character.limited ? "限定" : "恒常"}</span>
+            <span className="text-[#7f8ba5]">/</span>
+            <span className={attributeTextClassMap[character.attribute]}>{character.attribute}</span>
+            <span className="text-[#7f8ba5]">/</span>
+            <span className={roleTextClassMap[character.role]}>{character.role}</span>
           </div>
-          <span>{character.name}</span>
-        </div>
-      </td>
-      <td className={`${tableBodyCellClass} text-center`}>
-        <div className="flex justify-center">
-          {character.limited ? <span className={limitedBadgeClass}>限定</span> : <span className={normalBadgeClass}>恒常</span>}
+          <span className="text-[1.05rem]">{character.name}</span>
         </div>
       </td>
       <td className={`${tableBodyCellClass} text-center`}>
@@ -314,7 +310,6 @@ export const InputProgressTable = memo(function InputProgressTable({
         <colgroup>
           <col className="w-20" />
           <col className="w-[200px]" />
-          <col className="w-[90px]" />
           <col className="w-[95px]" />
           <col className="w-[130px]" />
           <col className="w-[130px]" />
@@ -341,12 +336,6 @@ export const InputProgressTable = memo(function InputProgressTable({
               <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("name")}>
                 キャラ
                 <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("name", sortKey, sortDirection)}</span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("limited", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("limited")}>
-                区分
-                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("limited", sortKey, sortDirection)}</span>
               </button>
             </th>
             <th aria-sort={getAriaSort("limitBreak", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
@@ -447,7 +436,7 @@ export const InputProgressTable = memo(function InputProgressTable({
         <tbody>
           {visibleRows.length === 0 ? (
             <tr>
-              <td colSpan={16} className="px-3 py-[18px] text-center text-muted">
+              <td colSpan={15} className="px-3 py-[18px] text-center text-muted">
                 条件に一致するキャラがいません
               </td>
             </tr>
