@@ -33,3 +33,6 @@ export const normalBadgeClass = "rounded-full border border-[#67b8ffa6] bg-[#1c4
 export const limitedBadgeClass = "rounded-full border border-[#ff7e63b3] bg-[#7b2c2552] px-2 py-0.5 text-[0.7rem] text-[#ffb19f]";
 export const sourceChipBaseClass = "rounded-full border px-2 py-0.5 text-[0.72rem]";
 export const sourceChipEmptyClass = `${sourceChipBaseClass} border-white/20 text-muted`;
+export const characterTagBaseClass = "inline-flex rounded-md border px-1.5 py-0.5 text-[0.67rem] font-semibold leading-none";
+export const characterNameCellLayoutClass = "grid grid-cols-[84px_1fr] items-center gap-2";
+export const characterTagStackClass = "grid gap-1 justify-items-start";

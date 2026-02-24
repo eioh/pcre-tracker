@@ -10,11 +10,13 @@ import {
 } from "../../utils/ue1HeartFragmentCost";
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import { getStarRemainingMemoryPieceCount, type StarMemoryCalcMode } from "../../utils/starMemoryCost";
-import { memorySourceLabelMap, sourceChipClassMap } from "./constants";
+import { attributeChipClassMap, memorySourceLabelMap, roleChipClassMap, sourceChipClassMap } from "./constants";
 import { formatUeLevel } from "./formatters";
 import type { ProgressPatch, VisibleRow } from "./types";
 import {
   disabledTableSelectClass,
+  characterNameCellLayoutClass,
+  characterTagStackClass,
   limitedBadgeClass,
   normalBadgeClass,
   sortButtonClass,
@@ -158,7 +160,15 @@ const TableRow = memo(function TableRow({
           />
         </label>
       </td>
-      <td className={`${tableBodyCellClass} whitespace-nowrap font-bold`}>{character.name}</td>
+      <td className={`${tableBodyCellClass} whitespace-nowrap font-bold`}>
+        <div className={characterNameCellLayoutClass}>
+          <div className={characterTagStackClass}>
+            <span className={attributeChipClassMap[character.attribute]}>{character.attribute}</span>
+            <span className={roleChipClassMap[character.role]}>{character.role}</span>
+          </div>
+          <span>{character.name}</span>
+        </div>
+      </td>
       <td className={`${tableBodyCellClass} text-center`}>
         <div className="flex justify-center">
           {character.limited ? <span className={limitedBadgeClass}>限定</span> : <span className={normalBadgeClass}>恒常</span>}

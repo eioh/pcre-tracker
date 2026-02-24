@@ -212,6 +212,15 @@ describe("InputProgressTable", () => {
     expect(screen.getByText("ハード")).toBeInTheDocument();
   });
 
+  it("キャラ名列に属性とロールのチップを表示する", () => {
+    const props = buildProps();
+    render(<InputProgressTable {...props} />);
+
+    expect(screen.getByText("火")).toBeInTheDocument();
+    expect(screen.getByText("アタッカー")).toBeInTheDocument();
+    expect(screen.getByText("ヒヨリ")).toBeInTheDocument();
+  });
+
   it("未実装キャラは専用装備セレクトを無効表示する", () => {
     const row: VisibleRow = {
       character: buildCharacter({
