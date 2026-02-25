@@ -28,3 +28,16 @@
 - `npm run typecheck`: 成功
 - `npm test`: 成功
 - `npm run build`: 成功
+
+## 追記（shadcn準拠強化）
+- `Checkbox` を `@radix-ui/react-checkbox` ベースへ移行
+- `MultiSelectFilter` を `details/summary` からポップオーバー式UIへ移行
+- `InputTab` から `details` 閉じ処理を削除し、各フィルタ側の外側クリック判定へ責務を移譲
+- `Select` のイベント契約を `onChange(event)` から `onValueChange(value)` へ統一
+- `App` のバックアップインポート導線を `FileImportButton` 共通部品へ置換し、生 `input[type=file]` の直接利用を削減
+- `InputFilters` の区切り線を生 `div` から `Separator` へ統一
+- `window.confirm` / `window.alert` を `AlertDialog` ベースのUIへ置換
+- `InputProgressTable` のテーブル構造を `ui/table` コンポーネントへ全面移行
+- `InputFilters` / `InputMemoryCalcSettings` のフォームラベル構造を `ui/field` コンポーネントへ統一
+- `uiStyles.ts` の未使用スタイル定義を削除し、テーブル/フォームの責務を `src/components/ui` へ集約
+- 関連テストを更新し、`npm run typecheck` / `npm test` 成功を確認

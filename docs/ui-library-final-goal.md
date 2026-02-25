@@ -15,9 +15,11 @@
 - Phase 1: 完了（ヘッダー + 入力画面フィルタ/設定の共通部品化）
 - Phase 2: 完了（テーブル操作UIの共通化）
 - Phase 3: 完了（ダッシュボードカード/分布表示の共通化とスタイル集約）
+- 追補（2026-02-25）: `Select` の `onValueChange` 統一、`FileImportButton` 導入、`Separator` 利用統一を反映
+- 追補（2026-02-25）: `AlertDialog` による標準ダイアログ撤廃、`ui/table` / `ui/field` への構造移行を反映
 
 ## 最終構成
-- 共通部品: Button / Input / Checkbox / Select / Tabs / Separator / 複数選択UI / Table操作UI / StatCard / DistributionChart
+- 共通部品: Button / Input / Checkbox / Select / Tabs / Separator / AlertDialog / Field / Table / 複数選択UI / Table操作UI / StatCard / DistributionChart
 - 画面: ヘッダー、タブ、フィルタ、計算設定、テーブル操作UI、ダッシュボードカード
 
 ## 非対象

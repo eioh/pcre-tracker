@@ -19,15 +19,15 @@ import {
   sortButtonClass,
   sortIndicatorClass,
   sourceChipEmptyClass,
-  tableBodyCellClass,
-  tableClass,
-  tableHeadCellClass,
   tableSwitchClass,
   tableWrapClass,
 } from "./uiStyles";
 import { TableCheckbox } from "../ui/table-checkbox";
 import { TableNumberInput } from "../ui/table-number-input";
 import { TableSelect } from "../ui/table-select";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow as UiTableRow } from "../ui/table";
 
 type InputProgressTableProps = {
   visibleRows: VisibleRow[];
@@ -54,6 +54,24 @@ function renderSortIndicator(columnKey: SortKey, sortKey: SortKey, sortDirection
     return "";
   }
   return sortDirection === "asc" ? "▲" : "▼";
+}
+
+type SortHeaderButtonProps = {
+  label: string;
+  columnKey: SortKey;
+  sortKey: SortKey;
+  sortDirection: SortDirection;
+  onSort: (sortKey: SortKey) => void;
+};
+
+// テーブルヘッダーのソートボタンを統一表示する。
+function SortHeaderButton({ label, columnKey, sortKey, sortDirection, onSort }: SortHeaderButtonProps) {
+  return (
+    <Button variant="ghost" className={`${sortButtonClass} relative w-full justify-center rounded-none px-0 py-0`} onClick={() => onSort(columnKey)}>
+      {label}
+      <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator(columnKey, sortKey, sortDirection)}</span>
+    </Button>
+  );
 }
 
 type TableRowProps = {
@@ -106,33 +124,27 @@ const TableRow = memo(function TableRow({
     [onUpdateProgress, character.name],
   );
   const handleStarChange = useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) =>
-      onUpdateProgress(character.name, { star: Number(event.target.value) as CharacterProgress["star"] }),
+    (value: string) => onUpdateProgress(character.name, { star: Number(value) as CharacterProgress["star"] }),
     [onUpdateProgress, character.name],
   );
   const handleUe1Change = useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) => {
-      if (event.target.value === "sp") {
+    (value: string) => {
+      if (value === "sp") {
         onUpdateProgress(character.name, { ue1Level: 370, ue1SpEquipped: true });
         return;
       }
-      const nextValue = (event.target.value === "null"
-        ? null
-        : Number(event.target.value)) as CharacterProgress["ue1Level"];
+      const nextValue = (value === "null" ? null : Number(value)) as CharacterProgress["ue1Level"];
       onUpdateProgress(character.name, { ue1Level: nextValue, ue1SpEquipped: false });
     },
     [onUpdateProgress, character.name],
   );
   const handleConnectRankChange = useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) =>
-      onUpdateProgress(character.name, { connectRank: Number(event.target.value) as CharacterProgress["connectRank"] }),
+    (value: string) => onUpdateProgress(character.name, { connectRank: Number(value) as CharacterProgress["connectRank"] }),
     [onUpdateProgress, character.name],
   );
   const handleUe2Change = useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) => {
-      const nextValue = (event.target.value === "null"
-        ? null
-        : Number(event.target.value)) as CharacterProgress["ue2Level"];
+    (value: string) => {
+      const nextValue = (value === "null" ? null : Number(value)) as CharacterProgress["ue2Level"];
       onUpdateProgress(character.name, { ue2Level: nextValue });
     },
     [onUpdateProgress, character.name],
@@ -146,13 +158,13 @@ const TableRow = memo(function TableRow({
   );
 
   return (
-    <tr className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]">
-      <td className={`${tableBodyCellClass} text-center`}>
+    <UiTableRow className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]">
+      <TableCell className="text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
           <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onChange={handleOwnedChange} />
         </label>
-      </td>
-      <td className={`${tableBodyCellClass} whitespace-nowrap font-bold`}>
+      </TableCell>
+      <TableCell className="whitespace-nowrap font-bold">
         <div className={characterNameCellLayoutClass}>
           <div className={characterTagLineClass}>
             <span className={character.limited ? "text-[#d8aeb3]" : "text-[#9ec8df]"}>{character.limited ? "限定" : "恒常"}</span>
@@ -163,26 +175,26 @@ const TableRow = memo(function TableRow({
           </div>
           <span className="text-[1.05rem]">{character.name}</span>
         </div>
-      </td>
-      <td className={`${tableBodyCellClass} text-center`}>
+      </TableCell>
+      <TableCell className="text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
           <TableCheckbox checked={progress.limitBreak} aria-label={`${character.name}の限界突破状態`} onChange={handleLimitBreakChange} />
         </label>
-      </td>
-      <td className={tableBodyCellClass}>
-        <TableSelect value={progress.star} appearance={isStarAtMax ? "maxed" : "default"} onChange={handleStarChange}>
+      </TableCell>
+      <TableCell>
+        <TableSelect value={progress.star} appearance={isStarAtMax ? "maxed" : "default"} onValueChange={handleStarChange}>
           {Array.from({ length: starMax }, (_, index) => index + 1).map((star) => (
             <option key={star} value={star}>
               {star}
             </option>
           ))}
         </TableSelect>
-      </td>
-      <td className={tableBodyCellClass}>
+      </TableCell>
+      <TableCell>
         <TableSelect
           value={progress.connectRank}
           appearance={isConnectRankAtMax ? "maxed" : "default"}
-          onChange={handleConnectRankChange}
+          onValueChange={handleConnectRankChange}
         >
           {Array.from({ length: 15 }, (_, index) => index + 1).map((rank) => (
             <option key={rank} value={rank}>
@@ -190,10 +202,10 @@ const TableRow = memo(function TableRow({
             </option>
           ))}
         </TableSelect>
-      </td>
-      <td className={tableBodyCellClass}>
+      </TableCell>
+      <TableCell>
         {character.implemented.ue1 ? (
-          <TableSelect value={ue1CompositeValue} appearance={isUe1AtMax ? "maxed" : "default"} onChange={handleUe1Change}>
+          <TableSelect value={ue1CompositeValue} appearance={isUe1AtMax ? "maxed" : "default"} onValueChange={handleUe1Change}>
             {UE1_LEVEL_VALUES.map((level) => (
               <option key={level} value={level}>
                 {formatUeLevel(level)}
@@ -206,10 +218,10 @@ const TableRow = memo(function TableRow({
             <option value="null">-</option>
           </TableSelect>
         )}
-      </td>
-      <td className={tableBodyCellClass}>
+      </TableCell>
+      <TableCell>
         {character.implemented.ue2 ? (
-          <TableSelect value={ue2Value} appearance={isUe2AtMax ? "maxed" : "default"} onChange={handleUe2Change}>
+          <TableSelect value={ue2Value} appearance={isUe2AtMax ? "maxed" : "default"} onValueChange={handleUe2Change}>
             {UE2_LEVEL_VALUES.map((level) => (
               <option key={level} value={level}>
                 {formatUeLevel(level)}
@@ -221,8 +233,8 @@ const TableRow = memo(function TableRow({
             <option value="null">-</option>
           </TableSelect>
         )}
-      </td>
-      <td className={tableBodyCellClass}>
+      </TableCell>
+      <TableCell>
         <TableNumberInput
           type="number"
           inputMode="numeric"
@@ -232,39 +244,39 @@ const TableRow = memo(function TableRow({
           aria-label={`${character.name}の所持メモピ数`}
           onChange={handleOwnedMemoryPieceChange}
         />
-      </td>
-      <td className={tableBodyCellClass}>
+      </TableCell>
+      <TableCell>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{starRemainingMemoryPiece}</span>
-      </td>
-      <td className={tableBodyCellClass}>
+      </TableCell>
+      <TableCell>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{connectRankRemainingMemoryPiece}</span>
-      </td>
-      <td className={tableBodyCellClass}>
+      </TableCell>
+      <TableCell>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingMemoryPiece}</span>
-      </td>
-      <td className={tableBodyCellClass}>
+      </TableCell>
+      <TableCell>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{limitBreakRemainingMemoryPiece}</span>
-      </td>
-      <td className={tableBodyCellClass}>
+      </TableCell>
+      <TableCell>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{adjustedTotalRemainingMemoryPiece}</span>
-      </td>
-      <td className={tableBodyCellClass}>
+      </TableCell>
+      <TableCell>
         <div className="flex flex-wrap gap-1.5">
           {character.memoryPieceSources.length === 0 ? (
-            <span className={sourceChipEmptyClass}>情報なし</span>
+            <Badge variant="muted">情報なし</Badge>
           ) : (
             character.memoryPieceSources.map((source) => (
-              <span key={source} className={sourceChipClassMap[source]}>
+              <Badge key={source} className={sourceChipClassMap[source]}>
                 {memorySourceLabelMap[source]}
-              </span>
+              </Badge>
             ))
           )}
         </div>
-      </td>
-      <td className={tableBodyCellClass}>
+      </TableCell>
+      <TableCell>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingHeartFragment}</span>
-      </td>
-    </tr>
+      </TableCell>
+    </UiTableRow>
   );
 });
 
@@ -281,7 +293,7 @@ export const InputProgressTable = memo(function InputProgressTable({
 }: InputProgressTableProps) {
   return (
     <div className={tableWrapClass}>
-      <table className={tableClass}>
+      <Table>
         <colgroup>
           <col className="w-20" />
           <col className="w-[200px]" />
@@ -299,122 +311,114 @@ export const InputProgressTable = memo(function InputProgressTable({
           <col className="w-[260px]" />
           <col className="w-[170px]" />
         </colgroup>
-        <thead>
-          <tr>
-            <th aria-sort={getAriaSort("owned", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("owned")}>
-                所持
-                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("owned", sortKey, sortDirection)}</span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("name", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("name")}>
-                キャラ
-                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("name", sortKey, sortDirection)}</span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("limitBreak", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("limitBreak")}>
-                限界突破
-                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("limitBreak", sortKey, sortDirection)}</span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("star", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("star")}>
-                ☆
-                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("star", sortKey, sortDirection)}</span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("connectRank", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button
-                type="button"
-                className={`${sortButtonClass} relative w-full justify-center`}
-                onClick={() => onSort("connectRank")}
-              >
-                コネクトRANK
-                <span className={`${sortIndicatorClass} absolute right-0`}>
-                  {renderSortIndicator("connectRank", sortKey, sortDirection)}
-                </span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("ue1", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("ue1")}>
-                専用1
-                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("ue1", sortKey, sortDirection)}</span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("ue2", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("ue2")}>
-                専用2
-                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("ue2", sortKey, sortDirection)}</span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("ownedMemoryPiece", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("ownedMemoryPiece")}>
-                所持メモピ
-                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("ownedMemoryPiece", sortKey, sortDirection)}</span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("starMemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("starMemoryNeeded")}>
-                ☆必要メモピ
-                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("starMemoryNeeded", sortKey, sortDirection)}</span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("connectRankMemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button
-                type="button"
-                className={`${sortButtonClass} relative w-full justify-center`}
-                onClick={() => onSort("connectRankMemoryNeeded")}
-              >
-                コネクトRANK必要メモピ
-                <span className={`${sortIndicatorClass} absolute right-0`}>
-                  {renderSortIndicator("connectRankMemoryNeeded", sortKey, sortDirection)}
-                </span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("ue1MemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("ue1MemoryNeeded")}>
-                専用1必要メモピ
-                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("ue1MemoryNeeded", sortKey, sortDirection)}</span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("limitBreakMemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("limitBreakMemoryNeeded")}>
-                限界突破必要メモピ
-                <span className={`${sortIndicatorClass} absolute right-0`}>
-                  {renderSortIndicator("limitBreakMemoryNeeded", sortKey, sortDirection)}
-                </span>
-              </button>
-            </th>
-            <th aria-sort={getAriaSort("totalMemoryNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button type="button" className={`${sortButtonClass} relative w-full justify-center`} onClick={() => onSort("totalMemoryNeeded")}>
-                必要メモピ合計
-                <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator("totalMemoryNeeded", sortKey, sortDirection)}</span>
-              </button>
-            </th>
-            <th className={`${tableHeadCellClass} text-center`}>メモピ入手</th>
-            <th aria-sort={getAriaSort("ue1HeartFragmentNeeded", sortKey, sortDirection)} className={`${tableHeadCellClass} text-center`}>
-              <button
-                type="button"
-                className={`${sortButtonClass} relative w-full justify-center`}
-                onClick={() => onSort("ue1HeartFragmentNeeded")}
-              >
-                専用1必要ハートの欠片
-                <span className={`${sortIndicatorClass} absolute right-0`}>
-                  {renderSortIndicator("ue1HeartFragmentNeeded", sortKey, sortDirection)}
-                </span>
-              </button>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+        <TableHeader>
+          <UiTableRow>
+            <TableHead aria-sort={getAriaSort("owned", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton label="所持" columnKey="owned" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("name", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton label="キャラ" columnKey="name" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("limitBreak", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton
+                label="限界突破"
+                columnKey="limitBreak"
+                sortKey={sortKey}
+                sortDirection={sortDirection}
+                onSort={onSort}
+              />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("star", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton label="☆" columnKey="star" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("connectRank", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton
+                label="コネクトRANK"
+                columnKey="connectRank"
+                sortKey={sortKey}
+                sortDirection={sortDirection}
+                onSort={onSort}
+              />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("ue1", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton label="専用1" columnKey="ue1" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("ue2", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton label="専用2" columnKey="ue2" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("ownedMemoryPiece", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton
+                label="所持メモピ"
+                columnKey="ownedMemoryPiece"
+                sortKey={sortKey}
+                sortDirection={sortDirection}
+                onSort={onSort}
+              />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("starMemoryNeeded", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton
+                label="☆必要メモピ"
+                columnKey="starMemoryNeeded"
+                sortKey={sortKey}
+                sortDirection={sortDirection}
+                onSort={onSort}
+              />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("connectRankMemoryNeeded", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton
+                label="コネクトRANK必要メモピ"
+                columnKey="connectRankMemoryNeeded"
+                sortKey={sortKey}
+                sortDirection={sortDirection}
+                onSort={onSort}
+              />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("ue1MemoryNeeded", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton
+                label="専用1必要メモピ"
+                columnKey="ue1MemoryNeeded"
+                sortKey={sortKey}
+                sortDirection={sortDirection}
+                onSort={onSort}
+              />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("limitBreakMemoryNeeded", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton
+                label="限界突破必要メモピ"
+                columnKey="limitBreakMemoryNeeded"
+                sortKey={sortKey}
+                sortDirection={sortDirection}
+                onSort={onSort}
+              />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("totalMemoryNeeded", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton
+                label="必要メモピ合計"
+                columnKey="totalMemoryNeeded"
+                sortKey={sortKey}
+                sortDirection={sortDirection}
+                onSort={onSort}
+              />
+            </TableHead>
+            <TableHead className="text-center">メモピ入手</TableHead>
+            <TableHead aria-sort={getAriaSort("ue1HeartFragmentNeeded", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton
+                label="専用1必要ハートの欠片"
+                columnKey="ue1HeartFragmentNeeded"
+                sortKey={sortKey}
+                sortDirection={sortDirection}
+                onSort={onSort}
+              />
+            </TableHead>
+          </UiTableRow>
+        </TableHeader>
+        <TableBody>
           {visibleRows.length === 0 ? (
-            <tr>
-              <td colSpan={15} className="px-3 py-[18px] text-center text-muted">
+            <UiTableRow>
+              <TableCell colSpan={15} className="px-3 py-[18px] text-center text-muted">
                 条件に一致するキャラがいません
-              </td>
-            </tr>
+              </TableCell>
+            </UiTableRow>
           ) : (
             visibleRows.map(({ character, progress }) => (
               <TableRow
@@ -428,8 +432,8 @@ export const InputProgressTable = memo(function InputProgressTable({
               />
             ))
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 });

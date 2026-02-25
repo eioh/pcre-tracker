@@ -11,12 +11,14 @@ import type {
   Ue2Filter,
 } from "../../domain/uiStorage";
 import { Button } from "../ui/button";
+import { Field, FieldControl, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { MultiSelectFilter } from "../ui/multi-select-filter";
 import { Select } from "../ui/select";
+import { Separator } from "../ui/separator";
 import { memorySourceLabelMap } from "./constants";
 import { formatUeLevel } from "./formatters";
-import { fieldGroupClass, filterSeparatorClass, inputToolbarClass, sectionLabelClass } from "./uiStyles";
+import { filterSeparatorClass, inputToolbarClass, sectionLabelClass } from "./uiStyles";
 
 type InputFiltersProps = {
   searchText: string;
@@ -95,17 +97,17 @@ export const InputFilters = memo(function InputFilters({
 
   return (
     <>
-      <label className={`${fieldGroupClass} mb-3`}>
-        <span>キャラ検索</span>
-        <span className="flex items-center gap-2">
+      <Field className="mb-3">
+        <FieldLabel>キャラ検索</FieldLabel>
+        <FieldControl className="flex items-center gap-2">
           <Input value={searchText} onChange={(event) => onSearchTextChange(event.target.value)} placeholder="例: ヒヨリ" />
           <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={resetSearchText}>
             リセット
           </Button>
-        </span>
-      </label>
+        </FieldControl>
+      </Field>
 
-      <div className={filterSeparatorClass} role="separator" aria-label="キャラ検索とフィルタの区切り" />
+      <Separator className={filterSeparatorClass} label="キャラ検索とフィルタの区切り" />
 
       <p className={`${sectionLabelClass} mb-1`}>フィルタ</p>
       <div className="mb-2">
@@ -114,32 +116,32 @@ export const InputFilters = memo(function InputFilters({
         </Button>
       </div>
       <div className={inputToolbarClass}>
-        <label className={fieldGroupClass}>
-          <span>所持</span>
-          <Select value={ownedFilter} onChange={(event) => onOwnedFilterChange(event.target.value as OwnedFilter)}>
+        <Field>
+          <FieldLabel>所持</FieldLabel>
+          <Select value={ownedFilter} onValueChange={(value) => onOwnedFilterChange(value as OwnedFilter)}>
             <option value="all">すべて</option>
             <option value="owned">所持のみ</option>
             <option value="unowned">未所持のみ</option>
           </Select>
-        </label>
+        </Field>
 
-        <label className={fieldGroupClass}>
-          <span>限定</span>
-          <Select value={limitedFilter} onChange={(event) => onLimitedFilterChange(event.target.value as LimitedFilter)}>
+        <Field>
+          <FieldLabel>限定</FieldLabel>
+          <Select value={limitedFilter} onValueChange={(value) => onLimitedFilterChange(value as LimitedFilter)}>
             <option value="all">すべて</option>
             <option value="limited">限定のみ</option>
             <option value="normal">恒常のみ</option>
           </Select>
-        </label>
+        </Field>
 
-        <label className={fieldGroupClass}>
-          <span>限界突破</span>
-          <Select value={limitBreakFilter} onChange={(event) => onLimitBreakFilterChange(event.target.value as LimitBreakFilter)}>
+        <Field>
+          <FieldLabel>限界突破</FieldLabel>
+          <Select value={limitBreakFilter} onValueChange={(value) => onLimitBreakFilterChange(value as LimitBreakFilter)}>
             <option value="all">すべて</option>
             <option value="on">限界突破済み</option>
             <option value="off">未限界突破</option>
           </Select>
-        </label>
+        </Field>
 
         <MultiSelectFilter
           title="☆"

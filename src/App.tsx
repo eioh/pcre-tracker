@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DashboardTab } from "./components/DashboardTab";
 import { InputTab } from "./components/InputTab";
 import { masterCharacters } from "./domain/master";
@@ -11,8 +11,20 @@ import {
 import { buildInitialState, loadStoredState, saveStoredState } from "./domain/storage";
 import type { CharacterProgress, StoredStateV1 } from "./domain/types";
 import { buildDefaultUiState, loadUiState, saveUiState, type InputViewSettings } from "./domain/uiStorage";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./components/ui/alert-dialog";
 import { Button } from "./components/ui/button";
+import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
+
 type ProgressPatch = Partial<
   Pick<
     CharacterProgress,
@@ -33,7 +45,10 @@ function formatUpdatedAt(value: string): string {
 export default function App() {
   const [state, setState] = useState<StoredStateV1>(() => loadStoredState(masterCharacters));
   const [uiState, setUiState] = useState(() => loadUiState());
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [pendingImportFile, setPendingImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [messageDialog, setMessageDialog] = useState<{ title: string; description: string; reloadOnClose: boolean } | null>(null);
 
   useEffect(() => {
     saveStoredState(state);
@@ -55,29 +70,53 @@ export default function App() {
     URL.revokeObjectURL(url);
   }, []);
 
-  // JSONファイルからバックアップを読み込み、localStorageへ復元する。
-  const handleImportBackupFile = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) {
+  // 選択したバックアップファイルをインポート確認ダイアログへ渡す。
+  const handleSelectImportFile = useCallback((file: File) => {
+    setPendingImportFile(file);
+  }, []);
+
+  // 承認後にバックアップを復元し、結果メッセージを表示する。
+  const handleConfirmImport = useCallback(async () => {
+    if (!pendingImportFile) {
       return;
     }
-
-    const shouldImport = window.confirm("現在の保存データを上書きします。インポートしますか？");
-    if (!shouldImport) {
-      return;
-    }
-
+    setIsImporting(true);
     try {
-      const text = await file.text();
+      const text = await pendingImportFile.text();
       const payload = parseBackupPayload(text);
       applyBackupPayloadToLocalStorage(payload);
-      window.alert("インポートが完了しました。画面を再読み込みします。");
-      window.location.reload();
+      setMessageDialog({
+        title: "インポート完了",
+        description: "インポートが完了しました。閉じると画面を再読み込みします。",
+        reloadOnClose: true,
+      });
     } catch {
-      window.alert("インポートに失敗しました。JSON形式を確認してください。");
+      setMessageDialog({
+        title: "インポート失敗",
+        description: "インポートに失敗しました。JSON形式を確認してください。",
+        reloadOnClose: false,
+      });
+    } finally {
+      setIsImporting(false);
+      setPendingImportFile(null);
     }
+  }, [pendingImportFile]);
+
+  // 保存データを初期化し、UI設定も既定値へ戻す。
+  const handleConfirmReset = useCallback(() => {
+    setState(buildInitialState(masterCharacters));
+    setUiState(buildDefaultUiState());
+    setIsResetDialogOpen(false);
   }, []);
+
+  // 結果メッセージを閉じ、必要なら画面を再読み込みする。
+  const handleCloseMessageDialog = useCallback(() => {
+    const shouldReload = messageDialog?.reloadOnClose ?? false;
+    setMessageDialog(null);
+    if (shouldReload) {
+      window.location.reload();
+    }
+  }, [messageDialog]);
 
   // 指定キャラの育成状態を部分更新し、更新日時を最新化する。
   const handleUpdateProgress = useCallback(
@@ -129,31 +168,15 @@ export default function App() {
             <Button variant="outline" onClick={handleExportBackup}>
               エクスポート
             </Button>
-            <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-              インポート
-            </Button>
+            <FileImportButton label="インポート" accept="application/json,.json" onSelectFile={handleSelectImportFile} />
             <Button
               variant="outline"
               onClick={() => {
-                const shouldReset = window.confirm("保存データを初期化します。よろしいですか？");
-                if (!shouldReset) {
-                  return;
-                }
-                setState(buildInitialState(masterCharacters));
-                setUiState(buildDefaultUiState());
+                setIsResetDialogOpen(true);
               }}
             >
               保存データを初期化
             </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="application/json,.json"
-              className="hidden"
-              onChange={(event) => {
-                void handleImportBackupFile(event);
-              }}
-            />
           </div>
           <p className="m-0 text-sm text-muted">最終更新: {latestUpdatedAt ? formatUpdatedAt(latestUpdatedAt) : "-"}</p>
         </div>
@@ -168,7 +191,7 @@ export default function App() {
           setUiState((previous) => ({ ...previous, activeTab: value }));
         }}
       >
-        <TabsList className="mb-5">
+        <TabsList className="mb-5" aria-label="画面切り替え">
           <TabsTrigger value="input">育成入力</TabsTrigger>
           <TabsTrigger value="dashboard">ダッシュボード</TabsTrigger>
         </TabsList>
@@ -186,6 +209,55 @@ export default function App() {
           <DashboardTab masterCharacters={masterCharacters} state={state} />
         </TabsContent>
       </Tabs>
+
+      <AlertDialog
+        open={pendingImportFile !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingImportFile(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>バックアップをインポートしますか？</AlertDialogTitle>
+            <AlertDialogDescription>
+              現在の保存データを上書きします。処理を続行する場合は「インポート」を押してください。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isImporting}>キャンセル</AlertDialogCancel>
+            <AlertDialogAction disabled={isImporting} onClick={() => void handleConfirmImport()}>
+              {isImporting ? "処理中..." : "インポート"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>保存データを初期化しますか？</AlertDialogTitle>
+            <AlertDialogDescription>保存中の進捗と表示設定を既定値へ戻します。この操作は取り消せません。</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>キャンセル</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmReset}>初期化する</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={messageDialog !== null} onOpenChange={(open) => !open && handleCloseMessageDialog()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{messageDialog?.title ?? ""}</AlertDialogTitle>
+            <AlertDialogDescription>{messageDialog?.description ?? ""}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleCloseMessageDialog}>閉じる</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
