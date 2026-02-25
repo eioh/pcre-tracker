@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import type { CharacterProgress, MasterCharacter, StoredStateV1 } from "../domain/types";
 import type {
   InputViewSettings,
@@ -33,7 +33,6 @@ type InputTabProps = {
 
 // 育成入力画面の状態管理と各 UI コンポーネントの合成を行う。
 export function InputTab({ masterCharacters, state, onUpdateProgress, initialSettings, onSettingsChange }: InputTabProps) {
-  const rootRef = useRef<HTMLElement | null>(null);
   const [searchText, setSearchText] = useState(initialSettings.searchText);
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>(initialSettings.ownedFilter);
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>(initialSettings.limitedFilter);
@@ -130,38 +129,8 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
     onSettingsChange(currentSettings);
   }, [currentSettings, onSettingsChange]);
 
-  useEffect(() => {
-    // フィルタ用ドロップダウン外クリック時に開いている一覧を閉じる。
-    function handleDocumentPointerDown(event: MouseEvent): void {
-      const root = rootRef.current;
-      if (!root) {
-        return;
-      }
-      const target = event.target;
-      if (!(target instanceof Node)) {
-        return;
-      }
-      const activeDropdowns = root.querySelectorAll("details.multi-select-dropdown[open]");
-      if (activeDropdowns.length === 0) {
-        return;
-      }
-      const isInsideAnyDropdown = Array.from(activeDropdowns).some((dropdown) => dropdown.contains(target));
-      if (isInsideAnyDropdown) {
-        return;
-      }
-      activeDropdowns.forEach((dropdown) => {
-        (dropdown as HTMLDetailsElement).open = false;
-      });
-    }
-
-    document.addEventListener("mousedown", handleDocumentPointerDown);
-    return () => {
-      document.removeEventListener("mousedown", handleDocumentPointerDown);
-    };
-  }, []);
-
   return (
-    <section className={panelClass} ref={rootRef}>
+    <section className={panelClass}>
       <InputFilters
         searchText={searchText}
         onSearchTextChange={setSearchText}

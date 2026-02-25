@@ -60,6 +60,12 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputProgressTable
   };
 }
 
+// コンボボックスを開いて項目ラベルを選択する。
+function selectOptionFromCombobox(combobox: HTMLElement, optionLabel: string): void {
+  fireEvent.click(combobox);
+  fireEvent.click(screen.getByRole("option", { name: optionLabel }));
+}
+
 describe("InputProgressTable", () => {
   it("行が0件のとき空表示メッセージを出す", () => {
     const props = buildProps({ visibleRows: [] });
@@ -118,10 +124,10 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const combos = within(bodyRow).getAllByRole("combobox");
 
-    fireEvent.change(combos[0] as HTMLSelectElement, { target: { value: "6" } });
-    fireEvent.change(combos[1] as HTMLSelectElement, { target: { value: "10" } });
-    fireEvent.change(combos[2] as HTMLSelectElement, { target: { value: "sp" } });
-    fireEvent.change(combos[3] as HTMLSelectElement, { target: { value: "5" } });
+    selectOptionFromCombobox(combos[0] as HTMLElement, "6");
+    selectOptionFromCombobox(combos[1] as HTMLElement, "10");
+    selectOptionFromCombobox(combos[2] as HTMLElement, "SP");
+    selectOptionFromCombobox(combos[3] as HTMLElement, "Lv.5");
 
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { star: 6 });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { connectRank: 10 });
@@ -265,8 +271,8 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const combos = within(bodyRow).getAllByRole("combobox");
 
-    fireEvent.change(combos[2] as HTMLSelectElement, { target: { value: "sp" } });
-    fireEvent.change(combos[2] as HTMLSelectElement, { target: { value: "130" } });
+    selectOptionFromCombobox(combos[2] as HTMLElement, "SP");
+    selectOptionFromCombobox(combos[2] as HTMLElement, "Lv.130");
 
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 370, ue1SpEquipped: true });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 130, ue1SpEquipped: false });

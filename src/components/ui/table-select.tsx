@@ -1,10 +1,16 @@
-import type { SelectHTMLAttributes } from "react";
+import type { ReactNode } from "react";
 import { Select } from "./select";
 import { cn } from "../../lib/utils";
 
 type TableSelectAppearance = "default" | "maxed" | "disabled";
 
-type TableSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
+type TableSelectProps = {
+  value?: string | number | readonly string[];
+  defaultValue?: string | number | readonly string[];
+  disabled?: boolean;
+  onValueChange?: (value: string) => void;
+  children?: ReactNode;
+  className?: string;
   appearance?: TableSelectAppearance;
 };
 

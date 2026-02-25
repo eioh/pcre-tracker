@@ -35,6 +35,18 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputFilters>>): C
   };
 }
 
+// ラベル付きコンボボックスを開いて指定項目を選択する。
+function selectComboboxOption(label: string, optionLabel: string): void {
+  fireEvent.click(screen.getByRole("combobox", { name: label }));
+  fireEvent.click(screen.getByRole("option", { name: optionLabel }));
+}
+
+// 複数選択フィルタのトリガーをタイトルから開く。
+function openMultiSelect(title: string): void {
+  const trigger = screen.getByText(title).closest("div")?.querySelector("button");
+  fireEvent.click(trigger as HTMLButtonElement);
+}
+
 describe("InputFilters", () => {
   it("検索入力の変更を親ハンドラへ通知できる", () => {
     const props = buildProps();
@@ -84,7 +96,7 @@ describe("InputFilters", () => {
     const props = buildProps({ starFilters: [] as StarFilter[], setStarFilters });
     render(<InputFilters {...props} />);
 
-    fireEvent.click(screen.getByText("☆").closest("div")?.querySelector("summary") as HTMLElement);
+    openMultiSelect("☆");
     fireEvent.click(screen.getByRole("checkbox", { name: "☆6" }));
 
     expect(setStarFilters).toHaveBeenCalledTimes(1);
@@ -101,7 +113,7 @@ describe("InputFilters", () => {
     });
     render(<InputFilters {...props} />);
 
-    fireEvent.click(screen.getByText("メモピ入手").closest("div")?.querySelector("summary") as HTMLElement);
+    openMultiSelect("メモピ入手");
     fireEvent.click(screen.getByRole("checkbox", { name: "情報なし" }));
 
     const updater = setMemorySourceFilters.mock.calls[0]?.[0] as
@@ -114,9 +126,9 @@ describe("InputFilters", () => {
     const props = buildProps();
     render(<InputFilters {...props} />);
 
-    fireEvent.change(screen.getByRole("combobox", { name: "所持" }), { target: { value: "owned" } });
-    fireEvent.change(screen.getByRole("combobox", { name: "限定" }), { target: { value: "limited" } });
-    fireEvent.change(screen.getByRole("combobox", { name: "限界突破" }), { target: { value: "on" } });
+    selectComboboxOption("所持", "所持のみ");
+    selectComboboxOption("限定", "限定のみ");
+    selectComboboxOption("限界突破", "限界突破済み");
 
     expect(props.onOwnedFilterChange).toHaveBeenCalledWith("owned");
     expect(props.onLimitedFilterChange).toHaveBeenCalledWith("limited");
