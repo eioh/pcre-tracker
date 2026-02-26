@@ -49,6 +49,8 @@ export default function App() {
   const [isImporting, setIsImporting] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [messageDialog, setMessageDialog] = useState<{ title: string; description: string; reloadOnClose: boolean } | null>(null);
+  const [inputSettingsSyncToken, setInputSettingsSyncToken] = useState(0);
+  const [hasOpenedInput, setHasOpenedInput] = useState(() => uiState.activeTab === "input");
 
   useEffect(() => {
     saveStoredState(state);
@@ -106,6 +108,8 @@ export default function App() {
   const handleConfirmReset = useCallback(() => {
     setState(buildInitialState(masterCharacters));
     setUiState(buildDefaultUiState());
+    // 外部要因で入力設定を既定値へ戻したことをInputTabへ伝える。
+    setInputSettingsSyncToken((previous) => previous + 1);
     setIsResetDialogOpen(false);
   }, []);
 
@@ -188,6 +192,10 @@ export default function App() {
           if (value !== "input" && value !== "dashboard") {
             return;
           }
+          // 初回表示後はInputTabを保持し、タブ再切り替え時の再マウントを回避する。
+          if (value === "input") {
+            setHasOpenedInput(true);
+          }
           setUiState((previous) => ({ ...previous, activeTab: value }));
         }}
       >
@@ -196,13 +204,14 @@ export default function App() {
           <TabsTrigger value="dashboard">ダッシュボード</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="input">
+        <TabsContent value="input" forceMount={hasOpenedInput ? true : undefined}>
           <InputTab
             masterCharacters={masterCharacters}
             state={state}
             onUpdateProgress={handleUpdateProgress}
             initialSettings={safeUiState.input}
             onSettingsChange={handleInputSettingsChange}
+            settingsSyncToken={inputSettingsSyncToken}
           />
         </TabsContent>
         <TabsContent value="dashboard">

@@ -1,4 +1,5 @@
-import { memo, useCallback } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { SortDirection, SortKey } from "../../domain/uiStorage";
@@ -82,6 +83,7 @@ type TableRowProps = {
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
   ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
+  rowRef?: (element: HTMLTableRowElement | null) => void;
 };
 
 // テーブル行コンポーネント。行単位でメモ化し不要な再レンダリングを防ぐ。
@@ -92,6 +94,7 @@ const TableRow = memo(function TableRow({
   starMemoryCalcMode,
   ue1MemoryCalcMode,
   ue1HeartFragmentCalcMode,
+  rowRef,
 }: TableRowProps) {
   const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
   const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
@@ -160,7 +163,7 @@ const TableRow = memo(function TableRow({
   );
 
   return (
-    <UiTableRow className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]">
+    <UiTableRow ref={rowRef} className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]">
       <TableCell className="text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
           <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onChange={handleOwnedChange} />
@@ -175,7 +178,7 @@ const TableRow = memo(function TableRow({
             <span className="text-[#7f8ba5]">/</span>
             <span className={roleTextClassMap[character.role]}>{character.role}</span>
           </div>
-          <span className="text-[1.05rem]">{character.name}</span>
+          <span className="block max-w-full truncate text-[1.05rem]">{character.name}</span>
         </div>
       </TableCell>
       <TableCell className="text-center">
@@ -302,9 +305,50 @@ export const InputProgressTable = memo(function InputProgressTable({
   ue1MemoryCalcMode,
   ue1HeartFragmentCalcMode,
 }: InputProgressTableProps) {
+  const scrollParentRef = useRef<HTMLDivElement | null>(null);
+  const rowVirtualizer = useVirtualizer({
+    count: visibleRows.length,
+    getScrollElement: () => scrollParentRef.current,
+    estimateSize: () => 72,
+    overscan: 8,
+  });
+  const virtualRows = rowVirtualizer.getVirtualItems();
+  const paddingTop = virtualRows.length > 0 ? (virtualRows[0]?.start ?? 0) : 0;
+  const paddingBottom =
+    virtualRows.length > 0
+      ? Math.max(0, rowVirtualizer.getTotalSize() - (virtualRows[virtualRows.length - 1]?.end ?? 0))
+      : 0;
+
+  useEffect(() => {
+    // 表示件数や表示条件の変化後に再計測し、可変行高のずれを抑える。
+    rowVirtualizer.measure();
+  }, [visibleRows, rowVirtualizer]);
+
+  const virtualizedRows = useMemo(() => {
+    const resolvedRows = virtualRows
+      .map((virtualRow) => {
+        const row = visibleRows[virtualRow.index];
+        if (!row) {
+          return null;
+        }
+        return { virtualRow, row };
+      })
+      .filter((item): item is { virtualRow: (typeof virtualRows)[number]; row: VisibleRow } => item !== null);
+
+    // スクロール領域の計測が未確定な瞬間でも、最低限の行を表示して操作不能を避ける。
+    if (resolvedRows.length === 0 && visibleRows.length > 0) {
+      const firstRow = visibleRows[0];
+      if (!firstRow) {
+        return resolvedRows;
+      }
+      return [{ virtualRow: null, row: firstRow }];
+    }
+    return resolvedRows;
+  }, [virtualRows, visibleRows]);
+
   return (
-    <div className={tableWrapClass}>
-      <Table>
+    <div ref={scrollParentRef} className={tableWrapClass}>
+      <Table className="table-fixed">
         <colgroup>
           <col className="w-20" />
           <col className="w-[200px]" />
@@ -433,17 +477,36 @@ export const InputProgressTable = memo(function InputProgressTable({
               </TableCell>
             </UiTableRow>
           ) : (
-            visibleRows.map(({ character, progress }) => (
-              <TableRow
-                key={character.name}
-                character={character}
-                progress={progress}
-                onUpdateProgress={onUpdateProgress}
-                starMemoryCalcMode={starMemoryCalcMode}
-                ue1MemoryCalcMode={ue1MemoryCalcMode}
-                ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
-              />
-            ))
+            <>
+              {paddingTop > 0 ? (
+                <UiTableRow aria-hidden="true">
+                  <TableCell colSpan={16} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
+                </UiTableRow>
+              ) : null}
+              {virtualizedRows.map(({ virtualRow, row }) => (
+                <TableRow
+                  key={row.character.name}
+                  rowRef={(element) => {
+                    if (!element || !virtualRow) {
+                      return;
+                    }
+                    element.dataset.index = String(virtualRow.index);
+                    rowVirtualizer.measureElement(element);
+                  }}
+                  character={row.character}
+                  progress={row.progress}
+                  onUpdateProgress={onUpdateProgress}
+                  starMemoryCalcMode={starMemoryCalcMode}
+                  ue1MemoryCalcMode={ue1MemoryCalcMode}
+                  ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
+                />
+              ))}
+              {paddingBottom > 0 ? (
+                <UiTableRow aria-hidden="true">
+                  <TableCell colSpan={16} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
+                </UiTableRow>
+              ) : null}
+            </>
           )}
         </TableBody>
       </Table>

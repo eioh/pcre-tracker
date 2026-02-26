@@ -29,11 +29,20 @@ type InputTabProps = {
   onUpdateProgress: (name: string, patch: ProgressPatch) => void;
   initialSettings: InputViewSettings;
   onSettingsChange: (settings: InputViewSettings) => void;
+  settingsSyncToken: number;
 };
 
 // 育成入力画面の状態管理と各 UI コンポーネントの合成を行う。
-export function InputTab({ masterCharacters, state, onUpdateProgress, initialSettings, onSettingsChange }: InputTabProps) {
+export function InputTab({
+  masterCharacters,
+  state,
+  onUpdateProgress,
+  initialSettings,
+  onSettingsChange,
+  settingsSyncToken,
+}: InputTabProps) {
   const mountedRef = useRef(false);
+  const isSyncingFromParentRef = useRef(false);
   const [searchText, setSearchText] = useState(initialSettings.searchText);
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>(initialSettings.ownedFilter);
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>(initialSettings.limitedFilter);
@@ -126,9 +135,35 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
   );
 
   useEffect(() => {
+    // 親からの明示同期トリガー時のみ、入力画面のローカル設定を外部値へ合わせる。
+    isSyncingFromParentRef.current = true;
+    setSearchText(initialSettings.searchText);
+    setOwnedFilter(initialSettings.ownedFilter);
+    setLimitedFilter(initialSettings.limitedFilter);
+    setLimitBreakFilter(initialSettings.limitBreakFilter);
+    setStarMemoryCalcMode(initialSettings.starMemoryCalcMode);
+    setUe1MemoryCalcMode(initialSettings.ue1MemoryCalcMode);
+    setUe1HeartFragmentCalcMode(initialSettings.ue1HeartFragmentCalcMode);
+    setStarFilters(initialSettings.starFilters);
+    setUe1Filters(initialSettings.ue1Filters);
+    setUe2Filters(initialSettings.ue2Filters);
+    setMemorySourceFilters(initialSettings.memorySourceFilters);
+    setSortKey(initialSettings.sortKey);
+    setSortDirection(initialSettings.sortDirection);
+
+    queueMicrotask(() => {
+      isSyncingFromParentRef.current = false;
+    });
+  }, [settingsSyncToken]);
+
+  useEffect(() => {
     // 初回マウント時は通知せず、ユーザー操作で設定が変化したときのみ親へ通知する。
     if (!mountedRef.current) {
       mountedRef.current = true;
+      return;
+    }
+    // 親からの同期反映中は通知せず、設定の往復更新を防ぐ。
+    if (isSyncingFromParentRef.current) {
       return;
     }
     // 画面設定が変化したタイミングで親へ通知し、永続化対象を同期する。

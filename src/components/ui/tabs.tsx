@@ -35,5 +35,5 @@ export function TabsTrigger({ className, ...props }: React.ComponentProps<typeof
 
 // 選択中タブに対応するコンテンツを表示する。
 export function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) {
-  return <TabsPrimitive.Content className={cn(className)} {...props} />;
+  return <TabsPrimitive.Content className={cn("data-[state=inactive]:hidden", className)} {...props} />;
 }

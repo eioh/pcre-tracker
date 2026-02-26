@@ -217,7 +217,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[10]).toHaveTextContent("120 / 256 / 66");
+    expect(cells[10]).toHaveTextContent("120/256/66");
   });
 
   it("メモピ入手列にソース名を表示する", () => {
