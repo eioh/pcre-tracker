@@ -5,8 +5,8 @@ import { cn } from "../../lib/utils";
 type TableSelectAppearance = "default" | "maxed" | "disabled";
 
 type TableSelectProps = {
-  value?: string | number | readonly string[];
-  defaultValue?: string | number | readonly string[];
+  value?: string;
+  defaultValue?: string;
   disabled?: boolean;
   onValueChange?: (value: string) => void;
   children?: ReactNode;
@@ -26,6 +26,13 @@ function getAppearanceClass(appearance: TableSelectAppearance): string {
 }
 
 // テーブルセルで使うセレクトの見た目を統一する。
-export function TableSelect({ className, appearance = "default", ...props }: TableSelectProps) {
-  return <Select className={cn("min-w-32 px-2.5 py-2", getAppearanceClass(appearance), className)} {...props} />;
+export function TableSelect({ className, appearance = "default", disabled, ...props }: TableSelectProps) {
+  const effectiveAppearance: TableSelectAppearance = disabled ? "disabled" : appearance;
+  return (
+    <Select
+      disabled={disabled}
+      className={cn("min-w-32 px-2.5 py-2", getAppearanceClass(effectiveAppearance), className)}
+      {...props}
+    />
+  );
 }

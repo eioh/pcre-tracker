@@ -3,6 +3,7 @@ import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { SortDirection, SortKey } from "../../domain/uiStorage";
 import { getConnectRankRemainingMemoryPieceCount } from "../../utils/connectRankMemoryCost";
+import { getConnectRankRemainingMaterialCost } from "../../utils/connectRankMaterialCost";
 import { getLimitBreakRemainingMemoryPieceCount } from "../../utils/limitBreakMemoryCost";
 import {
   getUe1RemainingHeartFragmentCountByMode,
@@ -109,6 +110,7 @@ const TableRow = memo(function TableRow({
   const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
   const connectRankRemainingMemoryPiece = getConnectRankRemainingMemoryPieceCount(progress);
   const ue1RemainingMemoryPiece = getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode);
+  const connectRankRemainingMaterial = getConnectRankRemainingMaterialCost(character.role, progress.connectRank);
   const ue1RemainingHeartFragment = getUe1RemainingHeartFragmentCountByMode(character, progress, ue1HeartFragmentCalcMode);
   const limitBreakRemainingMemoryPiece = getLimitBreakRemainingMemoryPieceCount(character, progress);
   const totalRemainingMemoryPiece =
@@ -182,9 +184,9 @@ const TableRow = memo(function TableRow({
         </label>
       </TableCell>
       <TableCell>
-        <TableSelect value={progress.star} appearance={isStarAtMax ? "maxed" : "default"} onValueChange={handleStarChange}>
+        <TableSelect value={String(progress.star)} appearance={isStarAtMax ? "maxed" : "default"} onValueChange={handleStarChange}>
           {Array.from({ length: starMax }, (_, index) => index + 1).map((star) => (
-            <option key={star} value={star}>
+            <option key={star} value={String(star)}>
               {star}
             </option>
           ))}
@@ -192,12 +194,12 @@ const TableRow = memo(function TableRow({
       </TableCell>
       <TableCell>
         <TableSelect
-          value={progress.connectRank}
+          value={String(progress.connectRank)}
           appearance={isConnectRankAtMax ? "maxed" : "default"}
           onValueChange={handleConnectRankChange}
         >
           {Array.from({ length: 15 }, (_, index) => index + 1).map((rank) => (
-            <option key={rank} value={rank}>
+            <option key={rank} value={String(rank)}>
               {rank}
             </option>
           ))}
@@ -207,7 +209,7 @@ const TableRow = memo(function TableRow({
         {character.implemented.ue1 ? (
           <TableSelect value={ue1CompositeValue} appearance={isUe1AtMax ? "maxed" : "default"} onValueChange={handleUe1Change}>
             {UE1_LEVEL_VALUES.map((level) => (
-              <option key={level} value={level}>
+              <option key={level} value={String(level)}>
                 {formatUeLevel(level)}
               </option>
             ))}
@@ -223,7 +225,7 @@ const TableRow = memo(function TableRow({
         {character.implemented.ue2 ? (
           <TableSelect value={ue2Value} appearance={isUe2AtMax ? "maxed" : "default"} onValueChange={handleUe2Change}>
             {UE2_LEVEL_VALUES.map((level) => (
-              <option key={level} value={level}>
+              <option key={level} value={String(level)}>
                 {formatUeLevel(level)}
               </option>
             ))}
@@ -250,6 +252,15 @@ const TableRow = memo(function TableRow({
       </TableCell>
       <TableCell>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{connectRankRemainingMemoryPiece}</span>
+      </TableCell>
+      <TableCell>
+        <span className="inline-grid w-full grid-cols-[3ch_auto_3ch_auto_3ch] place-content-center items-center gap-x-1 text-center text-sm font-bold tabular-nums whitespace-nowrap">
+          <span className="text-center">{connectRankRemainingMaterial.arts}</span>
+          <span className="text-center">/</span>
+          <span className="text-center">{connectRankRemainingMaterial.soul}</span>
+          <span className="text-center">/</span>
+          <span className="text-center">{connectRankRemainingMaterial.guard}</span>
+        </span>
       </TableCell>
       <TableCell>
         <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingMemoryPiece}</span>
@@ -305,6 +316,7 @@ export const InputProgressTable = memo(function InputProgressTable({
           <col className="w-[140px]" />
           <col className="w-[120px]" />
           <col className="w-[155px]" />
+          <col className="w-[250px]" />
           <col className="w-[130px]" />
           <col className="w-[145px]" />
           <col className="w-[120px]" />
@@ -373,6 +385,7 @@ export const InputProgressTable = memo(function InputProgressTable({
                 onSort={onSort}
               />
             </TableHead>
+            <TableHead className="text-center">コネクトRANK必要素材（アーツ/ソウル/ガード）</TableHead>
             <TableHead aria-sort={getAriaSort("ue1MemoryNeeded", sortKey, sortDirection)} className="text-center">
               <SortHeaderButton
                 label="専用1必要メモピ"
@@ -415,7 +428,7 @@ export const InputProgressTable = memo(function InputProgressTable({
         <TableBody>
           {visibleRows.length === 0 ? (
             <UiTableRow>
-              <TableCell colSpan={15} className="px-3 py-[18px] text-center text-muted">
+              <TableCell colSpan={16} className="px-3 py-[18px] text-center text-muted">
                 条件に一致するキャラがいません
               </TableCell>
             </UiTableRow>

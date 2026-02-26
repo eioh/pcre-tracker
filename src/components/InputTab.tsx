@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type { CharacterProgress, MasterCharacter, StoredStateV1 } from "../domain/types";
 import type {
   InputViewSettings,
@@ -33,6 +33,7 @@ type InputTabProps = {
 
 // 育成入力画面の状態管理と各 UI コンポーネントの合成を行う。
 export function InputTab({ masterCharacters, state, onUpdateProgress, initialSettings, onSettingsChange }: InputTabProps) {
+  const mountedRef = useRef(false);
   const [searchText, setSearchText] = useState(initialSettings.searchText);
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>(initialSettings.ownedFilter);
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>(initialSettings.limitedFilter);
@@ -125,9 +126,15 @@ export function InputTab({ masterCharacters, state, onUpdateProgress, initialSet
   );
 
   useEffect(() => {
+    // 初回マウント時は通知せず、ユーザー操作で設定が変化したときのみ親へ通知する。
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
     // 画面設定が変化したタイミングで親へ通知し、永続化対象を同期する。
     onSettingsChange(currentSettings);
-  }, [currentSettings, onSettingsChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- onSettingsChange は親側で安定参照(useCallback)を前提に意図的に依存配列から除外する。
+  }, [currentSettings]);
 
   return (
     <section className={panelClass}>

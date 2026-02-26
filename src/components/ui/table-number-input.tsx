@@ -1,10 +1,14 @@
-import type { InputHTMLAttributes } from "react";
+import { forwardRef, type ComponentPropsWithRef } from "react";
 import { Input } from "./input";
 import { cn } from "../../lib/utils";
 
-type TableNumberInputProps = InputHTMLAttributes<HTMLInputElement>;
+type TableNumberInputProps = ComponentPropsWithRef<typeof Input>;
 
 // テーブルセルで使う数値入力の見た目を統一する。
-export function TableNumberInput({ className, ...props }: TableNumberInputProps) {
-  return <Input className={cn("min-w-32 px-2.5 py-2", className)} {...props} />;
-}
+export const TableNumberInput = forwardRef<HTMLInputElement, TableNumberInputProps>(function TableNumberInput(
+  { className, ...props },
+  ref,
+) {
+  return <Input ref={ref} className={cn("min-w-32 px-2.5 py-2", className)} {...props} />;
+});
+TableNumberInput.displayName = "TableNumberInput";

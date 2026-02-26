@@ -40,6 +40,11 @@ type UseVisibleRowsParams = {
   sortDirection: SortDirection;
 };
 
+// switchの網羅性チェックに到達したら実行時エラーにする。
+function assertUnreachable(value: never): never {
+  throw new Error(`未知のsortKeyです: ${String(value)}`);
+}
+
 // 専用1の並び順を統一するための比較値を返す。
 function getUe1SortValue(character: MasterCharacter, progress: CharacterProgress): number {
   if (!character.implemented.ue1) {
@@ -66,12 +71,13 @@ function getAdjustedTotalMemoryNeeded(
   starMemoryCalcMode: StarMemoryCalcMode,
   ue1MemoryCalcMode: Ue1MemoryCalcMode,
 ): number {
+  const ownedMemoryPiece = Number(progress.ownedMemoryPiece ?? 0);
   const totalNeeded =
     getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode) +
     getConnectRankRemainingMemoryPieceCount(progress) +
     getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode) +
     getLimitBreakRemainingMemoryPieceCount(character, progress);
-  return Math.max(0, totalNeeded - progress.ownedMemoryPiece);
+  return Math.max(0, totalNeeded - ownedMemoryPiece);
 }
 
 // 育成入力テーブルの表示行をフィルタ・ソート条件から算出する。
@@ -146,7 +152,7 @@ export function useVisibleRows({
         } else if (character.implemented.ue1) {
           if (progress.ue1SpEquipped && selectedUe1Set.has("sp")) {
             isUe1Matched = true;
-          } else if (!progress.ue1SpEquipped && progress.ue1Level !== null && selectedUe1Set.has(progress.ue1Level)) {
+          } else if (!progress.ue1SpEquipped && progress.ue1Level != null && selectedUe1Set.has(progress.ue1Level)) {
             isUe1Matched = true;
           }
         }
@@ -158,7 +164,7 @@ export function useVisibleRows({
         let isUe2Matched = false;
         if (!character.implemented.ue2 && selectedUe2Set.has("unimplemented")) {
           isUe2Matched = true;
-        } else if (character.implemented.ue2 && progress.ue2Level !== null && selectedUe2Set.has(progress.ue2Level)) {
+        } else if (character.implemented.ue2 && progress.ue2Level != null && selectedUe2Set.has(progress.ue2Level)) {
           isUe2Matched = true;
         }
         if (!isUe2Matched) {
@@ -250,6 +256,8 @@ export function useVisibleRows({
             getAdjustedTotalMemoryNeeded(aCharacter, aProgress, starMemoryCalcMode, ue1MemoryCalcMode) -
             getAdjustedTotalMemoryNeeded(bCharacter, bProgress, starMemoryCalcMode, ue1MemoryCalcMode);
           break;
+        default:
+          return assertUnreachable(sortKey);
       }
 
       if (baseComparison !== 0) {

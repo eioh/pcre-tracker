@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
   applyBackupPayloadToLocalStorage,
   buildBackupPayloadFromLocalStorage,
@@ -9,6 +9,10 @@ import { STORAGE_KEY } from "./storage";
 import { UI_STORAGE_KEY } from "./uiStorage";
 
 describe("backup", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
   it("localStorageの2キー生値をバックアップ化できる", () => {
     window.localStorage.setItem(STORAGE_KEY, '{"schemaVersion":1}');
     window.localStorage.setItem(UI_STORAGE_KEY, '{"schemaVersion":1,"activeTab":"input"}');

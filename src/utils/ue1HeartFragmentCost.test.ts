@@ -60,10 +60,10 @@ describe("ue1HeartFragmentCost", () => {
   it("専用1Lv370またはSP装備済みは必要数0になる", () => {
     const character = createCharacter({ star6: true, ue1: true, ue1Sp: true, ue2: false });
     const maxLevelProgress = createProgress({ ue1Level: 370 });
-    const spProgress = createProgress({ ue1Level: 370, ue1SpEquipped: true });
+    const spOnlyProgress = createProgress({ ue1Level: 0, ue1SpEquipped: true });
 
     expect(getUe1RemainingHeartFragmentCount(character, maxLevelProgress)).toBe(0);
-    expect(getUe1RemainingHeartFragmentCount(character, spProgress)).toBe(0);
-    expect(getUe1RemainingHeartFragmentCountToMaxAssumed(spProgress)).toBe(0);
+    expect(getUe1RemainingHeartFragmentCount(character, spOnlyProgress)).toBe(0);
+    expect(getUe1RemainingHeartFragmentCountToMaxAssumed(spOnlyProgress)).toBe(0);
   });
 });

@@ -120,5 +120,9 @@ export function isCharacterNameMatched(nameOrTokens: string | string[], query: s
     return true;
   }
 
+  if (normalizedQuery.length < 2) {
+    return false;
+  }
+
   return tokens.some((token) => hasFuzzySubstringMatch(token, normalizedQuery));
 }

@@ -227,7 +227,14 @@ export default function App() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isImporting}>キャンセル</AlertDialogCancel>
-            <AlertDialogAction disabled={isImporting} onClick={() => void handleConfirmImport()}>
+            <AlertDialogAction
+              disabled={isImporting}
+              onClick={(event) => {
+                // インポート完了までダイアログを開いたままにし、進行中状態を表示する。
+                event.preventDefault();
+                void handleConfirmImport();
+              }}
+            >
               {isImporting ? "処理中..." : "インポート"}
             </AlertDialogAction>
           </AlertDialogFooter>

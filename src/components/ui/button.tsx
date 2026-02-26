@@ -28,6 +28,10 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
   VariantProps<typeof buttonVariants>;
 
 // shadcn/ui 形式の variants で描画するボタン。
-export function Button({ className, variant, size, type = "button", ...props }: ButtonProps) {
-  return <button type={type} className={cn(buttonVariants({ variant, size }), className)} {...props} />;
-}
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { className, variant, size, type = "button", ...props },
+  ref,
+) {
+  return <button ref={ref} type={type} className={cn(buttonVariants({ variant, size }), className)} {...props} />;
+});
+Button.displayName = "Button";

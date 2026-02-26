@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { toHiragana, toKatakana, toRomaji } from "wanakana";
 
@@ -37,7 +37,14 @@ function generateSearchTokens() {
     };
   });
 
-  writeFileSync(masterPath, `${JSON.stringify(enriched, null, 2)}\n`, "utf8");
+  const tempPath = `${masterPath}.tmp`;
+  try {
+    writeFileSync(tempPath, `${JSON.stringify(enriched, null, 2)}\n`, "utf8");
+    renameSync(tempPath, masterPath);
+  } catch (error) {
+    rmSync(tempPath, { force: true });
+    throw error;
+  }
 }
 
 generateSearchTokens();

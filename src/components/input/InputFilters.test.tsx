@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import type { ComponentProps } from "react";
 import type {
   LimitBreakFilter,
@@ -47,6 +47,21 @@ function openMultiSelect(title: string): void {
   fireEvent.click(trigger as HTMLButtonElement);
 }
 
+// 検索欄エリア内のリセットボタンを取得する。
+function getSearchResetButton(): HTMLButtonElement {
+  const field = screen.getByPlaceholderText("例: ヒヨリ").closest("label");
+  expect(field).not.toBeNull();
+  return within(field as HTMLElement).getByRole("button", { name: "リセット" }) as HTMLButtonElement;
+}
+
+// フィルタエリア内のリセットボタンを取得する。
+function getFilterResetButton(): HTMLButtonElement {
+  const filterTitle = screen.getByText("フィルタ");
+  const resetContainer = filterTitle.nextElementSibling;
+  expect(resetContainer).not.toBeNull();
+  return within(resetContainer as HTMLElement).getByRole("button", { name: "リセット" }) as HTMLButtonElement;
+}
+
 describe("InputFilters", () => {
   it("検索入力の変更を親ハンドラへ通知できる", () => {
     const props = buildProps();
@@ -61,8 +76,7 @@ describe("InputFilters", () => {
     const props = buildProps({ searchText: "ヒヨリ" });
     render(<InputFilters {...props} />);
 
-    const resetButtons = screen.getAllByRole("button", { name: "リセット" });
-    fireEvent.click(resetButtons[0] as HTMLButtonElement);
+    fireEvent.click(getSearchResetButton());
 
     expect(props.onSearchTextChange).toHaveBeenCalledWith("");
   });
@@ -79,8 +93,7 @@ describe("InputFilters", () => {
     });
     render(<InputFilters {...props} />);
 
-    const resetButtons = screen.getAllByRole("button", { name: "リセット" });
-    fireEvent.click(resetButtons[1] as HTMLButtonElement);
+    fireEvent.click(getFilterResetButton());
 
     expect(props.onOwnedFilterChange).toHaveBeenCalledWith("all");
     expect(props.onLimitedFilterChange).toHaveBeenCalledWith("all");
@@ -116,9 +129,11 @@ describe("InputFilters", () => {
     openMultiSelect("メモピ入手");
     fireEvent.click(screen.getByRole("checkbox", { name: "情報なし" }));
 
+    expect(setMemorySourceFilters).toHaveBeenCalledTimes(1);
     const updater = setMemorySourceFilters.mock.calls[0]?.[0] as
       | ((prev: MemorySourceFilter[]) => MemorySourceFilter[])
       | undefined;
+    expect(typeof updater).toBe("function");
     expect(updater?.([])).toEqual(["none"]);
   });
 

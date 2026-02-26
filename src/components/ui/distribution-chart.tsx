@@ -8,6 +8,7 @@ type DistributionItem = {
 type DistributionChartProps = {
   title: string;
   items: DistributionItem[];
+  emptyMessage?: string;
   className?: string;
 };
 
@@ -25,7 +26,7 @@ function getMaxCount(items: DistributionItem[]): number {
 }
 
 // 分布データを棒グラフ風のリストで表示する。
-export function DistributionChart({ title, items, className }: DistributionChartProps) {
+export function DistributionChart({ title, items, emptyMessage, className }: DistributionChartProps) {
   const visibleItems = filterVisibleItems(items);
   const maxCount = getMaxCount(visibleItems);
 
@@ -39,10 +40,12 @@ export function DistributionChart({ title, items, className }: DistributionChart
       <h3 className="mb-2.5 mt-0 text-sm font-semibold tracking-[0.06em]">{title}</h3>
       <ul className="m-0 grid list-none gap-2 pr-1.5">
         {visibleItems.length === 0 ? (
-          <li className="grid grid-cols-[80px_minmax(0,1fr)_4ch] items-center gap-2 text-sm text-muted">データがありません</li>
+          <li className="grid grid-cols-[80px_minmax(0,1fr)_4ch] items-center gap-2 text-sm text-muted">
+            {emptyMessage ?? "データがありません"}
+          </li>
         ) : (
-          visibleItems.map((item) => (
-            <li key={item.label} className="grid grid-cols-[80px_minmax(0,1fr)_4ch] items-center gap-2">
+          visibleItems.map((item, index) => (
+            <li key={`${item.label}-${index}`} className="grid grid-cols-[80px_minmax(0,1fr)_4ch] items-center gap-2">
               <span className="text-xs text-[#ccd9f5]">{item.label}</span>
               <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/10">
                 <div

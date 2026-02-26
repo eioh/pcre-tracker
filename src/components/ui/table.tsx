@@ -6,7 +6,7 @@ const Table = React.forwardRef<HTMLTableElement, React.TableHTMLAttributes<HTMLT
   { className, ...props },
   ref,
 ) {
-  return <table ref={ref} className={cn("w-full min-w-[1980px] border-collapse", className)} {...props} />;
+  return <table ref={ref} className={cn("w-full min-w-[1280px] border-collapse", className)} {...props} />;
 });
 Table.displayName = "Table";
 

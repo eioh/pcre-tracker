@@ -68,6 +68,9 @@ describe("buildDashboardSummary", () => {
     expect(summary.memoryPieceNeeded.ue1).toBe(0);
     expect(summary.memoryPieceNeeded.limitBreak).toBe(120);
     expect(summary.memoryPieceNeeded.total).toBe(590);
+    expect(summary.connectRankMaterialNeeded.arts).toBe(54);
+    expect(summary.connectRankMaterialNeeded.soul).toBe(120);
+    expect(summary.connectRankMaterialNeeded.guard).toBe(256);
 
     const ue1Sp = summary.ue1Distribution.find((item) => item.label === "SP");
     const ue1Unimplemented = summary.ue1Distribution.find((item) => item.label === "未実装");

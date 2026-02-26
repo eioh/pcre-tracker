@@ -92,6 +92,18 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
           }
           className="xl:col-span-2"
         />
+
+        <StatCard
+          title="コネクトRANK必要素材"
+          value={
+            <>
+              {summary.connectRankMaterialNeeded.arts} / {summary.connectRankMaterialNeeded.soul} /{" "}
+              {summary.connectRankMaterialNeeded.guard}
+            </>
+          }
+          subText={<>アーツ / ソウル / ガード</>}
+          className="xl:col-span-2"
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-3">

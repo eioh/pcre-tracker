@@ -124,7 +124,7 @@ const looseInputSettingsSchema = z
 const looseUiStateSchema = z
   .object({
     schemaVersion: z.number().optional(),
-    activeTab: z.string().optional(),
+    activeTab: z.unknown().optional(),
     input: z.unknown().optional(),
   })
   .passthrough();
@@ -212,18 +212,22 @@ function normalizeInputSettings(rawInput: unknown): InputViewSettings {
 
 // 保存文字列を解析し、現在仕様のUI状態へ正規化する。
 export function parseUiState(rawText: string): UiStateV1 {
-  const parsedJson = JSON.parse(rawText) as unknown;
-  const parsedState = looseUiStateSchema.safeParse(parsedJson);
-  if (!parsedState.success) {
+  try {
+    const parsedJson = JSON.parse(rawText) as unknown;
+    const parsedState = looseUiStateSchema.safeParse(parsedJson);
+    if (!parsedState.success) {
+      return buildDefaultUiState();
+    }
+
+    const raw = parsedState.data;
+    return {
+      schemaVersion: CURRENT_UI_SCHEMA_VERSION,
+      activeTab: normalizeEnumValue(raw.activeTab, ACTIVE_TAB_VALUES, "input"),
+      input: normalizeInputSettings(raw.input),
+    };
+  } catch {
     return buildDefaultUiState();
   }
-
-  const raw = parsedState.data;
-  return {
-    schemaVersion: CURRENT_UI_SCHEMA_VERSION,
-    activeTab: normalizeEnumValue(raw.activeTab, ACTIVE_TAB_VALUES, "input"),
-    input: normalizeInputSettings(raw.input),
-  };
 }
 
 // localStorageからUI設定を読み込み、失敗時は既定値を返す。
@@ -250,5 +254,10 @@ export function saveUiState(state: UiStateV1): void {
     return;
   }
 
-  window.localStorage.setItem(UI_STORAGE_KEY, JSON.stringify(state));
+  const serialized = JSON.stringify(state);
+  try {
+    window.localStorage.setItem(UI_STORAGE_KEY, serialized);
+  } catch (error) {
+    console.warn(`UI設定の保存に失敗しました: key=${UI_STORAGE_KEY}`, { error, serialized });
+  }
 }

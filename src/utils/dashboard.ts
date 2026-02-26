@@ -1,6 +1,7 @@
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type { MasterCharacter, StoredStateV1 } from "../domain/types";
 import { getConnectRankRemainingMemoryPieceCount } from "./connectRankMemoryCost";
+import { getConnectRankRemainingMaterialCost, sumConnectRankMaterialCost } from "./connectRankMaterialCost";
 import { getLimitBreakRemainingMemoryPieceCount } from "./limitBreakMemoryCost";
 import { getStarRemainingMemoryPieceCount } from "./starMemoryCost";
 import {
@@ -39,6 +40,11 @@ export type DashboardSummary = {
     ue1: number;
     limitBreak: number;
     total: number;
+  };
+  connectRankMaterialNeeded: {
+    arts: number;
+    soul: number;
+    guard: number;
   };
 };
 
@@ -79,6 +85,7 @@ export function buildDashboardSummary(
   let connectRankMemoryNeededTotal = 0;
   let ue1MemoryNeededTotal = 0;
   let limitBreakMemoryNeededTotal = 0;
+  let connectRankMaterialNeededTotal = { arts: 0, soul: 0, guard: 0 };
 
   for (const character of masterCharacters) {
     const progress = state.progressByName[character.name];
@@ -124,6 +131,10 @@ export function buildDashboardSummary(
     if (progress) {
       starMemoryNeededTotal += getStarRemainingMemoryPieceCount(character, progress, "implemented_max");
       connectRankMemoryNeededTotal += getConnectRankRemainingMemoryPieceCount(progress);
+      connectRankMaterialNeededTotal = sumConnectRankMaterialCost(
+        connectRankMaterialNeededTotal,
+        getConnectRankRemainingMaterialCost(character.role, progress.connectRank),
+      );
       ue1MemoryNeededTotal += getUe1RemainingMemoryPieceCount(character, progress, "implemented_max");
       limitBreakMemoryNeededTotal += getLimitBreakRemainingMemoryPieceCount(character, progress);
       ue1HeartFragmentNeededImplementedTotal += getUe1RemainingHeartFragmentCount(character, progress);
@@ -157,5 +168,6 @@ export function buildDashboardSummary(
       limitBreak: limitBreakMemoryNeededTotal,
       total: starMemoryNeededTotal + connectRankMemoryNeededTotal + ue1MemoryNeededTotal + limitBreakMemoryNeededTotal,
     },
+    connectRankMaterialNeeded: connectRankMaterialNeededTotal,
   };
 }

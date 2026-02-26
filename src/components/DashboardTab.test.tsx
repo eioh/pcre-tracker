@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { DashboardTab } from "./DashboardTab";
 import type { MasterCharacter, StoredStateV1 } from "../domain/types";
@@ -60,11 +60,14 @@ describe("DashboardTab", () => {
   it("主要KPIを表示できる", () => {
     renderDashboard();
 
-    expect(screen.getByText("所持キャラ数")).toBeInTheDocument();
-    expect(screen.getAllByText("1 / 2").length).toBeGreaterThan(0);
+    const ownedCard = screen.getByText("所持キャラ数").closest("article");
+    expect(ownedCard).not.toBeNull();
+    expect(within(ownedCard as HTMLElement).getByText("1 / 2")).toBeInTheDocument();
     expect(screen.getByText("所持率 50.0%")).toBeInTheDocument();
     expect(screen.getByText("必要メモピ合計")).toBeInTheDocument();
     expect(screen.getByText("590")).toBeInTheDocument();
+    expect(screen.getByText("コネクトRANK必要素材")).toBeInTheDocument();
+    expect(screen.getByText("54 / 120 / 256")).toBeInTheDocument();
   });
 
   it("分布チャートのタイトルと件数を表示できる", () => {
@@ -73,7 +76,9 @@ describe("DashboardTab", () => {
     expect(screen.getByText("☆分布")).toBeInTheDocument();
     expect(screen.getByText("専用1レベル分布")).toBeInTheDocument();
     expect(screen.getByText("専用2レベル分布")).toBeInTheDocument();
-    expect(screen.getAllByText("1").length).toBeGreaterThan(0);
+    const distributionSection = screen.getByText("☆分布").closest("section");
+    expect(distributionSection).not.toBeNull();
+    expect(within(distributionSection as HTMLElement).getAllByText("1")).toHaveLength(2);
   });
 
   it("分布バーの幅をstyleで反映する", () => {

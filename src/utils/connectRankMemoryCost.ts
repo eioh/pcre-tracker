@@ -14,7 +14,7 @@ export function getConnectRankRemainingMemoryPieceCount(progress: CharacterProgr
 
   for (const [unlockRankText, cost] of Object.entries(CONNECT_RANK_MEMORY_COST_BY_UNLOCK_RANK)) {
     const unlockRank = Number(unlockRankText);
-    if (progress.connectRank <= unlockRank && unlockRank < CONNECT_RANK_MAX) {
+    if (progress.connectRank < unlockRank && unlockRank < CONNECT_RANK_MAX) {
       totalCost += cost;
     }
   }

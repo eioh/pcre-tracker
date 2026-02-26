@@ -64,6 +64,10 @@ describe("uiStorage", () => {
     expect(loaded.activeTab).toBe("input");
     expect(loaded.input.searchText).toBe("");
     expect(loaded.input.ownedFilter).toBe("all");
+    expect(loaded.input.limitedFilter).toBe("all");
+    expect(loaded.input.limitBreakFilter).toBe("all");
+    expect(loaded.input.starMemoryCalcMode).toBe("implemented_max");
+    expect(loaded.input.ue1MemoryCalcMode).toBe("implemented_max");
     expect(loaded.input.ue1HeartFragmentCalcMode).toBe("implemented_max");
     expect(loaded.input.starFilters).toEqual([1]);
     expect(loaded.input.ue1Filters).toEqual([370, "sp"]);
@@ -73,7 +77,7 @@ describe("uiStorage", () => {
     expect(loaded.input.sortDirection).toBeNull();
   });
 
-  it("parseUiStateは壊れたJSONで例外を投げる", () => {
-    expect(() => parseUiState("not-json")).toThrow();
+  it("parseUiStateは壊れたJSONでも既定値を返す", () => {
+    expect(parseUiState("not-json")).toEqual(buildDefaultUiState());
   });
 });
