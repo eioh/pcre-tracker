@@ -23,6 +23,7 @@ const masterCharacters: MasterCharacter[] = [
 
 const state: StoredStateV1 = {
   schemaVersion: 1,
+  updatedAt: "2026-02-22T00:00:00.000Z",
   progressByName: {
     ヒヨリ: {
       owned: true,
@@ -33,7 +34,6 @@ const state: StoredStateV1 = {
       ue1SpEquipped: true,
       ue2Level: 2,
       ownedMemoryPiece: 0,
-      updatedAt: "2026-02-22T00:00:00.000Z",
     },
     ユイ: {
       owned: false,
@@ -44,7 +44,6 @@ const state: StoredStateV1 = {
       ue1SpEquipped: false,
       ue2Level: null,
       ownedMemoryPiece: 0,
-      updatedAt: "2026-02-22T00:00:00.000Z",
     },
   },
 };

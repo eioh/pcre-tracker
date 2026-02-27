@@ -24,7 +24,6 @@ function createProgress(partial: Partial<CharacterProgress>): CharacterProgress 
     ue1Level: 0,
     ue1SpEquipped: false,
     ue2Level: null,
-    updatedAt: "2026-02-23T00:00:00.000Z",
     ...partial,
   };
 }

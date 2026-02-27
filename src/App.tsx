@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DashboardTab } from "./components/DashboardTab";
 import { InputTab } from "./components/InputTab";
 import { masterCharacters } from "./domain/master";
@@ -122,7 +122,7 @@ export default function App() {
     }
   }, [messageDialog]);
 
-  // 指定キャラの育成状態を部分更新し、更新日時を最新化する。
+  // 指定キャラの育成状態を部分更新し、保存データ全体の最終更新時刻を最新化する。
   const handleUpdateProgress = useCallback(
     (name: string, patch: ProgressPatch) => {
       setState((previous) => {
@@ -132,12 +132,12 @@ export default function App() {
         }
         return {
           ...previous,
+          updatedAt: new Date().toISOString(),
           progressByName: {
             ...previous.progressByName,
             [name]: {
               ...current,
               ...patch,
-              updatedAt: new Date().toISOString(),
             },
           },
         };
@@ -145,13 +145,6 @@ export default function App() {
     },
     [],
   );
-
-  // 全キャラの更新日時から最新の1件を表示用に取得する。
-  const latestUpdatedAt = useMemo(() => {
-    return Object.values(state.progressByName)
-      .map((progress) => progress.updatedAt)
-      .sort((a, b) => b.localeCompare(a))[0];
-  }, [state.progressByName]);
 
   const safeUiState = uiState ?? buildDefaultUiState();
   const handleInputSettingsChange = useCallback((settings: InputViewSettings) => {
@@ -182,7 +175,7 @@ export default function App() {
               保存データを初期化
             </Button>
           </div>
-          <p className="m-0 text-sm text-muted">最終更新: {latestUpdatedAt ? formatUpdatedAt(latestUpdatedAt) : "-"}</p>
+          <p className="m-0 text-sm text-muted">最終更新: {state.updatedAt ? formatUpdatedAt(state.updatedAt) : "-"}</p>
         </div>
       </header>
 

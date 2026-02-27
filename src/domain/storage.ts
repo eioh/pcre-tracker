@@ -7,6 +7,7 @@ export const CURRENT_SCHEMA_VERSION = 1 as const;
 
 type MigratedStoredState = {
   schemaVersion: 1;
+  updatedAt: unknown;
   progressByName: Record<string, unknown>;
 };
 
@@ -24,8 +25,19 @@ function createDefaultProgress(character: MasterCharacter): CharacterProgress {
     ue1SpEquipped: false,
     ue2Level: character.implemented.ue2 ? 0 : null,
     ownedMemoryPiece: 0,
-    updatedAt: new Date().toISOString(),
   };
+}
+
+// 保存データ全体の最終更新日時を正規化する。
+function toStateUpdatedAt(value: unknown): string {
+  if (typeof value !== "string") {
+    return new Date().toISOString();
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return new Date().toISOString();
+  }
+  return parsed.toISOString();
 }
 
 // コネクトRANK入力値を1〜15の整数へ正規化する。
@@ -96,7 +108,6 @@ function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): Cha
     ue1SpEquipped: parsed.data.ue1SpEquipped,
     ue2Level: toUe2Level(parsed.data.ue2Level),
     ownedMemoryPiece: toOwnedMemoryPiece(parsed.data.ownedMemoryPiece),
-    updatedAt: parsed.data.updatedAt,
   };
 
   // 旧データや不整合データでも「未実装項目は null に固定」するための補正。
@@ -132,6 +143,7 @@ function migrateToLatestState(raw: unknown): MigratedStoredState | null {
   if (raw.schemaVersion === CURRENT_SCHEMA_VERSION && isRecord(raw.progressByName)) {
     return {
       schemaVersion: 1,
+      updatedAt: raw.updatedAt,
       progressByName: raw.progressByName,
     };
   }
@@ -139,6 +151,7 @@ function migrateToLatestState(raw: unknown): MigratedStoredState | null {
   if (isRecord(raw.progressByName)) {
     return {
       schemaVersion: 1,
+      updatedAt: raw.updatedAt,
       progressByName: raw.progressByName,
     };
   }
@@ -159,6 +172,7 @@ function reconcileWithMaster(
 
   return {
     schemaVersion: CURRENT_SCHEMA_VERSION,
+    updatedAt: toStateUpdatedAt(migratedState?.updatedAt),
     progressByName,
   };
 }

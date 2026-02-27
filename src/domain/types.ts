@@ -50,11 +50,11 @@ export type CharacterProgress = {
   ue1SpEquipped: boolean;
   ue2Level: Ue2Level;
   ownedMemoryPiece: number;
-  updatedAt: string;
 };
 
 export type StoredStateV1 = {
   schemaVersion: 1;
+  updatedAt: string;
   progressByName: Record<string, CharacterProgress>;
 };
 

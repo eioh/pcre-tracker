@@ -35,7 +35,6 @@ function buildProgress(overrides?: Partial<CharacterProgress>): CharacterProgres
     ue1SpEquipped: false,
     ue2Level: 0,
     ownedMemoryPiece: 0,
-    updatedAt: "2026-02-23T00:00:00.000Z",
     ...overrides,
   };
 }

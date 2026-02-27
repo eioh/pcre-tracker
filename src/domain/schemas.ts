@@ -45,10 +45,10 @@ export const characterProgressSchema = z.object({
   ue1SpEquipped: z.boolean(),
   ue2Level: z.union([z.null(), ue2LevelSchema]),
   ownedMemoryPiece: z.number().int().min(0).default(0),
-  updatedAt: z.string().datetime({ offset: true }),
 });
 
 export const storedStateV1Schema = z.object({
   schemaVersion: z.literal(1),
+  updatedAt: z.string().datetime({ offset: true }),
   progressByName: z.record(characterProgressSchema),
 });
