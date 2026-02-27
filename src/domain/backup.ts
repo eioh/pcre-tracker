@@ -3,13 +3,14 @@ import { STORAGE_KEY } from "./storage";
 import { UI_STORAGE_KEY } from "./uiStorage";
 
 export const BACKUP_FORMAT_VERSION = 1 as const;
+type BackupStorageValue = Record<string, unknown> | null;
 
 export type LocalStorageBackupV1 = {
   formatVersion: 1;
   exportedAt: string;
   storage: {
-    [STORAGE_KEY]: string | null;
-    [UI_STORAGE_KEY]: string | null;
+    [STORAGE_KEY]: BackupStorageValue;
+    [UI_STORAGE_KEY]: BackupStorageValue;
   };
 };
 
@@ -17,8 +18,8 @@ const backupPayloadSchema = z.object({
   formatVersion: z.literal(BACKUP_FORMAT_VERSION),
   exportedAt: z.string().datetime({ offset: true }),
   storage: z.object({
-    [STORAGE_KEY]: z.union([z.string(), z.null()]),
-    [UI_STORAGE_KEY]: z.union([z.string(), z.null()]),
+    [STORAGE_KEY]: z.union([z.record(z.unknown()), z.null()]),
+    [UI_STORAGE_KEY]: z.union([z.record(z.unknown()), z.null()]),
   }),
 });
 
@@ -38,6 +39,31 @@ export class BackupParseError extends Error {
   }
 }
 
+// localStorageのJSON文字列をオブジェクト化し、オブジェクト以外はnullとして扱う。
+function parseStorageValue(rawValue: string | null): BackupStorageValue {
+  if (rawValue === null) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue) as unknown;
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+      return null;
+    }
+    return parsed as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+// バックアップ内の値をlocalStorageへ保存可能な文字列へ正規化する。
+function stringifyStorageValue(value: BackupStorageValue): string | null {
+  if (value === null) {
+    return null;
+  }
+  return JSON.stringify(value);
+}
+
 // 現在のlocalStorageからバックアップ用ペイロードを作成する。
 export function buildBackupPayloadFromLocalStorage(): LocalStorageBackupV1 {
   if (typeof window === "undefined") {
@@ -55,8 +81,8 @@ export function buildBackupPayloadFromLocalStorage(): LocalStorageBackupV1 {
     formatVersion: BACKUP_FORMAT_VERSION,
     exportedAt: new Date().toISOString(),
     storage: {
-      [STORAGE_KEY]: window.localStorage.getItem(STORAGE_KEY),
-      [UI_STORAGE_KEY]: window.localStorage.getItem(UI_STORAGE_KEY),
+      [STORAGE_KEY]: parseStorageValue(window.localStorage.getItem(STORAGE_KEY)),
+      [UI_STORAGE_KEY]: parseStorageValue(window.localStorage.getItem(UI_STORAGE_KEY)),
     },
   };
 }
@@ -88,8 +114,8 @@ export function applyBackupPayloadToLocalStorage(payload: LocalStorageBackupV1):
     return;
   }
 
-  const growthData = payload.storage[STORAGE_KEY];
-  const uiData = payload.storage[UI_STORAGE_KEY];
+  const growthData = stringifyStorageValue(payload.storage[STORAGE_KEY]);
+  const uiData = stringifyStorageValue(payload.storage[UI_STORAGE_KEY]);
   const previousGrowthData = window.localStorage.getItem(STORAGE_KEY);
   const previousUiData = window.localStorage.getItem(UI_STORAGE_KEY);
 
