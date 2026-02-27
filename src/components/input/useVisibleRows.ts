@@ -227,29 +227,10 @@ export function useVisibleRows({
         case "ownedMemoryPiece":
           baseComparison = aProgress.ownedMemoryPiece - bProgress.ownedMemoryPiece;
           break;
-        case "starMemoryNeeded":
-          baseComparison =
-            getStarRemainingMemoryPieceCount(aCharacter, aProgress, starMemoryCalcMode) -
-            getStarRemainingMemoryPieceCount(bCharacter, bProgress, starMemoryCalcMode);
-          break;
-        case "connectRankMemoryNeeded":
-          baseComparison =
-            getConnectRankRemainingMemoryPieceCount(aProgress) - getConnectRankRemainingMemoryPieceCount(bProgress);
-          break;
-        case "ue1MemoryNeeded":
-          baseComparison =
-            getUe1RemainingMemoryPieceCount(aCharacter, aProgress, ue1MemoryCalcMode) -
-            getUe1RemainingMemoryPieceCount(bCharacter, bProgress, ue1MemoryCalcMode);
-          break;
         case "ue1HeartFragmentNeeded":
           baseComparison =
             getUe1RemainingHeartFragmentCountByMode(aCharacter, aProgress, ue1HeartFragmentCalcMode) -
             getUe1RemainingHeartFragmentCountByMode(bCharacter, bProgress, ue1HeartFragmentCalcMode);
-          break;
-        case "limitBreakMemoryNeeded":
-          baseComparison =
-            getLimitBreakRemainingMemoryPieceCount(aCharacter, aProgress) -
-            getLimitBreakRemainingMemoryPieceCount(bCharacter, bProgress);
           break;
         case "totalMemoryNeeded":
           baseComparison =

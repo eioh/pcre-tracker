@@ -30,6 +30,7 @@ import { TableSelect } from "../ui/table-select";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow as UiTableRow } from "../ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 type InputProgressTableProps = {
   visibleRows: VisibleRow[];
@@ -251,12 +252,6 @@ const TableRow = memo(function TableRow({
         />
       </TableCell>
       <TableCell>
-        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{starRemainingMemoryPiece}</span>
-      </TableCell>
-      <TableCell>
-        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{connectRankRemainingMemoryPiece}</span>
-      </TableCell>
-      <TableCell>
         <span className="inline-grid w-full grid-cols-[3ch_auto_3ch_auto_3ch] place-content-center items-center gap-x-1 text-center text-sm font-bold tabular-nums whitespace-nowrap">
           <span className="text-center">{connectRankRemainingMaterial.arts}</span>
           <span className="text-center">/</span>
@@ -266,13 +261,42 @@ const TableRow = memo(function TableRow({
         </span>
       </TableCell>
       <TableCell>
-        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingMemoryPiece}</span>
-      </TableCell>
-      <TableCell>
-        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{limitBreakRemainingMemoryPiece}</span>
-      </TableCell>
-      <TableCell>
-        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{adjustedTotalRemainingMemoryPiece}</span>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="inline-block w-full cursor-help text-center text-sm font-bold tabular-nums">
+                {adjustedTotalRemainingMemoryPiece}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="top" align="end" className="grid min-w-[220px] gap-1.5 text-left">
+              <span className="inline-flex items-baseline gap-2">
+                <span className="inline-block w-[9em]">☆</span>
+                <span className="tabular-nums">+{starRemainingMemoryPiece}</span>
+              </span>
+              <span className="inline-flex items-baseline gap-2">
+                <span className="inline-block w-[9em]">コネクトRANK</span>
+                <span className="tabular-nums">+{connectRankRemainingMemoryPiece}</span>
+              </span>
+              <span className="inline-flex items-baseline gap-2">
+                <span className="inline-block w-[9em]">専用1</span>
+                <span className="tabular-nums">+{ue1RemainingMemoryPiece}</span>
+              </span>
+              <span className="inline-flex items-baseline gap-2">
+                <span className="inline-block w-[9em]">限界突破</span>
+                <span className="tabular-nums">+{limitBreakRemainingMemoryPiece}</span>
+              </span>
+              <span className="inline-flex items-baseline gap-2">
+                <span className="inline-block w-[9em]">所持数</span>
+                <span className="tabular-nums">-{progress.ownedMemoryPiece}</span>
+              </span>
+              <div className="h-px bg-white/20" />
+              <span className="inline-flex items-baseline gap-2 font-bold">
+                <span className="inline-block w-[9em]">合計</span>
+                <span className="tabular-nums">{adjustedTotalRemainingMemoryPiece}</span>
+              </span>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TableCell>
       <TableCell>
         <div className="flex flex-wrap gap-1.5">
@@ -359,10 +383,7 @@ export const InputProgressTable = memo(function InputProgressTable({
           <col className="w-[150px]" />
           <col className="w-[140px]" />
           <col className="w-[120px]" />
-          <col className="w-[155px]" />
           <col className="w-[250px]" />
-          <col className="w-[130px]" />
-          <col className="w-[145px]" />
           <col className="w-[120px]" />
           <col className="w-[260px]" />
           <col className="w-[170px]" />
@@ -411,43 +432,7 @@ export const InputProgressTable = memo(function InputProgressTable({
                 onSort={onSort}
               />
             </TableHead>
-            <TableHead aria-sort={getAriaSort("starMemoryNeeded", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton
-                label="☆必要メモピ"
-                columnKey="starMemoryNeeded"
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={onSort}
-              />
-            </TableHead>
-            <TableHead aria-sort={getAriaSort("connectRankMemoryNeeded", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton
-                label="コネクトRANK必要メモピ"
-                columnKey="connectRankMemoryNeeded"
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={onSort}
-              />
-            </TableHead>
             <TableHead className="text-center">コネクトRANK必要素材（アーツ/ソウル/ガード）</TableHead>
-            <TableHead aria-sort={getAriaSort("ue1MemoryNeeded", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton
-                label="専用1必要メモピ"
-                columnKey="ue1MemoryNeeded"
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={onSort}
-              />
-            </TableHead>
-            <TableHead aria-sort={getAriaSort("limitBreakMemoryNeeded", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton
-                label="限界突破必要メモピ"
-                columnKey="limitBreakMemoryNeeded"
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={onSort}
-              />
-            </TableHead>
             <TableHead aria-sort={getAriaSort("totalMemoryNeeded", sortKey, sortDirection)} className="text-center">
               <SortHeaderButton
                 label="必要メモピ合計"
@@ -472,7 +457,7 @@ export const InputProgressTable = memo(function InputProgressTable({
         <TableBody>
           {visibleRows.length === 0 ? (
             <UiTableRow>
-              <TableCell colSpan={16} className="px-3 py-[18px] text-center text-muted">
+              <TableCell colSpan={12} className="px-3 py-[18px] text-center text-muted">
                 条件に一致するキャラがいません
               </TableCell>
             </UiTableRow>
@@ -480,7 +465,7 @@ export const InputProgressTable = memo(function InputProgressTable({
             <>
               {paddingTop > 0 ? (
                 <UiTableRow aria-hidden="true">
-                  <TableCell colSpan={16} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
+                  <TableCell colSpan={12} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
                 </UiTableRow>
               ) : null}
               {virtualizedRows.map(({ virtualRow, row }) => (
@@ -503,7 +488,7 @@ export const InputProgressTable = memo(function InputProgressTable({
               ))}
               {paddingBottom > 0 ? (
                 <UiTableRow aria-hidden="true">
-                  <TableCell colSpan={16} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
+                  <TableCell colSpan={12} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
                 </UiTableRow>
               ) : null}
             </>

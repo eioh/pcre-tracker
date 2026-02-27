@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ComponentProps } from "react";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { SortKey } from "../../domain/uiStorage";
@@ -156,7 +156,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[13]).toHaveTextContent("0");
+    expect(cells[9]).toHaveTextContent("0");
   });
 
   it("専用1必要ハートの欠片を表示する", () => {
@@ -167,7 +167,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[15]).toHaveTextContent("318");
+    expect(cells[11]).toHaveTextContent("318");
   });
 
   it("専用1必要ハートの欠片はモード切り替えで未実装キャラも表示できる", () => {
@@ -197,13 +197,13 @@ describe("InputProgressTable", () => {
     let tableRows = screen.getAllByRole("row");
     let bodyRow = tableRows[1] as HTMLTableRowElement;
     let cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[15]).toHaveTextContent("0");
+    expect(cells[11]).toHaveTextContent("0");
 
     rerender(<InputProgressTable {...allMaxProps} />);
     tableRows = screen.getAllByRole("row");
     bodyRow = tableRows[1] as HTMLTableRowElement;
     cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[15]).toHaveTextContent("318");
+    expect(cells[11]).toHaveTextContent("318");
   });
 
   it("コネクトRANK必要素材列にアーツ/ソウル/ガードを表示する", () => {
@@ -216,7 +216,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[10]).toHaveTextContent("120/256/66");
+    expect(cells[8]).toHaveTextContent("120/256/66");
   });
 
   it("メモピ入手列にソース名を表示する", () => {
@@ -265,13 +265,35 @@ describe("InputProgressTable", () => {
     expect(combos[3]).toBeDisabled();
   });
 
-  it("コネクトRANK必要メモピ列ヘッダー押下でソートキーを親へ通知できる", () => {
-    const props = buildProps();
+  it("必要メモピ合計セルのホバーで内訳ツールチップを表示する", async () => {
+    const row: VisibleRow = {
+      character: buildCharacter(),
+      progress: buildProgress({ star: 1 }),
+    };
+    const props = buildProps({ visibleRows: [row] });
     render(<InputProgressTable {...props} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /コネクトRANK必要メモピ/ }));
+    const tableRows = screen.getAllByRole("row");
+    const bodyRow = tableRows[1] as HTMLTableRowElement;
+    const cells = within(bodyRow).getAllByRole("cell");
+    const totalTrigger = within(cells[9] as HTMLElement).getByText("1210");
+    fireEvent.pointerMove(totalTrigger);
+    fireEvent.mouseOver(totalTrigger);
 
-    expect(props.onSort).toHaveBeenCalledWith("connectRankMemoryNeeded");
+    await waitFor(() => {
+      expect(
+        screen.getAllByText((_, element) => element?.textContent === "+450").length,
+      ).toBeGreaterThan(0);
+    });
+    expect(screen.getAllByText((_, element) => element?.textContent === "コネクトRANK").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "専用1").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "限界突破").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "+20").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "+620").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "+120").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "-0").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "合計").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "1210").length).toBeGreaterThan(0);
   });
 
   it("専用1のSP選択後に通常レベルへ戻せる", () => {

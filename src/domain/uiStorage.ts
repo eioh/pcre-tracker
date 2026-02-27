@@ -26,11 +26,7 @@ export type SortKey =
   | "ue1"
   | "ue2"
   | "ownedMemoryPiece"
-  | "starMemoryNeeded"
-  | "connectRankMemoryNeeded"
-  | "ue1MemoryNeeded"
   | "ue1HeartFragmentNeeded"
-  | "limitBreakMemoryNeeded"
   | "totalMemoryNeeded";
 export type SortDirection = "asc" | "desc" | null;
 
@@ -73,11 +69,7 @@ const SORT_KEY_VALUES: SortKey[] = [
   "ue1",
   "ue2",
   "ownedMemoryPiece",
-  "starMemoryNeeded",
-  "connectRankMemoryNeeded",
-  "ue1MemoryNeeded",
   "ue1HeartFragmentNeeded",
-  "limitBreakMemoryNeeded",
   "totalMemoryNeeded",
 ];
 const SORT_DIRECTION_VALUES: Array<Exclude<SortDirection, null>> = ["asc", "desc"];

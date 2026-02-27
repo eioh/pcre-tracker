@@ -77,6 +77,24 @@ describe("uiStorage", () => {
     expect(loaded.input.sortDirection).toBeNull();
   });
 
+  it("削除済みsortKeyは既定値へフォールバックする", () => {
+    window.localStorage.setItem(
+      UI_STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: 1,
+        activeTab: "input",
+        input: {
+          sortKey: "starMemoryNeeded",
+          sortDirection: "asc",
+        },
+      }),
+    );
+
+    const loaded = loadUiState();
+    expect(loaded.input.sortKey).toBe("name");
+    expect(loaded.input.sortDirection).toBe("asc");
+  });
+
   it("parseUiStateは壊れたJSONでも既定値を返す", () => {
     expect(parseUiState("not-json")).toEqual(buildDefaultUiState());
   });
