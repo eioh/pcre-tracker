@@ -37,7 +37,8 @@ export function MultiSelectFilter<T extends string | number>({
           <Button
             variant="outline"
             className={cn(
-              "h-10 w-full justify-between rounded-[12px] px-3 py-2.5 text-sm font-normal",
+              "h-10 w-full justify-between rounded-[12px] border-white/20 bg-[#090e17d9] px-3 py-2.5 text-sm font-normal text-main",
+              "focus-visible:border-accent-strong focus-visible:ring-2 focus-visible:ring-accent-strong/40",
               "overflow-hidden text-ellipsis whitespace-nowrap",
             )}
             aria-label={`${title}フィルタを開く`}
