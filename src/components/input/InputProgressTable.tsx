@@ -29,6 +29,7 @@ import {
 } from "./uiStyles";
 import { TableCheckbox } from "../ui/table-checkbox";
 import { TableNumberInput } from "../ui/table-number-input";
+import { SelectItem } from "../ui/select";
 import { TableSelect } from "../ui/table-select";
 import { Calendar } from "../ui/calendar";
 import { Button } from "../ui/button";
@@ -142,11 +143,11 @@ const TableRow = memo(function TableRow({
   const adjustedTotalRemainingMemoryPiece = Math.max(0, totalRemainingMemoryPiece - progress.ownedMemoryPiece);
 
   const handleOwnedChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => onUpdateProgress(character.name, { owned: event.target.checked }),
+    (checked: boolean | "indeterminate") => onUpdateProgress(character.name, { owned: checked === true }),
     [onUpdateProgress, character.name],
   );
   const handleLimitBreakChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => onUpdateProgress(character.name, { limitBreak: event.target.checked }),
+    (checked: boolean | "indeterminate") => onUpdateProgress(character.name, { limitBreak: checked === true }),
     [onUpdateProgress, character.name],
   );
   const handleStarChange = useCallback(
@@ -220,7 +221,7 @@ const TableRow = memo(function TableRow({
     >
       <TableCell className="text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
-          <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onChange={handleOwnedChange} />
+          <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onCheckedChange={handleOwnedChange} />
         </label>
       </TableCell>
       <TableCell className="whitespace-nowrap font-bold">
@@ -237,15 +238,15 @@ const TableRow = memo(function TableRow({
       </TableCell>
       <TableCell className="text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
-          <TableCheckbox checked={progress.limitBreak} aria-label={`${character.name}の限界突破状態`} onChange={handleLimitBreakChange} />
+          <TableCheckbox checked={progress.limitBreak} aria-label={`${character.name}の限界突破状態`} onCheckedChange={handleLimitBreakChange} />
         </label>
       </TableCell>
       <TableCell>
         <TableSelect value={String(progress.star)} appearance={isStarAtMax ? "maxed" : "default"} onValueChange={handleStarChange}>
           {Array.from({ length: starMax }, (_, index) => index + 1).map((star) => (
-            <option key={star} value={String(star)}>
+            <SelectItem key={star} value={String(star)}>
               {star}
-            </option>
+            </SelectItem>
           ))}
         </TableSelect>
       </TableCell>
@@ -255,11 +256,11 @@ const TableRow = memo(function TableRow({
           appearance={isConnectRankAtMax ? "maxed" : "default"}
           onValueChange={handleConnectRankChange}
         >
-          <option value="0">未開放</option>
+          <SelectItem value="0">未開放</SelectItem>
           {Array.from({ length: 15 }, (_, index) => index + 1).map((rank) => (
-            <option key={rank} value={String(rank)}>
+            <SelectItem key={rank} value={String(rank)}>
               {rank}
-            </option>
+            </SelectItem>
           ))}
         </TableSelect>
       </TableCell>
@@ -267,15 +268,15 @@ const TableRow = memo(function TableRow({
         {character.implemented.ue1 ? (
           <TableSelect value={ue1CompositeValue} appearance={isUe1AtMax ? "maxed" : "default"} onValueChange={handleUe1Change}>
             {UE1_LEVEL_VALUES.map((level) => (
-              <option key={level} value={String(level)}>
+              <SelectItem key={level} value={String(level)}>
                 {formatUeLevel(level)}
-              </option>
+              </SelectItem>
             ))}
-            {character.implemented.ue1Sp ? <option value="sp">SP</option> : null}
+            {character.implemented.ue1Sp ? <SelectItem value="sp">SP</SelectItem> : null}
           </TableSelect>
         ) : (
           <TableSelect value="null" appearance="disabled" disabled>
-            <option value="null">-</option>
+            <SelectItem value="null">-</SelectItem>
           </TableSelect>
         )}
       </TableCell>
@@ -283,14 +284,14 @@ const TableRow = memo(function TableRow({
         {character.implemented.ue2 ? (
           <TableSelect value={ue2Value} appearance={isUe2AtMax ? "maxed" : "default"} onValueChange={handleUe2Change}>
             {UE2_LEVEL_VALUES.map((level) => (
-              <option key={level} value={String(level)}>
+              <SelectItem key={level} value={String(level)}>
                 {formatUeLevel(level)}
-              </option>
+              </SelectItem>
             ))}
           </TableSelect>
         ) : (
           <TableSelect value="null" appearance="disabled" disabled>
-            <option value="null">-</option>
+            <SelectItem value="null">-</SelectItem>
           </TableSelect>
         )}
       </TableCell>

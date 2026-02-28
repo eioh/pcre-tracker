@@ -12,6 +12,11 @@
   --color-accent: #3cc8a7;
   --color-accent-strong: #00f6d0;
 
+  --color-input-bg: #090e17d9;
+  --color-popover-bg: #090e17f5;
+  --color-selected: #112336;
+  --color-checked-bg: #0b2a24;
+
   --shadow-panel: 0 20px 48px rgba(0, 0, 0, 0.45);
 }
 

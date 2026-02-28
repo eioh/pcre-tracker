@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { Select } from "./select";
 import { cn } from "../../lib/utils";
+import { Select, SelectContent, SelectTrigger, SelectValue } from "./select";
 
 type TableSelectAppearance = "default" | "maxed" | "disabled";
 
@@ -26,13 +26,15 @@ function getAppearanceClass(appearance: TableSelectAppearance): string {
 }
 
 // テーブルセルで使うセレクトの見た目を統一する。
-export function TableSelect({ className, appearance = "default", disabled, ...props }: TableSelectProps) {
+// children に SelectItem を渡して使用する。
+export function TableSelect({ className, appearance = "default", disabled, children, ...props }: TableSelectProps) {
   const effectiveAppearance: TableSelectAppearance = disabled ? "disabled" : appearance;
   return (
-    <Select
-      disabled={disabled}
-      className={cn("min-w-32 px-2.5 py-2", getAppearanceClass(effectiveAppearance), className)}
-      {...props}
-    />
+    <Select disabled={disabled} {...props}>
+      <SelectTrigger className={cn("min-w-32 px-2.5 py-2", getAppearanceClass(effectiveAppearance), className)}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>{children}</SelectContent>
+    </Select>
   );
 }

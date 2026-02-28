@@ -11,10 +11,10 @@ import type {
   Ue2Filter,
 } from "../../domain/uiStorage";
 import { Button } from "../ui/button";
-import { Field, FieldControl, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import { MultiSelectFilter } from "../ui/multi-select-filter";
-import { Select } from "../ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Separator } from "../ui/separator";
 import { memorySourceLabelMap } from "./constants";
 import { formatUeLevel } from "./formatters";
@@ -97,15 +97,15 @@ export const InputFilters = memo(function InputFilters({
 
   return (
     <>
-      <Field className="mb-3">
-        <FieldLabel>キャラ検索</FieldLabel>
-        <FieldControl className="flex items-center gap-2">
+      <div className="mb-3 grid gap-1.5 text-sm text-muted">
+        <Label>キャラ検索</Label>
+        <div className="flex items-center gap-2">
           <Input value={searchText} onChange={(event) => onSearchTextChange(event.target.value)} placeholder="例: ヒヨリ" />
           <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={resetSearchText}>
             リセット
           </Button>
-        </FieldControl>
-      </Field>
+        </div>
+      </div>
 
       <Separator className={filterSeparatorClass} label="キャラ検索とフィルタの区切り" />
 
@@ -116,32 +116,47 @@ export const InputFilters = memo(function InputFilters({
         </Button>
       </div>
       <div className={inputToolbarClass}>
-        <Field>
-          <FieldLabel>所持</FieldLabel>
+        <div className="grid gap-1.5 text-sm text-muted">
+          <Label>所持</Label>
           <Select value={ownedFilter} onValueChange={(value) => onOwnedFilterChange(value as OwnedFilter)}>
-            <option value="all">すべて</option>
-            <option value="owned">所持のみ</option>
-            <option value="unowned">未所持のみ</option>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">すべて</SelectItem>
+              <SelectItem value="owned">所持のみ</SelectItem>
+              <SelectItem value="unowned">未所持のみ</SelectItem>
+            </SelectContent>
           </Select>
-        </Field>
+        </div>
 
-        <Field>
-          <FieldLabel>限定</FieldLabel>
+        <div className="grid gap-1.5 text-sm text-muted">
+          <Label>限定</Label>
           <Select value={limitedFilter} onValueChange={(value) => onLimitedFilterChange(value as LimitedFilter)}>
-            <option value="all">すべて</option>
-            <option value="limited">限定のみ</option>
-            <option value="normal">恒常のみ</option>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">すべて</SelectItem>
+              <SelectItem value="limited">限定のみ</SelectItem>
+              <SelectItem value="normal">恒常のみ</SelectItem>
+            </SelectContent>
           </Select>
-        </Field>
+        </div>
 
-        <Field>
-          <FieldLabel>限界突破</FieldLabel>
+        <div className="grid gap-1.5 text-sm text-muted">
+          <Label>限界突破</Label>
           <Select value={limitBreakFilter} onValueChange={(value) => onLimitBreakFilterChange(value as LimitBreakFilter)}>
-            <option value="all">すべて</option>
-            <option value="on">限界突破済み</option>
-            <option value="off">未限界突破</option>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">すべて</SelectItem>
+              <SelectItem value="on">限界突破済み</SelectItem>
+              <SelectItem value="off">未限界突破</SelectItem>
+            </SelectContent>
           </Select>
-        </Field>
+        </div>
 
         <MultiSelectFilter
           title="☆"
