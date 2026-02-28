@@ -144,11 +144,13 @@ describe("InputProgressTable", () => {
     const combos = within(bodyRow).getAllByRole("combobox");
 
     selectOptionFromCombobox(combos[0] as HTMLElement, "6");
+    selectOptionFromCombobox(combos[1] as HTMLElement, "未開放");
     selectOptionFromCombobox(combos[1] as HTMLElement, "10");
     selectOptionFromCombobox(combos[2] as HTMLElement, "SP");
     selectOptionFromCombobox(combos[3] as HTMLElement, "Lv.5");
 
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { star: 6 });
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { connectRank: 0 });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { connectRank: 10 });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 370, ue1SpEquipped: true });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue2Level: 5 });

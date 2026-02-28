@@ -20,6 +20,11 @@ function createProgress(partial: Partial<CharacterProgress>): CharacterProgress 
 }
 
 describe("getConnectRankRemainingMemoryPieceCount", () => {
+  it("未開放(0)からRANK15までの必要メモピは20になる", () => {
+    const progress = createProgress({ connectRank: 0 });
+    expect(getConnectRankRemainingMemoryPieceCount(progress)).toBe(20);
+  });
+
   it("RANK1からRANK15までの必要メモピは20になる", () => {
     const progress = createProgress({ connectRank: 1 });
     expect(getConnectRankRemainingMemoryPieceCount(progress)).toBe(20);

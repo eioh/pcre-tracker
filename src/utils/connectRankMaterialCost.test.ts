@@ -8,6 +8,10 @@ function getCost(role: Role, connectRank: CharacterProgress["connectRank"]) {
 }
 
 describe("getConnectRankRemainingMaterialCost", () => {
+  it("アタッカーの未開放(0)はRANK1を含むRANK15までの残素材を計算できる", () => {
+    expect(getCost("アタッカー", 0)).toEqual({ arts: 126, soul: 270, guard: 66 });
+  });
+
   it("アタッカーのRANK1はRANK15までの残素材を計算できる", () => {
     expect(getCost("アタッカー", 1)).toEqual({ arts: 120, soul: 256, guard: 66 });
   });

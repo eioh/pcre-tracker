@@ -40,7 +40,7 @@ describe("loadStoredState", () => {
     expect(hiyori).toBeDefined();
     expect(hiyori?.limitBreak).toBe(false);
     expect(hiyori?.star).toBe(1);
-    expect(hiyori?.connectRank).toBe(1);
+    expect(hiyori?.connectRank).toBe(0);
     expect(hiyori?.ue1Level).toBe(140);
     expect(hiyori?.ue1SpEquipped).toBe(false);
     expect(hiyori?.ue2Level).toBeNull();
@@ -105,5 +105,33 @@ describe("loadStoredState", () => {
     const loaded = loadStoredState(masterCharacters);
     const hiyori = loaded.progressByName["ヒヨリ"];
     expect(hiyori?.obtainedDate).toBe("2026-02-28");
+  });
+
+  it("コネクトRANKの未開放(0)を保持して読み込む", () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: 1,
+        progressByName: {
+          ヒヨリ: {
+            owned: true,
+            limitBreak: false,
+            star: 3,
+            connectRank: 0,
+            ue1Level: 0,
+            ue1SpEquipped: false,
+            ue2Level: null,
+            ownedMemoryPiece: 1,
+            obtainedDate: null,
+            gachaPullCount: 12,
+            updatedAt: "2026-02-22T00:00:00.000Z",
+          },
+        },
+      }),
+    );
+
+    const loaded = loadStoredState(masterCharacters);
+    const hiyori = loaded.progressByName["ヒヨリ"];
+    expect(hiyori?.connectRank).toBe(0);
   });
 });

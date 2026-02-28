@@ -41,7 +41,7 @@ export const characterProgressSchema = z.object({
   owned: z.boolean(),
   limitBreak: z.boolean().default(false),
   star: z.number().int().min(1).max(6).default(1),
-  connectRank: z.number().int().min(1).max(15).default(1),
+  connectRank: z.number().int().min(0).max(15).default(0),
   ue1Level: z.union([z.null(), ue1LevelSchema]),
   ue1SpEquipped: z.boolean(),
   ue2Level: z.union([z.null(), ue2LevelSchema]),

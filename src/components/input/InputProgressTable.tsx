@@ -249,6 +249,7 @@ const TableRow = memo(function TableRow({
           appearance={isConnectRankAtMax ? "maxed" : "default"}
           onValueChange={handleConnectRankChange}
         >
+          <option value="0">未開放</option>
           {Array.from({ length: 15 }, (_, index) => index + 1).map((rank) => (
             <option key={rank} value={String(rank)}>
               {rank}

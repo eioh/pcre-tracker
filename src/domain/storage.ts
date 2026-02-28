@@ -20,7 +20,7 @@ function createDefaultProgress(character: MasterCharacter): CharacterProgress {
     owned: false,
     limitBreak: false,
     star: 1,
-    connectRank: 1,
+    connectRank: 0,
     ue1Level: character.implemented.ue1 ? 0 : null,
     ue1SpEquipped: false,
     ue2Level: character.implemented.ue2 ? 0 : null,
@@ -42,10 +42,10 @@ function toStateUpdatedAt(value: unknown): string {
   return parsed.toISOString();
 }
 
-// コネクトRANK入力値を1〜15の整数へ正規化する。
+// コネクトRANK入力値を0〜15の整数へ正規化する。
 function toConnectRank(value: number): CharacterProgress["connectRank"] {
-  if (!Number.isInteger(value) || value < 1) {
-    return 1;
+  if (!Number.isInteger(value) || value < 0) {
+    return 0;
   }
   if (value > 15) {
     return 15;
