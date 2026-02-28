@@ -26,6 +26,7 @@ import {
 import { Button } from "./components/ui/button";
 import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
+import { PenLine, LayoutDashboard } from "lucide-react";
 
 const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
 
@@ -220,8 +221,14 @@ export default function App() {
         }}
       >
         <TabsList className="mb-5" aria-label="画面切り替え">
-          <TabsTrigger value="input">育成入力</TabsTrigger>
-          <TabsTrigger value="dashboard">ダッシュボード</TabsTrigger>
+          <TabsTrigger value="input">
+            <PenLine className="size-4" />
+            育成入力
+          </TabsTrigger>
+          <TabsTrigger value="dashboard">
+            <LayoutDashboard className="size-4" />
+            ダッシュボード
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="input" forceMount={hasOpenedInput ? true : undefined}>
