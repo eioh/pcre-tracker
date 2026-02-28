@@ -58,9 +58,9 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
   const star6Rate = summary.star6.implemented === 0 ? 0 : (summary.star6.promoted / summary.star6.implemented) * 100;
 
   return (
-    <section className="grid gap-5 rounded-[20px] border border-white/30 bg-linear-to-br from-[#131a27cc] to-[#0d1421f2] p-5 shadow-panel">
+    <section className="grid gap-5 rounded-[20px] border border-white/30 bg-linear-to-br from-section-from to-section-to p-5 shadow-panel">
       <header className="grid gap-1">
-        <h2 className="m-0 text-[0.95rem] font-semibold tracking-[0.1em] text-[#c8d8f6]">PROGRESS DASHBOARD</h2>
+        <h2 className="m-0 text-[0.95rem] font-semibold tracking-[0.1em] text-sub">PROGRESS DASHBOARD</h2>
         <p className="m-0 text-sm text-muted">育成状態を主要指標と分布で確認できます</p>
       </header>
 
@@ -147,11 +147,11 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
         <DistributionChart title="専用2レベル分布" items={summary.ue2Distribution} />
       </div>
 
-      <section className="grid gap-3 rounded-2xl border border-[#6180b359] bg-linear-to-br from-[#0d1627e8] to-[#0a111de0] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+      <section className="grid gap-3 rounded-2xl border border-panel-border bg-linear-to-br from-panel-from to-panel-to p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h3 className="mb-1 mt-0 text-sm font-semibold tracking-[0.06em]">ガチャ回数推移</h3>
-            <p className="m-0 mt-1 text-xs text-[#c8d8f6]">
+            <p className="m-0 mt-1 text-xs text-sub">
               表示範囲の平均: {gachaPullChartItems.length === 0 ? "-" : `${averagePullCount.toFixed(1)}回`}
             </p>
           </div>

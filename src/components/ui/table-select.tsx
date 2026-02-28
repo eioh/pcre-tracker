@@ -17,10 +17,10 @@ type TableSelectProps = {
 // テーブル用セレクトの表示種別に応じたクラスを返す。
 function getAppearanceClass(appearance: TableSelectAppearance): string {
   if (appearance === "maxed") {
-    return "border-[#74d6c6] bg-[#0b1a22] text-[#d9fff7] ring-1 ring-[#74d6c6]/70";
+    return "border-maxed-border bg-maxed-bg text-maxed-text ring-1 ring-maxed-border/70";
   }
   if (appearance === "disabled") {
-    return "cursor-default appearance-none border-[#788aad38] bg-[#070b12bf] text-[#9fb0cf] opacity-100 [box-shadow:inset_0_0_0_1px_rgba(9,14,23,0.35)]";
+    return "cursor-default appearance-none border-disabled-border bg-disabled-bg text-disabled-text opacity-100 [box-shadow:inset_0_0_0_1px_rgba(9,14,23,0.35)]";
   }
   return "";
 }

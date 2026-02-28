@@ -18,6 +18,49 @@
   --color-checked-bg: #0b2a24;
 
   --shadow-panel: 0 20px 48px rgba(0, 0, 0, 0.45);
+
+  /* パネル/カード共通 */
+  --color-panel-border: #6180b359;
+  --color-panel-from: #0d1627e8;
+  --color-panel-to: #0a111de0;
+
+  /* セクション（DashboardTab の外枠） */
+  --color-section-from: #131a27cc;
+  --color-section-to: #0d1421f2;
+
+  /* テキスト補助色 */
+  --color-sub: #c8d8f6;
+
+  /* チャート配色 */
+  --color-chart-bar: #4f8dff;
+  --color-chart-ref: #9ac0ff;
+  --color-chart-accent: #45e6ff;
+  --color-chart-grid: rgba(255, 255, 255, 0.12);
+  --color-chart-cursor: rgba(69, 230, 255, 0.08);
+
+  /* バッジ: normal */
+  --color-badge-normal-border: #67b8ffa6;
+  --color-badge-normal-bg: #1c4e7a4f;
+  --color-badge-normal-text: #a9ddff;
+
+  /* バッジ: limited */
+  --color-badge-limited-border: #ff7e63b3;
+  --color-badge-limited-bg: #7b2c2552;
+  --color-badge-limited-text: #ffb19f;
+
+  /* テーブルセレクト: maxed */
+  --color-maxed-border: #74d6c6;
+  --color-maxed-bg: #0b1a22;
+  --color-maxed-text: #d9fff7;
+
+  /* テーブル */
+  --color-table-border: #7a94c533;
+  --color-table-header-bg: #101825f5;
+
+  /* テーブルセレクト: disabled */
+  --color-disabled-border: #788aad38;
+  --color-disabled-bg: #070b12bf;
+  --color-disabled-text: #9fb0cf;
 }
 
 :root {

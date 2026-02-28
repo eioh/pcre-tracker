@@ -33,7 +33,7 @@ export function DistributionChart({ title, items, emptyMessage, className }: Dis
   return (
     <section
       className={cn(
-        "rounded-2xl border border-[#6180b359] bg-linear-to-br from-[#0d1627e8] to-[#0a111de0] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+        "rounded-2xl border border-panel-border bg-linear-to-br from-panel-from to-panel-to p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
         className,
       )}
     >
@@ -46,10 +46,10 @@ export function DistributionChart({ title, items, emptyMessage, className }: Dis
         ) : (
           visibleItems.map((item, index) => (
             <li key={`${item.label}-${index}`} className="grid grid-cols-[80px_minmax(0,1fr)_4ch] items-center gap-2">
-              <span className="text-xs text-[#ccd9f5]">{item.label}</span>
+              <span className="text-xs text-sub">{item.label}</span>
               <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/10">
                 <div
-                  className="h-full rounded-full bg-linear-to-r from-accent to-[#45e6ff]"
+                  className="h-full rounded-full bg-linear-to-r from-accent to-chart-accent"
                   style={{ width: `${(item.count / maxCount) * 100}%` }}
                 />
               </div>
