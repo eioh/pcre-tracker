@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import { DashboardTab } from "./components/DashboardTab";
-import { InputTab } from "./components/InputTab";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { masterCharacters } from "./domain/master";
+
+// タブ表示時にのみ読み込むことで初期バンドルを軽量化する。
+const DashboardTab = lazy(() => import("./components/DashboardTab").then((m) => ({ default: m.DashboardTab })));
+const InputTab = lazy(() => import("./components/InputTab").then((m) => ({ default: m.InputTab })));
 import {
   applyBackupPayloadToLocalStorage,
   buildBackupPayloadFromLocalStorage,
@@ -40,6 +42,15 @@ type ProgressPatch = Partial<
     | "gachaPullCount"
   >
 >;
+
+// タブの遅延読み込み中に表示するフォールバックUI。
+function TabLoadingFallback() {
+  return (
+    <section className="flex min-h-[200px] items-center justify-center rounded-[20px] border border-white/30 bg-linear-to-br from-[#131a27cc] to-[#0d1421f2] p-8">
+      <p className="text-sm text-muted">読み込み中...</p>
+    </section>
+  );
+}
 
 // 最終更新日時の文字列を表示用フォーマットへ変換する。
 function formatUpdatedAt(value: string): string {
@@ -207,17 +218,21 @@ export default function App() {
         </TabsList>
 
         <TabsContent value="input" forceMount={hasOpenedInput ? true : undefined}>
-          <InputTab
-            masterCharacters={masterCharacters}
-            state={state}
-            onUpdateProgress={handleUpdateProgress}
-            initialSettings={safeUiState.input}
-            onSettingsChange={handleInputSettingsChange}
-            settingsSyncToken={inputSettingsSyncToken}
-          />
+          <Suspense fallback={<TabLoadingFallback />}>
+            <InputTab
+              masterCharacters={masterCharacters}
+              state={state}
+              onUpdateProgress={handleUpdateProgress}
+              initialSettings={safeUiState.input}
+              onSettingsChange={handleInputSettingsChange}
+              settingsSyncToken={inputSettingsSyncToken}
+            />
+          </Suspense>
         </TabsContent>
         <TabsContent value="dashboard">
-          <DashboardTab masterCharacters={masterCharacters} state={state} />
+          <Suspense fallback={<TabLoadingFallback />}>
+            <DashboardTab masterCharacters={masterCharacters} state={state} />
+          </Suspense>
         </TabsContent>
       </Tabs>
 

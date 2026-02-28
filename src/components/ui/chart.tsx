@@ -17,12 +17,13 @@ type ChartContainerProps = React.HTMLAttributes<HTMLDivElement> & {
 
 // チャート設定からCSS変数を組み立てて配色を統一する。
 function buildChartStyle(config: ChartConfig): React.CSSProperties {
-  const styles: React.CSSProperties = {};
+  type ChartStyleVariables = React.CSSProperties & Record<`--color-${string}`, string>;
+  const styles: ChartStyleVariables = {};
   for (const [key, item] of Object.entries(config)) {
     if (!item.color) {
       continue;
     }
-    styles[`--color-${key}` as keyof React.CSSProperties] = item.color;
+    styles[`--color-${key}`] = item.color;
   }
   return styles;
 }

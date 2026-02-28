@@ -1,4 +1,4 @@
-import type { TooltipProps } from "recharts";
+import type { TooltipContentProps } from "recharts";
 import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 import type { GachaPullChartItem } from "../../utils/dashboard";
@@ -28,7 +28,7 @@ function formatCharacterNameForAxis(value: string): string {
 }
 
 // ガチャ回数グラフ用のツールチップ内容を表示する。
-function GachaPullTooltipContent({ active, payload }: TooltipProps<ValueType, NameType>) {
+function GachaPullTooltipContent({ active, payload }: TooltipContentProps<ValueType, NameType>) {
   if (!active || !payload || payload.length === 0) {
     return null;
   }
@@ -71,7 +71,7 @@ export function GachaPullChart({ items, averagePullCount }: GachaPullChartProps)
             tick={{ fill: "#c8d8f6", fontSize: 11 }}
           />
           <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fill: "#c8d8f6", fontSize: 12 }} />
-          <ChartTooltip cursor={{ fill: "rgba(69,230,255,0.08)" }} content={<GachaPullTooltipContent />} />
+          <ChartTooltip cursor={{ fill: "rgba(69,230,255,0.08)" }} content={GachaPullTooltipContent} />
           <ReferenceLine
             y={averagePullCount}
             stroke="#9ac0ff"
