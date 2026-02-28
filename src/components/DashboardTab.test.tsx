@@ -109,7 +109,6 @@ describe("DashboardTab", () => {
     renderDashboard();
 
     expect(screen.getByText("ガチャ回数推移")).toBeInTheDocument();
-    expect(screen.getByText("横軸: キャラ名（日付順） / 縦軸: ガチャ回数")).toBeInTheDocument();
     expect(screen.getByLabelText("開始日")).toBeInTheDocument();
     expect(screen.getByLabelText("終了日")).toBeInTheDocument();
 
@@ -118,6 +117,7 @@ describe("DashboardTab", () => {
     const toDate = screen.getByLabelText("終了日") as HTMLInputElement;
     expect(fromDate.value).toBe(`${today.getFullYear()}-01-01`);
     expect(toDate.value).toBe(formatDateOnly(today));
+    expect(screen.getByText("表示範囲の平均: 120.0回")).toBeInTheDocument();
   });
 
   it("日付範囲で絞り込み、データがなければ空表示になる", () => {
@@ -127,5 +127,6 @@ describe("DashboardTab", () => {
     fireEvent.change(screen.getByLabelText("終了日"), { target: { value: "2026-02-21" } });
 
     expect(screen.getByText("該当データがありません")).toBeInTheDocument();
+    expect(screen.getByText("表示範囲の平均: -")).toBeInTheDocument();
   });
 });

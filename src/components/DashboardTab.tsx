@@ -29,6 +29,15 @@ function getCurrentYearStartDateOnlyString(today: Date): string {
   return `${today.getFullYear()}-01-01`;
 }
 
+// 表示範囲内のガチャ回数平均を算出し、小数1桁へ丸める。
+function calculateAveragePullCount(values: number[]): number {
+  if (values.length === 0) {
+    return 0;
+  }
+  const total = values.reduce((sum, value) => sum + value, 0);
+  return Math.round((total / values.length) * 10) / 10;
+}
+
 // 全体の育成進捗サマリーをカードと分布で表示する。
 export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
   const today = useMemo(() => new Date(), []);
@@ -38,6 +47,10 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
   const gachaPullChartItems = useMemo(
     () => buildGachaPullChartItems(masterCharacters, state, fromDate, toDate),
     [masterCharacters, state, fromDate, toDate],
+  );
+  const averagePullCount = useMemo(
+    () => calculateAveragePullCount(gachaPullChartItems.map((item) => item.gachaPullCount)),
+    [gachaPullChartItems],
   );
   const ownedRate = summary.totalCharacters === 0 ? 0 : (summary.ownedCharacters / summary.totalCharacters) * 100;
   const limitBreakRate =
@@ -138,7 +151,9 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h3 className="mb-1 mt-0 text-sm font-semibold tracking-[0.06em]">ガチャ回数推移</h3>
-            <p className="m-0 text-xs text-muted">横軸: キャラ名（日付順） / 縦軸: ガチャ回数</p>
+            <p className="m-0 mt-1 text-xs text-[#c8d8f6]">
+              表示範囲の平均: {gachaPullChartItems.length === 0 ? "-" : `${averagePullCount.toFixed(1)}回`}
+            </p>
           </div>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <label className="grid gap-1 text-xs text-muted">
@@ -154,7 +169,7 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
         {fromDate > toDate ? (
           <p className="m-0 text-sm text-muted">開始日が終了日より後です。範囲を見直してください。</p>
         ) : (
-          <GachaPullChart items={gachaPullChartItems} />
+          <GachaPullChart items={gachaPullChartItems} averagePullCount={averagePullCount} />
         )}
       </section>
     </section>

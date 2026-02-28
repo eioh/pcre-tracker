@@ -1,11 +1,12 @@
 import type { TooltipProps } from "recharts";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 import type { GachaPullChartItem } from "../../utils/dashboard";
 import { ChartContainer, ChartTooltip, type ChartConfig } from "./chart";
 
 type GachaPullChartProps = {
   items: GachaPullChartItem[];
+  averagePullCount: number;
 };
 
 const chartConfig: ChartConfig = {
@@ -46,7 +47,7 @@ function GachaPullTooltipContent({ active, payload }: TooltipProps<ValueType, Na
 }
 
 // キャラ名を横軸にしたガチャ回数の棒グラフを表示する。
-export function GachaPullChart({ items }: GachaPullChartProps) {
+export function GachaPullChart({ items, averagePullCount }: GachaPullChartProps) {
   if (items.length === 0) {
     return <p className="m-0 text-sm text-muted">該当データがありません</p>;
   }
@@ -71,6 +72,18 @@ export function GachaPullChart({ items }: GachaPullChartProps) {
           />
           <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fill: "#c8d8f6", fontSize: 12 }} />
           <ChartTooltip cursor={{ fill: "rgba(69,230,255,0.08)" }} content={<GachaPullTooltipContent />} />
+          <ReferenceLine
+            y={averagePullCount}
+            stroke="#9ac0ff"
+            strokeDasharray="6 4"
+            ifOverflow="extendDomain"
+            label={{
+              value: `平均 ${averagePullCount.toFixed(1)}`,
+              position: "insideTopRight",
+              fill: "#c8d8f6",
+              fontSize: 11,
+            }}
+          />
           <Bar dataKey="gachaPullCount" fill="#4f8dff" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ChartContainer>
