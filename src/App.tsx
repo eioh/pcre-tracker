@@ -27,6 +27,8 @@ import { Button } from "./components/ui/button";
 import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 
+const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
+
 type ProgressPatch = Partial<
   Pick<
     CharacterProgress,
@@ -73,7 +75,12 @@ export default function App() {
   const [hasOpenedInput, setHasOpenedInput] = useState(() => uiState.activeTab === "input");
 
   useEffect(() => {
-    saveStoredState(state);
+    const timerId = window.setTimeout(() => {
+      saveStoredState(state);
+    }, STORED_STATE_SAVE_DEBOUNCE_MS);
+    return () => {
+      window.clearTimeout(timerId);
+    };
   }, [state]);
 
   useEffect(() => {

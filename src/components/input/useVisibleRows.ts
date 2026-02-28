@@ -40,6 +40,19 @@ type UseVisibleRowsParams = {
   sortDirection: SortDirection;
 };
 
+type FilteredRow = {
+  character: MasterCharacter;
+  progress: CharacterProgress;
+  index: number;
+};
+
+type SortableRow = FilteredRow & {
+  ue1SortValue: number;
+  ue2SortValue: number;
+  adjustedTotalMemoryNeeded: number;
+  ue1HeartFragmentNeeded: number;
+};
+
 // switchの網羅性チェックに到達したら実行時エラーにする。
 function assertUnreachable(value: never): never {
   throw new Error(`未知のsortKeyです: ${String(value)}`);
@@ -80,6 +93,23 @@ function getAdjustedTotalMemoryNeeded(
   return Math.max(0, totalNeeded - ownedMemoryPiece);
 }
 
+// ソート比較で使う重い派生値を1回だけ計算する。
+function toSortableRow(
+  row: FilteredRow,
+  starMemoryCalcMode: StarMemoryCalcMode,
+  ue1MemoryCalcMode: Ue1MemoryCalcMode,
+  ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode,
+): SortableRow {
+  const { character, progress } = row;
+  return {
+    ...row,
+    ue1SortValue: getUe1SortValue(character, progress),
+    ue2SortValue: getUe2SortValue(character, progress),
+    adjustedTotalMemoryNeeded: getAdjustedTotalMemoryNeeded(character, progress, starMemoryCalcMode, ue1MemoryCalcMode),
+    ue1HeartFragmentNeeded: getUe1RemainingHeartFragmentCountByMode(character, progress, ue1HeartFragmentCalcMode),
+  };
+}
+
 // 育成入力テーブルの表示行をフィルタ・ソート条件から算出する。
 export function useVisibleRows({
   masterCharacters,
@@ -105,7 +135,7 @@ export function useVisibleRows({
 
   return useMemo(() => {
     const trimmedSearchText = searchText.trim();
-    const filteredRows: Array<{ character: MasterCharacter; progress: CharacterProgress; index: number }> = [];
+    const filteredRows: FilteredRow[] = [];
     const hasStarFilter = selectedStarSet.size > 0;
     const hasUe1Filter = selectedUe1Set.size > 0;
     const hasUe2Filter = selectedUe2Set.size > 0;
@@ -196,8 +226,11 @@ export function useVisibleRows({
       return filteredRows.map(({ character, progress }) => ({ character, progress }));
     }
 
+    const sortableRows = filteredRows.map((row) =>
+      toSortableRow(row, starMemoryCalcMode, ue1MemoryCalcMode, ue1HeartFragmentCalcMode),
+    );
     const directionMultiplier = sortDirection === "asc" ? 1 : -1;
-    const sortedRows = [...filteredRows].sort((a, b) => {
+    const sortedRows = [...sortableRows].sort((a, b) => {
       const { character: aCharacter, progress: aProgress } = a;
       const { character: bCharacter, progress: bProgress } = b;
       let baseComparison = 0;
@@ -222,10 +255,10 @@ export function useVisibleRows({
           baseComparison = aProgress.connectRank - bProgress.connectRank;
           break;
         case "ue1":
-          baseComparison = getUe1SortValue(aCharacter, aProgress) - getUe1SortValue(bCharacter, bProgress);
+          baseComparison = a.ue1SortValue - b.ue1SortValue;
           break;
         case "ue2":
-          baseComparison = getUe2SortValue(aCharacter, aProgress) - getUe2SortValue(bCharacter, bProgress);
+          baseComparison = a.ue2SortValue - b.ue2SortValue;
           break;
         case "ownedMemoryPiece":
           baseComparison = aProgress.ownedMemoryPiece - bProgress.ownedMemoryPiece;
@@ -245,14 +278,10 @@ export function useVisibleRows({
           baseComparison = aProgress.gachaPullCount - bProgress.gachaPullCount;
           break;
         case "ue1HeartFragmentNeeded":
-          baseComparison =
-            getUe1RemainingHeartFragmentCountByMode(aCharacter, aProgress, ue1HeartFragmentCalcMode) -
-            getUe1RemainingHeartFragmentCountByMode(bCharacter, bProgress, ue1HeartFragmentCalcMode);
+          baseComparison = a.ue1HeartFragmentNeeded - b.ue1HeartFragmentNeeded;
           break;
         case "totalMemoryNeeded":
-          baseComparison =
-            getAdjustedTotalMemoryNeeded(aCharacter, aProgress, starMemoryCalcMode, ue1MemoryCalcMode) -
-            getAdjustedTotalMemoryNeeded(bCharacter, bProgress, starMemoryCalcMode, ue1MemoryCalcMode);
+          baseComparison = a.adjustedTotalMemoryNeeded - b.adjustedTotalMemoryNeeded;
           break;
         default:
           return assertUnreachable(sortKey);

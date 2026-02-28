@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { buildInitialState } from "../domain/storage";
 import { buildDefaultInputViewSettings } from "../domain/uiStorage";
@@ -54,5 +54,28 @@ describe("InputTab", () => {
     await waitFor(() => {
       expect(getSearchInput().value).toBe("");
     });
+  });
+
+  it("検索入力はデバウンス経過後に表示件数へ反映される", async () => {
+    vi.useFakeTimers();
+    try {
+      const props = buildProps();
+      render(<InputTab {...props} />);
+
+      expect(screen.getByText("表示件数: 5")).toBeInTheDocument();
+
+      fireEvent.change(getSearchInput(), { target: { value: "一致しない検索語" } });
+
+      expect(screen.getByText("表示件数: 5")).toBeInTheDocument();
+
+      await act(async () => {
+        vi.advanceTimersByTime(300);
+        await Promise.resolve();
+      });
+
+      expect(screen.getByText("表示件数: 0")).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

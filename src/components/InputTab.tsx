@@ -23,6 +23,8 @@ import { useVisibleRows } from "./input/useVisibleRows";
 import { panelClass } from "./input/uiStyles";
 import { Separator } from "./ui/separator";
 
+const SEARCH_FILTER_DEBOUNCE_MS = 300;
+
 type InputTabProps = {
   masterCharacters: MasterCharacter[];
   state: StoredStateV1;
@@ -44,6 +46,7 @@ export function InputTab({
   const mountedRef = useRef(false);
   const isSyncingFromParentRef = useRef(false);
   const [searchText, setSearchText] = useState(initialSettings.searchText);
+  const [debouncedSearchText, setDebouncedSearchText] = useState(initialSettings.searchText);
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>(initialSettings.ownedFilter);
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>(initialSettings.limitedFilter);
   const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>(initialSettings.limitBreakFilter);
@@ -59,8 +62,18 @@ export function InputTab({
   const [sortKey, setSortKey] = useState<SortKey>(initialSettings.sortKey);
   const [sortDirection, setSortDirection] = useState<SortDirection>(initialSettings.sortDirection);
 
-  // 検索テキストの遅延値を使い、入力中のブロッキングを防ぐ。
-  const deferredSearchText = useDeferredValue(searchText);
+  useEffect(() => {
+    // 検索入力の連続更新中は反映を遅らせ、全件フィルタ計算の頻度を抑える。
+    const timerId = window.setTimeout(() => {
+      setDebouncedSearchText(searchText);
+    }, SEARCH_FILTER_DEBOUNCE_MS);
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [searchText]);
+
+  // デバウンス後の検索テキストをさらに低優先度で反映し、入力中のブロッキングを防ぐ。
+  const deferredSearchText = useDeferredValue(debouncedSearchText);
 
   const visibleRows = useVisibleRows({
     masterCharacters,
@@ -138,6 +151,7 @@ export function InputTab({
     // 親からの明示同期トリガー時のみ、入力画面のローカル設定を外部値へ合わせる。
     isSyncingFromParentRef.current = true;
     setSearchText(initialSettings.searchText);
+    setDebouncedSearchText(initialSettings.searchText);
     setOwnedFilter(initialSettings.ownedFilter);
     setLimitedFilter(initialSettings.limitedFilter);
     setLimitBreakFilter(initialSettings.limitBreakFilter);
