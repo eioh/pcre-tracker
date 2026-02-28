@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { DashboardTab } from "./DashboardTab";
 import type { MasterCharacter, StoredStateV1 } from "../domain/types";
@@ -36,8 +36,8 @@ const state: StoredStateV1 = {
       ue1SpEquipped: true,
       ue2Level: 2,
       ownedMemoryPiece: 0,
-      obtainedDate: null,
-      gachaPullCount: 0,
+      obtainedDate: "2026-02-20",
+      gachaPullCount: 120,
     },
     ユイ: {
       owned: false,
@@ -48,11 +48,19 @@ const state: StoredStateV1 = {
       ue1SpEquipped: false,
       ue2Level: null,
       ownedMemoryPiece: 0,
-      obtainedDate: null,
+      obtainedDate: "2026-01-10",
       gachaPullCount: 0,
     },
   },
 };
+
+// 日付を YYYY-MM-DD へ整形する。
+function formatDateOnly(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 // DashboardTabの表示対象をテスト用データで描画する。
 function renderDashboard(): void {
@@ -95,5 +103,29 @@ describe("DashboardTab", () => {
   it("分布コンポーネントは空データ時に空状態メッセージを表示する", () => {
     render(<DistributionChart title="空分布" items={[]} />);
     expect(screen.getByText("データがありません")).toBeInTheDocument();
+  });
+
+  it("ガチャ回数グラフと日付範囲入力を表示できる", () => {
+    renderDashboard();
+
+    expect(screen.getByText("ガチャ回数推移")).toBeInTheDocument();
+    expect(screen.getByText("横軸: キャラ名（日付順） / 縦軸: ガチャ回数")).toBeInTheDocument();
+    expect(screen.getByLabelText("開始日")).toBeInTheDocument();
+    expect(screen.getByLabelText("終了日")).toBeInTheDocument();
+
+    const today = new Date();
+    const fromDate = screen.getByLabelText("開始日") as HTMLInputElement;
+    const toDate = screen.getByLabelText("終了日") as HTMLInputElement;
+    expect(fromDate.value).toBe(`${today.getFullYear()}-01-01`);
+    expect(toDate.value).toBe(formatDateOnly(today));
+  });
+
+  it("日付範囲で絞り込み、データがなければ空表示になる", () => {
+    renderDashboard();
+
+    fireEvent.change(screen.getByLabelText("開始日"), { target: { value: "2026-02-21" } });
+    fireEvent.change(screen.getByLabelText("終了日"), { target: { value: "2026-02-21" } });
+
+    expect(screen.getByText("該当データがありません")).toBeInTheDocument();
   });
 });

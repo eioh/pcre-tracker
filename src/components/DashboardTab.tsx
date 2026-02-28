@@ -1,7 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { MasterCharacter, StoredStateV1 } from "../domain/types";
-import { buildDashboardSummary } from "../utils/dashboard";
+import { buildDashboardSummary, buildGachaPullChartItems } from "../utils/dashboard";
 import { DistributionChart } from "./ui/distribution-chart";
+import { GachaPullChart } from "./ui/gacha-pull-chart";
+import { Input } from "./ui/input";
 import { StatCard } from "./ui/stat-card";
 
 type DashboardTabProps = {
@@ -14,9 +16,29 @@ function formatPercent(value: number): string {
   return `${value.toFixed(1)}%`;
 }
 
+// 指定日付を YYYY-MM-DD 形式へ整形する。
+function toDateOnlyString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// 今年1月1日の YYYY-MM-DD 文字列を返す。
+function getCurrentYearStartDateOnlyString(today: Date): string {
+  return `${today.getFullYear()}-01-01`;
+}
+
 // 全体の育成進捗サマリーをカードと分布で表示する。
 export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
+  const today = useMemo(() => new Date(), []);
+  const [fromDate, setFromDate] = useState(() => getCurrentYearStartDateOnlyString(today));
+  const [toDate, setToDate] = useState(() => toDateOnlyString(today));
   const summary = useMemo(() => buildDashboardSummary(masterCharacters, state), [masterCharacters, state]);
+  const gachaPullChartItems = useMemo(
+    () => buildGachaPullChartItems(masterCharacters, state, fromDate, toDate),
+    [masterCharacters, state, fromDate, toDate],
+  );
   const ownedRate = summary.totalCharacters === 0 ? 0 : (summary.ownedCharacters / summary.totalCharacters) * 100;
   const limitBreakRate =
     summary.totalCharacters === 0 ? 0 : (summary.limitBreakCharacters / summary.totalCharacters) * 100;
@@ -111,6 +133,30 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
         <DistributionChart title="専用1レベル分布" items={summary.ue1Distribution} />
         <DistributionChart title="専用2レベル分布" items={summary.ue2Distribution} />
       </div>
+
+      <section className="grid gap-3 rounded-2xl border border-[#6180b359] bg-linear-to-br from-[#0d1627e8] to-[#0a111de0] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h3 className="mb-1 mt-0 text-sm font-semibold tracking-[0.06em]">ガチャ回数推移</h3>
+            <p className="m-0 text-xs text-muted">横軸: キャラ名（日付順） / 縦軸: ガチャ回数</p>
+          </div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <label className="grid gap-1 text-xs text-muted">
+              開始日
+              <Input type="date" value={fromDate} max={toDate} onChange={(event) => setFromDate(event.target.value)} />
+            </label>
+            <label className="grid gap-1 text-xs text-muted">
+              終了日
+              <Input type="date" value={toDate} min={fromDate} onChange={(event) => setToDate(event.target.value)} />
+            </label>
+          </div>
+        </div>
+        {fromDate > toDate ? (
+          <p className="m-0 text-sm text-muted">開始日が終了日より後です。範囲を見直してください。</p>
+        ) : (
+          <GachaPullChart items={gachaPullChartItems} />
+        )}
+      </section>
     </section>
   );
 }

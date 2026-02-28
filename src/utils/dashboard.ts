@@ -15,6 +15,12 @@ export type DistributionItem = {
   count: number;
 };
 
+export type GachaPullChartItem = {
+  name: string;
+  obtainedDate: string;
+  gachaPullCount: number;
+};
+
 export type DashboardSummary = {
   totalCharacters: number;
   ownedCharacters: number;
@@ -47,6 +53,60 @@ export type DashboardSummary = {
     guard: number;
   };
 };
+
+// YYYY-MM-DD 形式の入力文字列を同形式へ正規化する。不正値は null を返す。
+function normalizeDateOnly(value: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return null;
+  }
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+  return parsed.toISOString().slice(0, 10) === value ? value : null;
+}
+
+// 期間指定でガチャ回数グラフ用データを抽出し、入手日順に並べ替える。
+export function buildGachaPullChartItems(
+  masterCharacters: MasterCharacter[],
+  state: StoredStateV1,
+  fromDate: string,
+  toDate: string,
+): GachaPullChartItem[] {
+  const normalizedFromDate = normalizeDateOnly(fromDate);
+  const normalizedToDate = normalizeDateOnly(toDate);
+  if (!normalizedFromDate || !normalizedToDate || normalizedFromDate > normalizedToDate) {
+    return [];
+  }
+
+  const items: GachaPullChartItem[] = [];
+  for (const character of masterCharacters) {
+    const progress = state.progressByName[character.name];
+    if (!progress || progress.gachaPullCount <= 0 || progress.obtainedDate === null) {
+      continue;
+    }
+    const normalizedObtainedDate = normalizeDateOnly(progress.obtainedDate);
+    if (!normalizedObtainedDate) {
+      continue;
+    }
+    if (normalizedObtainedDate < normalizedFromDate || normalizedObtainedDate > normalizedToDate) {
+      continue;
+    }
+    items.push({
+      name: character.name,
+      obtainedDate: normalizedObtainedDate,
+      gachaPullCount: progress.gachaPullCount,
+    });
+  }
+
+  return items.sort((a, b) => {
+    const dateComparison = a.obtainedDate.localeCompare(b.obtainedDate);
+    if (dateComparison !== 0) {
+      return dateComparison;
+    }
+    return a.name.localeCompare(b.name, "ja");
+  });
+}
 
 // 専用1レベル表示用のラベルを生成する。
 function formatUe1Label(level: number): string {

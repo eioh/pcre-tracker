@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildDashboardSummary } from "./dashboard";
+import { buildDashboardSummary, buildGachaPullChartItems } from "./dashboard";
 import type { MasterCharacter, StoredStateV1 } from "../domain/types";
 
 const masterCharacters: MasterCharacter[] = [
@@ -86,5 +86,41 @@ describe("buildDashboardSummary", () => {
     expect(ue1Sp?.count).toBe(1);
     expect(ue1Unimplemented?.count).toBe(1);
     expect(ue2Lv2?.count).toBe(1);
+  });
+});
+
+describe("buildGachaPullChartItems", () => {
+  it("日付範囲内かつガチャ回数が1以上のキャラのみを日付順で返す", () => {
+    const chartState: StoredStateV1 = {
+      ...state,
+      progressByName: {
+        ヒヨリ: {
+          ...state.progressByName["ヒヨリ"],
+          obtainedDate: "2026-01-05",
+          gachaPullCount: 120,
+        },
+        ユイ: {
+          ...state.progressByName["ユイ"],
+          obtainedDate: "2026-01-03",
+          gachaPullCount: 0,
+        },
+      },
+    };
+    const items = buildGachaPullChartItems(masterCharacters, chartState, "2026-01-01", "2026-01-31");
+
+    expect(items).toEqual([
+      {
+        name: "ヒヨリ",
+        obtainedDate: "2026-01-05",
+        gachaPullCount: 120,
+      },
+    ]);
+  });
+
+  it("不正な期間指定や開始日>終了日の場合は空配列を返す", () => {
+    const items1 = buildGachaPullChartItems(masterCharacters, state, "2026-01-xx", "2026-01-31");
+    const items2 = buildGachaPullChartItems(masterCharacters, state, "2026-02-01", "2026-01-31");
+    expect(items1).toEqual([]);
+    expect(items2).toEqual([]);
   });
 });
