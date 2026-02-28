@@ -11,6 +11,7 @@ export const roleSchema = z.enum(ROLE_VALUES);
 
 export const masterCharacterSchema = z.object({
   name: z.string().min(1),
+  baseName: z.string().min(1),
   searchTokens: z.array(z.string().min(1)).optional(),
   limited: z.boolean(),
   attribute: attributeSchema,

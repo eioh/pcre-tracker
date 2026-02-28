@@ -121,7 +121,10 @@ export function useVisibleRows({
       if (!progress) {
         continue;
       }
-      if (trimmedSearchText && !isCharacterNameMatched(character.searchTokens ?? character.name, trimmedSearchText)) {
+      if (
+        trimmedSearchText &&
+        !isCharacterNameMatched(character.searchTokens ?? [character.name, character.baseName], trimmedSearchText)
+      ) {
         continue;
       }
       if (ownedFilter === "owned" && !progress.owned) {

@@ -1,6 +1,7 @@
 [
   {
     "name": "ヒヨリ",
+    "baseName": "ヒヨリ",
     "limited": false,
     "attribute": "火",
     "role": "アタッカー",
@@ -22,6 +23,7 @@
   },
   {
     "name": "ユイ",
+    "baseName": "ユイ",
     "limited": false,
     "attribute": "光",
     "role": "ヒーラー",
@@ -43,6 +45,7 @@
   },
   {
     "name": "レイ",
+    "baseName": "レイ",
     "limited": false,
     "attribute": "風",
     "role": "ブレイカー",
@@ -64,6 +67,7 @@
   },
   {
     "name": "ミソギ",
+    "baseName": "ミソギ",
     "limited": false,
     "attribute": "火",
     "role": "ジャマー",
@@ -85,6 +89,7 @@
   },
   {
     "name": "マツリ",
+    "baseName": "マツリ",
     "limited": false,
     "attribute": "火",
     "role": "タンク",
@@ -106,6 +111,7 @@
   },
   {
     "name": "アカリ",
+    "baseName": "アカリ",
     "limited": false,
     "attribute": "闇",
     "role": "デバッファー",
@@ -127,6 +133,7 @@
   },
   {
     "name": "ミヤコ",
+    "baseName": "ミヤコ",
     "limited": false,
     "attribute": "闇",
     "role": "タンク",
@@ -147,6 +154,7 @@
   },
   {
     "name": "ユキ",
+    "baseName": "ユキ",
     "limited": false,
     "attribute": "闇",
     "role": "ジャマー",
@@ -168,6 +176,7 @@
   },
   {
     "name": "アンナ",
+    "baseName": "アンナ",
     "limited": false,
     "attribute": "闇",
     "role": "アタッカー",
@@ -189,6 +198,7 @@
   },
   {
     "name": "マホ",
+    "baseName": "マホ",
     "limited": false,
     "attribute": "火",
     "role": "ブースター",
@@ -210,6 +220,7 @@
   },
   {
     "name": "リノ",
+    "baseName": "リノ",
     "limited": false,
     "attribute": "火",
     "role": "アタッカー",
@@ -231,6 +242,7 @@
   },
   {
     "name": "ハツネ",
+    "baseName": "ハツネ",
     "limited": false,
     "attribute": "光",
     "role": "ブレイカー",
@@ -252,6 +264,7 @@
   },
   {
     "name": "ナナカ",
+    "baseName": "ナナカ",
     "limited": false,
     "attribute": "闇",
     "role": "ブレイカー",
@@ -273,6 +286,7 @@
   },
   {
     "name": "カスミ",
+    "baseName": "カスミ",
     "limited": false,
     "attribute": "光",
     "role": "デバッファー",
@@ -294,6 +308,7 @@
   },
   {
     "name": "ミサト",
+    "baseName": "ミサト",
     "limited": false,
     "attribute": "風",
     "role": "ヒーラー",
@@ -315,6 +330,7 @@
   },
   {
     "name": "スズナ",
+    "baseName": "スズナ",
     "limited": false,
     "attribute": "光",
     "role": "アタッカー",
@@ -336,6 +352,7 @@
   },
   {
     "name": "カオリ",
+    "baseName": "カオリ",
     "limited": false,
     "attribute": "火",
     "role": "アタッカー",
@@ -357,6 +374,7 @@
   },
   {
     "name": "イオ",
+    "baseName": "イオ",
     "limited": false,
     "attribute": "闇",
     "role": "ジャマー",
@@ -378,6 +396,7 @@
   },
   {
     "name": "ミミ",
+    "baseName": "ミミ",
     "limited": false,
     "attribute": "風",
     "role": "アタッカー",
@@ -399,6 +418,7 @@
   },
   {
     "name": "クルミ",
+    "baseName": "クルミ",
     "limited": false,
     "attribute": "風",
     "role": "タンク",
@@ -420,6 +440,7 @@
   },
   {
     "name": "ヨリ",
+    "baseName": "ヨリ",
     "limited": false,
     "attribute": "闇",
     "role": "アタッカー",
@@ -441,6 +462,7 @@
   },
   {
     "name": "アヤネ",
+    "baseName": "アヤネ",
     "limited": false,
     "attribute": "風",
     "role": "ジャマー",
@@ -462,6 +484,7 @@
   },
   {
     "name": "スズメ",
+    "baseName": "スズメ",
     "limited": false,
     "attribute": "風",
     "role": "デバッファー",
@@ -482,6 +505,7 @@
   },
   {
     "name": "リン",
+    "baseName": "リン",
     "limited": false,
     "attribute": "風",
     "role": "ヒーラー",
@@ -503,6 +527,7 @@
   },
   {
     "name": "エリコ",
+    "baseName": "エリコ",
     "limited": false,
     "attribute": "闇",
     "role": "アタッカー",
@@ -524,6 +549,7 @@
   },
   {
     "name": "サレン",
+    "baseName": "サレン",
     "limited": false,
     "attribute": "火",
     "role": "ブースター",
@@ -545,6 +571,7 @@
   },
   {
     "name": "ノゾミ",
+    "baseName": "ノゾミ",
     "limited": false,
     "attribute": "光",
     "role": "タンク",
@@ -566,6 +593,7 @@
   },
   {
     "name": "ニノン",
+    "baseName": "ニノン",
     "limited": false,
     "attribute": "火",
     "role": "アタッカー",
@@ -586,6 +614,7 @@
   },
   {
     "name": "シノブ",
+    "baseName": "シノブ",
     "limited": false,
     "attribute": "闇",
     "role": "ブレイカー",
@@ -607,6 +636,7 @@
   },
   {
     "name": "アキノ",
+    "baseName": "アキノ",
     "limited": false,
     "attribute": "火",
     "role": "タンク",
@@ -628,6 +658,7 @@
   },
   {
     "name": "マヒル",
+    "baseName": "マヒル",
     "limited": false,
     "attribute": "風",
     "role": "ジャマー",
@@ -649,6 +680,7 @@
   },
   {
     "name": "ユカリ",
+    "baseName": "ユカリ",
     "limited": false,
     "attribute": "光",
     "role": "ヒーラー",
@@ -670,6 +702,7 @@
   },
   {
     "name": "キョウカ",
+    "baseName": "キョウカ",
     "limited": false,
     "attribute": "水",
     "role": "アタッカー",
@@ -691,6 +724,7 @@
   },
   {
     "name": "トモ",
+    "baseName": "トモ",
     "limited": false,
     "attribute": "風",
     "role": "ブースター",
@@ -712,6 +746,7 @@
   },
   {
     "name": "シオリ",
+    "baseName": "シオリ",
     "limited": false,
     "attribute": "風",
     "role": "ブレイカー",
@@ -733,6 +768,7 @@
   },
   {
     "name": "アオイ",
+    "baseName": "アオイ",
     "limited": false,
     "attribute": "風",
     "role": "ジャマー",
@@ -754,6 +790,7 @@
   },
   {
     "name": "チカ",
+    "baseName": "チカ",
     "limited": false,
     "attribute": "風",
     "role": "ヒーラー",
@@ -775,6 +812,7 @@
   },
   {
     "name": "マコト",
+    "baseName": "マコト",
     "limited": false,
     "attribute": "闇",
     "role": "デバッファー",
@@ -796,6 +834,7 @@
   },
   {
     "name": "イリヤ",
+    "baseName": "イリヤ",
     "limited": false,
     "attribute": "闇",
     "role": "アタッカー",
@@ -817,6 +856,7 @@
   },
   {
     "name": "クウカ",
+    "baseName": "クウカ",
     "limited": false,
     "attribute": "闇",
     "role": "タンク",
@@ -838,6 +878,7 @@
   },
   {
     "name": "タマキ",
+    "baseName": "タマキ",
     "limited": false,
     "attribute": "闇",
     "role": "ブレイカー",
@@ -859,6 +900,7 @@
   },
   {
     "name": "ジュン",
+    "baseName": "ジュン",
     "limited": false,
     "attribute": "火",
     "role": "タンク",
@@ -880,6 +922,7 @@
   },
   {
     "name": "ミフユ",
+    "baseName": "ミフユ",
     "limited": false,
     "attribute": "水",
     "role": "ジャマー",
@@ -901,6 +944,7 @@
   },
   {
     "name": "シズル",
+    "baseName": "シズル",
     "limited": false,
     "attribute": "光",
     "role": "タンク",
@@ -922,6 +966,7 @@
   },
   {
     "name": "ミサキ",
+    "baseName": "ミサキ",
     "limited": false,
     "attribute": "闇",
     "role": "ジャマー",
@@ -943,6 +988,7 @@
   },
   {
     "name": "ミツキ",
+    "baseName": "ミツキ",
     "limited": false,
     "attribute": "闇",
     "role": "デバッファー",
@@ -964,6 +1010,7 @@
   },
   {
     "name": "リマ",
+    "baseName": "リマ",
     "limited": false,
     "attribute": "風",
     "role": "タンク",
@@ -984,6 +1031,7 @@
   },
   {
     "name": "モニカ",
+    "baseName": "モニカ",
     "limited": false,
     "attribute": "風",
     "role": "ブースター",
@@ -1005,6 +1053,7 @@
   },
   {
     "name": "ツムギ",
+    "baseName": "ツムギ",
     "limited": false,
     "attribute": "風",
     "role": "ジャマー",
@@ -1026,6 +1075,7 @@
   },
   {
     "name": "アユミ",
+    "baseName": "アユミ",
     "limited": false,
     "attribute": "風",
     "role": "ジャマー",
@@ -1047,6 +1097,7 @@
   },
   {
     "name": "ルカ",
+    "baseName": "ルカ",
     "limited": false,
     "attribute": "水",
     "role": "タンク",
@@ -1068,6 +1119,7 @@
   },
   {
     "name": "ジータ",
+    "baseName": "ジータ",
     "limited": false,
     "attribute": "光",
     "role": "ブースター",
@@ -1090,6 +1142,7 @@
   },
   {
     "name": "ペコリーヌ",
+    "baseName": "ペコリーヌ",
     "limited": false,
     "attribute": "光",
     "role": "タンク",
@@ -1112,6 +1165,7 @@
   },
   {
     "name": "コッコロ",
+    "baseName": "コッコロ",
     "limited": false,
     "attribute": "風",
     "role": "ヒーラー",
@@ -1133,6 +1187,7 @@
   },
   {
     "name": "キャル",
+    "baseName": "キャル",
     "limited": false,
     "attribute": "闇",
     "role": "デバッファー",
@@ -1154,6 +1209,7 @@
   },
   {
     "name": "ムイミ",
+    "baseName": "ムイミ",
     "limited": true,
     "attribute": "火",
     "role": "アタッカー",
@@ -1174,6 +1230,7 @@
   },
   {
     "name": "アリサ",
+    "baseName": "アリサ",
     "limited": false,
     "attribute": "風",
     "role": "アタッカー",
@@ -1194,6 +1251,7 @@
   },
   {
     "name": "シェフィ",
+    "baseName": "シェフィ",
     "limited": false,
     "attribute": "水",
     "role": "ブレイカー",
@@ -1214,6 +1272,7 @@
   },
   {
     "name": "カヤ",
+    "baseName": "カヤ",
     "limited": false,
     "attribute": "火",
     "role": "ブレイカー",
@@ -1235,6 +1294,7 @@
   },
   {
     "name": "イノリ",
+    "baseName": "イノリ",
     "limited": false,
     "attribute": "火",
     "role": "ジャマー",
@@ -1256,6 +1316,7 @@
   },
   {
     "name": "ホマレ",
+    "baseName": "ホマレ",
     "limited": true,
     "attribute": "闇",
     "role": "デバッファー",
@@ -1276,6 +1337,7 @@
   },
   {
     "name": "ラビリスタ",
+    "baseName": "ラビリスタ",
     "limited": true,
     "attribute": "光",
     "role": "ブースター",
@@ -1296,6 +1358,7 @@
   },
   {
     "name": "カイザーインサイト",
+    "baseName": "カイザーインサイト",
     "limited": true,
     "attribute": "闇",
     "role": "デバッファー",
@@ -1317,6 +1380,7 @@
   },
   {
     "name": "ネネカ",
+    "baseName": "ネネカ",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -1337,6 +1401,7 @@
   },
   {
     "name": "クリスティーナ",
+    "baseName": "クリスティーナ",
     "limited": true,
     "attribute": "火",
     "role": "ブレイカー",
@@ -1358,6 +1423,7 @@
   },
   {
     "name": "ペコリーヌ（サマー）",
+    "baseName": "ペコリーヌ",
     "limited": true,
     "attribute": "水",
     "role": "アタッカー",
@@ -1379,6 +1445,7 @@
   },
   {
     "name": "コッコロ（サマー）",
+    "baseName": "コッコロ",
     "limited": true,
     "attribute": "水",
     "role": "ヒーラー",
@@ -1400,6 +1467,7 @@
   },
   {
     "name": "スズメ（サマー）",
+    "baseName": "スズメ",
     "limited": true,
     "attribute": "水",
     "role": "バッファー",
@@ -1421,6 +1489,7 @@
   },
   {
     "name": "キャル（サマー）",
+    "baseName": "キャル",
     "limited": true,
     "attribute": "水",
     "role": "ブレイカー",
@@ -1442,6 +1511,7 @@
   },
   {
     "name": "タマキ（サマー）",
+    "baseName": "タマキ",
     "limited": true,
     "attribute": "水",
     "role": "アタッカー",
@@ -1463,6 +1533,7 @@
   },
   {
     "name": "ミフユ（サマー）",
+    "baseName": "ミフユ",
     "limited": true,
     "attribute": "水",
     "role": "アタッカー",
@@ -1484,6 +1555,7 @@
   },
   {
     "name": "シノブ（ハロウィン）",
+    "baseName": "シノブ",
     "limited": true,
     "attribute": "火",
     "role": "アタッカー",
@@ -1504,6 +1576,7 @@
   },
   {
     "name": "ミヤコ（ハロウィン）",
+    "baseName": "ミヤコ",
     "limited": true,
     "attribute": "闇",
     "role": "デバッファー",
@@ -1524,6 +1597,7 @@
   },
   {
     "name": "ミサキ（ハロウィン）",
+    "baseName": "ミサキ",
     "limited": true,
     "attribute": "闇",
     "role": "バッファー",
@@ -1544,6 +1618,7 @@
   },
   {
     "name": "チカ（クリスマス）",
+    "baseName": "チカ",
     "limited": true,
     "attribute": "水",
     "role": "バッファー",
@@ -1564,6 +1639,7 @@
   },
   {
     "name": "クルミ（クリスマス）",
+    "baseName": "クルミ",
     "limited": true,
     "attribute": "水",
     "role": "バッファー",
@@ -1584,6 +1660,7 @@
   },
   {
     "name": "アヤネ（クリスマス）",
+    "baseName": "アヤネ",
     "limited": true,
     "attribute": "水",
     "role": "アタッカー",
@@ -1604,6 +1681,7 @@
   },
   {
     "name": "ヒヨリ（ニューイヤー）",
+    "baseName": "ヒヨリ",
     "limited": true,
     "attribute": "光",
     "role": "ブレイカー",
@@ -1625,6 +1703,7 @@
   },
   {
     "name": "ユイ（ニューイヤー）",
+    "baseName": "ユイ",
     "limited": true,
     "attribute": "光",
     "role": "ヒーラー",
@@ -1646,6 +1725,7 @@
   },
   {
     "name": "レイ（ニューイヤー）",
+    "baseName": "レイ",
     "limited": true,
     "attribute": "水",
     "role": "タンク",
@@ -1667,6 +1747,7 @@
   },
   {
     "name": "エリコ（バレンタイン）",
+    "baseName": "エリコ",
     "limited": true,
     "attribute": "火",
     "role": "アタッカー",
@@ -1687,6 +1768,7 @@
   },
   {
     "name": "シズル（バレンタイン）",
+    "baseName": "シズル",
     "limited": true,
     "attribute": "火",
     "role": "ヒーラー",
@@ -1707,6 +1789,7 @@
   },
   {
     "name": "アン",
+    "baseName": "アン",
     "limited": false,
     "attribute": "光",
     "role": "ブースター",
@@ -1727,6 +1810,7 @@
   },
   {
     "name": "ルゥ",
+    "baseName": "ルゥ",
     "limited": true,
     "attribute": "闇",
     "role": "アタッカー",
@@ -1747,6 +1831,7 @@
   },
   {
     "name": "グレア",
+    "baseName": "グレア",
     "limited": false,
     "attribute": "火",
     "role": "アタッカー",
@@ -1767,6 +1852,7 @@
   },
   {
     "name": "クウカ（オーエド）",
+    "baseName": "クウカ",
     "limited": false,
     "attribute": "火",
     "role": "タンク",
@@ -1788,6 +1874,7 @@
   },
   {
     "name": "ニノン（オーエド）",
+    "baseName": "ニノン",
     "limited": false,
     "attribute": "火",
     "role": "ブレイカー",
@@ -1810,6 +1897,7 @@
   },
   {
     "name": "レム",
+    "baseName": "レム",
     "limited": true,
     "attribute": "水",
     "role": "ジャマー",
@@ -1830,6 +1918,7 @@
   },
   {
     "name": "ラム",
+    "baseName": "ラム",
     "limited": true,
     "attribute": "風",
     "role": "ジャマー",
@@ -1848,6 +1937,7 @@
   },
   {
     "name": "エミリア",
+    "baseName": "エミリア",
     "limited": true,
     "attribute": "火",
     "role": "ヒーラー",
@@ -1868,6 +1958,7 @@
   },
   {
     "name": "スズナ（サマー）",
+    "baseName": "スズナ",
     "limited": true,
     "attribute": "水",
     "role": "アタッカー",
@@ -1889,6 +1980,7 @@
   },
   {
     "name": "イオ（サマー）",
+    "baseName": "イオ",
     "limited": true,
     "attribute": "水",
     "role": "ヒーラー",
@@ -1910,6 +2002,7 @@
   },
   {
     "name": "サレン（サマー）",
+    "baseName": "サレン",
     "limited": true,
     "attribute": "水",
     "role": "ブースター",
@@ -1931,6 +2024,7 @@
   },
   {
     "name": "マコト（サマー）",
+    "baseName": "マコト",
     "limited": true,
     "attribute": "水",
     "role": "デバッファー",
@@ -1952,6 +2046,7 @@
   },
   {
     "name": "カオリ（サマー）",
+    "baseName": "カオリ",
     "limited": true,
     "attribute": "水",
     "role": "アタッカー",
@@ -1973,6 +2068,7 @@
   },
   {
     "name": "マホ（サマー）",
+    "baseName": "マホ",
     "limited": true,
     "attribute": "火",
     "role": "ブレイカー",
@@ -1994,6 +2090,7 @@
   },
   {
     "name": "アオイ（編入生）",
+    "baseName": "アオイ",
     "limited": false,
     "attribute": "風",
     "role": "デバッファー",
@@ -2015,6 +2112,7 @@
   },
   {
     "name": "クロエ",
+    "baseName": "クロエ",
     "limited": false,
     "attribute": "闇",
     "role": "デバッファー",
@@ -2035,6 +2133,7 @@
   },
   {
     "name": "チエル",
+    "baseName": "チエル",
     "limited": false,
     "attribute": "風",
     "role": "アタッカー",
@@ -2056,6 +2155,7 @@
   },
   {
     "name": "ユニ",
+    "baseName": "ユニ",
     "limited": false,
     "attribute": "光",
     "role": "バッファー",
@@ -2077,6 +2177,7 @@
   },
   {
     "name": "キョウカ（ハロウィン）",
+    "baseName": "キョウカ",
     "limited": true,
     "attribute": "火",
     "role": "バッファー",
@@ -2097,6 +2198,7 @@
   },
   {
     "name": "ミソギ（ハロウィン）",
+    "baseName": "ミソギ",
     "limited": true,
     "attribute": "火",
     "role": "アタッカー",
@@ -2117,6 +2219,7 @@
   },
   {
     "name": "ミミ（ハロウィン）",
+    "baseName": "ミミ",
     "limited": false,
     "attribute": "火",
     "role": "バッファー",
@@ -2137,6 +2240,7 @@
   },
   {
     "name": "ルナ",
+    "baseName": "ルナ",
     "limited": false,
     "attribute": "闇",
     "role": "ブースター",
@@ -2157,6 +2261,7 @@
   },
   {
     "name": "クリスティーナ（クリスマス）",
+    "baseName": "クリスティーナ",
     "limited": true,
     "attribute": "水",
     "role": "バッファー",
@@ -2178,6 +2283,7 @@
   },
   {
     "name": "ノゾミ（クリスマス）",
+    "baseName": "ノゾミ",
     "limited": true,
     "attribute": "水",
     "role": "タンク",
@@ -2198,6 +2304,7 @@
   },
   {
     "name": "イリヤ（クリスマス）",
+    "baseName": "イリヤ",
     "limited": false,
     "attribute": "水",
     "role": "アタッカー",
@@ -2218,6 +2325,7 @@
   },
   {
     "name": "ペコリーヌ（ニューイヤー）",
+    "baseName": "ペコリーヌ",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -2239,6 +2347,7 @@
   },
   {
     "name": "コッコロ（ニューイヤー）",
+    "baseName": "コッコロ",
     "limited": true,
     "attribute": "光",
     "role": "タンク",
@@ -2260,6 +2369,7 @@
   },
   {
     "name": "キャル（ニューイヤー）",
+    "baseName": "キャル",
     "limited": true,
     "attribute": "闇",
     "role": "アタッカー",
@@ -2281,6 +2391,7 @@
   },
   {
     "name": "スズメ（ニューイヤー）",
+    "baseName": "スズメ",
     "limited": true,
     "attribute": "光",
     "role": "ヒーラー",
@@ -2302,6 +2413,7 @@
   },
   {
     "name": "カスミ（マジカル）",
+    "baseName": "カスミ",
     "limited": false,
     "attribute": "光",
     "role": "ジャマー",
@@ -2322,6 +2434,7 @@
   },
   {
     "name": "シオリ（マジカル）",
+    "baseName": "シオリ",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -2342,6 +2455,7 @@
   },
   {
     "name": "ウヅキ（デレマス）",
+    "baseName": "ウヅキ（デレマス）",
     "limited": true,
     "attribute": "光",
     "role": "ブースター",
@@ -2362,6 +2476,7 @@
   },
   {
     "name": "リン（デレマス）",
+    "baseName": "リン（デレマス）",
     "limited": true,
     "attribute": "水",
     "role": "タンク",
@@ -2382,6 +2497,7 @@
   },
   {
     "name": "ミオ（デレマス）",
+    "baseName": "ミオ（デレマス）",
     "limited": true,
     "attribute": "火",
     "role": "アタッカー",
@@ -2400,6 +2516,7 @@
   },
   {
     "name": "リン（レンジャー）",
+    "baseName": "リン",
     "limited": false,
     "attribute": "風",
     "role": "ブレイカー",
@@ -2421,6 +2538,7 @@
   },
   {
     "name": "マヒル（レンジャー）",
+    "baseName": "マヒル",
     "limited": false,
     "attribute": "風",
     "role": "ジャマー",
@@ -2443,6 +2561,7 @@
   },
   {
     "name": "リノ（ワンダー）",
+    "baseName": "リノ",
     "limited": false,
     "attribute": "風",
     "role": "アタッカー",
@@ -2464,6 +2583,7 @@
   },
   {
     "name": "アユミ（ワンダー）",
+    "baseName": "アユミ",
     "limited": true,
     "attribute": "風",
     "role": "ジャマー",
@@ -2485,6 +2605,7 @@
   },
   {
     "name": "ルカ（サマー）",
+    "baseName": "ルカ",
     "limited": true,
     "attribute": "水",
     "role": "アタッカー",
@@ -2506,6 +2627,7 @@
   },
   {
     "name": "アンナ（サマー）",
+    "baseName": "アンナ",
     "limited": true,
     "attribute": "水",
     "role": "デバッファー",
@@ -2527,6 +2649,7 @@
   },
   {
     "name": "ナナカ（サマー）",
+    "baseName": "ナナカ",
     "limited": false,
     "attribute": "水",
     "role": "デバッファー",
@@ -2548,6 +2671,7 @@
   },
   {
     "name": "ハツネ（サマー）",
+    "baseName": "ハツネ",
     "limited": true,
     "attribute": "水",
     "role": "アタッカー",
@@ -2569,6 +2693,7 @@
   },
   {
     "name": "ミサト（サマー）",
+    "baseName": "ミサト",
     "limited": true,
     "attribute": "水",
     "role": "ヒーラー",
@@ -2590,6 +2715,7 @@
   },
   {
     "name": "ジュン（サマー）",
+    "baseName": "ジュン",
     "limited": false,
     "attribute": "火",
     "role": "ジャマー",
@@ -2611,6 +2737,7 @@
   },
   {
     "name": "アカリ（エンジェル）",
+    "baseName": "アカリ",
     "limited": false,
     "attribute": "光",
     "role": "アタッカー",
@@ -2631,6 +2758,7 @@
   },
   {
     "name": "ヨリ（エンジェル）",
+    "baseName": "ヨリ",
     "limited": false,
     "attribute": "光",
     "role": "タンク",
@@ -2651,6 +2779,7 @@
   },
   {
     "name": "ツムギ（ハロウィン）",
+    "baseName": "ツムギ",
     "limited": true,
     "attribute": "闇",
     "role": "タンク",
@@ -2671,6 +2800,7 @@
   },
   {
     "name": "レイ（ハロウィン）",
+    "baseName": "レイ",
     "limited": false,
     "attribute": "闇",
     "role": "デバッファー",
@@ -2691,6 +2821,7 @@
   },
   {
     "name": "マツリ（ハロウィン）",
+    "baseName": "マツリ",
     "limited": true,
     "attribute": "闇",
     "role": "アタッカー",
@@ -2711,6 +2842,7 @@
   },
   {
     "name": "モニカ（マジカル）",
+    "baseName": "モニカ",
     "limited": false,
     "attribute": "光",
     "role": "バッファー",
@@ -2731,6 +2863,7 @@
   },
   {
     "name": "トモ（マジカル）",
+    "baseName": "トモ",
     "limited": false,
     "attribute": "光",
     "role": "アタッカー",
@@ -2751,6 +2884,7 @@
   },
   {
     "name": "アキノ（クリスマス）",
+    "baseName": "アキノ",
     "limited": true,
     "attribute": "光",
     "role": "アタッカー",
@@ -2771,6 +2905,7 @@
   },
   {
     "name": "サレン（クリスマス）",
+    "baseName": "サレン",
     "limited": false,
     "attribute": "光",
     "role": "タンク",
@@ -2791,6 +2926,7 @@
   },
   {
     "name": "ユカリ（クリスマス）",
+    "baseName": "ユカリ",
     "limited": true,
     "attribute": "光",
     "role": "デバッファー",
@@ -2811,6 +2947,7 @@
   },
   {
     "name": "ムイミ（ニューイヤー）",
+    "baseName": "ムイミ",
     "limited": true,
     "attribute": "火",
     "role": "アタッカー",
@@ -2832,6 +2969,7 @@
   },
   {
     "name": "ネネカ（ニューイヤー）",
+    "baseName": "ネネカ",
     "limited": true,
     "attribute": "風",
     "role": "バッファー",
@@ -2853,6 +2991,7 @@
   },
   {
     "name": "コッコロ（儀装束）",
+    "baseName": "コッコロ",
     "limited": true,
     "attribute": "風",
     "role": "アタッカー",
@@ -2873,6 +3012,7 @@
   },
   {
     "name": "ユイ（儀装束）",
+    "baseName": "ユイ",
     "limited": true,
     "attribute": "風",
     "role": "ヒーラー",
@@ -2893,6 +3033,7 @@
   },
   {
     "name": "カスミ（サマー）",
+    "baseName": "カスミ",
     "limited": false,
     "attribute": "水",
     "role": "デバッファー",
@@ -2914,6 +3055,7 @@
   },
   {
     "name": "リマ（シンデレラ）",
+    "baseName": "リマ",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -2934,6 +3076,7 @@
   },
   {
     "name": "マコト（シンデレラ）",
+    "baseName": "マコト",
     "limited": false,
     "attribute": "光",
     "role": "バッファー",
@@ -2954,6 +3097,7 @@
   },
   {
     "name": "マホ（シンデレラ）",
+    "baseName": "マホ",
     "limited": false,
     "attribute": "光",
     "role": "ブースター",
@@ -2974,6 +3118,7 @@
   },
   {
     "name": "クロエ（聖学祭）",
+    "baseName": "クロエ",
     "limited": false,
     "attribute": "風",
     "role": "デバッファー",
@@ -2994,6 +3139,7 @@
   },
   {
     "name": "チエル（聖学祭）",
+    "baseName": "チエル",
     "limited": false,
     "attribute": "風",
     "role": "バッファー",
@@ -3014,6 +3160,7 @@
   },
   {
     "name": "ユニ（聖学祭）",
+    "baseName": "ユニ",
     "limited": false,
     "attribute": "風",
     "role": "ブースター",
@@ -3034,6 +3181,7 @@
   },
   {
     "name": "イノリ（タイムトラベル）",
+    "baseName": "イノリ",
     "limited": false,
     "attribute": "火",
     "role": "バッファー",
@@ -3054,6 +3202,7 @@
   },
   {
     "name": "カヤ（タイムトラベル）",
+    "baseName": "カヤ",
     "limited": false,
     "attribute": "風",
     "role": "アタッカー",
@@ -3074,6 +3223,7 @@
   },
   {
     "name": "アオイ（作業服）",
+    "baseName": "アオイ",
     "limited": false,
     "attribute": "火",
     "role": "デバッファー",
@@ -3094,6 +3244,7 @@
   },
   {
     "name": "タマキ（作業服）",
+    "baseName": "タマキ",
     "limited": true,
     "attribute": "火",
     "role": "ブースター",
@@ -3114,6 +3265,7 @@
   },
   {
     "name": "ミフユ（作業服）",
+    "baseName": "ミフユ",
     "limited": false,
     "attribute": "火",
     "role": "アタッカー",
@@ -3134,6 +3286,7 @@
   },
   {
     "name": "エリコ（サマー）",
+    "baseName": "エリコ",
     "limited": true,
     "attribute": "水",
     "role": "デバッファー",
@@ -3155,6 +3308,7 @@
   },
   {
     "name": "シズル（サマー）",
+    "baseName": "シズル",
     "limited": false,
     "attribute": "水",
     "role": "タンク",
@@ -3176,6 +3330,7 @@
   },
   {
     "name": "ノゾミ（サマー）",
+    "baseName": "ノゾミ",
     "limited": true,
     "attribute": "水",
     "role": "ブースター",
@@ -3197,6 +3352,7 @@
   },
   {
     "name": "チカ（サマー）",
+    "baseName": "チカ",
     "limited": false,
     "attribute": "水",
     "role": "ヒーラー",
@@ -3218,6 +3374,7 @@
   },
   {
     "name": "ツムギ（サマー）",
+    "baseName": "ツムギ",
     "limited": true,
     "attribute": "水",
     "role": "ジャマー",
@@ -3239,6 +3396,7 @@
   },
   {
     "name": "ミツキ（オーエド）",
+    "baseName": "ミツキ",
     "limited": false,
     "attribute": "闇",
     "role": "ジャマー",
@@ -3260,6 +3418,7 @@
   },
   {
     "name": "ユキ（オーエド）",
+    "baseName": "ユキ",
     "limited": false,
     "attribute": "光",
     "role": "ブースター",
@@ -3281,6 +3440,7 @@
   },
   {
     "name": "カオリ（ハロウィン）",
+    "baseName": "カオリ",
     "limited": true,
     "attribute": "火",
     "role": "アタッカー",
@@ -3301,6 +3461,7 @@
   },
   {
     "name": "ニノン（ハロウィン）",
+    "baseName": "ニノン",
     "limited": true,
     "attribute": "火",
     "role": "ブースター",
@@ -3321,6 +3482,7 @@
   },
   {
     "name": "スズナ（ハロウィン）",
+    "baseName": "スズナ",
     "limited": false,
     "attribute": "闇",
     "role": "ジャマー",
@@ -3341,6 +3503,7 @@
   },
   {
     "name": "クレジッタ",
+    "baseName": "クレジッタ",
     "limited": true,
     "attribute": "光",
     "role": "ブレイカー",
@@ -3361,6 +3524,7 @@
   },
   {
     "name": "ランファ",
+    "baseName": "ランファ",
     "limited": true,
     "attribute": "闇",
     "role": "デバッファー",
@@ -3381,6 +3545,7 @@
   },
   {
     "name": "ミソラ",
+    "baseName": "ミソラ",
     "limited": true,
     "attribute": "闇",
     "role": "ブレイカー",
@@ -3401,6 +3566,7 @@
   },
   {
     "name": "カリン",
+    "baseName": "カリン",
     "limited": true,
     "attribute": "風",
     "role": "ブースター",
@@ -3421,6 +3587,7 @@
   },
   {
     "name": "ネビア",
+    "baseName": "ネビア",
     "limited": true,
     "attribute": "光",
     "role": "ジャマー",
@@ -3441,6 +3608,7 @@
   },
   {
     "name": "イオ（ノワール）",
+    "baseName": "イオ",
     "limited": false,
     "attribute": "闇",
     "role": "ジャマー",
@@ -3462,6 +3630,7 @@
   },
   {
     "name": "クウカ（ノワール）",
+    "baseName": "クウカ",
     "limited": false,
     "attribute": "闇",
     "role": "タンク",
@@ -3483,6 +3652,7 @@
   },
   {
     "name": "マヒル（クリスマス）",
+    "baseName": "マヒル",
     "limited": true,
     "attribute": "風",
     "role": "ジャマー",
@@ -3503,6 +3673,7 @@
   },
   {
     "name": "リノ（クリスマス）",
+    "baseName": "リノ",
     "limited": false,
     "attribute": "光",
     "role": "バッファー",
@@ -3523,6 +3694,7 @@
   },
   {
     "name": "ミヤコ（クリスマス）",
+    "baseName": "ミヤコ",
     "limited": true,
     "attribute": "水",
     "role": "ブースター",
@@ -3543,6 +3715,7 @@
   },
   {
     "name": "シズル（ノワール）",
+    "baseName": "シズル",
     "limited": true,
     "attribute": "闇",
     "role": "タンク",
@@ -3564,6 +3737,7 @@
   },
   {
     "name": "シェフィ（ニューイヤー）",
+    "baseName": "シェフィ",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -3585,6 +3759,7 @@
   },
   {
     "name": "ルカ（ニューイヤー）",
+    "baseName": "ルカ",
     "limited": true,
     "attribute": "水",
     "role": "アタッカー",
@@ -3606,6 +3781,7 @@
   },
   {
     "name": "イリヤ（ニューイヤー）",
+    "baseName": "イリヤ",
     "limited": true,
     "attribute": "闇",
     "role": "アタッカー",
@@ -3627,6 +3803,7 @@
   },
   {
     "name": "ペコリーヌ（オーバーロード）",
+    "baseName": "ペコリーヌ",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -3648,6 +3825,7 @@
   },
   {
     "name": "キャル（オーバーロード）",
+    "baseName": "キャル",
     "limited": true,
     "attribute": "光",
     "role": "ジャマー",
@@ -3669,6 +3847,7 @@
   },
   {
     "name": "ラビリスタ（オーバーロード）",
+    "baseName": "ラビリスタ",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -3690,6 +3869,7 @@
   },
   {
     "name": "クルミ（ステージ）",
+    "baseName": "クルミ",
     "limited": false,
     "attribute": "光",
     "role": "バッファー",
@@ -3711,6 +3891,7 @@
   },
   {
     "name": "ミサキ（ステージ）",
+    "baseName": "ミサキ",
     "limited": false,
     "attribute": "闇",
     "role": "バッファー",
@@ -3732,6 +3913,7 @@
   },
   {
     "name": "アユミ（怪盗）",
+    "baseName": "アユミ",
     "limited": true,
     "attribute": "闇",
     "role": "ジャマー",
@@ -3752,6 +3934,7 @@
   },
   {
     "name": "イノリ（怪盗）",
+    "baseName": "イノリ",
     "limited": false,
     "attribute": "闇",
     "role": "アタッカー",
@@ -3772,6 +3955,7 @@
   },
   {
     "name": "アンナ（パイレーツ）",
+    "baseName": "アンナ",
     "limited": false,
     "attribute": "水",
     "role": "ブレイカー",
@@ -3793,6 +3977,7 @@
   },
   {
     "name": "シノブ（パイレーツ）",
+    "baseName": "シノブ",
     "limited": false,
     "attribute": "水",
     "role": "デバッファー",
@@ -3814,6 +3999,7 @@
   },
   {
     "name": "アオイ（キャンプ）",
+    "baseName": "アオイ",
     "limited": true,
     "attribute": "風",
     "role": "アタッカー",
@@ -3834,6 +4020,7 @@
   },
   {
     "name": "ユカリ（キャンプ）",
+    "baseName": "ユカリ",
     "limited": false,
     "attribute": "風",
     "role": "バッファー",
@@ -3854,6 +4041,7 @@
   },
   {
     "name": "ヴァンピィ",
+    "baseName": "ヴァンピィ",
     "limited": false,
     "attribute": "闇",
     "role": "デバッファー",
@@ -3874,6 +4062,7 @@
   },
   {
     "name": "ヒヨリ（サマー）",
+    "baseName": "ヒヨリ",
     "limited": true,
     "attribute": "水",
     "role": "ブースター",
@@ -3895,6 +4084,7 @@
   },
   {
     "name": "レイ（サマー）",
+    "baseName": "レイ",
     "limited": true,
     "attribute": "水",
     "role": "バッファー",
@@ -3916,6 +4106,7 @@
   },
   {
     "name": "ユイ（サマー）",
+    "baseName": "ユイ",
     "limited": false,
     "attribute": "水",
     "role": "ヒーラー",
@@ -3937,6 +4128,7 @@
   },
   {
     "name": "キョウカ（サマー）",
+    "baseName": "キョウカ",
     "limited": false,
     "attribute": "水",
     "role": "ブレイカー",
@@ -3958,6 +4150,7 @@
   },
   {
     "name": "ミソギ（サマー）",
+    "baseName": "ミソギ",
     "limited": true,
     "attribute": "火",
     "role": "ジャマー",
@@ -3979,6 +4172,7 @@
   },
   {
     "name": "ミミ（サマー）",
+    "baseName": "ミミ",
     "limited": true,
     "attribute": "水",
     "role": "ブレイカー",
@@ -4000,6 +4194,7 @@
   },
   {
     "name": "アメス",
+    "baseName": "アメス",
     "limited": true,
     "attribute": "光",
     "role": "ヒーラー",
@@ -4020,6 +4215,7 @@
   },
   {
     "name": "マホ（エクスプローラー）",
+    "baseName": "マホ",
     "limited": false,
     "attribute": "風",
     "role": "バッファー",
@@ -4041,6 +4237,7 @@
   },
   {
     "name": "アヤネ（エクスプローラー）",
+    "baseName": "アヤネ",
     "limited": false,
     "attribute": "風",
     "role": "バッファー",
@@ -4060,6 +4257,7 @@
   },
   {
     "name": "ネア",
+    "baseName": "ネア",
     "limited": true,
     "attribute": "水",
     "role": "ジャマー",
@@ -4080,6 +4278,7 @@
   },
   {
     "name": "リン（ハロウィン）",
+    "baseName": "リン",
     "limited": true,
     "attribute": "闇",
     "role": "ジャマー",
@@ -4100,6 +4299,7 @@
   },
   {
     "name": "トモ（ハロウィン）",
+    "baseName": "トモ",
     "limited": true,
     "attribute": "火",
     "role": "バッファー",
@@ -4120,6 +4320,7 @@
   },
   {
     "name": "ナナカ（ハロウィン）",
+    "baseName": "ナナカ",
     "limited": false,
     "attribute": "火",
     "role": "ジャマー",
@@ -4140,6 +4341,7 @@
   },
   {
     "name": "クリスティーナ（ワイルド）",
+    "baseName": "クリスティーナ",
     "limited": true,
     "attribute": "風",
     "role": "アタッカー",
@@ -4161,6 +4363,7 @@
   },
   {
     "name": "マツリ（ワイルド）",
+    "baseName": "マツリ",
     "limited": false,
     "attribute": "火",
     "role": "タンク",
@@ -4181,6 +4384,7 @@
   },
   {
     "name": "アカリ（クリスマス）",
+    "baseName": "アカリ",
     "limited": true,
     "attribute": "風",
     "role": "バッファー",
@@ -4201,6 +4405,7 @@
   },
   {
     "name": "ヨリ（クリスマス）",
+    "baseName": "ヨリ",
     "limited": true,
     "attribute": "風",
     "role": "ブースター",
@@ -4221,6 +4426,7 @@
   },
   {
     "name": "ジュン（クリスマス）",
+    "baseName": "ジュン",
     "limited": false,
     "attribute": "光",
     "role": "タンク",
@@ -4241,6 +4447,7 @@
   },
   {
     "name": "ホマレ（ニューイヤー）",
+    "baseName": "ホマレ",
     "limited": true,
     "attribute": "火",
     "role": "ブレイカー",
@@ -4262,6 +4469,7 @@
   },
   {
     "name": "ミサト（ニューイヤー）",
+    "baseName": "ミサト",
     "limited": true,
     "attribute": "光",
     "role": "ヒーラー",
@@ -4283,6 +4491,7 @@
   },
   {
     "name": "ミツキ（ニューイヤー）",
+    "baseName": "ミツキ",
     "limited": true,
     "attribute": "闇",
     "role": "デバッファー",
@@ -4304,6 +4513,7 @@
   },
   {
     "name": "ノゾミ（リベレイター）",
+    "baseName": "ノゾミ",
     "limited": true,
     "attribute": "光",
     "role": "ブースター",
@@ -4325,6 +4535,7 @@
   },
   {
     "name": "カヤ（リベレイター）",
+    "baseName": "カヤ",
     "limited": true,
     "attribute": "光",
     "role": "アタッカー",
@@ -4346,6 +4557,7 @@
   },
   {
     "name": "ムイミ（リベレイター）",
+    "baseName": "ムイミ",
     "limited": true,
     "attribute": "光",
     "role": "ブレイカー",
@@ -4367,6 +4579,7 @@
   },
   {
     "name": "タマキ（カフェ）",
+    "baseName": "タマキ",
     "limited": false,
     "attribute": "風",
     "role": "アタッカー",
@@ -4387,6 +4600,7 @@
   },
   {
     "name": "モニカ（カフェ）",
+    "baseName": "モニカ",
     "limited": false,
     "attribute": "風",
     "role": "デバッファー",
@@ -4407,6 +4621,7 @@
   },
   {
     "name": "コッコロ（レンジャー）",
+    "baseName": "コッコロ",
     "limited": true,
     "attribute": "風",
     "role": "バッファー",
@@ -4428,6 +4643,7 @@
   },
   {
     "name": "シオリ（レンジャー）",
+    "baseName": "シオリ",
     "limited": false,
     "attribute": "風",
     "role": "デバッファー",
@@ -4449,6 +4665,7 @@
   },
   {
     "name": "ジータ（ウォーロック）",
+    "baseName": "ジータ",
     "limited": true,
     "attribute": "闇",
     "role": "バッファー",
@@ -4470,6 +4687,7 @@
   },
   {
     "name": "ビカラ",
+    "baseName": "ビカラ",
     "limited": true,
     "attribute": "闇",
     "role": "バッファー",
@@ -4490,6 +4708,7 @@
   },
   {
     "name": "カリン（アルケミスト）",
+    "baseName": "カリン",
     "limited": true,
     "attribute": "闇",
     "role": "ヒーラー",
@@ -4510,6 +4729,7 @@
   },
   {
     "name": "リリ（フォールン）",
+    "baseName": "リリ",
     "limited": false,
     "attribute": "闇",
     "role": "ブレイカー",
@@ -4529,6 +4749,7 @@
   },
   {
     "name": "クリア（フォールン）",
+    "baseName": "クリア",
     "limited": false,
     "attribute": "闇",
     "role": "タンク",
@@ -4548,6 +4769,7 @@
   },
   {
     "name": "プレシア（フォールン）",
+    "baseName": "プレシア",
     "limited": false,
     "attribute": "闇",
     "role": "バッファー",
@@ -4567,6 +4789,7 @@
   },
   {
     "name": "イリヤ（儀装束）",
+    "baseName": "イリヤ",
     "limited": true,
     "attribute": "風",
     "role": "ブースター",
@@ -4587,6 +4810,7 @@
   },
   {
     "name": "ユキ（儀装束）",
+    "baseName": "ユキ",
     "limited": false,
     "attribute": "風",
     "role": "バッファー",
@@ -4605,6 +4829,7 @@
   },
   {
     "name": "クローチェ",
+    "baseName": "クローチェ",
     "limited": true,
     "attribute": "光",
     "role": "アタッカー",
@@ -4626,6 +4851,7 @@
   },
   {
     "name": "ライラエル",
+    "baseName": "ライラエル",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -4646,6 +4872,7 @@
   },
   {
     "name": "ネネカ（サマー）",
+    "baseName": "ネネカ",
     "limited": true,
     "attribute": "水",
     "role": "ブースター",
@@ -4667,6 +4894,7 @@
   },
   {
     "name": "アキノ（サマー）",
+    "baseName": "アキノ",
     "limited": true,
     "attribute": "火",
     "role": "バッファー",
@@ -4688,6 +4916,7 @@
   },
   {
     "name": "ユカリ（サマー）",
+    "baseName": "ユカリ",
     "limited": false,
     "attribute": "水",
     "role": "タンク",
@@ -4707,6 +4936,7 @@
   },
   {
     "name": "ランファ（サマー）",
+    "baseName": "ランファ",
     "limited": true,
     "attribute": "水",
     "role": "ブースター",
@@ -4728,6 +4958,7 @@
   },
   {
     "name": "クウカ（サマー）",
+    "baseName": "クウカ",
     "limited": true,
     "attribute": "水",
     "role": "タンク",
@@ -4749,6 +4980,7 @@
   },
   {
     "name": "シノブ（サマー）",
+    "baseName": "シノブ",
     "limited": true,
     "attribute": "闇",
     "role": "デバッファー",
@@ -4770,6 +5002,7 @@
   },
   {
     "name": "キャル（編入生）",
+    "baseName": "キャル",
     "limited": true,
     "attribute": "火",
     "role": "ブースター",
@@ -4790,6 +5023,7 @@
   },
   {
     "name": "スズナ（編入生）",
+    "baseName": "スズナ",
     "limited": false,
     "attribute": "光",
     "role": "バッファー",
@@ -4808,6 +5042,7 @@
   },
   {
     "name": "サレン（サラサリア）",
+    "baseName": "サレン",
     "limited": true,
     "attribute": "火",
     "role": "バッファー",
@@ -4828,6 +5063,7 @@
   },
   {
     "name": "ルカ（サラサリア）",
+    "baseName": "ルカ",
     "limited": false,
     "attribute": "水",
     "role": "タンク",
@@ -4846,6 +5082,7 @@
   },
   {
     "name": "リンド",
+    "baseName": "リンド",
     "limited": false,
     "attribute": "火",
     "role": "バッファー",
@@ -4864,6 +5101,7 @@
   },
   {
     "name": "ヴルム",
+    "baseName": "ヴルム",
     "limited": false,
     "attribute": "火",
     "role": "デバッファー",
@@ -4882,6 +5120,7 @@
   },
   {
     "name": "ペコリーヌ（クリスマス）",
+    "baseName": "ペコリーヌ",
     "limited": true,
     "attribute": "水",
     "role": "タンク",
@@ -4903,6 +5142,7 @@
   },
   {
     "name": "クレジッタ（クリスマス）",
+    "baseName": "クレジッタ",
     "limited": false,
     "attribute": "光",
     "role": "デバッファー",
@@ -4921,6 +5161,7 @@
   },
   {
     "name": "イノリ（ニューイヤー）",
+    "baseName": "イノリ",
     "limited": true,
     "attribute": "火",
     "role": "ジャマー",
@@ -4942,6 +5183,7 @@
   },
   {
     "name": "ハツネ（ニューイヤー）",
+    "baseName": "ハツネ",
     "limited": true,
     "attribute": "光",
     "role": "ブレイカー",
@@ -4963,6 +5205,7 @@
   },
   {
     "name": "カスミ（ニューイヤー）",
+    "baseName": "カスミ",
     "limited": true,
     "attribute": "火",
     "role": "バッファー",
@@ -4984,6 +5227,7 @@
   },
   {
     "name": "ヒヨリ（アストラル）",
+    "baseName": "ヒヨリ",
     "limited": true,
     "attribute": "火",
     "role": "ブースター",
@@ -5004,6 +5248,7 @@
   },
   {
     "name": "レイ（アストラル）",
+    "baseName": "レイ",
     "limited": true,
     "attribute": "風",
     "role": "ジャマー",
@@ -5024,6 +5269,7 @@
   },
   {
     "name": "ユイ（アストラル）",
+    "baseName": "ユイ",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -5044,6 +5290,7 @@
   },
   {
     "name": "エリス",
+    "baseName": "エリス",
     "limited": true,
     "attribute": "闇",
     "role": "ヒーラー",
@@ -5064,6 +5311,7 @@
   },
   {
     "name": "ユニ（ウィンター）",
+    "baseName": "ユニ",
     "limited": true,
     "attribute": "水",
     "role": "ブースター",
@@ -5085,6 +5333,7 @@
   },
   {
     "name": "クロエ（ウィンター）",
+    "baseName": "クロエ",
     "limited": false,
     "attribute": "水",
     "role": "ブレイカー",
@@ -5104,6 +5353,7 @@
   },
   {
     "name": "チエル（ウィンター）",
+    "baseName": "チエル",
     "limited": true,
     "attribute": "水",
     "role": "ブースター",
@@ -5125,6 +5375,7 @@
   },
   {
     "name": "アネモネ",
+    "baseName": "アネモネ",
     "limited": true,
     "attribute": "風",
     "role": "デバッファー",
@@ -5145,6 +5396,7 @@
   },
   {
     "name": "ネフィ＝ネラ",
+    "baseName": "ネフィ＝ネラ",
     "limited": true,
     "attribute": "火",
     "role": "ブースター",
@@ -5165,6 +5417,7 @@
   },
   {
     "name": "マコト（コマンダー）",
+    "baseName": "マコト",
     "limited": true,
     "attribute": "闇",
     "role": "ブレイカー",
@@ -5184,6 +5437,7 @@
   },
   {
     "name": "エリコ（コマンダー）",
+    "baseName": "エリコ",
     "limited": false,
     "attribute": "闇",
     "role": "バッファー",
@@ -5203,6 +5457,7 @@
   },
   {
     "name": "ヤマト",
+    "baseName": "ヤマト",
     "limited": true,
     "attribute": "闇",
     "role": "タンク",
@@ -5223,6 +5478,7 @@
   },
   {
     "name": "ワカナ",
+    "baseName": "ワカナ",
     "limited": true,
     "attribute": "風",
     "role": "バッファー",
@@ -5243,6 +5499,7 @@
   },
   {
     "name": "フブキ",
+    "baseName": "フブキ",
     "limited": true,
     "attribute": "火",
     "role": "ブレイカー",
@@ -5263,6 +5520,7 @@
   },
   {
     "name": "キョウカ（スプリング）",
+    "baseName": "キョウカ",
     "limited": true,
     "attribute": "風",
     "role": "アタッカー",
@@ -5283,6 +5541,7 @@
   },
   {
     "name": "スズメ（スプリング）",
+    "baseName": "スズメ",
     "limited": false,
     "attribute": "風",
     "role": "デバッファー",
@@ -5301,6 +5560,7 @@
   },
   {
     "name": "クルル",
+    "baseName": "クルル",
     "limited": false,
     "attribute": "光",
     "role": "タンク",
@@ -5319,6 +5579,7 @@
   },
   {
     "name": "マホ（ドリームパーク）",
+    "baseName": "マホ",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -5340,6 +5601,7 @@
   },
   {
     "name": "ネア（サマー）",
+    "baseName": "ネア",
     "limited": false,
     "attribute": "火",
     "role": "タンク",
@@ -5359,6 +5621,7 @@
   },
   {
     "name": "ミソラ（サマー）",
+    "baseName": "ミソラ",
     "limited": true,
     "attribute": "風",
     "role": "ブレイカー",
@@ -5380,6 +5643,7 @@
   },
   {
     "name": "リリ（サマー）",
+    "baseName": "リリ",
     "limited": true,
     "attribute": "水",
     "role": "バッファー",
@@ -5401,6 +5665,7 @@
   },
   {
     "name": "アメス（サマー）",
+    "baseName": "アメス",
     "limited": true,
     "attribute": "水",
     "role": "ブースター",
@@ -5422,6 +5687,7 @@
   },
   {
     "name": "ホマレ（サマー）",
+    "baseName": "ホマレ",
     "limited": false,
     "attribute": "闇",
     "role": "ブレイカー",
@@ -5441,6 +5707,7 @@
   },
   {
     "name": "エミリア（サマー）",
+    "baseName": "エミリア",
     "limited": true,
     "attribute": "風",
     "role": "ジャマー",
@@ -5460,6 +5727,7 @@
   },
   {
     "name": "エキドナ（サマー）",
+    "baseName": "エキドナ",
     "limited": true,
     "attribute": "闇",
     "role": "ブレイカー",
@@ -5481,6 +5749,7 @@
   },
   {
     "name": "レム（サマー）",
+    "baseName": "レム",
     "limited": true,
     "attribute": "光",
     "role": "アタッカー",
@@ -5502,6 +5771,7 @@
   },
   {
     "name": "ノゾミ（アルケミスト）",
+    "baseName": "ノゾミ",
     "limited": true,
     "attribute": "水",
     "role": "バッファー",
@@ -5522,6 +5792,7 @@
   },
   {
     "name": "ルイズマリー",
+    "baseName": "ルイズマリー",
     "limited": true,
     "attribute": "火",
     "role": "バッファー",
@@ -5541,6 +5812,7 @@
   },
   {
     "name": "イロハ",
+    "baseName": "イロハ",
     "limited": false,
     "attribute": "光",
     "role": "アタッカー",
@@ -5559,6 +5831,7 @@
   },
   {
     "name": "ソノ",
+    "baseName": "ソノ",
     "limited": false,
     "attribute": "水",
     "role": "デバッファー",
@@ -5577,6 +5850,7 @@
   },
   {
     "name": "ライラエル（クリスマス）",
+    "baseName": "ライラエル",
     "limited": true,
     "attribute": "火",
     "role": "ブレイカー",
@@ -5597,6 +5871,7 @@
   },
   {
     "name": "イオ（クリスマス）",
+    "baseName": "イオ",
     "limited": false,
     "attribute": "光",
     "role": "デバッファー",
@@ -5615,6 +5890,7 @@
   },
   {
     "name": "グレイス",
+    "baseName": "グレイス",
     "limited": true,
     "attribute": "闇",
     "role": "ブースター",
@@ -5635,6 +5911,7 @@
   },
   {
     "name": "ヴァイオレット",
+    "baseName": "ヴァイオレット",
     "limited": true,
     "attribute": "闇",
     "role": "タンク",
@@ -5655,6 +5932,7 @@
   },
   {
     "name": "モニカ（ニューイヤー）",
+    "baseName": "モニカ",
     "limited": true,
     "attribute": "光",
     "role": "ブレイカー",
@@ -5674,6 +5952,7 @@
   },
   {
     "name": "サレン（ニューイヤー）",
+    "baseName": "サレン",
     "limited": true,
     "attribute": "光",
     "role": "アタッカー",
@@ -5695,6 +5974,7 @@
   },
   {
     "name": "メドゥーサ",
+    "baseName": "メドゥーサ",
     "limited": true,
     "attribute": "闇",
     "role": "ブレイカー",
@@ -5716,6 +5996,7 @@
   },
   {
     "name": "ラビリスタ（アルファ）",
+    "baseName": "ラビリスタ",
     "limited": true,
     "attribute": "水",
     "role": "アタッカー",
@@ -5736,6 +6017,7 @@
   },
   {
     "name": "ネネカ（アルファ）",
+    "baseName": "ネネカ",
     "limited": true,
     "attribute": "闇",
     "role": "ブースター",
@@ -5756,6 +6038,7 @@
   },
   {
     "name": "クリスティーナ（アルファ）",
+    "baseName": "クリスティーナ",
     "limited": true,
     "attribute": "闇",
     "role": "アタッカー",
@@ -5777,6 +6060,7 @@
   },
   {
     "name": "フィオ",
+    "baseName": "フィオ",
     "limited": true,
     "attribute": "風",
     "role": "ヒーラー",
@@ -5797,6 +6081,7 @@
   },
   {
     "name": "ランファ（儀装束）",
+    "baseName": "ランファ",
     "limited": true,
     "attribute": "風",
     "role": "ブレイカー",
@@ -5815,6 +6100,7 @@
   },
   {
     "name": "チカ（儀装束）",
+    "baseName": "チカ",
     "limited": false,
     "attribute": "風",
     "role": "バッファー",
@@ -5833,6 +6119,7 @@
   },
   {
     "name": "クローチェ（エアリアル）",
+    "baseName": "クローチェ",
     "limited": true,
     "attribute": "火",
     "role": "ブースター",
@@ -5852,6 +6139,7 @@
   },
   {
     "name": "アオイ（パイロット）",
+    "baseName": "アオイ",
     "limited": true,
     "attribute": "光",
     "role": "デバッファー",
@@ -5870,6 +6158,7 @@
   },
   {
     "name": "ホウオウ",
+    "baseName": "ホウオウ",
     "limited": true,
     "attribute": "火",
     "role": "ヒーラー",
@@ -5888,6 +6177,7 @@
   },
   {
     "name": "ツムギ（ジオ・ゲヘナ）",
+    "baseName": "ツムギ",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -5906,6 +6196,7 @@
   },
   {
     "name": "カノン",
+    "baseName": "カノン",
     "limited": true,
     "attribute": "火",
     "role": "ブレイカー",
@@ -5924,6 +6215,7 @@
   },
   {
     "name": "エリス（サマー）",
+    "baseName": "エリス",
     "limited": true,
     "attribute": "風",
     "role": "バッファー",
@@ -5943,6 +6235,7 @@
   },
   {
     "name": "シェフィ（サマー）",
+    "baseName": "シェフィ",
     "limited": true,
     "attribute": "光",
     "role": "タンク",
@@ -5962,6 +6255,7 @@
   },
   {
     "name": "プレシア（サマー）",
+    "baseName": "プレシア",
     "limited": true,
     "attribute": "風",
     "role": "バッファー",
@@ -5981,6 +6275,7 @@
   },
   {
     "name": "クリア（サマー）",
+    "baseName": "クリア",
     "limited": true,
     "attribute": "風",
     "role": "ブレイカー",
@@ -6000,6 +6295,7 @@
   },
   {
     "name": "アネモネ（サマー）",
+    "baseName": "アネモネ",
     "limited": true,
     "attribute": "光",
     "role": "ブースター",
@@ -6019,6 +6315,7 @@
   },
   {
     "name": "アイラ",
+    "baseName": "アイラ",
     "limited": true,
     "attribute": "火",
     "role": "アタッカー",
@@ -6039,6 +6336,7 @@
   },
   {
     "name": "シナツ",
+    "baseName": "シナツ",
     "limited": true,
     "attribute": "風",
     "role": "ブレイカー",
@@ -6059,6 +6357,7 @@
   },
   {
     "name": "ヒヨリ（サラサリア）",
+    "baseName": "ヒヨリ",
     "limited": false,
     "attribute": "闇",
     "role": "ブースター",
@@ -6077,6 +6376,7 @@
   },
   {
     "name": "ユキノ",
+    "baseName": "ユキノ",
     "limited": true,
     "attribute": "水",
     "role": "ブレイカー",
@@ -6095,6 +6395,7 @@
   },
   {
     "name": "サツキ",
+    "baseName": "サツキ",
     "limited": true,
     "attribute": "闇",
     "role": "アタッカー",
@@ -6113,6 +6414,7 @@
   },
   {
     "name": "アラクネ",
+    "baseName": "アラクネ",
     "limited": true,
     "attribute": "火",
     "role": "ブースター",
@@ -6133,6 +6435,7 @@
   },
   {
     "name": "サクラ",
+    "baseName": "サクラ",
     "limited": true,
     "attribute": "闇",
     "role": "バッファー",
@@ -6151,6 +6454,7 @@
   },
   {
     "name": "ナーナ",
+    "baseName": "ナーナ",
     "limited": false,
     "attribute": "火",
     "role": "バッファー",
@@ -6170,6 +6474,7 @@
   },
   {
     "name": "ミソラ（クリスマス）",
+    "baseName": "ミソラ",
     "limited": true,
     "attribute": "水",
     "role": "バッファー",
@@ -6188,6 +6493,7 @@
   },
   {
     "name": "ユイ（クリスマス）",
+    "baseName": "ユイ",
     "limited": true,
     "attribute": "火",
     "role": "タンク",
@@ -6206,6 +6512,7 @@
   },
   {
     "name": "シズル（ニューイヤー）",
+    "baseName": "シズル",
     "limited": true,
     "attribute": "風",
     "role": "タンク",
@@ -6225,6 +6532,7 @@
   },
   {
     "name": "ニノン（サマー）",
+    "baseName": "ニノン",
     "limited": false,
     "attribute": "水",
     "role": "ジャマー",
@@ -6244,6 +6552,7 @@
   },
   {
     "name": "カスミ（シスター）",
+    "baseName": "カスミ",
     "limited": true,
     "attribute": "光",
     "role": "ブレイカー",
@@ -6263,6 +6572,7 @@
   },
   {
     "name": "コッコロ（嚮導幼君）",
+    "baseName": "コッコロ",
     "limited": true,
     "attribute": "風",
     "role": "バッファー",
@@ -6283,6 +6593,7 @@
   },
   {
     "name": "リノ（ニューイヤー）",
+    "baseName": "リノ",
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
@@ -6302,6 +6613,7 @@
   },
   {
     "name": "ヴァイオレット（イサナミ）",
+    "baseName": "ヴァイオレット",
     "limited": true,
     "attribute": "水",
     "role": "タンク",
@@ -6320,6 +6632,7 @@
   },
   {
     "name": "ライラエル（パルフェクト）",
+    "baseName": "ライラエル",
     "limited": true,
     "attribute": "風",
     "role": "ブレイカー",
@@ -6338,6 +6651,7 @@
   },
   {
     "name": "ヒヨリ（プリンセス）",
+    "baseName": "ヒヨリ",
     "limited": true,
     "attribute": "火",
     "role": "デバッファー",
@@ -6358,6 +6672,7 @@
   },
   {
     "name": "ネフィ＝ネラ（鬼面仏心）",
+    "baseName": "ネフィ＝ネラ",
     "limited": true,
     "attribute": "光",
     "role": "ブースター",
@@ -6376,6 +6691,7 @@
   },
   {
     "name": "ユイ（プリンセス）",
+    "baseName": "ユイ",
     "limited": true,
     "attribute": "光",
     "role": "アタッカー",
@@ -6396,6 +6712,7 @@
   },
   {
     "name": "レイ（プリンセス）",
+    "baseName": "レイ",
     "limited": true,
     "attribute": "風",
     "role": "アタッカー",
@@ -6416,6 +6733,7 @@
   },
   {
     "name": "ペコリーヌ（プリンセス）",
+    "baseName": "ペコリーヌ",
     "limited": true,
     "attribute": "光",
     "role": "タンク",
@@ -6437,6 +6755,7 @@
   },
   {
     "name": "コッコロ（プリンセス）",
+    "baseName": "コッコロ",
     "limited": true,
     "attribute": "風",
     "role": "ヒーラー",
@@ -6457,6 +6776,7 @@
   },
   {
     "name": "キャル（プリンセス）",
+    "baseName": "キャル",
     "limited": true,
     "attribute": "闇",
     "role": "ブレイカー",
@@ -6477,6 +6797,7 @@
   },
   {
     "name": "ハツネ＆シオリ",
+    "baseName": "ハツネ＆シオリ",
     "limited": true,
     "attribute": "光",
     "role": "アタッカー",
@@ -6497,6 +6818,7 @@
   },
   {
     "name": "ミソギ＆ミミ＆キョウカ",
+    "baseName": "ミソギ＆ミミ＆キョウカ",
     "limited": true,
     "attribute": "光",
     "role": "ブレイカー",
@@ -6517,6 +6839,7 @@
   },
   {
     "name": "アキノ＆サレン",
+    "baseName": "アキノ＆サレン",
     "limited": true,
     "attribute": "火",
     "role": "バッファー",
@@ -6537,6 +6860,7 @@
   },
   {
     "name": "アン＆グレア",
+    "baseName": "アン＆グレア",
     "limited": true,
     "attribute": "火",
     "role": "アタッカー",
@@ -6557,6 +6881,7 @@
   },
   {
     "name": "シズル＆リノ",
+    "baseName": "シズル＆リノ",
     "limited": true,
     "attribute": "光",
     "role": "タンク",
@@ -6577,6 +6902,7 @@
   },
   {
     "name": "シェフィ（プリンセス）",
+    "baseName": "シェフィ",
     "limited": true,
     "attribute": "水",
     "role": "ブレイカー",
@@ -6597,6 +6923,7 @@
   },
   {
     "name": "ペコリーヌ（アストライア）",
+    "baseName": "ペコリーヌ",
     "limited": true,
     "attribute": "火",
     "role": "タンク",

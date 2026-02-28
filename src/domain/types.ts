@@ -28,6 +28,7 @@ export type Role = (typeof ROLE_VALUES)[number];
 
 export type MasterCharacter = {
   name: string;
+  baseName: string;
   searchTokens?: string[];
   limited: boolean;
   attribute: Attribute;
