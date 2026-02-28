@@ -18,8 +18,9 @@ npm run dev
 
 ## データ構成
 
-- マスター: `src/data/characterMaster.json`
-- マスターを更新した場合は `npm run generate` を実行して `searchTokens` を再生成し、生成後の JSON をコミットしてください。
+- マスター（手編集元）: `src/data/characterMaster.json`
+- マスター（生成・アプリ参照）: `src/data/characterMaster.generated.json`
+- マスターを更新した場合は `npm run generate` を実行して `searchTokens` を再生成し、生成ファイルをコミットしてください。
 - 更新手順: `docs/character-master-update-guide.md`
 
 ## 保存先

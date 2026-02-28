@@ -1,4 +1,4 @@
-import rawMasterCharacters from "../data/characterMaster.json";
+import rawMasterCharacters from "../data/characterMaster.generated.json";
 import { masterCharacterListSchema } from "./schemas";
 import type { MasterCharacter } from "./types";
 

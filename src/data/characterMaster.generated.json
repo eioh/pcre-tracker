@@ -14,6 +14,11 @@
     "memoryPieceSources": [
       "arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "ヒヨリ",
+      "ひより",
+      "hiyori"
     ]
   },
   {
@@ -31,6 +36,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "ユイ",
+      "ゆい",
+      "yui"
     ]
   },
   {
@@ -48,6 +58,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "レイ",
+      "れい",
+      "rei"
     ]
   },
   {
@@ -65,6 +80,11 @@
     "memoryPieceSources": [
       "arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "ミソギ",
+      "みそぎ",
+      "misogi"
     ]
   },
   {
@@ -82,6 +102,11 @@
     "memoryPieceSources": [
       "dungeon_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "マツリ",
+      "まつり",
+      "matsuri"
     ]
   },
   {
@@ -99,6 +124,11 @@
     "memoryPieceSources": [
       "dungeon_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "アカリ",
+      "あかり",
+      "akari"
     ]
   },
   {
@@ -115,6 +145,11 @@
     },
     "memoryPieceSources": [
       "p_arena_coin"
+    ],
+    "searchTokens": [
+      "ミヤコ",
+      "みやこ",
+      "miyako"
     ]
   },
   {
@@ -132,6 +167,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "ユキ",
+      "ゆき",
+      "yuki"
     ]
   },
   {
@@ -149,6 +189,11 @@
     "memoryPieceSources": [
       "p_arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "アンナ",
+      "あんな",
+      "anna"
     ]
   },
   {
@@ -166,6 +211,11 @@
     "memoryPieceSources": [
       "dungeon_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "マホ",
+      "まほ",
+      "maho"
     ]
   },
   {
@@ -183,6 +233,11 @@
     "memoryPieceSources": [
       "arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "リノ",
+      "りの",
+      "rino"
     ]
   },
   {
@@ -200,6 +255,11 @@
     "memoryPieceSources": [
       "p_arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "ハツネ",
+      "はつね",
+      "hatsune"
     ]
   },
   {
@@ -217,6 +277,11 @@
     "memoryPieceSources": [
       "arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "ナナカ",
+      "ななか",
+      "nanaka"
     ]
   },
   {
@@ -234,6 +299,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "カスミ",
+      "かすみ",
+      "kasumi"
     ]
   },
   {
@@ -251,6 +321,11 @@
     "memoryPieceSources": [
       "dungeon_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "ミサト",
+      "みさと",
+      "misato"
     ]
   },
   {
@@ -268,6 +343,11 @@
     "memoryPieceSources": [
       "p_arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "スズナ",
+      "すずな",
+      "suzuna"
     ]
   },
   {
@@ -285,6 +365,11 @@
     "memoryPieceSources": [
       "p_arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "カオリ",
+      "かおり",
+      "kaori"
     ]
   },
   {
@@ -302,6 +387,11 @@
     "memoryPieceSources": [
       "clan_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "イオ",
+      "いお",
+      "io"
     ]
   },
   {
@@ -319,6 +409,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "ミミ",
+      "みみ",
+      "mimi"
     ]
   },
   {
@@ -336,6 +431,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "クルミ",
+      "くるみ",
+      "kurumi"
     ]
   },
   {
@@ -353,6 +453,11 @@
     "memoryPieceSources": [
       "clan_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "ヨリ",
+      "より",
+      "yori"
     ]
   },
   {
@@ -370,6 +475,11 @@
     "memoryPieceSources": [
       "arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "アヤネ",
+      "あやね",
+      "ayane"
     ]
   },
   {
@@ -386,6 +496,11 @@
     },
     "memoryPieceSources": [
       "clan_coin"
+    ],
+    "searchTokens": [
+      "スズメ",
+      "すずめ",
+      "suzume"
     ]
   },
   {
@@ -403,6 +518,11 @@
     "memoryPieceSources": [
       "dungeon_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "リン",
+      "りん",
+      "rin"
     ]
   },
   {
@@ -420,6 +540,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "エリコ",
+      "えりこ",
+      "eriko"
     ]
   },
   {
@@ -437,6 +562,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "サレン",
+      "されん",
+      "saren"
     ]
   },
   {
@@ -454,6 +584,11 @@
     "memoryPieceSources": [
       "dungeon_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "ノゾミ",
+      "のぞみ",
+      "nozomi"
     ]
   },
   {
@@ -470,6 +605,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ニノン",
+      "にのん",
+      "ninon"
     ]
   },
   {
@@ -487,6 +627,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "シノブ",
+      "しのぶ",
+      "shinobu"
     ]
   },
   {
@@ -504,6 +649,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "アキノ",
+      "あきの",
+      "akino"
     ]
   },
   {
@@ -521,6 +671,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "マヒル",
+      "まひる",
+      "mahiru"
     ]
   },
   {
@@ -538,6 +693,11 @@
     "memoryPieceSources": [
       "dungeon_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "ユカリ",
+      "ゆかり",
+      "yukari"
     ]
   },
   {
@@ -555,6 +715,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "キョウカ",
+      "きょうか",
+      "kyouka"
     ]
   },
   {
@@ -572,6 +737,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "トモ",
+      "とも",
+      "tomo"
     ]
   },
   {
@@ -589,6 +759,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "シオリ",
+      "しおり",
+      "shiori"
     ]
   },
   {
@@ -606,6 +781,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "アオイ",
+      "あおい",
+      "aoi"
     ]
   },
   {
@@ -623,6 +803,11 @@
     "memoryPieceSources": [
       "clan_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "チカ",
+      "ちか",
+      "chika"
     ]
   },
   {
@@ -640,6 +825,11 @@
     "memoryPieceSources": [
       "clan_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "マコト",
+      "まこと",
+      "makoto"
     ]
   },
   {
@@ -657,6 +847,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "イリヤ",
+      "いりや",
+      "iriya"
     ]
   },
   {
@@ -674,6 +869,11 @@
     "memoryPieceSources": [
       "dungeon_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "クウカ",
+      "くうか",
+      "kuuka"
     ]
   },
   {
@@ -691,6 +891,11 @@
     "memoryPieceSources": [
       "arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "タマキ",
+      "たまき",
+      "tamaki"
     ]
   },
   {
@@ -708,6 +913,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "ジュン",
+      "じゅん",
+      "jun"
     ]
   },
   {
@@ -725,6 +935,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "ミフユ",
+      "みふゆ",
+      "mifuyu"
     ]
   },
   {
@@ -742,6 +957,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "シズル",
+      "しずる",
+      "shizuru"
     ]
   },
   {
@@ -759,6 +979,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "ミサキ",
+      "みさき",
+      "misaki"
     ]
   },
   {
@@ -776,6 +1001,11 @@
     "memoryPieceSources": [
       "dungeon_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "ミツキ",
+      "みつき",
+      "mitsuki"
     ]
   },
   {
@@ -792,6 +1022,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "リマ",
+      "りま",
+      "rima"
     ]
   },
   {
@@ -809,6 +1044,11 @@
     "memoryPieceSources": [
       "arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "モニカ",
+      "もにか",
+      "monika"
     ]
   },
   {
@@ -826,6 +1066,11 @@
     "memoryPieceSources": [
       "p_arena_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "ツムギ",
+      "つむぎ",
+      "tsumugi"
     ]
   },
   {
@@ -843,6 +1088,11 @@
     "memoryPieceSources": [
       "dungeon_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "アユミ",
+      "あゆみ",
+      "ayumi"
     ]
   },
   {
@@ -860,6 +1110,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "ルカ",
+      "るか",
+      "ruka"
     ]
   },
   {
@@ -877,6 +1132,12 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "ジータ",
+      "じいた",
+      "ジイタ",
+      "jiita"
     ]
   },
   {
@@ -894,6 +1155,12 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "ペコリーヌ",
+      "ぺこりいぬ",
+      "ペコリイヌ",
+      "pekoriinu"
     ]
   },
   {
@@ -911,6 +1178,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "コッコロ",
+      "こっころ",
+      "kokkoro"
     ]
   },
   {
@@ -928,6 +1200,11 @@
     "memoryPieceSources": [
       "dungeon_coin",
       "side_story"
+    ],
+    "searchTokens": [
+      "キャル",
+      "きゃる",
+      "kyaru"
     ]
   },
   {
@@ -944,6 +1221,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ムイミ",
+      "むいみ",
+      "muimi"
     ]
   },
   {
@@ -960,6 +1242,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "アリサ",
+      "ありさ",
+      "arisa"
     ]
   },
   {
@@ -976,6 +1263,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "シェフィ",
+      "しぇふぃ",
+      "shefyi"
     ]
   },
   {
@@ -993,6 +1285,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "カヤ",
+      "かや",
+      "kaya"
     ]
   },
   {
@@ -1010,6 +1307,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "イノリ",
+      "いのり",
+      "inori"
     ]
   },
   {
@@ -1026,6 +1328,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ホマレ",
+      "ほまれ",
+      "homare"
     ]
   },
   {
@@ -1042,6 +1349,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ラビリスタ",
+      "らびりすた",
+      "rabirisuta"
     ]
   },
   {
@@ -1058,6 +1370,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "カイザーインサイト",
+      "かいざあいんさいと",
+      "カイザアインサイト",
+      "kaizaainsaito"
     ]
   },
   {
@@ -1074,6 +1392,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ネネカ",
+      "ねねか",
+      "neneka"
     ]
   },
   {
@@ -1090,6 +1413,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "クリスティーナ",
+      "くりすてぃいな",
+      "クリスティイナ",
+      "kurisuteiina"
     ]
   },
   {
@@ -1106,6 +1435,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ペコリーヌ(サマー)",
+      "ぺこりいぬ(さまあ)",
+      "ペコリイヌ(サマア)",
+      "pekoriinu(samaa)"
     ]
   },
   {
@@ -1122,6 +1457,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "コッコロ(サマー)",
+      "こっころ(さまあ)",
+      "コッコロ(サマア)",
+      "kokkoro(samaa)"
     ]
   },
   {
@@ -1138,6 +1479,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "スズメ(サマー)",
+      "すずめ(さまあ)",
+      "スズメ(サマア)",
+      "suzume(samaa)"
     ]
   },
   {
@@ -1154,6 +1501,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "キャル(サマー)",
+      "きゃる(さまあ)",
+      "キャル(サマア)",
+      "kyaru(samaa)"
     ]
   },
   {
@@ -1170,6 +1523,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "タマキ(サマー)",
+      "たまき(さまあ)",
+      "タマキ(サマア)",
+      "tamaki(samaa)"
     ]
   },
   {
@@ -1186,6 +1545,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ミフユ(サマー)",
+      "みふゆ(さまあ)",
+      "ミフユ(サマア)",
+      "mifuyu(samaa)"
     ]
   },
   {
@@ -1202,6 +1567,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "シノブ(ハロウィン)",
+      "しのぶ(はろうぃん)",
+      "shinobu(harouin)"
     ]
   },
   {
@@ -1218,6 +1588,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ミヤコ(ハロウィン)",
+      "みやこ(はろうぃん)",
+      "miyako(harouin)"
     ]
   },
   {
@@ -1234,6 +1609,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ミサキ(ハロウィン)",
+      "みさき(はろうぃん)",
+      "misaki(harouin)"
     ]
   },
   {
@@ -1250,6 +1630,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "チカ(クリスマス)",
+      "ちか(くりすます)",
+      "chika(kurisumasu)"
     ]
   },
   {
@@ -1266,6 +1651,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "クルミ(クリスマス)",
+      "くるみ(くりすます)",
+      "kurumi(kurisumasu)"
     ]
   },
   {
@@ -1282,6 +1672,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "アヤネ(クリスマス)",
+      "あやね(くりすます)",
+      "ayane(kurisumasu)"
     ]
   },
   {
@@ -1298,6 +1693,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ヒヨリ(ニューイヤー)",
+      "ひより(にゅういやあ)",
+      "ヒヨリ(ニュウイヤア)",
+      "hiyori(nyuuiyaa)"
     ]
   },
   {
@@ -1314,6 +1715,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ユイ(ニューイヤー)",
+      "ゆい(にゅういやあ)",
+      "ユイ(ニュウイヤア)",
+      "yui(nyuuiyaa)"
     ]
   },
   {
@@ -1330,6 +1737,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "レイ(ニューイヤー)",
+      "れい(にゅういやあ)",
+      "レイ(ニュウイヤア)",
+      "rei(nyuuiyaa)"
     ]
   },
   {
@@ -1346,6 +1759,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "エリコ(バレンタイン)",
+      "えりこ(ばれんたいん)",
+      "eriko(barentain)"
     ]
   },
   {
@@ -1362,6 +1780,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "シズル(バレンタイン)",
+      "しずる(ばれんたいん)",
+      "shizuru(barentain)"
     ]
   },
   {
@@ -1378,6 +1801,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "アン",
+      "あん",
+      "an"
     ]
   },
   {
@@ -1394,6 +1822,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ルゥ",
+      "るぅ",
+      "ruu"
     ]
   },
   {
@@ -1410,6 +1843,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "グレア",
+      "ぐれあ",
+      "gurea"
     ]
   },
   {
@@ -1426,6 +1864,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "クウカ(オーエド)",
+      "くうか(おうえど)",
+      "クウカ(オウエド)",
+      "kuuka(ooedo)"
     ]
   },
   {
@@ -1443,6 +1887,12 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "ニノン(オーエド)",
+      "にのん(おうえど)",
+      "ニノン(オウエド)",
+      "ninon(ooedo)"
     ]
   },
   {
@@ -1459,6 +1909,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "レム",
+      "れむ",
+      "remu"
     ]
   },
   {
@@ -1473,7 +1928,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ラム",
+      "らむ",
+      "ramu"
+    ]
   },
   {
     "name": "エミリア",
@@ -1489,6 +1949,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "エミリア",
+      "えみりあ",
+      "emiria"
     ]
   },
   {
@@ -1505,6 +1970,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "スズナ(サマー)",
+      "すずな(さまあ)",
+      "スズナ(サマア)",
+      "suzuna(samaa)"
     ]
   },
   {
@@ -1521,6 +1992,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "イオ(サマー)",
+      "いお(さまあ)",
+      "イオ(サマア)",
+      "io(samaa)"
     ]
   },
   {
@@ -1537,6 +2014,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "サレン(サマー)",
+      "されん(さまあ)",
+      "サレン(サマア)",
+      "saren(samaa)"
     ]
   },
   {
@@ -1553,6 +2036,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "マコト(サマー)",
+      "まこと(さまあ)",
+      "マコト(サマア)",
+      "makoto(samaa)"
     ]
   },
   {
@@ -1569,6 +2058,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "カオリ(サマー)",
+      "かおり(さまあ)",
+      "カオリ(サマア)",
+      "kaori(samaa)"
     ]
   },
   {
@@ -1585,6 +2080,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "マホ(サマー)",
+      "まほ(さまあ)",
+      "マホ(サマア)",
+      "maho(samaa)"
     ]
   },
   {
@@ -1602,6 +2103,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "アオイ(編入生)",
+      "あおい(編入生)",
+      "aoi(編入生)"
     ]
   },
   {
@@ -1618,6 +2124,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "クロエ",
+      "くろえ",
+      "kuroe"
     ]
   },
   {
@@ -1635,6 +2146,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "チエル",
+      "ちえる",
+      "chieru"
     ]
   },
   {
@@ -1652,6 +2168,11 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "ユニ",
+      "ゆに",
+      "yuni"
     ]
   },
   {
@@ -1668,6 +2189,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "キョウカ(ハロウィン)",
+      "きょうか(はろうぃん)",
+      "kyouka(harouin)"
     ]
   },
   {
@@ -1684,6 +2210,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ミソギ(ハロウィン)",
+      "みそぎ(はろうぃん)",
+      "misogi(harouin)"
     ]
   },
   {
@@ -1700,6 +2231,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ミミ(ハロウィン)",
+      "みみ(はろうぃん)",
+      "mimi(harouin)"
     ]
   },
   {
@@ -1716,6 +2252,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ルナ",
+      "るな",
+      "runa"
     ]
   },
   {
@@ -1732,6 +2273,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "クリスティーナ(クリスマス)",
+      "くりすてぃいな(くりすます)",
+      "クリスティイナ(クリスマス)",
+      "kurisuteiina(kurisumasu)"
     ]
   },
   {
@@ -1748,6 +2295,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ノゾミ(クリスマス)",
+      "のぞみ(くりすます)",
+      "nozomi(kurisumasu)"
     ]
   },
   {
@@ -1764,6 +2316,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "イリヤ(クリスマス)",
+      "いりや(くりすます)",
+      "iriya(kurisumasu)"
     ]
   },
   {
@@ -1780,6 +2337,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ペコリーヌ(ニューイヤー)",
+      "ぺこりいぬ(にゅういやあ)",
+      "ペコリイヌ(ニュウイヤア)",
+      "pekoriinu(nyuuiyaa)"
     ]
   },
   {
@@ -1796,6 +2359,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "コッコロ(ニューイヤー)",
+      "こっころ(にゅういやあ)",
+      "コッコロ(ニュウイヤア)",
+      "kokkoro(nyuuiyaa)"
     ]
   },
   {
@@ -1812,6 +2381,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "キャル(ニューイヤー)",
+      "きゃる(にゅういやあ)",
+      "キャル(ニュウイヤア)",
+      "kyaru(nyuuiyaa)"
     ]
   },
   {
@@ -1828,6 +2403,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "スズメ(ニューイヤー)",
+      "すずめ(にゅういやあ)",
+      "スズメ(ニュウイヤア)",
+      "suzume(nyuuiyaa)"
     ]
   },
   {
@@ -1844,6 +2425,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "カスミ(マジカル)",
+      "かすみ(まじかる)",
+      "kasumi(majikaru)"
     ]
   },
   {
@@ -1860,6 +2446,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "シオリ(マジカル)",
+      "しおり(まじかる)",
+      "shiori(majikaru)"
     ]
   },
   {
@@ -1876,6 +2467,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ウヅキ(デレマス)",
+      "うづき(でれます)",
+      "uzuki(deremasu)"
     ]
   },
   {
@@ -1892,6 +2488,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "リン(デレマス)",
+      "りん(でれます)",
+      "rin(deremasu)"
     ]
   },
   {
@@ -1906,7 +2507,12 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ミオ(デレマス)",
+      "みお(でれます)",
+      "mio(deremasu)"
+    ]
   },
   {
     "name": "リン（レンジャー）",
@@ -1922,6 +2528,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "リン(レンジャー)",
+      "りん(れんじゃあ)",
+      "リン(レンジャア)",
+      "rin(renjaa)"
     ]
   },
   {
@@ -1939,6 +2551,12 @@
     "memoryPieceSources": [
       "hard_quest",
       "side_story"
+    ],
+    "searchTokens": [
+      "マヒル(レンジャー)",
+      "まひる(れんじゃあ)",
+      "マヒル(レンジャア)",
+      "mahiru(renjaa)"
     ]
   },
   {
@@ -1955,6 +2573,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "リノ(ワンダー)",
+      "りの(わんだあ)",
+      "リノ(ワンダア)",
+      "rino(wandaa)"
     ]
   },
   {
@@ -1971,6 +2595,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "アユミ(ワンダー)",
+      "あゆみ(わんだあ)",
+      "アユミ(ワンダア)",
+      "ayumi(wandaa)"
     ]
   },
   {
@@ -1987,6 +2617,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ルカ(サマー)",
+      "るか(さまあ)",
+      "ルカ(サマア)",
+      "ruka(samaa)"
     ]
   },
   {
@@ -2003,6 +2639,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "アンナ(サマー)",
+      "あんな(さまあ)",
+      "アンナ(サマア)",
+      "anna(samaa)"
     ]
   },
   {
@@ -2019,6 +2661,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ナナカ(サマー)",
+      "ななか(さまあ)",
+      "ナナカ(サマア)",
+      "nanaka(samaa)"
     ]
   },
   {
@@ -2035,6 +2683,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ハツネ(サマー)",
+      "はつね(さまあ)",
+      "ハツネ(サマア)",
+      "hatsune(samaa)"
     ]
   },
   {
@@ -2051,6 +2705,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ミサト(サマー)",
+      "みさと(さまあ)",
+      "ミサト(サマア)",
+      "misato(samaa)"
     ]
   },
   {
@@ -2067,6 +2727,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ジュン(サマー)",
+      "じゅん(さまあ)",
+      "ジュン(サマア)",
+      "jun(samaa)"
     ]
   },
   {
@@ -2083,6 +2749,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "アカリ(エンジェル)",
+      "あかり(えんじぇる)",
+      "akari(enjeru)"
     ]
   },
   {
@@ -2099,6 +2770,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ヨリ(エンジェル)",
+      "より(えんじぇる)",
+      "yori(enjeru)"
     ]
   },
   {
@@ -2115,6 +2791,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ツムギ(ハロウィン)",
+      "つむぎ(はろうぃん)",
+      "tsumugi(harouin)"
     ]
   },
   {
@@ -2131,6 +2812,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "レイ(ハロウィン)",
+      "れい(はろうぃん)",
+      "rei(harouin)"
     ]
   },
   {
@@ -2147,6 +2833,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "マツリ(ハロウィン)",
+      "まつり(はろうぃん)",
+      "matsuri(harouin)"
     ]
   },
   {
@@ -2163,6 +2854,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "モニカ(マジカル)",
+      "もにか(まじかる)",
+      "monika(majikaru)"
     ]
   },
   {
@@ -2179,6 +2875,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "トモ(マジカル)",
+      "とも(まじかる)",
+      "tomo(majikaru)"
     ]
   },
   {
@@ -2195,6 +2896,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "アキノ(クリスマス)",
+      "あきの(くりすます)",
+      "akino(kurisumasu)"
     ]
   },
   {
@@ -2211,6 +2917,11 @@
     },
     "memoryPieceSources": [
       "clan_coin"
+    ],
+    "searchTokens": [
+      "サレン(クリスマス)",
+      "されん(くりすます)",
+      "saren(kurisumasu)"
     ]
   },
   {
@@ -2227,6 +2938,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ユカリ(クリスマス)",
+      "ゆかり(くりすます)",
+      "yukari(kurisumasu)"
     ]
   },
   {
@@ -2243,6 +2959,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ムイミ(ニューイヤー)",
+      "むいみ(にゅういやあ)",
+      "ムイミ(ニュウイヤア)",
+      "muimi(nyuuiyaa)"
     ]
   },
   {
@@ -2259,6 +2981,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ネネカ(ニューイヤー)",
+      "ねねか(にゅういやあ)",
+      "ネネカ(ニュウイヤア)",
+      "neneka(nyuuiyaa)"
     ]
   },
   {
@@ -2275,6 +3003,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "コッコロ(儀装束)",
+      "こっころ(儀装束)",
+      "kokkoro(儀装束)"
     ]
   },
   {
@@ -2291,6 +3024,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ユイ(儀装束)",
+      "ゆい(儀装束)",
+      "yui(儀装束)"
     ]
   },
   {
@@ -2307,6 +3045,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "カスミ(サマー)",
+      "かすみ(さまあ)",
+      "カスミ(サマア)",
+      "kasumi(samaa)"
     ]
   },
   {
@@ -2323,6 +3067,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "リマ(シンデレラ)",
+      "りま(しんでれら)",
+      "rima(shinderera)"
     ]
   },
   {
@@ -2339,6 +3088,11 @@
     },
     "memoryPieceSources": [
       "p_arena_coin"
+    ],
+    "searchTokens": [
+      "マコト(シンデレラ)",
+      "まこと(しんでれら)",
+      "makoto(shinderera)"
     ]
   },
   {
@@ -2355,6 +3109,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "マホ(シンデレラ)",
+      "まほ(しんでれら)",
+      "maho(shinderera)"
     ]
   },
   {
@@ -2371,6 +3130,11 @@
     },
     "memoryPieceSources": [
       "dungeon_coin"
+    ],
+    "searchTokens": [
+      "クロエ(聖学祭)",
+      "くろえ(聖学祭)",
+      "kuroe(聖学祭)"
     ]
   },
   {
@@ -2387,6 +3151,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "チエル(聖学祭)",
+      "ちえる(聖学祭)",
+      "chieru(聖学祭)"
     ]
   },
   {
@@ -2403,6 +3172,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ユニ(聖学祭)",
+      "ゆに(聖学祭)",
+      "yuni(聖学祭)"
     ]
   },
   {
@@ -2419,6 +3193,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "イノリ(タイムトラベル)",
+      "いのり(たいむとらべる)",
+      "inori(taimutoraberu)"
     ]
   },
   {
@@ -2435,6 +3214,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "カヤ(タイムトラベル)",
+      "かや(たいむとらべる)",
+      "kaya(taimutoraberu)"
     ]
   },
   {
@@ -2451,6 +3235,11 @@
     },
     "memoryPieceSources": [
       "arena_coin"
+    ],
+    "searchTokens": [
+      "アオイ(作業服)",
+      "あおい(作業服)",
+      "aoi(作業服)"
     ]
   },
   {
@@ -2467,6 +3256,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "タマキ(作業服)",
+      "たまき(作業服)",
+      "tamaki(作業服)"
     ]
   },
   {
@@ -2483,6 +3277,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ミフユ(作業服)",
+      "みふゆ(作業服)",
+      "mifuyu(作業服)"
     ]
   },
   {
@@ -2499,6 +3298,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "エリコ(サマー)",
+      "えりこ(さまあ)",
+      "エリコ(サマア)",
+      "eriko(samaa)"
     ]
   },
   {
@@ -2515,6 +3320,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "シズル(サマー)",
+      "しずる(さまあ)",
+      "シズル(サマア)",
+      "shizuru(samaa)"
     ]
   },
   {
@@ -2531,6 +3342,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ノゾミ(サマー)",
+      "のぞみ(さまあ)",
+      "ノゾミ(サマア)",
+      "nozomi(samaa)"
     ]
   },
   {
@@ -2547,6 +3364,12 @@
     },
     "memoryPieceSources": [
       "p_arena_coin"
+    ],
+    "searchTokens": [
+      "チカ(サマー)",
+      "ちか(さまあ)",
+      "チカ(サマア)",
+      "chika(samaa)"
     ]
   },
   {
@@ -2563,6 +3386,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ツムギ(サマー)",
+      "つむぎ(さまあ)",
+      "ツムギ(サマア)",
+      "tsumugi(samaa)"
     ]
   },
   {
@@ -2579,6 +3408,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ミツキ(オーエド)",
+      "みつき(おうえど)",
+      "ミツキ(オウエド)",
+      "mitsuki(ooedo)"
     ]
   },
   {
@@ -2595,6 +3430,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ユキ(オーエド)",
+      "ゆき(おうえど)",
+      "ユキ(オウエド)",
+      "yuki(ooedo)"
     ]
   },
   {
@@ -2611,6 +3452,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "カオリ(ハロウィン)",
+      "かおり(はろうぃん)",
+      "kaori(harouin)"
     ]
   },
   {
@@ -2627,6 +3473,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ニノン(ハロウィン)",
+      "にのん(はろうぃん)",
+      "ninon(harouin)"
     ]
   },
   {
@@ -2643,6 +3494,11 @@
     },
     "memoryPieceSources": [
       "dungeon_coin"
+    ],
+    "searchTokens": [
+      "スズナ(ハロウィン)",
+      "すずな(はろうぃん)",
+      "suzuna(harouin)"
     ]
   },
   {
@@ -2659,6 +3515,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "クレジッタ",
+      "くれじった",
+      "kurejitta"
     ]
   },
   {
@@ -2675,6 +3536,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ランファ",
+      "らんふぁ",
+      "ranfua"
     ]
   },
   {
@@ -2691,6 +3557,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ミソラ",
+      "みそら",
+      "misora"
     ]
   },
   {
@@ -2707,6 +3578,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "カリン",
+      "かりん",
+      "karin"
     ]
   },
   {
@@ -2723,6 +3599,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ネビア",
+      "ねびあ",
+      "nebia"
     ]
   },
   {
@@ -2739,6 +3620,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "イオ(ノワール)",
+      "いお(のわある)",
+      "イオ(ノワアル)",
+      "io(nowaaru)"
     ]
   },
   {
@@ -2755,6 +3642,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "クウカ(ノワール)",
+      "くうか(のわある)",
+      "クウカ(ノワアル)",
+      "kuuka(nowaaru)"
     ]
   },
   {
@@ -2771,6 +3664,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "マヒル(クリスマス)",
+      "まひる(くりすます)",
+      "mahiru(kurisumasu)"
     ]
   },
   {
@@ -2787,6 +3685,11 @@
     },
     "memoryPieceSources": [
       "arena_coin"
+    ],
+    "searchTokens": [
+      "リノ(クリスマス)",
+      "りの(くりすます)",
+      "rino(kurisumasu)"
     ]
   },
   {
@@ -2803,6 +3706,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ミヤコ(クリスマス)",
+      "みやこ(くりすます)",
+      "miyako(kurisumasu)"
     ]
   },
   {
@@ -2819,6 +3727,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "シズル(ノワール)",
+      "しずる(のわある)",
+      "シズル(ノワアル)",
+      "shizuru(nowaaru)"
     ]
   },
   {
@@ -2835,6 +3749,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "シェフィ(ニューイヤー)",
+      "しぇふぃ(にゅういやあ)",
+      "シェフィ(ニュウイヤア)",
+      "shefyi(nyuuiyaa)"
     ]
   },
   {
@@ -2851,6 +3771,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ルカ(ニューイヤー)",
+      "るか(にゅういやあ)",
+      "ルカ(ニュウイヤア)",
+      "ruka(nyuuiyaa)"
     ]
   },
   {
@@ -2867,6 +3793,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "イリヤ(ニューイヤー)",
+      "いりや(にゅういやあ)",
+      "イリヤ(ニュウイヤア)",
+      "iriya(nyuuiyaa)"
     ]
   },
   {
@@ -2883,6 +3815,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ペコリーヌ(オーバーロード)",
+      "ぺこりいぬ(おうばあろうど)",
+      "ペコリイヌ(オウバアロウド)",
+      "pekoriinu(oobaaroodo)"
     ]
   },
   {
@@ -2899,6 +3837,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "キャル(オーバーロード)",
+      "きゃる(おうばあろうど)",
+      "キャル(オウバアロウド)",
+      "kyaru(oobaaroodo)"
     ]
   },
   {
@@ -2915,6 +3859,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ラビリスタ(オーバーロード)",
+      "らびりすた(おうばあろうど)",
+      "ラビリスタ(オウバアロウド)",
+      "rabirisuta(oobaaroodo)"
     ]
   },
   {
@@ -2931,6 +3881,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "クルミ(ステージ)",
+      "くるみ(すてえじ)",
+      "クルミ(ステエジ)",
+      "kurumi(suteeji)"
     ]
   },
   {
@@ -2947,6 +3903,12 @@
     },
     "memoryPieceSources": [
       "clan_coin"
+    ],
+    "searchTokens": [
+      "ミサキ(ステージ)",
+      "みさき(すてえじ)",
+      "ミサキ(ステエジ)",
+      "misaki(suteeji)"
     ]
   },
   {
@@ -2963,6 +3925,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "アユミ(怪盗)",
+      "あゆみ(怪盗)",
+      "ayumi(怪盗)"
     ]
   },
   {
@@ -2979,6 +3946,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "イノリ(怪盗)",
+      "いのり(怪盗)",
+      "inori(怪盗)"
     ]
   },
   {
@@ -2995,6 +3967,12 @@
     },
     "memoryPieceSources": [
       "dungeon_coin"
+    ],
+    "searchTokens": [
+      "アンナ(パイレーツ)",
+      "あんな(ぱいれえつ)",
+      "アンナ(パイレエツ)",
+      "anna(paireetsu)"
     ]
   },
   {
@@ -3011,6 +3989,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "シノブ(パイレーツ)",
+      "しのぶ(ぱいれえつ)",
+      "シノブ(パイレエツ)",
+      "shinobu(paireetsu)"
     ]
   },
   {
@@ -3027,6 +4011,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "アオイ(キャンプ)",
+      "あおい(きゃんぷ)",
+      "aoi(kyanpu)"
     ]
   },
   {
@@ -3043,6 +4032,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ユカリ(キャンプ)",
+      "ゆかり(きゃんぷ)",
+      "yukari(kyanpu)"
     ]
   },
   {
@@ -3059,6 +4053,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ヴァンピィ",
+      "ゔぁんぴぃ",
+      "vuanpyi"
     ]
   },
   {
@@ -3075,6 +4074,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ヒヨリ(サマー)",
+      "ひより(さまあ)",
+      "ヒヨリ(サマア)",
+      "hiyori(samaa)"
     ]
   },
   {
@@ -3091,6 +4096,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "レイ(サマー)",
+      "れい(さまあ)",
+      "レイ(サマア)",
+      "rei(samaa)"
     ]
   },
   {
@@ -3107,6 +4118,12 @@
     },
     "memoryPieceSources": [
       "arena_coin"
+    ],
+    "searchTokens": [
+      "ユイ(サマー)",
+      "ゆい(さまあ)",
+      "ユイ(サマア)",
+      "yui(samaa)"
     ]
   },
   {
@@ -3123,6 +4140,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "キョウカ(サマー)",
+      "きょうか(さまあ)",
+      "キョウカ(サマア)",
+      "kyouka(samaa)"
     ]
   },
   {
@@ -3139,6 +4162,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ミソギ(サマー)",
+      "みそぎ(さまあ)",
+      "ミソギ(サマア)",
+      "misogi(samaa)"
     ]
   },
   {
@@ -3155,6 +4184,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ミミ(サマー)",
+      "みみ(さまあ)",
+      "ミミ(サマア)",
+      "mimi(samaa)"
     ]
   },
   {
@@ -3171,6 +4206,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "アメス",
+      "あめす",
+      "amesu"
     ]
   },
   {
@@ -3187,6 +4227,12 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "マホ(エクスプローラー)",
+      "まほ(えくすぷろうらあ)",
+      "マホ(エクスプロウラア)",
+      "maho(ekusupurooraa)"
     ]
   },
   {
@@ -3201,7 +4247,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "アヤネ(エクスプローラー)",
+      "あやね(えくすぷろうらあ)",
+      "アヤネ(エクスプロウラア)",
+      "ayane(ekusupurooraa)"
+    ]
   },
   {
     "name": "ネア",
@@ -3217,6 +4269,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ネア",
+      "ねあ",
+      "nea"
     ]
   },
   {
@@ -3233,6 +4290,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "リン(ハロウィン)",
+      "りん(はろうぃん)",
+      "rin(harouin)"
     ]
   },
   {
@@ -3249,6 +4311,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "トモ(ハロウィン)",
+      "とも(はろうぃん)",
+      "tomo(harouin)"
     ]
   },
   {
@@ -3265,6 +4332,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "ナナカ(ハロウィン)",
+      "ななか(はろうぃん)",
+      "nanaka(harouin)"
     ]
   },
   {
@@ -3281,6 +4353,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "クリスティーナ(ワイルド)",
+      "くりすてぃいな(わいるど)",
+      "クリスティイナ(ワイルド)",
+      "kurisuteiina(wairudo)"
     ]
   },
   {
@@ -3297,6 +4375,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "マツリ(ワイルド)",
+      "まつり(わいるど)",
+      "matsuri(wairudo)"
     ]
   },
   {
@@ -3313,6 +4396,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "アカリ(クリスマス)",
+      "あかり(くりすます)",
+      "akari(kurisumasu)"
     ]
   },
   {
@@ -3329,6 +4417,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ヨリ(クリスマス)",
+      "より(くりすます)",
+      "yori(kurisumasu)"
     ]
   },
   {
@@ -3345,6 +4438,11 @@
     },
     "memoryPieceSources": [
       "dungeon_coin"
+    ],
+    "searchTokens": [
+      "ジュン(クリスマス)",
+      "じゅん(くりすます)",
+      "jun(kurisumasu)"
     ]
   },
   {
@@ -3361,6 +4459,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ホマレ(ニューイヤー)",
+      "ほまれ(にゅういやあ)",
+      "ホマレ(ニュウイヤア)",
+      "homare(nyuuiyaa)"
     ]
   },
   {
@@ -3377,6 +4481,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ミサト(ニューイヤー)",
+      "みさと(にゅういやあ)",
+      "ミサト(ニュウイヤア)",
+      "misato(nyuuiyaa)"
     ]
   },
   {
@@ -3393,6 +4503,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "ミツキ(ニューイヤー)",
+      "みつき(にゅういやあ)",
+      "ミツキ(ニュウイヤア)",
+      "mitsuki(nyuuiyaa)"
     ]
   },
   {
@@ -3409,6 +4525,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ノゾミ(リベレイター)",
+      "のぞみ(りべれいたあ)",
+      "ノゾミ(リベレイタア)",
+      "nozomi(ribereitaa)"
     ]
   },
   {
@@ -3425,6 +4547,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "カヤ(リベレイター)",
+      "かや(りべれいたあ)",
+      "カヤ(リベレイタア)",
+      "kaya(ribereitaa)"
     ]
   },
   {
@@ -3441,6 +4569,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ムイミ(リベレイター)",
+      "むいみ(りべれいたあ)",
+      "ムイミ(リベレイタア)",
+      "muimi(ribereitaa)"
     ]
   },
   {
@@ -3457,6 +4591,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "タマキ(カフェ)",
+      "たまき(かふぇ)",
+      "tamaki(kafye)"
     ]
   },
   {
@@ -3473,6 +4612,11 @@
     },
     "memoryPieceSources": [
       "hard_quest"
+    ],
+    "searchTokens": [
+      "モニカ(カフェ)",
+      "もにか(かふぇ)",
+      "monika(kafye)"
     ]
   },
   {
@@ -3489,6 +4633,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "コッコロ(レンジャー)",
+      "こっころ(れんじゃあ)",
+      "コッコロ(レンジャア)",
+      "kokkoro(renjaa)"
     ]
   },
   {
@@ -3505,6 +4655,12 @@
     },
     "memoryPieceSources": [
       "arena_coin"
+    ],
+    "searchTokens": [
+      "シオリ(レンジャー)",
+      "しおり(れんじゃあ)",
+      "シオリ(レンジャア)",
+      "shiori(renjaa)"
     ]
   },
   {
@@ -3521,6 +4677,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ジータ(ウォーロック)",
+      "じいた(うぉうろっく)",
+      "ジイタ(ウォウロック)",
+      "jiita(uoorokku)"
     ]
   },
   {
@@ -3537,6 +4699,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ビカラ",
+      "びから",
+      "bikara"
     ]
   },
   {
@@ -3553,6 +4720,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "カリン(アルケミスト)",
+      "かりん(あるけみすと)",
+      "karin(arukemisuto)"
     ]
   },
   {
@@ -3567,7 +4739,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "リリ(フォールン)",
+      "りり(ふぉうるん)",
+      "リリ(フォウルン)",
+      "riri(fuoorun)"
+    ]
   },
   {
     "name": "クリア（フォールン）",
@@ -3581,7 +4759,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "クリア(フォールン)",
+      "くりあ(ふぉうるん)",
+      "クリア(フォウルン)",
+      "kuria(fuoorun)"
+    ]
   },
   {
     "name": "プレシア（フォールン）",
@@ -3595,7 +4779,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "プレシア(フォールン)",
+      "ぷれしあ(ふぉうるん)",
+      "プレシア(フォウルン)",
+      "pureshia(fuoorun)"
+    ]
   },
   {
     "name": "イリヤ（儀装束）",
@@ -3611,6 +4801,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "イリヤ(儀装束)",
+      "いりや(儀装束)",
+      "iriya(儀装束)"
     ]
   },
   {
@@ -3625,7 +4820,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ユキ(儀装束)",
+      "ゆき(儀装束)",
+      "yuki(儀装束)"
+    ]
   },
   {
     "name": "クローチェ",
@@ -3641,6 +4841,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "クローチェ",
+      "くろうちぇ",
+      "クロウチェ",
+      "kurooche"
     ]
   },
   {
@@ -3657,6 +4863,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ライラエル",
+      "らいらえる",
+      "rairaeru"
     ]
   },
   {
@@ -3673,6 +4884,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ネネカ(サマー)",
+      "ねねか(さまあ)",
+      "ネネカ(サマア)",
+      "neneka(samaa)"
     ]
   },
   {
@@ -3689,6 +4906,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "アキノ(サマー)",
+      "あきの(さまあ)",
+      "アキノ(サマア)",
+      "akino(samaa)"
     ]
   },
   {
@@ -3703,7 +4926,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ユカリ(サマー)",
+      "ゆかり(さまあ)",
+      "ユカリ(サマア)",
+      "yukari(samaa)"
+    ]
   },
   {
     "name": "ランファ（サマー）",
@@ -3719,6 +4948,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ランファ(サマー)",
+      "らんふぁ(さまあ)",
+      "ランファ(サマア)",
+      "ranfua(samaa)"
     ]
   },
   {
@@ -3735,6 +4970,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "クウカ(サマー)",
+      "くうか(さまあ)",
+      "クウカ(サマア)",
+      "kuuka(samaa)"
     ]
   },
   {
@@ -3751,6 +4992,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "シノブ(サマー)",
+      "しのぶ(さまあ)",
+      "シノブ(サマア)",
+      "shinobu(samaa)"
     ]
   },
   {
@@ -3767,6 +5014,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "キャル(編入生)",
+      "きゃる(編入生)",
+      "kyaru(編入生)"
     ]
   },
   {
@@ -3781,7 +5033,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "スズナ(編入生)",
+      "すずな(編入生)",
+      "suzuna(編入生)"
+    ]
   },
   {
     "name": "サレン（サラサリア）",
@@ -3797,6 +5054,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "サレン(サラサリア)",
+      "されん(さらさりあ)",
+      "saren(sarasaria)"
     ]
   },
   {
@@ -3811,7 +5073,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ルカ(サラサリア)",
+      "るか(さらさりあ)",
+      "ruka(sarasaria)"
+    ]
   },
   {
     "name": "リンド",
@@ -3825,7 +5092,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "リンド",
+      "りんど",
+      "rindo"
+    ]
   },
   {
     "name": "ヴルム",
@@ -3839,7 +5111,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ヴルム",
+      "ゔるむ",
+      "vurumu"
+    ]
   },
   {
     "name": "ペコリーヌ（クリスマス）",
@@ -3855,6 +5132,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ペコリーヌ(クリスマス)",
+      "ぺこりいぬ(くりすます)",
+      "ペコリイヌ(クリスマス)",
+      "pekoriinu(kurisumasu)"
     ]
   },
   {
@@ -3869,7 +5152,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "クレジッタ(クリスマス)",
+      "くれじった(くりすます)",
+      "kurejitta(kurisumasu)"
+    ]
   },
   {
     "name": "イノリ（ニューイヤー）",
@@ -3885,6 +5173,12 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "イノリ(ニューイヤー)",
+      "いのり(にゅういやあ)",
+      "イノリ(ニュウイヤア)",
+      "inori(nyuuiyaa)"
     ]
   },
   {
@@ -3901,6 +5195,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ハツネ(ニューイヤー)",
+      "はつね(にゅういやあ)",
+      "ハツネ(ニュウイヤア)",
+      "hatsune(nyuuiyaa)"
     ]
   },
   {
@@ -3917,6 +5217,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "カスミ(ニューイヤー)",
+      "かすみ(にゅういやあ)",
+      "カスミ(ニュウイヤア)",
+      "kasumi(nyuuiyaa)"
     ]
   },
   {
@@ -3933,6 +5239,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ヒヨリ(アストラル)",
+      "ひより(あすとらる)",
+      "hiyori(asutoraru)"
     ]
   },
   {
@@ -3949,6 +5260,11 @@
     },
     "memoryPieceSources": [
       "side_story"
+    ],
+    "searchTokens": [
+      "レイ(アストラル)",
+      "れい(あすとらる)",
+      "rei(asutoraru)"
     ]
   },
   {
@@ -3965,6 +5281,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ユイ(アストラル)",
+      "ゆい(あすとらる)",
+      "yui(asutoraru)"
     ]
   },
   {
@@ -3981,6 +5302,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "エリス",
+      "えりす",
+      "erisu"
     ]
   },
   {
@@ -3997,6 +5323,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ユニ(ウィンター)",
+      "ゆに(うぃんたあ)",
+      "ユニ(ウィンタア)",
+      "yuni(uintaa)"
     ]
   },
   {
@@ -4011,7 +5343,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "クロエ(ウィンター)",
+      "くろえ(うぃんたあ)",
+      "クロエ(ウィンタア)",
+      "kuroe(uintaa)"
+    ]
   },
   {
     "name": "チエル（ウィンター）",
@@ -4027,6 +5365,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "チエル(ウィンター)",
+      "ちえる(うぃんたあ)",
+      "チエル(ウィンタア)",
+      "chieru(uintaa)"
     ]
   },
   {
@@ -4043,6 +5387,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "アネモネ",
+      "あねもね",
+      "anemone"
     ]
   },
   {
@@ -4059,6 +5408,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ネフィ=ネラ",
+      "ねふぃ=ねら",
+      "nefyi=nera"
     ]
   },
   {
@@ -4073,7 +5427,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "マコト(コマンダー)",
+      "まこと(こまんだあ)",
+      "マコト(コマンダア)",
+      "makoto(komandaa)"
+    ]
   },
   {
     "name": "エリコ（コマンダー）",
@@ -4087,7 +5447,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "エリコ(コマンダー)",
+      "えりこ(こまんだあ)",
+      "エリコ(コマンダア)",
+      "eriko(komandaa)"
+    ]
   },
   {
     "name": "ヤマト",
@@ -4103,6 +5469,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ヤマト",
+      "やまと",
+      "yamato"
     ]
   },
   {
@@ -4119,6 +5490,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ワカナ",
+      "わかな",
+      "wakana"
     ]
   },
   {
@@ -4135,6 +5511,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "フブキ",
+      "ふぶき",
+      "fubuki"
     ]
   },
   {
@@ -4151,6 +5532,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "キョウカ(スプリング)",
+      "きょうか(すぷりんぐ)",
+      "kyouka(supuringu)"
     ]
   },
   {
@@ -4165,7 +5551,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "スズメ(スプリング)",
+      "すずめ(すぷりんぐ)",
+      "suzume(supuringu)"
+    ]
   },
   {
     "name": "クルル",
@@ -4179,7 +5570,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "クルル",
+      "くるる",
+      "kururu"
+    ]
   },
   {
     "name": "マホ（ドリームパーク）",
@@ -4195,6 +5591,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "マホ(ドリームパーク)",
+      "まほ(どりいむぱあく)",
+      "マホ(ドリイムパアク)",
+      "maho(doriimupaaku)"
     ]
   },
   {
@@ -4209,7 +5611,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ネア(サマー)",
+      "ねあ(さまあ)",
+      "ネア(サマア)",
+      "nea(samaa)"
+    ]
   },
   {
     "name": "ミソラ（サマー）",
@@ -4225,6 +5633,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ミソラ(サマー)",
+      "みそら(さまあ)",
+      "ミソラ(サマア)",
+      "misora(samaa)"
     ]
   },
   {
@@ -4241,6 +5655,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "リリ(サマー)",
+      "りり(さまあ)",
+      "リリ(サマア)",
+      "riri(samaa)"
     ]
   },
   {
@@ -4257,6 +5677,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "アメス(サマー)",
+      "あめす(さまあ)",
+      "アメス(サマア)",
+      "amesu(samaa)"
     ]
   },
   {
@@ -4271,7 +5697,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ホマレ(サマー)",
+      "ほまれ(さまあ)",
+      "ホマレ(サマア)",
+      "homare(samaa)"
+    ]
   },
   {
     "name": "エミリア（サマー）",
@@ -4285,7 +5717,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "エミリア(サマー)",
+      "えみりあ(さまあ)",
+      "エミリア(サマア)",
+      "emiria(samaa)"
+    ]
   },
   {
     "name": "エキドナ（サマー）",
@@ -4301,6 +5739,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "エキドナ(サマー)",
+      "えきどな(さまあ)",
+      "エキドナ(サマア)",
+      "ekidona(samaa)"
     ]
   },
   {
@@ -4317,6 +5761,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "レム(サマー)",
+      "れむ(さまあ)",
+      "レム(サマア)",
+      "remu(samaa)"
     ]
   },
   {
@@ -4333,6 +5783,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ノゾミ(アルケミスト)",
+      "のぞみ(あるけみすと)",
+      "nozomi(arukemisuto)"
     ]
   },
   {
@@ -4347,7 +5802,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ルイズマリー",
+      "るいずまりい",
+      "ルイズマリイ",
+      "ruizumarii"
+    ]
   },
   {
     "name": "イロハ",
@@ -4361,7 +5822,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "イロハ",
+      "いろは",
+      "iroha"
+    ]
   },
   {
     "name": "ソノ",
@@ -4375,7 +5841,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ソノ",
+      "その",
+      "sono"
+    ]
   },
   {
     "name": "ライラエル（クリスマス）",
@@ -4391,6 +5862,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ライラエル(クリスマス)",
+      "らいらえる(くりすます)",
+      "rairaeru(kurisumasu)"
     ]
   },
   {
@@ -4405,7 +5881,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "イオ(クリスマス)",
+      "いお(くりすます)",
+      "io(kurisumasu)"
+    ]
   },
   {
     "name": "グレイス",
@@ -4421,6 +5902,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "グレイス",
+      "ぐれいす",
+      "gureisu"
     ]
   },
   {
@@ -4437,6 +5923,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ヴァイオレット",
+      "ゔぁいおれっと",
+      "vuaioretto"
     ]
   },
   {
@@ -4451,7 +5942,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "モニカ(ニューイヤー)",
+      "もにか(にゅういやあ)",
+      "モニカ(ニュウイヤア)",
+      "monika(nyuuiyaa)"
+    ]
   },
   {
     "name": "サレン（ニューイヤー）",
@@ -4467,6 +5964,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "サレン(ニューイヤー)",
+      "されん(にゅういやあ)",
+      "サレン(ニュウイヤア)",
+      "saren(nyuuiyaa)"
     ]
   },
   {
@@ -4483,6 +5986,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "メドゥーサ",
+      "めどぅうさ",
+      "メドゥウサ",
+      "medouusa"
     ]
   },
   {
@@ -4499,6 +6008,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ラビリスタ(アルファ)",
+      "らびりすた(あるふぁ)",
+      "rabirisuta(arufua)"
     ]
   },
   {
@@ -4515,6 +6029,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ネネカ(アルファ)",
+      "ねねか(あるふぁ)",
+      "neneka(arufua)"
     ]
   },
   {
@@ -4531,6 +6050,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "クリスティーナ(アルファ)",
+      "くりすてぃいな(あるふぁ)",
+      "クリスティイナ(アルファ)",
+      "kurisuteiina(arufua)"
     ]
   },
   {
@@ -4547,6 +6072,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "フィオ",
+      "ふぃお",
+      "fyio"
     ]
   },
   {
@@ -4561,7 +6091,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ランファ(儀装束)",
+      "らんふぁ(儀装束)",
+      "ranfua(儀装束)"
+    ]
   },
   {
     "name": "チカ（儀装束）",
@@ -4575,7 +6110,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "チカ(儀装束)",
+      "ちか(儀装束)",
+      "chika(儀装束)"
+    ]
   },
   {
     "name": "クローチェ（エアリアル）",
@@ -4589,7 +6129,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "クローチェ(エアリアル)",
+      "くろうちぇ(えありある)",
+      "クロウチェ(エアリアル)",
+      "kurooche(eariaru)"
+    ]
   },
   {
     "name": "アオイ（パイロット）",
@@ -4603,7 +6149,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "アオイ(パイロット)",
+      "あおい(ぱいろっと)",
+      "aoi(pairotto)"
+    ]
   },
   {
     "name": "ホウオウ",
@@ -4617,7 +6168,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ホウオウ",
+      "ほうおう",
+      "houou"
+    ]
   },
   {
     "name": "ツムギ（ジオ・ゲヘナ）",
@@ -4631,7 +6187,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ツムギ(ジオ・ゲヘナ)",
+      "つむぎ(じお・げへな)",
+      "tsumugi(jio/gehena)"
+    ]
   },
   {
     "name": "カノン",
@@ -4645,7 +6206,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "カノン",
+      "かのん",
+      "kanon"
+    ]
   },
   {
     "name": "エリス（サマー）",
@@ -4659,7 +6225,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "エリス(サマー)",
+      "えりす(さまあ)",
+      "エリス(サマア)",
+      "erisu(samaa)"
+    ]
   },
   {
     "name": "シェフィ（サマー）",
@@ -4673,7 +6245,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "シェフィ(サマー)",
+      "しぇふぃ(さまあ)",
+      "シェフィ(サマア)",
+      "shefyi(samaa)"
+    ]
   },
   {
     "name": "プレシア（サマー）",
@@ -4687,7 +6265,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "プレシア(サマー)",
+      "ぷれしあ(さまあ)",
+      "プレシア(サマア)",
+      "pureshia(samaa)"
+    ]
   },
   {
     "name": "クリア（サマー）",
@@ -4701,7 +6285,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "クリア(サマー)",
+      "くりあ(さまあ)",
+      "クリア(サマア)",
+      "kuria(samaa)"
+    ]
   },
   {
     "name": "アネモネ（サマー）",
@@ -4715,7 +6305,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "アネモネ(サマー)",
+      "あねもね(さまあ)",
+      "アネモネ(サマア)",
+      "anemone(samaa)"
+    ]
   },
   {
     "name": "アイラ",
@@ -4731,6 +6327,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "アイラ",
+      "あいら",
+      "aira"
     ]
   },
   {
@@ -4747,6 +6348,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "シナツ",
+      "しなつ",
+      "shinatsu"
     ]
   },
   {
@@ -4761,7 +6367,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ヒヨリ(サラサリア)",
+      "ひより(さらさりあ)",
+      "hiyori(sarasaria)"
+    ]
   },
   {
     "name": "ユキノ",
@@ -4775,7 +6386,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ユキノ",
+      "ゆきの",
+      "yukino"
+    ]
   },
   {
     "name": "サツキ",
@@ -4789,7 +6405,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "サツキ",
+      "さつき",
+      "satsuki"
+    ]
   },
   {
     "name": "アラクネ",
@@ -4805,6 +6426,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "アラクネ",
+      "あらくね",
+      "arakune"
     ]
   },
   {
@@ -4819,7 +6445,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "サクラ",
+      "さくら",
+      "sakura"
+    ]
   },
   {
     "name": "ナーナ",
@@ -4833,7 +6464,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ナーナ",
+      "なあな",
+      "ナアナ",
+      "naana"
+    ]
   },
   {
     "name": "ミソラ（クリスマス）",
@@ -4847,7 +6484,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ミソラ(クリスマス)",
+      "みそら(くりすます)",
+      "misora(kurisumasu)"
+    ]
   },
   {
     "name": "ユイ（クリスマス）",
@@ -4861,7 +6503,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ユイ(クリスマス)",
+      "ゆい(くりすます)",
+      "yui(kurisumasu)"
+    ]
   },
   {
     "name": "シズル（ニューイヤー）",
@@ -4875,7 +6522,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "シズル(ニューイヤー)",
+      "しずる(にゅういやあ)",
+      "シズル(ニュウイヤア)",
+      "shizuru(nyuuiyaa)"
+    ]
   },
   {
     "name": "ニノン（サマー）",
@@ -4889,7 +6542,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ニノン(サマー)",
+      "にのん(さまあ)",
+      "ニノン(サマア)",
+      "ninon(samaa)"
+    ]
   },
   {
     "name": "カスミ（シスター）",
@@ -4903,7 +6562,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "カスミ(シスター)",
+      "かすみ(しすたあ)",
+      "カスミ(シスタア)",
+      "kasumi(shisutaa)"
+    ]
   },
   {
     "name": "コッコロ（嚮導幼君）",
@@ -4919,6 +6584,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "コッコロ(嚮導幼君)",
+      "こっころ(嚮導幼君)",
+      "kokkoro(嚮導幼君)"
     ]
   },
   {
@@ -4933,7 +6603,13 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "リノ(ニューイヤー)",
+      "りの(にゅういやあ)",
+      "リノ(ニュウイヤア)",
+      "rino(nyuuiyaa)"
+    ]
   },
   {
     "name": "ヴァイオレット（イサナミ）",
@@ -4947,7 +6623,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ヴァイオレット(イサナミ)",
+      "ゔぁいおれっと(いさなみ)",
+      "vuaioretto(isanami)"
+    ]
   },
   {
     "name": "ライラエル（パルフェクト）",
@@ -4961,7 +6642,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ライラエル(パルフェクト)",
+      "らいらえる(ぱるふぇくと)",
+      "rairaeru(parufyekuto)"
+    ]
   },
   {
     "name": "ヒヨリ（プリンセス）",
@@ -4977,6 +6663,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ヒヨリ(プリンセス)",
+      "ひより(ぷりんせす)",
+      "hiyori(purinsesu)"
     ]
   },
   {
@@ -4991,7 +6682,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ネフィ=ネラ(鬼面仏心)",
+      "ねふぃ=ねら(鬼面仏心)",
+      "nefyi=nera(鬼面仏心)"
+    ]
   },
   {
     "name": "ユイ（プリンセス）",
@@ -5007,6 +6703,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ユイ(プリンセス)",
+      "ゆい(ぷりんせす)",
+      "yui(purinsesu)"
     ]
   },
   {
@@ -5023,6 +6724,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "レイ(プリンセス)",
+      "れい(ぷりんせす)",
+      "rei(purinsesu)"
     ]
   },
   {
@@ -5039,6 +6745,12 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ペコリーヌ(プリンセス)",
+      "ぺこりいぬ(ぷりんせす)",
+      "ペコリイヌ(プリンセス)",
+      "pekoriinu(purinsesu)"
     ]
   },
   {
@@ -5055,6 +6767,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "コッコロ(プリンセス)",
+      "こっころ(ぷりんせす)",
+      "kokkoro(purinsesu)"
     ]
   },
   {
@@ -5071,6 +6788,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "キャル(プリンセス)",
+      "きゃる(ぷりんせす)",
+      "kyaru(purinsesu)"
     ]
   },
   {
@@ -5087,6 +6809,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ハツネ&シオリ",
+      "はつね&しおり",
+      "hatsune&shiori"
     ]
   },
   {
@@ -5103,6 +6830,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "ミソギ&ミミ&キョウカ",
+      "みそぎ&みみ&きょうか",
+      "misogi&mimi&kyouka"
     ]
   },
   {
@@ -5119,6 +6851,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "アキノ&サレン",
+      "あきの&されん",
+      "akino&saren"
     ]
   },
   {
@@ -5135,6 +6872,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "アン&グレア",
+      "あん&ぐれあ",
+      "an&gurea"
     ]
   },
   {
@@ -5151,6 +6893,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "シズル&リノ",
+      "しずる&りの",
+      "shizuru&rino"
     ]
   },
   {
@@ -5167,6 +6914,11 @@
     },
     "memoryPieceSources": [
       "master_coin"
+    ],
+    "searchTokens": [
+      "シェフィ(プリンセス)",
+      "しぇふぃ(ぷりんせす)",
+      "shefyi(purinsesu)"
     ]
   },
   {
@@ -5181,6 +6933,12 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": []
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ペコリーヌ(アストライア)",
+      "ぺこりいぬ(あすとらいあ)",
+      "ペコリイヌ(アストライア)",
+      "pekoriinu(asutoraia)"
+    ]
   }
 ]

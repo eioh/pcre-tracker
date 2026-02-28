@@ -2,7 +2,8 @@ import { readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { toHiragana, toKatakana, toRomaji } from "wanakana";
 
-const masterPath = resolve(process.cwd(), "src/data/characterMaster.json");
+const sourceMasterPath = resolve(process.cwd(), "src/data/characterMaster.json");
+const generatedMasterPath = resolve(process.cwd(), "src/data/characterMaster.generated.json");
 
 // 検索用の比較で使う正規化文字列を作る。
 function normalizeForSearch(value) {
@@ -20,7 +21,7 @@ function buildNameSearchTokens(name) {
 
 // マスターデータへ検索トークンを付与して保存する。
 function generateSearchTokens() {
-  const rawText = readFileSync(masterPath, "utf8");
+  const rawText = readFileSync(sourceMasterPath, "utf8");
   const characters = JSON.parse(rawText);
 
   if (!Array.isArray(characters)) {
@@ -37,10 +38,10 @@ function generateSearchTokens() {
     };
   });
 
-  const tempPath = `${masterPath}.tmp`;
+  const tempPath = `${generatedMasterPath}.tmp`;
   try {
     writeFileSync(tempPath, `${JSON.stringify(enriched, null, 2)}\n`, "utf8");
-    renameSync(tempPath, masterPath);
+    renameSync(tempPath, generatedMasterPath);
   } catch (error) {
     rmSync(tempPath, { force: true });
     throw error;

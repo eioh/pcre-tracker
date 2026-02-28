@@ -2,11 +2,12 @@
 
 最終更新日: 2026-02-28
 
-このドキュメントは、`src/data/characterMaster.json` に新キャラを追加・更新するときの運用手順をまとめたものです。
+このドキュメントは、`src/data/characterMaster.json` に新キャラを追加・更新し、`src/data/characterMaster.generated.json` を再生成するときの運用手順をまとめたものです。
 
 ## 1. 更新対象
 
-- マスターデータ: `src/data/characterMaster.json`
+- マスターデータ（手編集元）: `src/data/characterMaster.json`
+- マスターデータ（生成・アプリ参照）: `src/data/characterMaster.generated.json`
 - 検索トークン生成スクリプト: `scripts/generate-search-tokens.mjs`
 - 運用手順書: `docs/character-master-update-guide.md`
 
@@ -33,13 +34,13 @@
 - `memoryPieceSources`:
   - 情報が確定するまで空配列 `[]` を許容する
   - ショップ追加などで確定後に更新する
-- `searchTokens` は手編集しない（`npm run generate` で再生成）
+- `searchTokens` は手編集しない（`npm run generate` で生成ファイルへ再生成）
 
 ## 4. 作業手順
 
 1. `src/data/characterMaster.json` にキャラを追加/更新する。
-2. `npm run generate` を実行して `searchTokens` を再生成する。
-3. 差分を確認して不要変更がないことを確認する。
+2. `npm run generate` を実行して `src/data/characterMaster.generated.json` を再生成する。
+3. 差分を確認して不要変更がないことを確認する（元データは上書きされない）。
 
 ## 5. 検証コマンド
 
@@ -52,4 +53,4 @@
 - 追加キャラの `name` が重複していない
 - `implemented` が実装状況と一致している
 - `memoryPieceSources` が方針どおりに設定されている
-- `searchTokens` が `npm run generate` 後の状態でコミット対象になっている
+- `src/data/characterMaster.generated.json` が `npm run generate` 後の状態でコミット対象になっている
