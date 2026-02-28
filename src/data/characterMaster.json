@@ -5901,10 +5901,7 @@
     "searchTokens": [
       "ツムギ(ジオ・ゲヘナ)",
       "つむぎ(じお・げへな)",
-      "tsumugi(jio/gehena)",
-      "tsumugi jio gehena",
-      "tsumugi-jio-gehena",
-      "tsumugijiogehena"
+      "tsumugi(jio/gehena)"
     ]
   },
   {
@@ -6596,6 +6593,25 @@
       "シェフィ(プリンセス)",
       "しぇふぃ(ぷりんせす)",
       "shefyi(purinsesu)"
+    ]
+  },
+  {
+    "name": "ペコリーヌ（アストライア）",
+    "limited": true,
+    "attribute": "火",
+    "role": "タンク",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ペコリーヌ(アストライア)",
+      "ぺこりいぬ(あすとらいあ)",
+      "ペコリイヌ(アストライア)",
+      "pekoriinu(asutoraia)"
     ]
   }
 ]
