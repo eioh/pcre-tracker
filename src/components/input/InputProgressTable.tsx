@@ -312,7 +312,7 @@ const TableRow = memo(function TableRow({
         </div>
       </TableCell>
       <TableCell>
-        <span className="inline-block min-w-14 text-right text-sm font-bold tabular-nums">{ue1RemainingHeartFragment}</span>
+        <span className="inline-block w-full text-center text-sm font-bold tabular-nums">{ue1RemainingHeartFragment}</span>
       </TableCell>
     </UiTableRow>
   );
@@ -377,15 +377,14 @@ export const InputProgressTable = memo(function InputProgressTable({
           <col className="w-20" />
           <col className="w-[200px]" />
           <col className="w-[95px]" />
-          <col className="w-[130px]" />
-          <col className="w-[130px]" />
           <col className="w-[150px]" />
           <col className="w-[150px]" />
-          <col className="w-[140px]" />
-          <col className="w-[120px]" />
-          <col className="w-[250px]" />
-          <col className="w-[120px]" />
-          <col className="w-[260px]" />
+          <col className="w-[150px]" />
+          <col className="w-[150px]" />
+          <col className="w-[150px]" />
+          <col className="w-[170px]" />
+          <col className="w-[150px]" />
+          <col className="w-[150px]" />
           <col className="w-[170px]" />
         </colgroup>
         <TableHeader>
@@ -432,7 +431,11 @@ export const InputProgressTable = memo(function InputProgressTable({
                 onSort={onSort}
               />
             </TableHead>
-            <TableHead className="text-center">コネクトRANK必要素材（アーツ/ソウル/ガード）</TableHead>
+            <TableHead className="text-center">
+              コネクトRANK必要素材
+              <br />
+              （アーツ/ソウル/ガード）
+            </TableHead>
             <TableHead aria-sort={getAriaSort("totalMemoryNeeded", sortKey, sortDirection)} className="text-center">
               <SortHeaderButton
                 label="必要メモピ合計"

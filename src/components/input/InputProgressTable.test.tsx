@@ -210,7 +210,8 @@ describe("InputProgressTable", () => {
     const props = buildProps();
     render(<InputProgressTable {...props} />);
 
-    expect(screen.getByText("コネクトRANK必要素材（アーツ/ソウル/ガード）")).toBeInTheDocument();
+    expect(screen.getByText(/コネクトRANK必要素材/)).toBeInTheDocument();
+    expect(screen.getByText(/アーツ\/ソウル\/ガード/)).toBeInTheDocument();
 
     const tableRows = screen.getAllByRole("row");
     const bodyRow = tableRows[1] as HTMLTableRowElement;
