@@ -1,0 +1,3273 @@
+{
+  "formatVersion": 1,
+  "exportedAt": "2026-02-28T00:00:00.000Z",
+  "storage": {
+    "pcr_growth_tracker": {
+      "schemaVersion": 1,
+      "updatedAt": "2026-02-28T00:00:00.000Z",
+      "progressByName": {
+        "ヒヨリ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 6,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": true,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ユイ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "レイ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 50,
+          "ue1SpEquipped": false,
+          "ue2Level": 2,
+          "ownedMemoryPiece": 74
+        },
+        "ミソギ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 4,
+          "ue1Level": 70,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 111
+        },
+        "マツリ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 5,
+          "ue1Level": 90,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 148
+        },
+        "アカリ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 6,
+          "ue1Level": 110,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 185
+        },
+        "ミヤコ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 7,
+          "ue1Level": 130,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 222
+        },
+        "ユキ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 3,
+          "connectRank": 8,
+          "ue1Level": 140,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 259
+        },
+        "アンナ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 9,
+          "ue1Level": 150,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 296
+        },
+        "マホ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 10,
+          "ue1Level": 160,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 333
+        },
+        "リノ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 6,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 0
+        },
+        "ハツネ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ナナカ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 13,
+          "ue1Level": 190,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 444
+        },
+        "カスミ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 14,
+          "ue1Level": 200,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 481
+        },
+        "ミサト": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 210,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 518
+        },
+        "スズナ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 220,
+          "ue1SpEquipped": false,
+          "ue2Level": 3,
+          "ownedMemoryPiece": 555
+        },
+        "カオリ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 2,
+          "ue1Level": 230,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 592
+        },
+        "イオ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 240,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 629
+        },
+        "ミミ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 4,
+          "ue1Level": 250,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 666
+        },
+        "クルミ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 5,
+          "ue1Level": 260,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 703
+        },
+        "ヨリ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 6,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": true,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "アヤネ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "スズメ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 8,
+          "ue1Level": 290,
+          "ue1SpEquipped": false,
+          "ue2Level": 4,
+          "ownedMemoryPiece": 814
+        },
+        "リン": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 9,
+          "ue1Level": 300,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 851
+        },
+        "エリコ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 10,
+          "ue1Level": 310,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 888
+        },
+        "サレン": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 11,
+          "ue1Level": 320,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 925
+        },
+        "ノゾミ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 12,
+          "ue1Level": 330,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 962
+        },
+        "ニノン": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 13,
+          "ue1Level": 340,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 999
+        },
+        "シノブ": {
+          "owned": false,
+          "limitBreak": true,
+          "star": 3,
+          "connectRank": 14,
+          "ue1Level": 350,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1036
+        },
+        "アキノ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 360,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1073
+        },
+        "マヒル": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 6,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 0
+        },
+        "ユカリ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "キョウカ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 30,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1184
+        },
+        "トモ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 4,
+          "ue1Level": 50,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 21
+        },
+        "シオリ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 5,
+          "ue1Level": 70,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 58
+        },
+        "アオイ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 6,
+          "ue1Level": 90,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 95
+        },
+        "チカ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 7,
+          "ue1Level": 110,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 132
+        },
+        "マコト": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 8,
+          "ue1Level": 130,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 169
+        },
+        "イリヤ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 9,
+          "ue1Level": 140,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 206
+        },
+        "クウカ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 10,
+          "ue1Level": 150,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 243
+        },
+        "タマキ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 6,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ジュン": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ミフユ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 1,
+          "connectRank": 13,
+          "ue1Level": 180,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 354
+        },
+        "シズル": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 14,
+          "ue1Level": 190,
+          "ue1SpEquipped": false,
+          "ue2Level": 1,
+          "ownedMemoryPiece": 391
+        },
+        "ミサキ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 200,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 428
+        },
+        "ミツキ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 210,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 465
+        },
+        "リマ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 2,
+          "ue1Level": 220,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 502
+        },
+        "モニカ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 230,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 539
+        },
+        "ツムギ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 4,
+          "ue1Level": 240,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 576
+        },
+        "アユミ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 3,
+          "connectRank": 5,
+          "ue1Level": 250,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 613
+        },
+        "ルカ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 6,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ジータ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ペコリーヌ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 8,
+          "ue1Level": 280,
+          "ue1SpEquipped": false,
+          "ue2Level": 4,
+          "ownedMemoryPiece": 724
+        },
+        "コッコロ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 9,
+          "ue1Level": 290,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 761
+        },
+        "キャル": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 10,
+          "ue1Level": 300,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 798
+        },
+        "ムイミ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 11,
+          "ue1Level": 310,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 835
+        },
+        "アリサ": {
+          "owned": false,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 12,
+          "ue1Level": 320,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 872
+        },
+        "シェフィ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 13,
+          "ue1Level": 330,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 909
+        },
+        "カヤ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 14,
+          "ue1Level": 340,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 946
+        },
+        "イノリ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 350,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 983
+        },
+        "ホマレ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ラビリスタ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "カイザーインサイト": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1094
+        },
+        "ネネカ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 30,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1131
+        },
+        "クリスティーナ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 5,
+          "ue1Level": 50,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1168
+        },
+        "ペコリーヌ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 6,
+          "ue1Level": 70,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 5
+        },
+        "コッコロ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 7,
+          "ue1Level": 90,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 42
+        },
+        "スズメ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 110,
+          "ue1SpEquipped": false,
+          "ue2Level": 1,
+          "ownedMemoryPiece": 79
+        },
+        "キャル（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 9,
+          "ue1Level": 130,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 116
+        },
+        "タマキ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 140,
+          "ue1SpEquipped": false,
+          "ue2Level": 3,
+          "ownedMemoryPiece": 153
+        },
+        "ミフユ（サマー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": true,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 0
+        },
+        "シノブ（ハロウィン）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 0
+        },
+        "ミヤコ（ハロウィン）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 170,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 264
+        },
+        "ミサキ（ハロウィン）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 180,
+          "ue1SpEquipped": false,
+          "ue2Level": 1,
+          "ownedMemoryPiece": 301
+        },
+        "チカ（クリスマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": 190,
+          "ue1SpEquipped": false,
+          "ue2Level": 2,
+          "ownedMemoryPiece": 338
+        },
+        "クルミ（クリスマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 200,
+          "ue1SpEquipped": false,
+          "ue2Level": 3,
+          "ownedMemoryPiece": 375
+        },
+        "アヤネ（クリスマス）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 2,
+          "ue1Level": 210,
+          "ue1SpEquipped": false,
+          "ue2Level": 4,
+          "ownedMemoryPiece": 412
+        },
+        "ヒヨリ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 220,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 449
+        },
+        "ユイ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 4,
+          "ue1Level": 230,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 486
+        },
+        "レイ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 5,
+          "ue1Level": 240,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 523
+        },
+        "エリコ（バレンタイン）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 0
+        },
+        "シズル（バレンタイン）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 0
+        },
+        "アン": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 270,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 634
+        },
+        "ルゥ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 280,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 671
+        },
+        "グレア": {
+          "owned": false,
+          "limitBreak": true,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 290,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 708
+        },
+        "クウカ（オーエド）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 11,
+          "ue1Level": 300,
+          "ue1SpEquipped": false,
+          "ue2Level": 1,
+          "ownedMemoryPiece": 745
+        },
+        "ニノン（オーエド）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 12,
+          "ue1Level": 310,
+          "ue1SpEquipped": false,
+          "ue2Level": 2,
+          "ownedMemoryPiece": 782
+        },
+        "レム": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 13,
+          "ue1Level": 320,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 819
+        },
+        "ラム": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 14,
+          "ue1Level": 330,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 856
+        },
+        "エミリア": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 340,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 893
+        },
+        "スズナ（サマー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 0
+        },
+        "イオ（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 0
+        },
+        "サレン（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": 2,
+          "ownedMemoryPiece": 1004
+        },
+        "マコト（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": 3,
+          "ownedMemoryPiece": 1041
+        },
+        "カオリ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 30,
+          "ue1SpEquipped": false,
+          "ue2Level": 4,
+          "ownedMemoryPiece": 1078
+        },
+        "マホ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 6,
+          "ue1Level": 50,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 1115
+        },
+        "アオイ（編入生）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 7,
+          "ue1Level": 70,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 1152
+        },
+        "クロエ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 90,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1189
+        },
+        "チエル": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 110,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 26
+        },
+        "ユニ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 130,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 63
+        },
+        "キョウカ（ハロウィン）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 0
+        },
+        "ミソギ（ハロウィン）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 0
+        },
+        "ミミ（ハロウィン）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 160,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 174
+        },
+        "ルナ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 170,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 211
+        },
+        "クリスティーナ（クリスマス）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": 180,
+          "ue1SpEquipped": false,
+          "ue2Level": 2,
+          "ownedMemoryPiece": 248
+        },
+        "ノゾミ（クリスマス）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 190,
+          "ue1SpEquipped": false,
+          "ue2Level": 3,
+          "ownedMemoryPiece": 285
+        },
+        "イリヤ（クリスマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 2,
+          "ue1Level": 200,
+          "ue1SpEquipped": false,
+          "ue2Level": 4,
+          "ownedMemoryPiece": 322
+        },
+        "ペコリーヌ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 210,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 359
+        },
+        "コッコロ（ニューイヤー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 220,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 396
+        },
+        "キャル（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 230,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 433
+        },
+        "スズメ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 0
+        },
+        "カスミ（マジカル）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 0
+        },
+        "シオリ（マジカル）": {
+          "owned": false,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 260,
+          "ue1SpEquipped": false,
+          "ue2Level": 4,
+          "ownedMemoryPiece": 544
+        },
+        "ウヅキ（デレマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 270,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 581
+        },
+        "リン（デレマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 280,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 618
+        },
+        "ミオ（デレマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 11,
+          "ue1Level": 290,
+          "ue1SpEquipped": false,
+          "ue2Level": 1,
+          "ownedMemoryPiece": 655
+        },
+        "リン（レンジャー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 12,
+          "ue1Level": 300,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 692
+        },
+        "マヒル（レンジャー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 310,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 729
+        },
+        "リノ（ワンダー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 320,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 766
+        },
+        "アユミ（ワンダー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": 330,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 803
+        },
+        "ルカ（サマー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 0
+        },
+        "アンナ（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ナナカ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 360,
+          "ue1SpEquipped": false,
+          "ue2Level": 2,
+          "ownedMemoryPiece": 914
+        },
+        "ハツネ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": 3,
+          "ownedMemoryPiece": 951
+        },
+        "ミサト（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 988
+        },
+        "ジュン（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 6,
+          "ue1Level": 30,
+          "ue1SpEquipped": false,
+          "ue2Level": 5,
+          "ownedMemoryPiece": 1025
+        },
+        "アカリ（エンジェル）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 3,
+          "connectRank": 7,
+          "ue1Level": 50,
+          "ue1SpEquipped": false,
+          "ue2Level": 0,
+          "ownedMemoryPiece": 1062
+        },
+        "ヨリ（エンジェル）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 70,
+          "ue1SpEquipped": false,
+          "ue2Level": 1,
+          "ownedMemoryPiece": 1099
+        },
+        "ツムギ（ハロウィン）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 90,
+          "ue1SpEquipped": false,
+          "ue2Level": 2,
+          "ownedMemoryPiece": 1136
+        },
+        "レイ（ハロウィン）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 110,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1173
+        },
+        "マツリ（ハロウィン）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "モニカ（マジカル）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "トモ（マジカル）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 150,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 84
+        },
+        "アキノ（クリスマス）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 160,
+          "ue1SpEquipped": false,
+          "ue2Level": 1,
+          "ownedMemoryPiece": 121
+        },
+        "サレン（クリスマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": 170,
+          "ue1SpEquipped": false,
+          "ue2Level": 2,
+          "ownedMemoryPiece": 158
+        },
+        "ユカリ（クリスマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 180,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 195
+        },
+        "ムイミ（ニューイヤー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 2,
+          "ue1Level": 190,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 232
+        },
+        "ネネカ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 200,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 269
+        },
+        "コッコロ（儀装束）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 210,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 306
+        },
+        "ユイ（儀装束）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 220,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 343
+        },
+        "カスミ（サマー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "リマ（シンデレラ）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "マコト（シンデレラ）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 250,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 454
+        },
+        "マホ（シンデレラ）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 260,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 491
+        },
+        "クロエ（聖学祭）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 270,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 528
+        },
+        "チエル（聖学祭）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 11,
+          "ue1Level": 280,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 565
+        },
+        "ユニ（聖学祭）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 12,
+          "ue1Level": 290,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 602
+        },
+        "イノリ（タイムトラベル）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 300,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 639
+        },
+        "カヤ（タイムトラベル）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 310,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 676
+        },
+        "アオイ（作業服）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": 320,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 713
+        },
+        "タマキ（作業服）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ミフユ（作業服）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "エリコ（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 350,
+          "ue1SpEquipped": false,
+          "ue2Level": 2,
+          "ownedMemoryPiece": 824
+        },
+        "シズル（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 360,
+          "ue1SpEquipped": false,
+          "ue2Level": 3,
+          "ownedMemoryPiece": 861
+        },
+        "ノゾミ（サマー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 898
+        },
+        "チカ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 6,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 935
+        },
+        "ツムギ（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 7,
+          "ue1Level": 30,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 972
+        },
+        "ミツキ（オーエド）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 50,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1009
+        },
+        "ユキ（オーエド）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 70,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1046
+        },
+        "カオリ（ハロウィン）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 90,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1083
+        },
+        "ニノン（ハロウィン）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "スズナ（ハロウィン）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "クレジッタ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 140,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1194
+        },
+        "ランファ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 150,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 31
+        },
+        "ミソラ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": 160,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 68
+        },
+        "カリン": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 105
+        },
+        "ネビア": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 2,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 142
+        },
+        "イオ（ノワール）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 190,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 179
+        },
+        "クウカ（ノワール）": {
+          "owned": false,
+          "limitBreak": true,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 200,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 216
+        },
+        "マヒル（クリスマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 210,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 253
+        },
+        "リノ（クリスマス）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ミヤコ（クリスマス）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "シズル（ノワール）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 240,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 364
+        },
+        "シェフィ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 250,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 401
+        },
+        "ルカ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 260,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 438
+        },
+        "イリヤ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 1,
+          "connectRank": 11,
+          "ue1Level": 270,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 475
+        },
+        "ペコリーヌ（オーバーロード）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 12,
+          "ue1Level": 280,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 512
+        },
+        "キャル（オーバーロード）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 290,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 549
+        },
+        "ラビリスタ（オーバーロード）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 300,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 586
+        },
+        "クルミ（ステージ）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": 310,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 623
+        },
+        "ミサキ（ステージ）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "アユミ（怪盗）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "イノリ（怪盗）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 340,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 734
+        },
+        "アンナ（パイレーツ）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 350,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 771
+        },
+        "シノブ（パイレーツ）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 360,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 808
+        },
+        "アオイ（キャンプ）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 6,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 845
+        },
+        "ユカリ（キャンプ）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 7,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 882
+        },
+        "ヴァンピィ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 8,
+          "ue1Level": 30,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 919
+        },
+        "ヒヨリ（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 50,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 956
+        },
+        "レイ（サマー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 70,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 993
+        },
+        "ユイ（サマー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "キョウカ（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ミソギ（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 130,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1104
+        },
+        "ミミ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 140,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1141
+        },
+        "アメス": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1178
+        },
+        "マホ（エクスプローラー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 160,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 15
+        },
+        "アヤネ（エクスプローラー）": {
+          "owned": false,
+          "limitBreak": true,
+          "star": 3,
+          "connectRank": 2,
+          "ue1Level": 170,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 52
+        },
+        "ネア": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 180,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 89
+        },
+        "リン（ハロウィン）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 190,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 126
+        },
+        "トモ（ハロウィン）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 200,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 163
+        },
+        "ナナカ（ハロウィン）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "クリスティーナ（ワイルド）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "マツリ（ワイルド）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 230,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 274
+        },
+        "アカリ（クリスマス）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 240,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 311
+        },
+        "ヨリ（クリスマス）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 250,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 348
+        },
+        "ジュン（クリスマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 11,
+          "ue1Level": 260,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 385
+        },
+        "ホマレ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 12,
+          "ue1Level": 270,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 422
+        },
+        "ミサト（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 280,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 459
+        },
+        "ミツキ（ニューイヤー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 290,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 496
+        },
+        "ノゾミ（リベレイター）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": 300,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 533
+        },
+        "カヤ（リベレイター）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ムイミ（リベレイター）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "タマキ（カフェ）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 330,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 644
+        },
+        "モニカ（カフェ）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 340,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 681
+        },
+        "コッコロ（レンジャー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 350,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 718
+        },
+        "シオリ（レンジャー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 6,
+          "ue1Level": 360,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 755
+        },
+        "ジータ（ウォーロック）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 7,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 792
+        },
+        "ビカラ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 829
+        },
+        "カリン（アルケミスト）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 30,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 866
+        },
+        "リリ（フォールン）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 50,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 903
+        },
+        "クリア（フォールン）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "プレシア（フォールン）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "イリヤ（儀装束）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 110,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1014
+        },
+        "ユキ（儀装束）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 130,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1051
+        },
+        "クローチェ": {
+          "owned": false,
+          "limitBreak": true,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1088
+        },
+        "ライラエル": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1125
+        },
+        "ネネカ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 2,
+          "ue1Level": 160,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1162
+        },
+        "アキノ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 170,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1199
+        },
+        "ユカリ（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 180,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 36
+        },
+        "ランファ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 190,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 73
+        },
+        "クウカ（サマー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "シノブ（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "キャル（編入生）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 220,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 184
+        },
+        "スズナ（編入生）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 230,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 221
+        },
+        "サレン（サラサリア）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 240,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 258
+        },
+        "ルカ（サラサリア）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 11,
+          "ue1Level": 250,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 295
+        },
+        "リンド": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 12,
+          "ue1Level": 260,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 332
+        },
+        "ヴルム": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 270,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 369
+        },
+        "ペコリーヌ（クリスマス）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 280,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 406
+        },
+        "クレジッタ（クリスマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": 290,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 443
+        },
+        "イノリ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ハツネ（ニューイヤー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "カスミ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 320,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 554
+        },
+        "ヒヨリ（アストラル）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 330,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 591
+        },
+        "レイ（アストラル）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 340,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 628
+        },
+        "ユイ（アストラル）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 1,
+          "connectRank": 6,
+          "ue1Level": 350,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 665
+        },
+        "エリス": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 7,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 702
+        },
+        "ユニ（ウィンター）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 739
+        },
+        "クロエ（ウィンター）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 776
+        },
+        "チエル（ウィンター）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 30,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 813
+        },
+        "アネモネ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ネフィ＝ネラ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "マコト（コマンダー）": {
+          "owned": false,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 90,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 924
+        },
+        "エリコ（コマンダー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 110,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 961
+        },
+        "ヤマト": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": 130,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 998
+        },
+        "ワカナ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 140,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1035
+        },
+        "フブキ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 2,
+          "ue1Level": 150,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1072
+        },
+        "キョウカ（スプリング）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 160,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1109
+        },
+        "スズメ（スプリング）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 170,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1146
+        },
+        "クルル": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 180,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1183
+        },
+        "マホ（ドリームパーク）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ネア（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ミソラ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 210,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 94
+        },
+        "リリ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 220,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 131
+        },
+        "アメス（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 230,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 168
+        },
+        "ホマレ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 11,
+          "ue1Level": 240,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 205
+        },
+        "エミリア（サマー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 3,
+          "connectRank": 12,
+          "ue1Level": 250,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 242
+        },
+        "エキドナ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 260,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 279
+        },
+        "レム（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 270,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 316
+        },
+        "ノゾミ（アルケミスト）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": 280,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 353
+        },
+        "ルイズマリー": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "イロハ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ソノ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 464
+        },
+        "ライラエル（クリスマス）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 320,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 501
+        },
+        "イオ（クリスマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 330,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 538
+        },
+        "グレイス": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 6,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 575
+        },
+        "ヴァイオレット": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 7,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 612
+        },
+        "モニカ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 360,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 649
+        },
+        "サレン（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 686
+        },
+        "メドゥーサ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 723
+        },
+        "ラビリスタ（アルファ）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ネネカ（アルファ）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "クリスティーナ（アルファ）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": 70,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 834
+        },
+        "フィオ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 871
+        },
+        "ランファ（儀装束）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 908
+        },
+        "チカ（儀装束）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 945
+        },
+        "クローチェ（エアリアル）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 2,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 982
+        },
+        "アオイ（パイロット）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1019
+        },
+        "ホウオウ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1056
+        },
+        "ツムギ（ジオ・ゲヘナ）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1093
+        },
+        "カノン": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "エリス（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "シェフィ（サマー）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 4
+        },
+        "プレシア（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 41
+        },
+        "クリア（サマー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 78
+        },
+        "アネモネ（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 11,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 115
+        },
+        "アイラ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 12,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 152
+        },
+        "シナツ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 189
+        },
+        "ヒヨリ（サラサリア）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 226
+        },
+        "ユキノ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 263
+        },
+        "サツキ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "アラクネ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "サクラ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 374
+        },
+        "ナーナ": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 411
+        },
+        "ミソラ（クリスマス）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 448
+        },
+        "ユイ（クリスマス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 6,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 485
+        },
+        "シズル（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 7,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 522
+        },
+        "ニノン（サマー）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 559
+        },
+        "カスミ（シスター）": {
+          "owned": false,
+          "limitBreak": true,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 596
+        },
+        "コッコロ（嚮導幼君）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 633
+        },
+        "リノ（ニューイヤー）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ヴァイオレット（イサナミ）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ライラエル（パルフェクト）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 13,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 744
+        },
+        "ヒヨリ（プリンセス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 14,
+          "ue1Level": 70,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 781
+        },
+        "ネフィ＝ネラ（鬼面仏心）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 15,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 818
+        },
+        "ユイ（プリンセス）": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 110,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 855
+        },
+        "レイ（プリンセス）": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 3,
+          "connectRank": 2,
+          "ue1Level": 130,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 892
+        },
+        "ペコリーヌ（プリンセス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 5,
+          "connectRank": 3,
+          "ue1Level": 140,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 929
+        },
+        "コッコロ（プリンセス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 4,
+          "ue1Level": 150,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 966
+        },
+        "キャル（プリンセス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 5,
+          "ue1Level": 160,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1003
+        },
+        "ハツネ＆シオリ": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 15,
+          "ue1Level": 370,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "ミソギ＆ミミ＆キョウカ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 1,
+          "ue1Level": 0,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 0
+        },
+        "アキノ＆サレン": {
+          "owned": true,
+          "limitBreak": true,
+          "star": 5,
+          "connectRank": 8,
+          "ue1Level": 190,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1114
+        },
+        "アン＆グレア": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 2,
+          "connectRank": 9,
+          "ue1Level": 200,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1151
+        },
+        "シズル＆リノ": {
+          "owned": false,
+          "limitBreak": false,
+          "star": 4,
+          "connectRank": 10,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 1188
+        },
+        "シェフィ（プリンセス）": {
+          "owned": true,
+          "limitBreak": false,
+          "star": 1,
+          "connectRank": 11,
+          "ue1Level": null,
+          "ue1SpEquipped": false,
+          "ue2Level": null,
+          "ownedMemoryPiece": 25
+        }
+      }
+    },
+    "pcr_growth_tracker_ui": null
+  }
+}
