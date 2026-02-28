@@ -102,7 +102,8 @@ type TableRowProps = {
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
   ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
-  rowRef?: (element: HTMLTableRowElement | null) => void;
+  virtualRowIndex?: number;
+  measureElement?: (element: HTMLTableRowElement | null) => void;
 };
 
 // テーブル行コンポーネント。行単位でメモ化し不要な再レンダリングを防ぐ。
@@ -113,7 +114,8 @@ const TableRow = memo(function TableRow({
   starMemoryCalcMode,
   ue1MemoryCalcMode,
   ue1HeartFragmentCalcMode,
-  rowRef,
+  virtualRowIndex,
+  measureElement,
 }: TableRowProps) {
   const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
   const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
@@ -211,7 +213,11 @@ const TableRow = memo(function TableRow({
   );
 
   return (
-    <UiTableRow ref={rowRef} className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]">
+    <UiTableRow
+      data-index={virtualRowIndex}
+      ref={measureElement}
+      className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]"
+    >
       <TableCell className="text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
           <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onChange={handleOwnedChange} />
@@ -442,9 +448,9 @@ export const InputProgressTable = memo(function InputProgressTable({
       : 0;
 
   useEffect(() => {
-    // 表示件数や表示条件の変化後に再計測し、可変行高のずれを抑える。
+    // 表示件数の変化時のみ全体再計測し、スクロール中の不要な再計測を避ける。
     rowVirtualizer.measure();
-  }, [visibleRows, rowVirtualizer]);
+  }, [visibleRows.length, rowVirtualizer]);
 
   const virtualizedRows = useMemo(() => {
     const resolvedRows = virtualRows
@@ -586,13 +592,8 @@ export const InputProgressTable = memo(function InputProgressTable({
               {virtualizedRows.map(({ virtualRow, row }) => (
                 <TableRow
                   key={row.character.name}
-                  rowRef={(element) => {
-                    if (!element || !virtualRow) {
-                      return;
-                    }
-                    element.dataset.index = String(virtualRow.index);
-                    rowVirtualizer.measureElement(element);
-                  }}
+                  virtualRowIndex={virtualRow?.index}
+                  measureElement={virtualRow ? rowVirtualizer.measureElement : undefined}
                   character={row.character}
                   progress={row.progress}
                   onUpdateProgress={onUpdateProgress}
