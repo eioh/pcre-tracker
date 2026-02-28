@@ -28,7 +28,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 type ProgressPatch = Partial<
   Pick<
     CharacterProgress,
-    "owned" | "limitBreak" | "star" | "connectRank" | "ue1Level" | "ue1SpEquipped" | "ue2Level" | "ownedMemoryPiece"
+    | "owned"
+    | "limitBreak"
+    | "star"
+    | "connectRank"
+    | "ue1Level"
+    | "ue1SpEquipped"
+    | "ue2Level"
+    | "ownedMemoryPiece"
+    | "obtainedDate"
+    | "gachaPullCount"
   >
 >;
 

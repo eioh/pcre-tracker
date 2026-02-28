@@ -27,6 +27,9 @@ function createProgress(partial: Partial<CharacterProgress>): CharacterProgress 
     ue1Level: 0,
     ue1SpEquipped: false,
     ue2Level: null,
+    ownedMemoryPiece: 0,
+    obtainedDate: null,
+    gachaPullCount: 0,
     ...partial,
   };
 }

@@ -35,6 +35,8 @@ function buildProgress(overrides?: Partial<CharacterProgress>): CharacterProgres
     ue1SpEquipped: false,
     ue2Level: 0,
     ownedMemoryPiece: 0,
+    obtainedDate: null,
+    gachaPullCount: 0,
     ...overrides,
   };
 }
@@ -89,6 +91,24 @@ describe("InputProgressTable", () => {
     fireEvent.click(screen.getByRole("button", { name: /所持メモピ/ }));
 
     expect(props.onSort).toHaveBeenCalledWith("ownedMemoryPiece");
+  });
+
+  it("入手日列ヘッダー押下でソートキーを親へ通知できる", () => {
+    const props = buildProps();
+    render(<InputProgressTable {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "入手日" }));
+
+    expect(props.onSort).toHaveBeenCalledWith("obtainedDate");
+  });
+
+  it("ガチャ回数列ヘッダー押下でソートキーを親へ通知できる", () => {
+    const props = buildProps();
+    render(<InputProgressTable {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /ガチャ回数/ }));
+
+    expect(props.onSort).toHaveBeenCalledWith("gachaPullCount");
   });
 
   it("専用1必要ハートの欠片列ヘッダー押下でソートキーを親へ通知できる", () => {
@@ -156,7 +176,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[9]).toHaveTextContent("0");
+    expect(cells[11]).toHaveTextContent("0");
   });
 
   it("専用1必要ハートの欠片を表示する", () => {
@@ -167,7 +187,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[11]).toHaveTextContent("318");
+    expect(cells[13]).toHaveTextContent("318");
   });
 
   it("専用1必要ハートの欠片はモード切り替えで未実装キャラも表示できる", () => {
@@ -197,13 +217,13 @@ describe("InputProgressTable", () => {
     let tableRows = screen.getAllByRole("row");
     let bodyRow = tableRows[1] as HTMLTableRowElement;
     let cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[11]).toHaveTextContent("0");
+    expect(cells[13]).toHaveTextContent("0");
 
     rerender(<InputProgressTable {...allMaxProps} />);
     tableRows = screen.getAllByRole("row");
     bodyRow = tableRows[1] as HTMLTableRowElement;
     cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[11]).toHaveTextContent("318");
+    expect(cells[13]).toHaveTextContent("318");
   });
 
   it("コネクトRANK必要素材列にアーツ/ソウル/ガードを表示する", () => {
@@ -217,7 +237,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[8]).toHaveTextContent("120/256/66");
+    expect(cells[10]).toHaveTextContent("120/256/66");
   });
 
   it("メモピ入手列にソース名を表示する", () => {
@@ -277,7 +297,7 @@ describe("InputProgressTable", () => {
     const tableRows = screen.getAllByRole("row");
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
-    const totalTrigger = within(cells[9] as HTMLElement).getByText("1210");
+    const totalTrigger = within(cells[11] as HTMLElement).getByText("1210");
     fireEvent.pointerMove(totalTrigger);
     fireEvent.mouseOver(totalTrigger);
 
@@ -324,5 +344,46 @@ describe("InputProgressTable", () => {
 
     expect(onUpdateProgress).toHaveBeenNthCalledWith(1, "ヒヨリ", { ownedMemoryPiece: 0 });
     expect(onUpdateProgress).toHaveBeenNthCalledWith(2, "ヒヨリ", { ownedMemoryPiece: 12 });
+  });
+
+  it("入手日セルクリックでカレンダー入力値を更新できる", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({ onUpdateProgress });
+    render(<InputProgressTable {...props} />);
+
+    const dateInput = screen.getByLabelText("ヒヨリの入手日");
+    fireEvent.click(screen.getByRole("button", { name: "ヒヨリの入手日セル" }));
+    fireEvent.change(dateInput, { target: { value: "2026-02-28" } });
+
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { obtainedDate: "2026-02-28" });
+  });
+
+  it("入手日入力を空にすると null を通知する", () => {
+    const onUpdateProgress = vi.fn();
+    const row: VisibleRow = {
+      character: buildCharacter(),
+      progress: buildProgress({ obtainedDate: "2026-02-28" }),
+    };
+    const props = buildProps({ onUpdateProgress, visibleRows: [row] });
+    render(<InputProgressTable {...props} />);
+
+    fireEvent.change(screen.getByLabelText("ヒヨリの入手日"), { target: { value: "" } });
+
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { obtainedDate: null });
+  });
+
+  it("ガチャ回数入力は 0〜300 の範囲に補正して通知する", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({ onUpdateProgress });
+    render(<InputProgressTable {...props} />);
+
+    const input = screen.getByRole("spinbutton", { name: "ヒヨリのガチャ回数" });
+    fireEvent.change(input, { target: { value: "-4.8" } });
+    fireEvent.change(input, { target: { value: "12.9" } });
+    fireEvent.change(input, { target: { value: "999" } });
+
+    expect(onUpdateProgress).toHaveBeenNthCalledWith(1, "ヒヨリ", { gachaPullCount: 0 });
+    expect(onUpdateProgress).toHaveBeenNthCalledWith(2, "ヒヨリ", { gachaPullCount: 12 });
+    expect(onUpdateProgress).toHaveBeenNthCalledWith(3, "ヒヨリ", { gachaPullCount: 300 });
   });
 });

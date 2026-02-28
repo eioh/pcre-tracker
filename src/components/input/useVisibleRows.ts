@@ -227,6 +227,20 @@ export function useVisibleRows({
         case "ownedMemoryPiece":
           baseComparison = aProgress.ownedMemoryPiece - bProgress.ownedMemoryPiece;
           break;
+        case "obtainedDate":
+          if (aProgress.obtainedDate === null && bProgress.obtainedDate !== null) {
+            return 1;
+          }
+          if (aProgress.obtainedDate !== null && bProgress.obtainedDate === null) {
+            return -1;
+          }
+          if (aProgress.obtainedDate !== null && bProgress.obtainedDate !== null) {
+            baseComparison = aProgress.obtainedDate.localeCompare(bProgress.obtainedDate);
+          }
+          break;
+        case "gachaPullCount":
+          baseComparison = aProgress.gachaPullCount - bProgress.gachaPullCount;
+          break;
         case "ue1HeartFragmentNeeded":
           baseComparison =
             getUe1RemainingHeartFragmentCountByMode(aCharacter, aProgress, ue1HeartFragmentCalcMode) -

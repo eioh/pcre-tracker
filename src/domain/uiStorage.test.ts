@@ -33,7 +33,7 @@ describe("uiStorage", () => {
         ue1Filters: [370, "sp"],
         ue2Filters: [5],
         memorySourceFilters: ["hard_quest", "none"],
-        sortKey: "ue1HeartFragmentNeeded",
+        sortKey: "obtainedDate",
         sortDirection: "desc",
       },
     };
@@ -93,6 +93,24 @@ describe("uiStorage", () => {
     const loaded = loadUiState();
     expect(loaded.input.sortKey).toBe("name");
     expect(loaded.input.sortDirection).toBe("asc");
+  });
+
+  it("新規sortKeyのガチャ回数を正しく復元する", () => {
+    window.localStorage.setItem(
+      UI_STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: 1,
+        activeTab: "input",
+        input: {
+          sortKey: "gachaPullCount",
+          sortDirection: "desc",
+        },
+      }),
+    );
+
+    const loaded = loadUiState();
+    expect(loaded.input.sortKey).toBe("gachaPullCount");
+    expect(loaded.input.sortDirection).toBe("desc");
   });
 
   it("parseUiStateは壊れたJSONでも既定値を返す", () => {

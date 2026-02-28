@@ -25,6 +25,8 @@ function createDefaultProgress(character: MasterCharacter): CharacterProgress {
     ue1SpEquipped: false,
     ue2Level: character.implemented.ue2 ? 0 : null,
     ownedMemoryPiece: 0,
+    obtainedDate: null,
+    gachaPullCount: 0,
   };
 }
 
@@ -88,6 +90,34 @@ function toOwnedMemoryPiece(value: number): CharacterProgress["ownedMemoryPiece"
   return Math.max(0, Math.floor(value));
 }
 
+// 入手日文字列を YYYY-MM-DD 形式へ正規化する。
+function toObtainedDate(value: unknown): CharacterProgress["obtainedDate"] {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+  const normalized = trimmed.replace(/\//g, "-");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+    return null;
+  }
+  const parsed = new Date(`${normalized}T00:00:00.000Z`);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+  return parsed.toISOString().slice(0, 10) === normalized ? normalized : null;
+}
+
+// ガチャ回数入力値を 0〜300 の整数へ正規化する。
+function toGachaPullCount(value: number): CharacterProgress["gachaPullCount"] {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+  return Math.min(300, Math.max(0, Math.floor(value)));
+}
+
 function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): CharacterProgress {
   const defaultProgress = createDefaultProgress(character);
   const normalizedRawProgress =
@@ -108,6 +138,8 @@ function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): Cha
     ue1SpEquipped: parsed.data.ue1SpEquipped,
     ue2Level: toUe2Level(parsed.data.ue2Level),
     ownedMemoryPiece: toOwnedMemoryPiece(parsed.data.ownedMemoryPiece),
+    obtainedDate: toObtainedDate(parsed.data.obtainedDate),
+    gachaPullCount: toGachaPullCount(parsed.data.gachaPullCount),
   };
 
   // 旧データや不整合データでも「未実装項目は null に固定」するための補正。

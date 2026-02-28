@@ -45,9 +45,11 @@ describe("loadStoredState", () => {
     expect(hiyori?.ue1SpEquipped).toBe(false);
     expect(hiyori?.ue2Level).toBeNull();
     expect(hiyori?.ownedMemoryPiece).toBe(0);
+    expect(hiyori?.obtainedDate).toBeNull();
+    expect(hiyori?.gachaPullCount).toBe(0);
   });
 
-  it("所持メモピ数を0以上の整数へ正規化する", () => {
+  it("ガチャ回数を0〜300の範囲へ正規化し、日付不正値を補正する", () => {
     window.localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
@@ -61,7 +63,9 @@ describe("loadStoredState", () => {
             ue1Level: 0,
             ue1SpEquipped: false,
             ue2Level: null,
-            ownedMemoryPiece: -12.8,
+            ownedMemoryPiece: 0,
+            obtainedDate: "2026/02/30",
+            gachaPullCount: 401.2,
             updatedAt: "2026-02-22T00:00:00.000Z",
           },
         },
@@ -71,6 +75,35 @@ describe("loadStoredState", () => {
     const loaded = loadStoredState(masterCharacters);
     const hiyori = loaded.progressByName["ヒヨリ"];
     expect(hiyori).toBeDefined();
-    expect(hiyori?.ownedMemoryPiece).toBe(0);
+    expect(hiyori?.obtainedDate).toBeNull();
+    expect(hiyori?.gachaPullCount).toBe(300);
+  });
+
+  it("入手日のスラッシュ形式をハイフン形式へ正規化する", () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: 1,
+        progressByName: {
+          ヒヨリ: {
+            owned: true,
+            limitBreak: false,
+            star: 3,
+            connectRank: 15,
+            ue1Level: 0,
+            ue1SpEquipped: false,
+            ue2Level: null,
+            ownedMemoryPiece: 1,
+            obtainedDate: "2026/02/28",
+            gachaPullCount: 12,
+            updatedAt: "2026-02-22T00:00:00.000Z",
+          },
+        },
+      }),
+    );
+
+    const loaded = loadStoredState(masterCharacters);
+    const hiyori = loaded.progressByName["ヒヨリ"];
+    expect(hiyori?.obtainedDate).toBe("2026-02-28");
   });
 });

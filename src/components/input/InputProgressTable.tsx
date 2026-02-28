@@ -1,5 +1,8 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import * as Popover from "@radix-ui/react-popover";
+import { format, isValid, parseISO } from "date-fns";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { SortDirection, SortKey } from "../../domain/uiStorage";
@@ -13,7 +16,7 @@ import {
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import { getStarRemainingMemoryPieceCount, type StarMemoryCalcMode } from "../../utils/starMemoryCost";
 import { attributeTextClassMap, memorySourceLabelMap, roleTextClassMap, sourceChipClassMap } from "./constants";
-import { formatUeLevel } from "./formatters";
+import { formatObtainedDate, formatUeLevel } from "./formatters";
 import type { ProgressPatch, VisibleRow } from "./types";
 import {
   characterNameCellLayoutClass,
@@ -27,6 +30,7 @@ import {
 import { TableCheckbox } from "../ui/table-checkbox";
 import { TableNumberInput } from "../ui/table-number-input";
 import { TableSelect } from "../ui/table-select";
+import { Calendar } from "../ui/calendar";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow as UiTableRow } from "../ui/table";
@@ -57,6 +61,20 @@ function renderSortIndicator(columnKey: SortKey, sortKey: SortKey, sortDirection
     return "";
   }
   return sortDirection === "asc" ? "▲" : "▼";
+}
+
+// 保存用の日付文字列をDateへ変換し、不正値なら undefined を返す。
+function parseStoredDate(value: string | null): Date | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const parsed = parseISO(value);
+  return isValid(parsed) ? parsed : undefined;
+}
+
+// Date型を保存用の YYYY-MM-DD 文字列へ変換する。
+function toStoredDateString(value: Date): string {
+  return format(value, "yyyy-MM-dd");
 }
 
 type SortHeaderButtonProps = {
@@ -162,6 +180,35 @@ const TableRow = memo(function TableRow({
     },
     [onUpdateProgress, character.name],
   );
+  const selectedObtainedDate = useMemo(() => parseStoredDate(progress.obtainedDate), [progress.obtainedDate]);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const handleObtainedDateChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const nextValue = event.target.value.trim();
+      onUpdateProgress(character.name, { obtainedDate: nextValue ? nextValue : null });
+    },
+    [onUpdateProgress, character.name],
+  );
+  const handleObtainedDateSelect = useCallback(
+    (value: Date | undefined) => {
+      if (!value) {
+        return;
+      }
+      onUpdateProgress(character.name, { obtainedDate: toStoredDateString(value) });
+      setIsDatePickerOpen(false);
+    },
+    [onUpdateProgress, character.name],
+  );
+  const handleObtainedDateClear = useCallback(() => {
+    onUpdateProgress(character.name, { obtainedDate: null });
+  }, [onUpdateProgress, character.name]);
+  const handleGachaPullCountChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const nextGachaPullCount = Math.min(300, Math.max(0, Math.floor(Number(event.target.value) || 0)));
+      onUpdateProgress(character.name, { gachaPullCount: nextGachaPullCount });
+    },
+    [onUpdateProgress, character.name],
+  );
 
   return (
     <UiTableRow ref={rowRef} className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]">
@@ -249,6 +296,56 @@ const TableRow = memo(function TableRow({
           value={progress.ownedMemoryPiece}
           aria-label={`${character.name}の所持メモピ数`}
           onChange={handleOwnedMemoryPieceChange}
+        />
+      </TableCell>
+      <TableCell className="text-center">
+        <Popover.Root open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+          <Popover.Trigger asChild>
+            <button
+              type="button"
+              aria-label={`${character.name}の入手日セル`}
+              className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-[#090e17d9] px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            >
+              <span className="tabular-nums">{formatObtainedDate(progress.obtainedDate)}</span>
+              <span className="inline-flex items-center gap-1.5 text-muted">
+                <CalendarIcon className="size-4" />
+                <ChevronDown className="size-4" />
+              </span>
+            </button>
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content
+              side="bottom"
+              align="center"
+              className="z-50 rounded-[12px] border border-white/20 bg-[#090e17f5] p-2 shadow-panel"
+            >
+              <Calendar mode="single" selected={selectedObtainedDate} onSelect={handleObtainedDateSelect} />
+              <div className="mt-1.5 flex justify-end">
+                <Button variant="ghost" size="sm" aria-label={`${character.name}の入手日クリア`} onClick={handleObtainedDateClear}>
+                  クリア
+                </Button>
+              </div>
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
+        <input
+          type="date"
+          value={progress.obtainedDate ?? ""}
+          aria-label={`${character.name}の入手日`}
+          className="sr-only"
+          onChange={handleObtainedDateChange}
+        />
+      </TableCell>
+      <TableCell>
+        <TableNumberInput
+          type="number"
+          inputMode="numeric"
+          min={0}
+          max={300}
+          step={1}
+          value={progress.gachaPullCount}
+          aria-label={`${character.name}のガチャ回数`}
+          onChange={handleGachaPullCountChange}
         />
       </TableCell>
       <TableCell>
@@ -384,6 +481,8 @@ export const InputProgressTable = memo(function InputProgressTable({
           <col className="w-[150px]" />
           <col className="w-[170px]" />
           <col className="w-[150px]" />
+          <col className="w-[160px]" />
+          <col className="w-[150px]" />
           <col className="w-[150px]" />
           <col className="w-[170px]" />
         </colgroup>
@@ -431,6 +530,18 @@ export const InputProgressTable = memo(function InputProgressTable({
                 onSort={onSort}
               />
             </TableHead>
+            <TableHead aria-sort={getAriaSort("obtainedDate", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton label="入手日" columnKey="obtainedDate" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
+            </TableHead>
+            <TableHead aria-sort={getAriaSort("gachaPullCount", sortKey, sortDirection)} className="text-center">
+              <SortHeaderButton
+                label="ガチャ回数"
+                columnKey="gachaPullCount"
+                sortKey={sortKey}
+                sortDirection={sortDirection}
+                onSort={onSort}
+              />
+            </TableHead>
             <TableHead className="text-center">
               コネクトRANK必要素材
               <br />
@@ -460,7 +571,7 @@ export const InputProgressTable = memo(function InputProgressTable({
         <TableBody>
           {visibleRows.length === 0 ? (
             <UiTableRow>
-              <TableCell colSpan={12} className="px-3 py-[18px] text-center text-muted">
+              <TableCell colSpan={14} className="px-3 py-[18px] text-center text-muted">
                 条件に一致するキャラがいません
               </TableCell>
             </UiTableRow>
@@ -468,7 +579,7 @@ export const InputProgressTable = memo(function InputProgressTable({
             <>
               {paddingTop > 0 ? (
                 <UiTableRow aria-hidden="true">
-                  <TableCell colSpan={12} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
+                  <TableCell colSpan={14} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
                 </UiTableRow>
               ) : null}
               {virtualizedRows.map(({ virtualRow, row }) => (
@@ -491,7 +602,7 @@ export const InputProgressTable = memo(function InputProgressTable({
               ))}
               {paddingBottom > 0 ? (
                 <UiTableRow aria-hidden="true">
-                  <TableCell colSpan={12} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
+                  <TableCell colSpan={14} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
                 </UiTableRow>
               ) : null}
             </>

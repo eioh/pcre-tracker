@@ -45,6 +45,8 @@ export const characterProgressSchema = z.object({
   ue1SpEquipped: z.boolean(),
   ue2Level: z.union([z.null(), ue2LevelSchema]),
   ownedMemoryPiece: z.number().int().min(0).default(0),
+  obtainedDate: z.union([z.null(), z.string()]).default(null),
+  gachaPullCount: z.number().finite().default(0),
 });
 
 export const storedStateV1Schema = z.object({

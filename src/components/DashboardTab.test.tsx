@@ -36,6 +36,8 @@ const state: StoredStateV1 = {
       ue1SpEquipped: true,
       ue2Level: 2,
       ownedMemoryPiece: 0,
+      obtainedDate: null,
+      gachaPullCount: 0,
     },
     ユイ: {
       owned: false,
@@ -46,6 +48,8 @@ const state: StoredStateV1 = {
       ue1SpEquipped: false,
       ue2Level: null,
       ownedMemoryPiece: 0,
+      obtainedDate: null,
+      gachaPullCount: 0,
     },
   },
 };

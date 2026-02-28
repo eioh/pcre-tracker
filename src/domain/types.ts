@@ -50,6 +50,8 @@ export type CharacterProgress = {
   ue1SpEquipped: boolean;
   ue2Level: Ue2Level;
   ownedMemoryPiece: number;
+  obtainedDate: string | null;
+  gachaPullCount: number;
 };
 
 export type StoredStateV1 = {

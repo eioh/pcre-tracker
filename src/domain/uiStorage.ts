@@ -26,6 +26,8 @@ export type SortKey =
   | "ue1"
   | "ue2"
   | "ownedMemoryPiece"
+  | "obtainedDate"
+  | "gachaPullCount"
   | "ue1HeartFragmentNeeded"
   | "totalMemoryNeeded";
 export type SortDirection = "asc" | "desc" | null;
@@ -69,6 +71,8 @@ const SORT_KEY_VALUES: SortKey[] = [
   "ue1",
   "ue2",
   "ownedMemoryPiece",
+  "obtainedDate",
+  "gachaPullCount",
   "ue1HeartFragmentNeeded",
   "totalMemoryNeeded",
 ];
