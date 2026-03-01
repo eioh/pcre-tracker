@@ -1,7 +1,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import * as Popover from "@radix-ui/react-popover";
 import { format, isValid, parseISO } from "date-fns";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
@@ -102,8 +102,6 @@ type TableRowProps = {
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
   ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
-  virtualRowIndex?: number;
-  measureElement?: (element: HTMLTableRowElement | null) => void;
 };
 
 // テーブル行コンポーネント。行単位でメモ化し不要な再レンダリングを防ぐ。
@@ -114,8 +112,6 @@ const TableRow = memo(function TableRow({
   starMemoryCalcMode,
   ue1MemoryCalcMode,
   ue1HeartFragmentCalcMode,
-  virtualRowIndex,
-  measureElement,
 }: TableRowProps) {
   const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
   const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
@@ -213,11 +209,7 @@ const TableRow = memo(function TableRow({
   );
 
   return (
-    <UiTableRow
-      data-index={virtualRowIndex}
-      ref={measureElement}
-      className="odd:bg-row-odd even:bg-row-even hover:bg-row-hover"
-    >
+    <UiTableRow className="odd:bg-row-odd even:bg-row-even hover:bg-row-hover">
       <TableCell className="text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
           <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onCheckedChange={handleOwnedChange} />
@@ -446,13 +438,7 @@ export const InputProgressTable = memo(function InputProgressTable({
     virtualRows.length > 0
       ? Math.max(0, rowVirtualizer.getTotalSize() - (virtualRows[virtualRows.length - 1]?.end ?? 0))
       : 0;
-
-  useEffect(() => {
-    // 表示件数の変化時のみ全体再計測し、スクロール中の不要な再計測を避ける。
-    rowVirtualizer.measure();
-  }, [visibleRows.length, rowVirtualizer]);
-
-  const virtualizedRows = useMemo(() => {
+  const visibleVirtualRows = useMemo(() => {
     const resolvedRows = virtualRows
       .map((virtualRow) => {
         const row = visibleRows[virtualRow.index];
@@ -584,16 +570,14 @@ export const InputProgressTable = memo(function InputProgressTable({
             </UiTableRow>
           ) : (
             <>
-              {paddingTop > 0 ? (
+              {virtualRows.length > 0 && paddingTop > 0 ? (
                 <UiTableRow aria-hidden="true">
                   <TableCell colSpan={14} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
                 </UiTableRow>
               ) : null}
-              {virtualizedRows.map(({ virtualRow, row }) => (
+              {visibleVirtualRows.map(({ virtualRow, row }) => (
                 <TableRow
-                  key={row.character.name}
-                  virtualRowIndex={virtualRow?.index}
-                  measureElement={virtualRow ? rowVirtualizer.measureElement : undefined}
+                  key={`${row.character.name}-${virtualRow?.index ?? "fallback"}`}
                   character={row.character}
                   progress={row.progress}
                   onUpdateProgress={onUpdateProgress}
@@ -602,7 +586,7 @@ export const InputProgressTable = memo(function InputProgressTable({
                   ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
                 />
               ))}
-              {paddingBottom > 0 ? (
+              {virtualRows.length > 0 && paddingBottom > 0 ? (
                 <UiTableRow aria-hidden="true">
                   <TableCell colSpan={14} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
                 </UiTableRow>

@@ -11,18 +11,14 @@ import type {
   Ue2Filter,
 } from "../../domain/uiStorage";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { MultiSelectFilter } from "../ui/multi-select-filter";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Separator } from "../ui/separator";
 import { memorySourceLabelMap } from "./constants";
 import { formatUeLevel } from "./formatters";
-import { filterSeparatorClass, inputToolbarClass, sectionLabelClass } from "./uiStyles";
+import { inputToolbarClass, sectionLabelClass } from "./uiStyles";
 
 type InputFiltersProps = {
-  searchText: string;
-  onSearchTextChange: (value: string) => void;
   ownedFilter: OwnedFilter;
   onOwnedFilterChange: (value: OwnedFilter) => void;
   limitedFilter: LimitedFilter;
@@ -44,10 +40,8 @@ function buildSummary(labels: string[]): string {
   return labels.join(" / ");
 }
 
-// 育成入力画面の検索・フィルタ操作 UI を表示する。
+// 育成入力画面のフィルタ操作 UI を表示する。
 export const InputFilters = memo(function InputFilters({
-  searchText,
-  onSearchTextChange,
   ownedFilter,
   onOwnedFilterChange,
   limitedFilter,
@@ -79,11 +73,6 @@ export const InputFilters = memo(function InputFilters({
     setFilters((previous) => (previous.includes(filter) ? previous.filter((value) => value !== filter) : [...previous, filter]));
   }
 
-  // キャラ検索文字列を初期化する。
-  function resetSearchText(): void {
-    onSearchTextChange("");
-  }
-
   // すべての絞り込み条件を既定値へ戻す。
   function resetFilters(): void {
     onOwnedFilterChange("all");
@@ -97,18 +86,6 @@ export const InputFilters = memo(function InputFilters({
 
   return (
     <>
-      <div className="mb-3 grid gap-1.5 text-sm text-muted">
-        <Label>キャラ検索</Label>
-        <div className="flex items-center gap-2">
-          <Input value={searchText} onChange={(event) => onSearchTextChange(event.target.value)} placeholder="例: ヒヨリ" />
-          <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={resetSearchText}>
-            リセット
-          </Button>
-        </div>
-      </div>
-
-      <Separator className={filterSeparatorClass} label="キャラ検索とフィルタの区切り" />
-
       <p className={`${sectionLabelClass} mb-1`}>フィルタ</p>
       <div className="mb-2">
         <Button type="button" variant="outline" size="sm" onClick={resetFilters}>

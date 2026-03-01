@@ -15,8 +15,6 @@ import { InputFilters } from "./InputFilters";
 // InputFiltersの初期propsを生成して、各テストで必要な値だけ上書きできるようにする。
 function buildProps(overrides?: Partial<ComponentProps<typeof InputFilters>>): ComponentProps<typeof InputFilters> {
   return {
-    searchText: "",
-    onSearchTextChange: vi.fn(),
     ownedFilter: "all",
     onOwnedFilterChange: vi.fn<(value: OwnedFilter) => void>(),
     limitedFilter: "all",
@@ -49,14 +47,6 @@ function openMultiSelect(title: string): void {
   fireEvent.click(trigger as HTMLButtonElement);
 }
 
-// 検索欄エリア内のリセットボタンを取得する。
-function getSearchResetButton(): HTMLButtonElement {
-  const input = screen.getByPlaceholderText("例: ヒヨリ");
-  const wrapper = input.closest(".flex");
-  expect(wrapper).not.toBeNull();
-  return within(wrapper as HTMLElement).getByRole("button", { name: "リセット" }) as HTMLButtonElement;
-}
-
 // フィルタエリア内のリセットボタンを取得する。
 function getFilterResetButton(): HTMLButtonElement {
   const filterTitle = screen.getByText("フィルタ");
@@ -66,24 +56,6 @@ function getFilterResetButton(): HTMLButtonElement {
 }
 
 describe("InputFilters", () => {
-  it("検索入力の変更を親ハンドラへ通知できる", () => {
-    const props = buildProps();
-    render(<InputFilters {...props} />);
-
-    fireEvent.change(screen.getByPlaceholderText("例: ヒヨリ"), { target: { value: "ユイ" } });
-
-    expect(props.onSearchTextChange).toHaveBeenCalledWith("ユイ");
-  });
-
-  it("検索欄のリセットボタンで文字列を空へ戻せる", () => {
-    const props = buildProps({ searchText: "ヒヨリ" });
-    render(<InputFilters {...props} />);
-
-    fireEvent.click(getSearchResetButton());
-
-    expect(props.onSearchTextChange).toHaveBeenCalledWith("");
-  });
-
   it("フィルタリセットで既定値へ戻すコールバックをまとめて発火する", () => {
     const props = buildProps({
       ownedFilter: "owned",

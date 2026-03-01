@@ -23,7 +23,38 @@ function getSearchInput(): HTMLInputElement {
   return screen.getByPlaceholderText("例: ヒヨリ") as HTMLInputElement;
 }
 
+// 詳細設定を開いて内部入力欄へアクセスできる状態にする。
+function openDetailSettings(): void {
+  fireEvent.click(screen.getByRole("button", { name: "詳細設定" }));
+}
+
 describe("InputTab", () => {
+  it("検索欄のリセットボタンで文字列を空へ戻せる", async () => {
+    const props = buildProps();
+    render(<InputTab {...props} />);
+
+    fireEvent.change(getSearchInput(), { target: { value: "ユイ" } });
+    await waitFor(() => {
+      expect(getSearchInput().value).toBe("ユイ");
+    });
+
+    fireEvent.click(screen.getAllByRole("button", { name: "リセット" })[0] as HTMLButtonElement);
+
+    expect(getSearchInput().value).toBe("");
+  });
+
+  it("詳細設定は初期表示で閉じており、クリックで展開できる", () => {
+    const props = buildProps();
+    render(<InputTab {...props} />);
+
+    expect(screen.getByPlaceholderText("例: ヒヨリ")).toBeInTheDocument();
+    expect(screen.queryByText("必要メモピ/ハートの欠片計算")).not.toBeInTheDocument();
+
+    openDetailSettings();
+
+    expect(screen.getByText("必要メモピ/ハートの欠片計算")).toBeInTheDocument();
+  });
+
   it("settingsSyncTokenが変わらない限りinitialSettings変更ではローカル入力を維持する", async () => {
     const props = buildProps();
     const { rerender } = render(<InputTab {...props} />);
@@ -48,7 +79,7 @@ describe("InputTab", () => {
       expect(getSearchInput().value).toBe("ユイ");
     });
 
-    const nextSettings = { ...props.initialSettings, searchText: "" };
+    const nextSettings = { ...props.initialSettings, searchText: "", isDetailSettingsOpen: true };
     rerender(<InputTab {...props} initialSettings={nextSettings} settingsSyncToken={1} />);
 
     await waitFor(() => {
@@ -77,5 +108,20 @@ describe("InputTab", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("settingsSyncToken更新時は詳細設定の開閉状態も再同期する", async () => {
+    const props = buildProps();
+    const { rerender } = render(<InputTab {...props} />);
+
+    openDetailSettings();
+    expect(screen.getByText("必要メモピ/ハートの欠片計算")).toBeInTheDocument();
+
+    const nextSettings = { ...props.initialSettings, isDetailSettingsOpen: false };
+    rerender(<InputTab {...props} initialSettings={nextSettings} settingsSyncToken={1} />);
+
+    await waitFor(() => {
+      expect(screen.queryByText("必要メモピ/ハートの欠片計算")).not.toBeInTheDocument();
+    });
   });
 });

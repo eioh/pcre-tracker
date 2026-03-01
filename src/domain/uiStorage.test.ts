@@ -23,6 +23,7 @@ describe("uiStorage", () => {
       activeTab: "dashboard",
       input: {
         searchText: "ヒヨリ",
+        isDetailSettingsOpen: true,
         ownedFilter: "owned",
         limitedFilter: "limited",
         limitBreakFilter: "on",
@@ -50,6 +51,7 @@ describe("uiStorage", () => {
         activeTab: "broken",
         input: {
           searchText: 123,
+          isDetailSettingsOpen: "broken",
           ownedFilter: "foo",
           starFilters: [1, 99, 1, "x"],
           ue1Filters: [370, 999, "sp"],
@@ -63,6 +65,7 @@ describe("uiStorage", () => {
     const loaded = loadUiState();
     expect(loaded.activeTab).toBe("input");
     expect(loaded.input.searchText).toBe("");
+    expect(loaded.input.isDetailSettingsOpen).toBe(false);
     expect(loaded.input.ownedFilter).toBe("all");
     expect(loaded.input.limitedFilter).toBe("all");
     expect(loaded.input.limitBreakFilter).toBe("all");

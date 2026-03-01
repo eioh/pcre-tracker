@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type { CharacterProgress, MasterCharacter, StoredStateV1 } from "../domain/types";
 import type {
@@ -19,8 +20,11 @@ import { InputFilters } from "./input/InputFilters";
 import { InputMemoryCalcSettings } from "./input/InputMemoryCalcSettings";
 import { InputProgressTable } from "./input/InputProgressTable";
 import type { ProgressPatch } from "./input/types";
+import { filterSeparatorClass, panelClass } from "./input/uiStyles";
 import { useVisibleRows } from "./input/useVisibleRows";
-import { panelClass } from "./input/uiStyles";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 
 const SEARCH_FILTER_DEBOUNCE_MS = 300;
@@ -47,6 +51,7 @@ export function InputTab({
   const isSyncingFromParentRef = useRef(false);
   const [searchText, setSearchText] = useState(initialSettings.searchText);
   const [debouncedSearchText, setDebouncedSearchText] = useState(initialSettings.searchText);
+  const [isDetailSettingsOpen, setIsDetailSettingsOpen] = useState(initialSettings.isDetailSettingsOpen);
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>(initialSettings.ownedFilter);
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>(initialSettings.limitedFilter);
   const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>(initialSettings.limitBreakFilter);
@@ -114,9 +119,20 @@ export function InputTab({
     [sortKey, sortDirection],
   );
 
+  // 詳細設定セクションの開閉状態を切り替える。
+  const handleDetailSettingsToggle = useCallback((): void => {
+    setIsDetailSettingsOpen((previous) => !previous);
+  }, []);
+
+  // キャラ検索文字列を初期化する。
+  const handleSearchReset = useCallback((): void => {
+    setSearchText("");
+  }, []);
+
   const currentSettings = useMemo<InputViewSettings>(
     () => ({
       searchText,
+      isDetailSettingsOpen,
       ownedFilter,
       limitedFilter,
       limitBreakFilter,
@@ -132,6 +148,7 @@ export function InputTab({
     }),
     [
       searchText,
+      isDetailSettingsOpen,
       ownedFilter,
       limitedFilter,
       limitBreakFilter,
@@ -152,6 +169,7 @@ export function InputTab({
     isSyncingFromParentRef.current = true;
     setSearchText(initialSettings.searchText);
     setDebouncedSearchText(initialSettings.searchText);
+    setIsDetailSettingsOpen(initialSettings.isDetailSettingsOpen);
     setOwnedFilter(initialSettings.ownedFilter);
     setLimitedFilter(initialSettings.limitedFilter);
     setLimitBreakFilter(initialSettings.limitBreakFilter);
@@ -187,35 +205,62 @@ export function InputTab({
 
   return (
     <section className={panelClass}>
-      <InputFilters
-        searchText={searchText}
-        onSearchTextChange={setSearchText}
-        ownedFilter={ownedFilter}
-        onOwnedFilterChange={setOwnedFilter}
-        limitedFilter={limitedFilter}
-        onLimitedFilterChange={setLimitedFilter}
-        limitBreakFilter={limitBreakFilter}
-        onLimitBreakFilterChange={setLimitBreakFilter}
-        starFilters={starFilters}
-        setStarFilters={setStarFilters}
-        ue1Filters={ue1Filters}
-        setUe1Filters={setUe1Filters}
-        ue2Filters={ue2Filters}
-        setUe2Filters={setUe2Filters}
-        memorySourceFilters={memorySourceFilters}
-        setMemorySourceFilters={setMemorySourceFilters}
-      />
+      <div className="mb-3 grid gap-1.5 text-sm text-muted">
+        <Label>キャラ検索</Label>
+        <div className="flex items-center gap-2">
+          <Input value={searchText} onChange={(event) => setSearchText(event.target.value)} placeholder="例: ヒヨリ" />
+          <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={handleSearchReset}>
+            リセット
+          </Button>
+        </div>
+      </div>
 
-      <Separator label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
+      <Separator className={filterSeparatorClass} label="キャラ検索と詳細設定の区切り" />
 
-      <InputMemoryCalcSettings
-        starMemoryCalcMode={starMemoryCalcMode}
-        onStarMemoryCalcModeChange={setStarMemoryCalcMode}
-        ue1MemoryCalcMode={ue1MemoryCalcMode}
-        onUe1MemoryCalcModeChange={setUe1MemoryCalcMode}
-        ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
-        onUe1HeartFragmentCalcModeChange={setUe1HeartFragmentCalcMode}
-      />
+      <div className="mb-3">
+        <button
+          type="button"
+          aria-expanded={isDetailSettingsOpen}
+          aria-controls="input-detail-settings"
+          className="inline-flex w-full items-center justify-between rounded-[12px] border border-white/20 bg-transparent px-3 py-2 text-left text-sm font-semibold text-main transition hover:border-accent hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+          onClick={handleDetailSettingsToggle}
+        >
+          <span>詳細設定</span>
+          <ChevronDown className={`size-4 shrink-0 transition-transform ${isDetailSettingsOpen ? "rotate-180" : ""}`} />
+        </button>
+      </div>
+
+      {isDetailSettingsOpen ? (
+        <div id="input-detail-settings">
+          <InputFilters
+            ownedFilter={ownedFilter}
+            onOwnedFilterChange={setOwnedFilter}
+            limitedFilter={limitedFilter}
+            onLimitedFilterChange={setLimitedFilter}
+            limitBreakFilter={limitBreakFilter}
+            onLimitBreakFilterChange={setLimitBreakFilter}
+            starFilters={starFilters}
+            setStarFilters={setStarFilters}
+            ue1Filters={ue1Filters}
+            setUe1Filters={setUe1Filters}
+            ue2Filters={ue2Filters}
+            setUe2Filters={setUe2Filters}
+            memorySourceFilters={memorySourceFilters}
+            setMemorySourceFilters={setMemorySourceFilters}
+          />
+
+          <Separator className="mt-4" label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
+
+          <InputMemoryCalcSettings
+            starMemoryCalcMode={starMemoryCalcMode}
+            onStarMemoryCalcModeChange={setStarMemoryCalcMode}
+            ue1MemoryCalcMode={ue1MemoryCalcMode}
+            onUe1MemoryCalcModeChange={setUe1MemoryCalcMode}
+            ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
+            onUe1HeartFragmentCalcModeChange={setUe1HeartFragmentCalcMode}
+          />
+        </div>
+      ) : null}
 
       <Separator className="mt-4 mb-1" label="必要メモピ/ハートの欠片計算とテーブルの区切り" />
 

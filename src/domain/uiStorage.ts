@@ -34,6 +34,7 @@ export type SortDirection = "asc" | "desc" | null;
 
 export type InputViewSettings = {
   searchText: string;
+  isDetailSettingsOpen: boolean;
   ownedFilter: OwnedFilter;
   limitedFilter: LimitedFilter;
   limitBreakFilter: LimitBreakFilter;
@@ -85,6 +86,7 @@ const allowedMemorySourceFilterSet = new Set<MemorySourceFilter>(["none", ...MEM
 
 const defaultInputViewSettings: InputViewSettings = {
   searchText: "",
+  isDetailSettingsOpen: false,
   ownedFilter: "all",
   limitedFilter: "all",
   limitBreakFilter: "all",
@@ -102,6 +104,7 @@ const defaultInputViewSettings: InputViewSettings = {
 const looseInputSettingsSchema = z
   .object({
     searchText: z.unknown().optional(),
+    isDetailSettingsOpen: z.unknown().optional(),
     ownedFilter: z.unknown().optional(),
     limitedFilter: z.unknown().optional(),
     limitBreakFilter: z.unknown().optional(),
@@ -175,6 +178,10 @@ function normalizeInputSettings(rawInput: unknown): InputViewSettings {
   const raw = parsedInput.data;
   return {
     searchText: typeof raw.searchText === "string" ? raw.searchText : "",
+    isDetailSettingsOpen:
+      typeof raw.isDetailSettingsOpen === "boolean"
+        ? raw.isDetailSettingsOpen
+        : defaultInputViewSettings.isDetailSettingsOpen,
     ownedFilter: normalizeEnumValue(raw.ownedFilter, OWNED_FILTER_VALUES, defaultInputViewSettings.ownedFilter),
     limitedFilter: normalizeEnumValue(raw.limitedFilter, LIMITED_FILTER_VALUES, defaultInputViewSettings.limitedFilter),
     limitBreakFilter: normalizeEnumValue(
