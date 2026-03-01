@@ -60,5 +60,3 @@ export type StoredStateV1 = {
   updatedAt: string;
   progressByName: Record<string, CharacterProgress>;
 };
-
-export type AppState = StoredStateV1;

@@ -12,30 +12,30 @@ export const memorySourceLabelMap: Record<MemoryPieceSource, string> = {
 };
 
 export const sourceChipClassMap: Record<MemoryPieceSource, string> = {
-  dungeon_coin: `${sourceChipBaseClass} border-[#56c6ff99] bg-[#145c7e52] text-[#8fe6ff]`,
-  arena_coin: `${sourceChipBaseClass} border-[#ff9966a6] bg-[#823f2257] text-[#ffc58c]`,
-  p_arena_coin: `${sourceChipBaseClass} border-[#ba79ffa6] bg-[#522a7e5c] text-[#d9b0ff]`,
-  clan_coin: `${sourceChipBaseClass} border-[#ff6b7aa6] bg-[#7c223857] text-[#ff9ea4]`,
-  master_coin: `${sourceChipBaseClass} border-[#ffd455b3] bg-[#7e5a155c] text-[#ffe291]`,
-  hard_quest: `${sourceChipBaseClass} border-[#ff8150a6] bg-[#82341c57] text-[#ffad7c]`,
-  side_story: `${sourceChipBaseClass} border-[#5bdba4a6] bg-[#1c674957] text-[#9df0cb]`,
+  dungeon_coin: `${sourceChipBaseClass} border-chip-dungeon-border bg-chip-dungeon-bg text-chip-dungeon-text`,
+  arena_coin: `${sourceChipBaseClass} border-chip-arena-border bg-chip-arena-bg text-chip-arena-text`,
+  p_arena_coin: `${sourceChipBaseClass} border-chip-p-arena-border bg-chip-p-arena-bg text-chip-p-arena-text`,
+  clan_coin: `${sourceChipBaseClass} border-chip-clan-border bg-chip-clan-bg text-chip-clan-text`,
+  master_coin: `${sourceChipBaseClass} border-chip-master-border bg-chip-master-bg text-chip-master-text`,
+  hard_quest: `${sourceChipBaseClass} border-chip-hard-border bg-chip-hard-bg text-chip-hard-text`,
+  side_story: `${sourceChipBaseClass} border-chip-side-border bg-chip-side-bg text-chip-side-text`,
 };
 
 export const attributeTextClassMap: Record<Attribute, string> = {
-  火: "text-[#e39b89]",
-  水: "text-[#86b8df]",
-  風: "text-[#8bc8ab]",
-  光: "text-[#d9ca8a]",
-  闇: "text-[#aa9ad8]",
+  火: "text-attr-fire",
+  水: "text-attr-water",
+  風: "text-attr-wind",
+  光: "text-attr-light",
+  闇: "text-attr-dark",
 };
 
 export const roleTextClassMap: Record<Role, string> = {
-  アタッカー: "text-[#e19595]",
-  ブレイカー: "text-[#d9cc92]",
-  バッファー: "text-[#ddb08a]",
-  デバッファー: "text-[#8eb8df]",
-  ブースター: "text-[#95d7df]",
-  ヒーラー: "text-[#9ecd9a]",
-  タンク: "text-[#b39ad4]",
-  ジャマー: "text-[#dda1c8]",
+  アタッカー: "text-role-attacker",
+  ブレイカー: "text-role-breaker",
+  バッファー: "text-role-buffer",
+  デバッファー: "text-role-debuffer",
+  ブースター: "text-role-booster",
+  ヒーラー: "text-role-healer",
+  タンク: "text-role-tank",
+  ジャマー: "text-role-jammer",
 };

@@ -23,7 +23,6 @@ import {
   characterTagLineClass,
   sortButtonClass,
   sortIndicatorClass,
-  sourceChipEmptyClass,
   tableSwitchClass,
   tableWrapClass,
 } from "./uiStyles";
@@ -217,7 +216,7 @@ const TableRow = memo(function TableRow({
     <UiTableRow
       data-index={virtualRowIndex}
       ref={measureElement}
-      className="odd:bg-[#091425b5] even:bg-[#10203ab5] hover:bg-[#3a537c24]"
+      className="odd:bg-row-odd even:bg-row-even hover:bg-row-hover"
     >
       <TableCell className="text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
@@ -227,10 +226,10 @@ const TableRow = memo(function TableRow({
       <TableCell className="whitespace-nowrap font-bold">
         <div className={characterNameCellLayoutClass}>
           <div className={characterTagLineClass}>
-            <span className={character.limited ? "text-[#d8aeb3]" : "text-[#9ec8df]"}>{character.limited ? "限定" : "恒常"}</span>
-            <span className="text-[#7f8ba5]">/</span>
+            <span className={character.limited ? "text-limited-text" : "text-normal-text"}>{character.limited ? "限定" : "恒常"}</span>
+            <span className="text-tag-separator">/</span>
             <span className={attributeTextClassMap[character.attribute]}>{character.attribute}</span>
-            <span className="text-[#7f8ba5]">/</span>
+            <span className="text-tag-separator">/</span>
             <span className={roleTextClassMap[character.role]}>{character.role}</span>
           </div>
           <span className="block max-w-full truncate text-[1.05rem]">{character.name}</span>
@@ -312,7 +311,7 @@ const TableRow = memo(function TableRow({
             <button
               type="button"
               aria-label={`${character.name}の入手日セル`}
-              className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-[#090e17d9] px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-input-bg px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
             >
               <span className="tabular-nums">{formatObtainedDate(progress.obtainedDate)}</span>
               <span className="inline-flex items-center gap-1.5 text-muted">
@@ -325,7 +324,7 @@ const TableRow = memo(function TableRow({
             <Popover.Content
               side="bottom"
               align="center"
-              className="z-50 rounded-[12px] border border-white/20 bg-[#090e17f5] p-2 shadow-panel"
+              className="z-50 rounded-[12px] border border-white/20 bg-popover-bg p-2 shadow-panel"
             >
               <Calendar mode="single" selected={selectedObtainedDate} onSelect={handleObtainedDateSelect} />
               <div className="mt-1.5 flex justify-end">

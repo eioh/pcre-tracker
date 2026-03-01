@@ -61,6 +61,62 @@
   --color-disabled-border: #788aad38;
   --color-disabled-bg: #070b12bf;
   --color-disabled-text: #9fb0cf;
+
+  /* 入力フィルタ */
+  --color-filter-separator: #7a94c547;
+
+  /* 入力テーブルラッパー */
+  --color-table-wrap-border: #7a94c53d;
+  --color-table-wrap-bg: #0b111bcc;
+  --color-sort-hover: #dff8ff;
+  --color-row-odd: #091425b5;
+  --color-row-even: #10203ab5;
+  --color-row-hover: #3a537c24;
+
+  /* 入力テーブルのキャラタグ */
+  --color-limited-text: #d8aeb3;
+  --color-normal-text: #9ec8df;
+  --color-tag-separator: #7f8ba5;
+
+  /* 属性表示色 */
+  --color-attr-fire: #e39b89;
+  --color-attr-water: #86b8df;
+  --color-attr-wind: #8bc8ab;
+  --color-attr-light: #d9ca8a;
+  --color-attr-dark: #aa9ad8;
+
+  /* ロール表示色 */
+  --color-role-attacker: #e19595;
+  --color-role-breaker: #d9cc92;
+  --color-role-buffer: #ddb08a;
+  --color-role-debuffer: #8eb8df;
+  --color-role-booster: #95d7df;
+  --color-role-healer: #9ecd9a;
+  --color-role-tank: #b39ad4;
+  --color-role-jammer: #dda1c8;
+
+  /* メモピ入手チップ */
+  --color-chip-dungeon-border: #56c6ff99;
+  --color-chip-dungeon-bg: #145c7e52;
+  --color-chip-dungeon-text: #8fe6ff;
+  --color-chip-arena-border: #ff9966a6;
+  --color-chip-arena-bg: #823f2257;
+  --color-chip-arena-text: #ffc58c;
+  --color-chip-p-arena-border: #ba79ffa6;
+  --color-chip-p-arena-bg: #522a7e5c;
+  --color-chip-p-arena-text: #d9b0ff;
+  --color-chip-clan-border: #ff6b7aa6;
+  --color-chip-clan-bg: #7c223857;
+  --color-chip-clan-text: #ff9ea4;
+  --color-chip-master-border: #ffd455b3;
+  --color-chip-master-bg: #7e5a155c;
+  --color-chip-master-text: #ffe291;
+  --color-chip-hard-border: #ff8150a6;
+  --color-chip-hard-bg: #82341c57;
+  --color-chip-hard-text: #ffad7c;
+  --color-chip-side-border: #5bdba4a6;
+  --color-chip-side-bg: #1c674957;
+  --color-chip-side-text: #9df0cb;
 }
 
 :root {

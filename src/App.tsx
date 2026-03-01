@@ -49,7 +49,7 @@ type ProgressPatch = Partial<
 // タブの遅延読み込み中に表示するフォールバックUI。
 function TabLoadingFallback() {
   return (
-    <section className="flex min-h-[200px] items-center justify-center rounded-[20px] border border-white/30 bg-linear-to-br from-[#131a27cc] to-[#0d1421f2] p-8">
+    <section className="flex min-h-[200px] items-center justify-center rounded-[20px] border border-white/30 bg-linear-to-br from-section-from to-section-to p-8">
       <p className="text-sm text-muted">読み込み中...</p>
     </section>
   );

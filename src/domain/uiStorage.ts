@@ -236,12 +236,7 @@ export function loadUiState(): UiStateV1 {
   if (!rawText) {
     return buildDefaultUiState();
   }
-
-  try {
-    return parseUiState(rawText);
-  } catch {
-    return buildDefaultUiState();
-  }
+  return parseUiState(rawText);
 }
 
 // UI設定をlocalStorageへ保存する。
