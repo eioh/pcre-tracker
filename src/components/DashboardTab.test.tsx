@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { DashboardTab } from "./DashboardTab";
 import type { MasterCharacter, StoredStateV1 } from "../domain/types";
@@ -7,6 +7,7 @@ import { DistributionChart } from "./ui/distribution-chart";
 const masterCharacters: MasterCharacter[] = [
   {
     name: "ヒヨリ",
+    baseName: "ヒヨリ",
     limited: false,
     attribute: "火",
     role: "アタッカー",
@@ -15,6 +16,7 @@ const masterCharacters: MasterCharacter[] = [
   },
   {
     name: "ユイ",
+    baseName: "ユイ",
     limited: false,
     attribute: "光",
     role: "ヒーラー",
@@ -63,15 +65,15 @@ function formatDateOnly(date: Date): string {
 }
 
 // DashboardTabの表示対象をテスト用データで描画する。
-function renderDashboard(): void {
-  render(<DashboardTab masterCharacters={masterCharacters} state={state} />);
+function renderDashboard(overrideState?: StoredStateV1): void {
+  render(<DashboardTab masterCharacters={masterCharacters} state={overrideState ?? state} />);
 }
 
 describe("DashboardTab", () => {
   it("主要KPIを表示できる", () => {
     renderDashboard();
 
-    const ownedCard = screen.getByText("所持キャラ数").closest("article");
+    const ownedCard = screen.getByText("所持キャラ数").parentElement;
     expect(ownedCard).not.toBeNull();
     expect(within(ownedCard as HTMLElement).getByText("1 / 2")).toBeInTheDocument();
     expect(screen.getByText("所持率 50.0%")).toBeInTheDocument();
@@ -109,22 +111,27 @@ describe("DashboardTab", () => {
     renderDashboard();
 
     expect(screen.getByText("ガチャ回数推移")).toBeInTheDocument();
-    expect(screen.getByLabelText("開始日")).toBeInTheDocument();
-    expect(screen.getByLabelText("終了日")).toBeInTheDocument();
+    expect(screen.getByText("開始日")).toBeInTheDocument();
+    expect(screen.getByText("終了日")).toBeInTheDocument();
 
     const today = new Date();
-    const fromDate = screen.getByLabelText("開始日") as HTMLInputElement;
-    const toDate = screen.getByLabelText("終了日") as HTMLInputElement;
-    expect(fromDate.value).toBe(`${today.getFullYear()}-01-01`);
-    expect(toDate.value).toBe(formatDateOnly(today));
+    expect(screen.getByText(`${today.getFullYear()}/01/01`)).toBeInTheDocument();
+    expect(screen.getByText(formatDateOnly(today).replaceAll("-", "/"))).toBeInTheDocument();
     expect(screen.getByText("表示範囲の平均: 120.0回")).toBeInTheDocument();
   });
 
   it("日付範囲で絞り込み、データがなければ空表示になる", () => {
-    renderDashboard();
-
-    fireEvent.change(screen.getByLabelText("開始日"), { target: { value: "2026-02-21" } });
-    fireEvent.change(screen.getByLabelText("終了日"), { target: { value: "2026-02-21" } });
+    const outOfRangeState: StoredStateV1 = {
+      ...state,
+      progressByName: {
+        ...state.progressByName,
+        ヒヨリ: {
+          ...state.progressByName["ヒヨリ"],
+          obtainedDate: "2025-02-20",
+        },
+      },
+    };
+    renderDashboard(outOfRangeState);
 
     expect(screen.getByText("該当データがありません")).toBeInTheDocument();
     expect(screen.getByText("表示範囲の平均: -")).toBeInTheDocument();

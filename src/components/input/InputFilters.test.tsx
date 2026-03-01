@@ -37,7 +37,9 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputFilters>>): C
 
 // ラベル付きコンボボックスを開いて指定項目を選択する。
 function selectComboboxOption(label: string, optionLabel: string): void {
-  fireEvent.click(screen.getByRole("combobox", { name: label }));
+  const field = screen.getByText(label).closest("div");
+  expect(field).not.toBeNull();
+  fireEvent.click(within(field as HTMLElement).getByRole("combobox"));
   fireEvent.click(screen.getByRole("option", { name: optionLabel }));
 }
 
@@ -49,9 +51,10 @@ function openMultiSelect(title: string): void {
 
 // 検索欄エリア内のリセットボタンを取得する。
 function getSearchResetButton(): HTMLButtonElement {
-  const field = screen.getByPlaceholderText("例: ヒヨリ").closest("label");
-  expect(field).not.toBeNull();
-  return within(field as HTMLElement).getByRole("button", { name: "リセット" }) as HTMLButtonElement;
+  const input = screen.getByPlaceholderText("例: ヒヨリ");
+  const wrapper = input.closest(".flex");
+  expect(wrapper).not.toBeNull();
+  return within(wrapper as HTMLElement).getByRole("button", { name: "リセット" }) as HTMLButtonElement;
 }
 
 // フィルタエリア内のリセットボタンを取得する。
