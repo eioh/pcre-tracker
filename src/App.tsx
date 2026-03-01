@@ -185,7 +185,7 @@ export default function App() {
         <div>
           <p className="m-0 font-orbitron text-xs tracking-[0.12em] text-accent">Princess Connect! Re:Dive</p>
           <h1 className="mb-1 mt-2 font-orbitron text-[clamp(1.8rem,4vw,2.5rem)] tracking-[0.04em]">育成トラッカー</h1>
-          <p className="m-0 text-sm text-muted md:text-base">入力とダッシュボードを1ページで管理</p>
+          <p className="m-0 text-sm text-muted md:text-base">育成状況を管理</p>
         </div>
 
         <div className="flex w-full flex-col items-start gap-2.5 lg:w-auto lg:items-end">

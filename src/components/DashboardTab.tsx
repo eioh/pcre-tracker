@@ -75,8 +75,7 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
   return (
     <section className="grid gap-5 rounded-[20px] border border-white/30 bg-linear-to-br from-section-from to-section-to p-5 shadow-panel">
       <header className="grid gap-1">
-        <h2 className="m-0 text-[0.95rem] font-semibold tracking-[0.1em] text-sub">PROGRESS DASHBOARD</h2>
-        <p className="m-0 text-sm text-muted">育成状態を主要指標と分布で確認できます</p>
+        <h2 className="m-0 text-[0.95rem] font-semibold tracking-[0.1em] text-sub">進捗ダッシュボード</h2>
       </header>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">

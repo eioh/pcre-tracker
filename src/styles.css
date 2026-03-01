@@ -1,8 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500&family=Orbitron:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap");
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Noto Sans JP", sans-serif;
+  --font-inter: "Inter", sans-serif;
   --font-orbitron: "Orbitron", sans-serif;
 
   --color-bg-start: #0a1018;

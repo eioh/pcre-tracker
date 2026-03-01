@@ -19,7 +19,9 @@ export function StatCard({ title, value, subText, className }: StatCardProps) {
       )}
     >
       <h3 className="m-0 text-[0.78rem] font-semibold tracking-[0.06em] text-muted">{title}</h3>
-      <p className="mb-1.5 mt-2.5 font-orbitron text-[clamp(1.2rem,2.8vw,1.9rem)] leading-tight">{value}</p>
+      <p className="mb-1.5 mt-2.5 font-inter text-[clamp(1.2rem,2.8vw,1.9rem)] leading-tight font-normal tabular-nums tracking-tight">
+        {value}
+      </p>
       <small className="block text-sm text-muted">{subText}</small>
     </Card>
   );
