@@ -33,8 +33,8 @@ function getCurrentYearStartDateOnlyString(today: Date): string {
 
 // YYYY-MM-DD 文字列を Date オブジェクトに変換する。
 function parseDate(dateString: string): Date {
-  const [year, month, day] = dateString.split("-").map(Number);
-  return new Date(year, month - 1, day);
+  const parts = dateString.split("-").map(Number);
+  return new Date(parts[0]!, parts[1]! - 1, parts[2]!);
 }
 
 // YYYY-MM-DD 文字列を YYYY/MM/DD 表示用文字列に変換する。
@@ -177,7 +177,7 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
                 <Popover.Trigger asChild>
                   <button
                     type="button"
-                    className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-[#090e17d9] px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                    className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-input-bg px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
                   >
                     <span className="tabular-nums">{formatDisplayDate(fromDate)}</span>
                     <span className="inline-flex items-center gap-1.5 text-muted">
@@ -190,7 +190,7 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
                   <Popover.Content
                     side="bottom"
                     align="center"
-                    className="z-50 rounded-[12px] border border-white/20 bg-[#090e17f5] p-2 shadow-panel"
+                    className="z-50 rounded-[12px] border border-white/20 bg-popover-bg p-2 shadow-panel"
                   >
                     <Calendar
                       mode="single"
@@ -212,7 +212,7 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
                 <Popover.Trigger asChild>
                   <button
                     type="button"
-                    className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-[#090e17d9] px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                    className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-input-bg px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
                   >
                     <span className="tabular-nums">{formatDisplayDate(toDate)}</span>
                     <span className="inline-flex items-center gap-1.5 text-muted">
@@ -225,7 +225,7 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
                   <Popover.Content
                     side="bottom"
                     align="center"
-                    className="z-50 rounded-[12px] border border-white/20 bg-[#090e17f5] p-2 shadow-panel"
+                    className="z-50 rounded-[12px] border border-white/20 bg-popover-bg p-2 shadow-panel"
                   >
                     <Calendar
                       mode="single"
