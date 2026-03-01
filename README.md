@@ -31,4 +31,4 @@ npm run dev
 ## GitHub Pages
 
 - `main` ブランチへの push で `.github/workflows/deploy-pages.yml` が自動デプロイします。
-- リポジトリ名が `pcr-my-data` の場合、`vite.config.ts` の `base` は `GITHUB_PAGES=true` 時に `/pcr-my-data/` になります。
+- リポジトリ名が `pcre-tracker` の場合、`vite.config.ts` の `base` は `GITHUB_PAGES=true` 時に `/pcre-tracker/` になります。

@@ -8,7 +8,7 @@ const isGitHubPages =
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: isGitHubPages ? "/pcr-my-data/" : "/",
+  base: isGitHubPages ? "/pcre-tracker/" : "/",
   resolve: {
     alias: {
       "@": "/src",
