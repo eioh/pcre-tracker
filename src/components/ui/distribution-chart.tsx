@@ -53,7 +53,7 @@ export function DistributionChart({ title, items, emptyMessage, className }: Dis
                   style={{ width: `${(item.count / maxCount) * 100}%` }}
                 />
               </div>
-              <strong className="w-[4ch] text-right font-orbitron text-sm tabular-nums">{item.count}</strong>
+              <strong className="w-[4ch] text-right font-inter text-sm tabular-nums">{item.count}</strong>
             </li>
           ))
         )}

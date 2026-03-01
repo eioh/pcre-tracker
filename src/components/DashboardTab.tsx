@@ -131,18 +131,6 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
         />
 
         <StatCard
-          title="必要メモピ合計"
-          value={summary.memoryPieceNeeded.total}
-          subText={
-            <>
-              ☆{summary.memoryPieceNeeded.star} / CR{summary.memoryPieceNeeded.connectRank} / 専1{summary.memoryPieceNeeded.ue1}
-              {" / "}限凸{summary.memoryPieceNeeded.limitBreak}
-            </>
-          }
-          className="xl:col-span-2"
-        />
-
-        <StatCard
           title="コネクトRANK必要素材"
           value={
             <>

@@ -77,8 +77,6 @@ describe("DashboardTab", () => {
     expect(ownedCard).not.toBeNull();
     expect(within(ownedCard as HTMLElement).getByText("1 / 2")).toBeInTheDocument();
     expect(screen.getByText("所持率 50.0%")).toBeInTheDocument();
-    expect(screen.getByText("必要メモピ合計")).toBeInTheDocument();
-    expect(screen.getByText("590")).toBeInTheDocument();
     expect(screen.getByText("コネクトRANK必要素材")).toBeInTheDocument();
     expect(screen.getByText("54 / 120 / 256")).toBeInTheDocument();
   });
