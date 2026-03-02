@@ -156,12 +156,15 @@ describe("InputProgressTable", () => {
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue2Level: 5 });
   });
 
-  it("所持メモピ入力の変更を進捗更新として通知する", () => {
+  it("所持メモピ入力はフォーカス外れ時に進捗更新として通知する", () => {
     const onUpdateProgress = vi.fn();
     const props = buildProps({ onUpdateProgress });
     render(<InputProgressTable {...props} />);
 
-    fireEvent.change(screen.getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" }), { target: { value: "42" } });
+    const input = screen.getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" });
+    fireEvent.change(input, { target: { value: "42" } });
+    expect(onUpdateProgress).not.toHaveBeenCalled();
+    fireEvent.blur(input);
 
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ownedMemoryPiece: 42 });
   });
@@ -335,17 +338,20 @@ describe("InputProgressTable", () => {
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 130, ue1SpEquipped: false });
   });
 
-  it("所持メモピ入力は負値と小数を補正して通知する", () => {
+  it("所持メモピ入力は確定時に負値と小数を補正して通知する", () => {
     const onUpdateProgress = vi.fn();
     const props = buildProps({ onUpdateProgress });
     render(<InputProgressTable {...props} />);
 
     const input = screen.getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" });
     fireEvent.change(input, { target: { value: "-3.8" } });
+    expect(onUpdateProgress).not.toHaveBeenCalled();
+    fireEvent.blur(input);
     fireEvent.change(input, { target: { value: "12.9" } });
+    fireEvent.blur(input);
 
-    expect(onUpdateProgress).toHaveBeenNthCalledWith(1, "ヒヨリ", { ownedMemoryPiece: 0 });
-    expect(onUpdateProgress).toHaveBeenNthCalledWith(2, "ヒヨリ", { ownedMemoryPiece: 12 });
+    expect(onUpdateProgress).toHaveBeenCalledTimes(1);
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ownedMemoryPiece: 12 });
   });
 
   it("入手日セルクリックでカレンダー入力値を更新できる", () => {
@@ -374,18 +380,22 @@ describe("InputProgressTable", () => {
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { obtainedDate: null });
   });
 
-  it("ガチャ回数入力は 0〜300 の範囲に補正して通知する", () => {
+  it("ガチャ回数入力は確定時に 0〜300 の範囲へ補正して通知する", () => {
     const onUpdateProgress = vi.fn();
     const props = buildProps({ onUpdateProgress });
     render(<InputProgressTable {...props} />);
 
     const input = screen.getByRole("spinbutton", { name: "ヒヨリのガチャ回数" });
     fireEvent.change(input, { target: { value: "-4.8" } });
+    expect(onUpdateProgress).not.toHaveBeenCalled();
+    fireEvent.blur(input);
     fireEvent.change(input, { target: { value: "12.9" } });
+    fireEvent.keyDown(input, { key: "Enter" });
     fireEvent.change(input, { target: { value: "999" } });
+    fireEvent.blur(input);
 
-    expect(onUpdateProgress).toHaveBeenNthCalledWith(1, "ヒヨリ", { gachaPullCount: 0 });
-    expect(onUpdateProgress).toHaveBeenNthCalledWith(2, "ヒヨリ", { gachaPullCount: 12 });
-    expect(onUpdateProgress).toHaveBeenNthCalledWith(3, "ヒヨリ", { gachaPullCount: 300 });
+    expect(onUpdateProgress).toHaveBeenNthCalledWith(1, "ヒヨリ", { gachaPullCount: 12 });
+    expect(onUpdateProgress).toHaveBeenNthCalledWith(2, "ヒヨリ", { gachaPullCount: 300 });
+    expect(onUpdateProgress).toHaveBeenCalledTimes(2);
   });
 });
