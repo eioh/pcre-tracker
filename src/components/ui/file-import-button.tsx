@@ -1,14 +1,15 @@
-import { useCallback, useRef, type ChangeEvent } from "react";
+import { useCallback, useRef, type ChangeEvent, type ReactNode } from "react";
 import { Button } from "./button";
 
 type FileImportButtonProps = {
   label: string;
+  icon?: ReactNode;
   accept?: string;
   onSelectFile: (file: File) => void | Promise<void>;
 };
 
 // ボタン押下でファイル選択を開き、選択ファイルを親へ渡す。
-export function FileImportButton({ label, accept, onSelectFile }: FileImportButtonProps) {
+export function FileImportButton({ label, icon, accept, onSelectFile }: FileImportButtonProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // 非表示inputを開いてファイル選択ダイアログを表示する。
@@ -32,6 +33,7 @@ export function FileImportButton({ label, accept, onSelectFile }: FileImportButt
   return (
     <>
       <Button type="button" variant="outline" onClick={openFileDialog}>
+        {icon}
         {label}
       </Button>
       <input ref={fileInputRef} type="file" accept={accept} className="hidden" onChange={handleFileChange} />

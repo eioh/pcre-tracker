@@ -1,6 +1,8 @@
 import { cn } from "../../lib/utils";
 import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis, YAxis } from "recharts";
-import { ChartContainer, type ChartConfig } from "./chart";
+import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
+import type { TooltipContentProps } from "recharts";
+import { ChartContainer, ChartTooltip, type ChartConfig } from "./chart";
 
 type DistributionItem = {
   label: string;
@@ -41,6 +43,23 @@ function getChartHeight(itemCount: number): number {
   return Math.max(160, basePadding + itemCount * rowHeight);
 }
 
+// 分布グラフ用のツールチップ内容を表示する。
+function DistributionTooltipContent({ active, payload }: TooltipContentProps<ValueType, NameType>) {
+  if (!active || !payload || payload.length === 0) {
+    return null;
+  }
+  const row = payload[0]?.payload as DistributionItem | undefined;
+  if (!row) {
+    return null;
+  }
+  return (
+    <div className="grid gap-1.5 rounded-[10px] border border-white/20 bg-popover-bg px-3 py-2 text-xs shadow-panel">
+      <div className="text-main">{row.label}</div>
+      <div className="text-muted">件数: {row.count}</div>
+    </div>
+  );
+}
+
 // 分布データを棒グラフ風のリストで表示する。
 export function DistributionChart({ title, items, emptyMessage, className }: DistributionChartProps) {
   const visibleItems = filterVisibleItems(items);
@@ -60,7 +79,7 @@ export function DistributionChart({ title, items, emptyMessage, className }: Dis
       ) : (
         <ChartContainer config={chartConfig} className="h-auto w-full">
           <ResponsiveContainer width="100%" height={chartHeight}>
-            <BarChart data={visibleItems} layout="vertical" margin={{ top: 4, right: 20, bottom: 4, left: 0 }}>
+            <BarChart data={visibleItems} layout="vertical" margin={{ top: 4, right: 56, bottom: 4, left: 0 }}>
               <XAxis type="number" hide domain={[0, maxCount]} />
               <YAxis
                 type="category"
@@ -70,6 +89,7 @@ export function DistributionChart({ title, items, emptyMessage, className }: Dis
                 tickLine={false}
                 tick={{ fill: "var(--color-sub)", fontSize: 13 }}
               />
+              <ChartTooltip cursor={{ fill: "var(--color-chart-cursor)" }} content={DistributionTooltipContent} />
               <Bar
                 dataKey="count"
                 radius={[6, 6, 6, 6]}

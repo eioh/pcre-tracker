@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type { CharacterProgress, MasterCharacter, StoredStateV1 } from "../domain/types";
 import type {
@@ -208,7 +208,13 @@ export function InputTab({
       <div className="mb-3 grid gap-1.5 text-sm text-muted">
         <Label>キャラ検索</Label>
         <div className="flex items-center gap-2">
-          <Input value={searchText} onChange={(event) => setSearchText(event.target.value)} placeholder="例: ヒヨリ" />
+          <div className="relative w-full">
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
+            />
+            <Input value={searchText} onChange={(event) => setSearchText(event.target.value)} className="pl-9" placeholder="例: ヒヨリ" />
+          </div>
           <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={handleSearchReset}>
             リセット
           </Button>
