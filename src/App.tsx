@@ -26,7 +26,7 @@ import {
 import { Button } from "./components/ui/button";
 import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { PenLine, LayoutDashboard } from "lucide-react";
+import { PenLine, LayoutDashboard, Download, Upload, RotateCcw } from "lucide-react";
 
 const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
 
@@ -191,15 +191,22 @@ export default function App() {
         <div className="flex w-full flex-col items-start gap-2.5 lg:w-auto lg:items-end">
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="outline" onClick={handleExportBackup}>
+              <Download className="size-4" aria-hidden="true" />
               エクスポート
             </Button>
-            <FileImportButton label="インポート" accept="application/json,.json" onSelectFile={handleSelectImportFile} />
+            <FileImportButton
+              label="インポート"
+              icon={<Upload className="size-4" aria-hidden="true" />}
+              accept="application/json,.json"
+              onSelectFile={handleSelectImportFile}
+            />
             <Button
               variant="outline"
               onClick={() => {
                 setIsResetDialogOpen(true);
               }}
             >
+              <RotateCcw className="size-4" aria-hidden="true" />
               保存データを初期化
             </Button>
           </div>

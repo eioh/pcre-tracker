@@ -1,7 +1,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import * as Popover from "@radix-ui/react-popover";
 import { format, isValid, parseISO } from "date-fns";
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
@@ -136,6 +136,8 @@ const TableRow = memo(function TableRow({
   const totalRemainingMemoryPiece =
     starRemainingMemoryPiece + connectRankRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
   const adjustedTotalRemainingMemoryPiece = Math.max(0, totalRemainingMemoryPiece - progress.ownedMemoryPiece);
+  const [ownedMemoryPieceInput, setOwnedMemoryPieceInput] = useState(String(progress.ownedMemoryPiece));
+  const [gachaPullCountInput, setGachaPullCountInput] = useState(String(progress.gachaPullCount));
 
   const handleOwnedChange = useCallback(
     (checked: boolean | "indeterminate") => onUpdateProgress(character.name, { owned: checked === true }),
@@ -173,10 +175,26 @@ const TableRow = memo(function TableRow({
   );
   const handleOwnedMemoryPieceChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const nextOwnedMemoryPiece = Math.max(0, Math.floor(Number(event.target.value) || 0));
-      onUpdateProgress(character.name, { ownedMemoryPiece: nextOwnedMemoryPiece });
+      setOwnedMemoryPieceInput(event.target.value);
     },
-    [onUpdateProgress, character.name],
+    [],
+  );
+  const handleOwnedMemoryPieceCommit = useCallback(() => {
+    const nextOwnedMemoryPiece = Math.max(0, Math.floor(Number(ownedMemoryPieceInput) || 0));
+    setOwnedMemoryPieceInput(String(nextOwnedMemoryPiece));
+    if (nextOwnedMemoryPiece !== progress.ownedMemoryPiece) {
+      onUpdateProgress(character.name, { ownedMemoryPiece: nextOwnedMemoryPiece });
+    }
+  }, [character.name, onUpdateProgress, ownedMemoryPieceInput, progress.ownedMemoryPiece]);
+  const handleOwnedMemoryPieceKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key !== "Enter") {
+        return;
+      }
+      handleOwnedMemoryPieceCommit();
+      event.currentTarget.blur();
+    },
+    [handleOwnedMemoryPieceCommit],
   );
   const selectedObtainedDate = useMemo(() => parseStoredDate(progress.obtainedDate), [progress.obtainedDate]);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -202,11 +220,33 @@ const TableRow = memo(function TableRow({
   }, [onUpdateProgress, character.name]);
   const handleGachaPullCountChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const nextGachaPullCount = Math.min(300, Math.max(0, Math.floor(Number(event.target.value) || 0)));
-      onUpdateProgress(character.name, { gachaPullCount: nextGachaPullCount });
+      setGachaPullCountInput(event.target.value);
     },
-    [onUpdateProgress, character.name],
+    [],
   );
+  const handleGachaPullCountCommit = useCallback(() => {
+    const nextGachaPullCount = Math.min(300, Math.max(0, Math.floor(Number(gachaPullCountInput) || 0)));
+    setGachaPullCountInput(String(nextGachaPullCount));
+    if (nextGachaPullCount !== progress.gachaPullCount) {
+      onUpdateProgress(character.name, { gachaPullCount: nextGachaPullCount });
+    }
+  }, [character.name, gachaPullCountInput, onUpdateProgress, progress.gachaPullCount]);
+  const handleGachaPullCountKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key !== "Enter") {
+        return;
+      }
+      handleGachaPullCountCommit();
+      event.currentTarget.blur();
+    },
+    [handleGachaPullCountCommit],
+  );
+  useEffect(() => {
+    setOwnedMemoryPieceInput(String(progress.ownedMemoryPiece));
+  }, [progress.ownedMemoryPiece]);
+  useEffect(() => {
+    setGachaPullCountInput(String(progress.gachaPullCount));
+  }, [progress.gachaPullCount]);
 
   return (
     <UiTableRow className="odd:bg-row-odd even:bg-row-even hover:bg-row-hover">
@@ -292,9 +332,11 @@ const TableRow = memo(function TableRow({
           inputMode="numeric"
           min={0}
           step={1}
-          value={progress.ownedMemoryPiece}
+          value={ownedMemoryPieceInput}
           aria-label={`${character.name}の所持メモピ数`}
           onChange={handleOwnedMemoryPieceChange}
+          onBlur={handleOwnedMemoryPieceCommit}
+          onKeyDown={handleOwnedMemoryPieceKeyDown}
         />
       </TableCell>
       <TableCell className="text-center">
@@ -342,9 +384,11 @@ const TableRow = memo(function TableRow({
           min={0}
           max={300}
           step={1}
-          value={progress.gachaPullCount}
+          value={gachaPullCountInput}
           aria-label={`${character.name}のガチャ回数`}
           onChange={handleGachaPullCountChange}
+          onBlur={handleGachaPullCountCommit}
+          onKeyDown={handleGachaPullCountKeyDown}
         />
       </TableCell>
       <TableCell>
@@ -577,7 +621,7 @@ export const InputProgressTable = memo(function InputProgressTable({
               ) : null}
               {visibleVirtualRows.map(({ virtualRow, row }) => (
                 <TableRow
-                  key={`${row.character.name}-${virtualRow?.index ?? "fallback"}`}
+                  key={row.character.name}
                   character={row.character}
                   progress={row.progress}
                   onUpdateProgress={onUpdateProgress}
