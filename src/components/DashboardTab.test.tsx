@@ -81,7 +81,7 @@ describe("DashboardTab", () => {
     expect(screen.getByText("54 / 120 / 256")).toBeInTheDocument();
   });
 
-  it("分布チャートのタイトルと件数を表示できる", () => {
+  it("分布チャートのタイトルとチャート領域を表示できる", () => {
     renderDashboard();
 
     expect(screen.getByText("☆分布")).toBeInTheDocument();
@@ -89,15 +89,15 @@ describe("DashboardTab", () => {
     expect(screen.getByText("専用2レベル分布")).toBeInTheDocument();
     const distributionSection = screen.getByText("☆分布").closest("section");
     expect(distributionSection).not.toBeNull();
-    expect(within(distributionSection as HTMLElement).getAllByText("1")).toHaveLength(2);
+    expect((distributionSection as HTMLElement).querySelector('[data-slot="chart"]')).not.toBeNull();
   });
 
-  it("分布バーの幅をstyleで反映する", () => {
+  it("分布チャートをrechartsコンテナとして描画する", () => {
     renderDashboard();
 
-    const bar = document.querySelector("li div[style]") as HTMLDivElement | null;
-    expect(bar).not.toBeNull();
-    expect(bar?.style.width).not.toBe("");
+    const distributionSection = screen.getByText("☆分布").closest("section");
+    expect(distributionSection).not.toBeNull();
+    expect((distributionSection as HTMLElement).querySelector(".recharts-responsive-container")).not.toBeNull();
   });
 
   it("分布コンポーネントは空データ時に空状態メッセージを表示する", () => {

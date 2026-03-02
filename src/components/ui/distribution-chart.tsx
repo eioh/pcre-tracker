@@ -1,4 +1,6 @@
 import { cn } from "../../lib/utils";
+import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { ChartContainer, type ChartConfig } from "./chart";
 
 type DistributionItem = {
   label: string;
@@ -10,6 +12,13 @@ type DistributionChartProps = {
   items: DistributionItem[];
   emptyMessage?: string;
   className?: string;
+};
+
+const chartConfig: ChartConfig = {
+  count: {
+    label: "件数",
+    color: "var(--color-chart-bar)",
+  },
 };
 
 // 分布データの表示対象をゼロ件以外に絞り込む。
@@ -25,39 +34,61 @@ function getMaxCount(items: DistributionItem[]): number {
   return Math.max(...items.map((item) => item.count));
 }
 
+// 表示件数に応じてチャート高さを決定し、余白が過剰にならないよう調整する。
+function getChartHeight(itemCount: number): number {
+  const rowHeight = 42;
+  const basePadding = 28;
+  return Math.max(160, basePadding + itemCount * rowHeight);
+}
+
 // 分布データを棒グラフ風のリストで表示する。
 export function DistributionChart({ title, items, emptyMessage, className }: DistributionChartProps) {
   const visibleItems = filterVisibleItems(items);
   const maxCount = getMaxCount(visibleItems);
+  const chartHeight = getChartHeight(visibleItems.length);
 
   return (
     <section
       className={cn(
-        "rounded-2xl border border-panel-border bg-linear-to-br from-panel-from to-panel-to p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+        "overflow-hidden rounded-2xl border border-panel-border bg-linear-to-br from-panel-from to-panel-to p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
         className,
       )}
     >
       <h3 className="mb-2.5 mt-0 text-sm font-semibold tracking-[0.06em]">{title}</h3>
-      <ul className="m-0 grid list-none gap-2 pr-1.5">
-        {visibleItems.length === 0 ? (
-          <li className="grid grid-cols-[80px_minmax(0,1fr)_4ch] items-center gap-2 text-sm text-muted">
-            {emptyMessage ?? "データがありません"}
-          </li>
-        ) : (
-          visibleItems.map((item, index) => (
-            <li key={`${item.label}-${index}`} className="grid grid-cols-[80px_minmax(0,1fr)_4ch] items-center gap-2">
-              <span className="text-xs text-sub">{item.label}</span>
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full bg-linear-to-r from-accent to-chart-accent"
-                  style={{ width: `${(item.count / maxCount) * 100}%` }}
+      {visibleItems.length === 0 ? (
+        <p className="m-0 text-sm text-muted">{emptyMessage ?? "データがありません"}</p>
+      ) : (
+        <ChartContainer config={chartConfig} className="h-auto w-full">
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <BarChart data={visibleItems} layout="vertical" margin={{ top: 4, right: 20, bottom: 4, left: 0 }}>
+              <XAxis type="number" hide domain={[0, maxCount]} />
+              <YAxis
+                type="category"
+                dataKey="label"
+                width={76}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "var(--color-sub)", fontSize: 13 }}
+              />
+              <Bar
+                dataKey="count"
+                radius={[6, 6, 6, 6]}
+                fill="var(--color-chart-bar)"
+                background={{ fill: "rgba(255, 255, 255, 0.12)", radius: 6 }}
+              >
+                <LabelList
+                  dataKey="count"
+                  position="right"
+                  fill="var(--color-main)"
+                  fontSize={12}
+                  fontWeight={700}
+                  className="font-inter tabular-nums"
                 />
-              </div>
-              <strong className="w-[4ch] text-right font-inter text-sm tabular-nums">{item.count}</strong>
-            </li>
-          ))
-        )}
-      </ul>
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      )}
     </section>
   );
 }
