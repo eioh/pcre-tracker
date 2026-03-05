@@ -72,7 +72,8 @@
   --color-sort-hover: #dff8ff;
   --color-row-odd: #091425b5;
   --color-row-even: #10203ab5;
-  --color-row-hover: #3a537c24;
+  --color-row-hover: #2d42631f;
+  --color-row-hover-sticky: #4d6079;
 
   /* 入力テーブルのキャラタグ */
   --color-limited-text: #d8aeb3;

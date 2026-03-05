@@ -249,13 +249,13 @@ const TableRow = memo(function TableRow({
   }, [progress.gachaPullCount]);
 
   return (
-    <UiTableRow className="odd:bg-row-odd even:bg-row-even hover:bg-row-hover">
-      <TableCell className="text-center">
+    <UiTableRow className="odd:[&>td]:bg-row-odd even:[&>td]:bg-row-even hover:[&>td]:bg-row-hover hover:[&>td:nth-child(-n+2)]:bg-row-hover-sticky">
+      <TableCell className="sticky left-0 z-[4] text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
           <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onCheckedChange={handleOwnedChange} />
         </label>
       </TableCell>
-      <TableCell className="whitespace-nowrap font-bold">
+      <TableCell className="sticky left-20 z-[4] border-r border-table-border whitespace-nowrap font-bold">
         <div className={characterNameCellLayoutClass}>
           <div className={characterTagLineClass}>
             <span className={character.limited ? "text-limited-text" : "text-normal-text"}>{character.limited ? "限定" : "恒常"}</span>
@@ -525,10 +525,13 @@ export const InputProgressTable = memo(function InputProgressTable({
         </colgroup>
         <TableHeader>
           <UiTableRow>
-            <TableHead aria-sort={getAriaSort("owned", sortKey, sortDirection)} className="text-center">
+            <TableHead aria-sort={getAriaSort("owned", sortKey, sortDirection)} className="sticky left-0 z-[6] bg-table-header-bg text-center">
               <SortHeaderButton label="所持" columnKey="owned" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
             </TableHead>
-            <TableHead aria-sort={getAriaSort("name", sortKey, sortDirection)} className="text-center">
+            <TableHead
+              aria-sort={getAriaSort("name", sortKey, sortDirection)}
+              className="sticky left-20 z-[6] border-r border-table-border bg-table-header-bg text-center"
+            >
               <SortHeaderButton label="キャラ" columnKey="name" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
             </TableHead>
             <TableHead aria-sort={getAriaSort("limitBreak", sortKey, sortDirection)} className="text-center">

@@ -267,6 +267,29 @@ describe("InputProgressTable", () => {
     expect(screen.getByText("ヒヨリ")).toBeInTheDocument();
   });
 
+  it("所持列とキャラ列のヘッダーを固定表示するクラスが付与される", () => {
+    const props = buildProps();
+    render(<InputProgressTable {...props} />);
+
+    const ownedHeader = screen.getByRole("columnheader", { name: "所持" });
+    const nameHeader = screen.getByRole("columnheader", { name: "キャラ" });
+
+    expect(ownedHeader).toHaveClass("sticky", "left-0", "z-[6]");
+    expect(nameHeader).toHaveClass("sticky", "left-20", "z-[6]", "border-r");
+  });
+
+  it("所持列とキャラ列のボディセルを固定表示するクラスが付与される", () => {
+    const props = buildProps();
+    render(<InputProgressTable {...props} />);
+
+    const tableRows = screen.getAllByRole("row");
+    const bodyRow = tableRows[1] as HTMLTableRowElement;
+    const cells = within(bodyRow).getAllByRole("cell");
+
+    expect(cells[0]).toHaveClass("sticky", "left-0", "z-[4]");
+    expect(cells[1]).toHaveClass("sticky", "left-20", "z-[4]", "border-r");
+  });
+
   it("未実装キャラは専用装備セレクトを無効表示する", () => {
     const row: VisibleRow = {
       character: buildCharacter({
