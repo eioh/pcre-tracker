@@ -29,7 +29,7 @@ import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 
 const SEARCH_FILTER_DEBOUNCE_MS = 300;
-const DETAIL_SETTINGS_ANIMATION_MS = 280;
+const DETAIL_SETTINGS_ANIMATION_MS = 300;
 
 type InputTabProps = {
   masterCharacters: MasterCharacter[];

@@ -10,7 +10,7 @@ import {
   parseBackupPayload,
   serializeBackupPayload,
 } from "./domain/backup";
-import { buildInitialState, loadStoredState, saveStoredState } from "./domain/storage";
+import { buildInitialState, loadStoredState, saveStoredState, toPurePieceCount } from "./domain/storage";
 import type { CharacterProgress, StoredStateV1 } from "./domain/types";
 import { buildDefaultUiState, loadUiState, saveUiState, type InputViewSettings } from "./domain/uiStorage";
 import {
@@ -182,7 +182,7 @@ export default function App() {
   // キャラ名単位（☆6用）のピュアピ所持数を更新する。
   const handleUpdateCharacterPurePiece = useCallback((name: string, value: number) => {
     setState((previous) => {
-      const nextValue = Math.min(99999, Math.max(0, Math.floor(value)));
+      const nextValue = toPurePieceCount(value);
       if (previous.purePieceByCharacterName[name] === nextValue) {
         return previous;
       }
