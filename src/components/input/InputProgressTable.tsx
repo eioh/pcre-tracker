@@ -2,7 +2,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import * as Popover from "@radix-ui/react-popover";
 import { format, isValid, parseISO } from "date-fns";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { SortDirection, SortKey } from "../../domain/uiStorage";
@@ -370,7 +370,7 @@ const TableRow = memo(function TableRow({
           </TableSelect>
         )}
       </TableCell>
-      <TableCell>
+      <TableCell className="border-r border-table-border">
         <TableNumberInput
           type="number"
           inputMode="numeric"
@@ -416,9 +416,8 @@ const TableRow = memo(function TableRow({
               className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-input-bg px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
             >
               <span className="tabular-nums">{formatObtainedDate(progress.obtainedDate)}</span>
-              <span className="inline-flex items-center gap-1.5 text-muted">
+              <span className="inline-flex items-center text-muted">
                 <CalendarIcon className="size-4" />
-                <ChevronDown className="size-4" />
               </span>
             </button>
           </Popover.Trigger>
@@ -445,7 +444,7 @@ const TableRow = memo(function TableRow({
           onChange={handleObtainedDateChange}
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="border-r border-table-border">
         <TableNumberInput
           type="number"
           inputMode="numeric"
@@ -705,7 +704,10 @@ export const InputProgressTable = memo(function InputProgressTable({
             <TableHead aria-sort={getAriaSort("obtainedDate", sortKey, sortDirection)} className="text-center">
               <SortHeaderButton label="入手日" columnKey="obtainedDate" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
             </TableHead>
-            <TableHead aria-sort={getAriaSort("gachaPullCount", sortKey, sortDirection)} className="text-center">
+            <TableHead
+              aria-sort={getAriaSort("gachaPullCount", sortKey, sortDirection)}
+              className="border-r border-table-border text-center"
+            >
               <SortHeaderButton
                 label="ガチャ回数"
                 columnKey="gachaPullCount"

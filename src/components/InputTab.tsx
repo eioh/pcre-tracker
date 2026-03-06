@@ -21,7 +21,7 @@ import { InputFilters } from "./input/InputFilters";
 import { InputMemoryCalcSettings } from "./input/InputMemoryCalcSettings";
 import { InputProgressTable } from "./input/InputProgressTable";
 import type { ProgressPatch } from "./input/types";
-import { filterSeparatorClass, panelClass } from "./input/uiStyles";
+import { panelClass } from "./input/uiStyles";
 import { useVisibleRows } from "./input/useVisibleRows";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -29,6 +29,7 @@ import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 
 const SEARCH_FILTER_DEBOUNCE_MS = 300;
+const DETAIL_SETTINGS_ANIMATION_MS = 280;
 
 type InputTabProps = {
   masterCharacters: MasterCharacter[];
@@ -55,6 +56,8 @@ export function InputTab({
   const [searchText, setSearchText] = useState(initialSettings.searchText);
   const [debouncedSearchText, setDebouncedSearchText] = useState(initialSettings.searchText);
   const [isDetailSettingsOpen, setIsDetailSettingsOpen] = useState(initialSettings.isDetailSettingsOpen);
+  const [shouldRenderDetailSettings, setShouldRenderDetailSettings] = useState(initialSettings.isDetailSettingsOpen);
+  const [isDetailSettingsVisible, setIsDetailSettingsVisible] = useState(initialSettings.isDetailSettingsOpen);
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>(initialSettings.ownedFilter);
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>(initialSettings.limitedFilter);
   const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>(initialSettings.limitBreakFilter);
@@ -85,6 +88,28 @@ export function InputTab({
       window.clearTimeout(timerId);
     };
   }, [searchText]);
+
+  useEffect(() => {
+    // 詳細設定の開閉時にフェード+高さトランジションを適用する。
+    if (isDetailSettingsOpen) {
+      setIsDetailSettingsVisible(false);
+      setShouldRenderDetailSettings(true);
+      const timerId = window.setTimeout(() => {
+        setIsDetailSettingsVisible(true);
+      }, 16);
+      return () => {
+        window.clearTimeout(timerId);
+      };
+    }
+
+    setIsDetailSettingsVisible(false);
+    const timerId = window.setTimeout(() => {
+      setShouldRenderDetailSettings(false);
+    }, DETAIL_SETTINGS_ANIMATION_MS);
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [isDetailSettingsOpen]);
 
   // デバウンス後の検索テキストをさらに低優先度で反映し、入力中のブロッキングを防ぐ。
   const deferredSearchText = useDeferredValue(debouncedSearchText);
@@ -193,6 +218,8 @@ export function InputTab({
     setSearchText(initialSettings.searchText);
     setDebouncedSearchText(initialSettings.searchText);
     setIsDetailSettingsOpen(initialSettings.isDetailSettingsOpen);
+    setShouldRenderDetailSettings(initialSettings.isDetailSettingsOpen);
+    setIsDetailSettingsVisible(initialSettings.isDetailSettingsOpen);
     setOwnedFilter(initialSettings.ownedFilter);
     setLimitedFilter(initialSettings.limitedFilter);
     setLimitBreakFilter(initialSettings.limitBreakFilter);
@@ -229,92 +256,107 @@ export function InputTab({
   }, [currentSettings]);
 
   return (
-    <section className={panelClass}>
-      <div className="mb-3 grid gap-1.5 text-sm text-muted">
-        <Label>キャラ検索</Label>
-        <div className="flex items-center gap-2">
-          <div className="relative w-full">
-            <Search
-              aria-hidden="true"
-              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
-            />
-            <Input value={searchText} onChange={(event) => setSearchText(event.target.value)} className="pl-9" placeholder="例: ヒヨリ" />
+    <>
+      <section className={`${panelClass} mb-4`}>
+        <div className={isDetailSettingsOpen ? "mb-3" : ""}>
+          <button
+            type="button"
+            aria-expanded={isDetailSettingsOpen}
+            aria-controls="input-detail-settings"
+            className="inline-flex h-8 items-center gap-1.5 text-left text-sm leading-none font-semibold text-main transition hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            onClick={handleDetailSettingsToggle}
+          >
+            <span>詳細設定</span>
+            <ChevronDown className={`size-4 shrink-0 transition-transform ${isDetailSettingsOpen ? "rotate-180" : ""}`} />
+          </button>
+        </div>
+
+        {shouldRenderDetailSettings ? (
+          <div
+            id="input-detail-settings"
+            aria-hidden={!isDetailSettingsOpen}
+            className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-out ${
+              isDetailSettingsVisible ? "max-h-[1200px] opacity-100" : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="pt-1">
+              <InputFilters
+                ownedFilter={ownedFilter}
+                onOwnedFilterChange={setOwnedFilter}
+                limitedFilter={limitedFilter}
+                onLimitedFilterChange={setLimitedFilter}
+                limitBreakFilter={limitBreakFilter}
+                onLimitBreakFilterChange={setLimitBreakFilter}
+                purePieceAvailabilityFilter={purePieceAvailabilityFilter}
+                onPurePieceAvailabilityFilterChange={setPurePieceAvailabilityFilter}
+                starFilters={starFilters}
+                setStarFilters={setStarFilters}
+                ue1Filters={ue1Filters}
+                setUe1Filters={setUe1Filters}
+                ue2Filters={ue2Filters}
+                setUe2Filters={setUe2Filters}
+                memorySourceFilters={memorySourceFilters}
+                setMemorySourceFilters={setMemorySourceFilters}
+              />
+
+              <Separator className="mt-4" label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
+
+              <InputMemoryCalcSettings
+                starMemoryCalcMode={starMemoryCalcMode}
+                onStarMemoryCalcModeChange={setStarMemoryCalcMode}
+                ue1MemoryCalcMode={ue1MemoryCalcMode}
+                onUe1MemoryCalcModeChange={setUe1MemoryCalcMode}
+                ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
+                onUe1HeartFragmentCalcModeChange={setUe1HeartFragmentCalcMode}
+                includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
+                onIncludeSameBasePurePieceForUe2Change={setIncludeSameBasePurePieceForUe2}
+              />
+            </div>
           </div>
-          <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={handleSearchReset}>
-            リセット
-          </Button>
+        ) : null}
+      </section>
+
+      <section className={panelClass}>
+        <div className="mb-3 grid gap-1.5 text-sm text-muted">
+          <Label>キャラ検索</Label>
+          <div className="flex items-center gap-2">
+            <div className="relative w-full">
+              <Search
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
+              />
+              <Input
+                value={searchText}
+                onChange={(event) => setSearchText(event.target.value)}
+                className="pl-9"
+                placeholder="例: ヒヨリ"
+              />
+            </div>
+            <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={handleSearchReset}>
+              リセット
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <Separator className={filterSeparatorClass} label="キャラ検索と詳細設定の区切り" />
+        <Separator className="mt-4 mb-1" label="検索エリアとテーブルの区切り" />
 
-      <div className="mb-3">
-        <button
-          type="button"
-          aria-expanded={isDetailSettingsOpen}
-          aria-controls="input-detail-settings"
-          className="inline-flex w-full items-center justify-between rounded-[12px] border border-white/20 bg-transparent px-3 py-2 text-left text-sm font-semibold text-main transition hover:border-accent hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-          onClick={handleDetailSettingsToggle}
-        >
-          <span>詳細設定</span>
-          <ChevronDown className={`size-4 shrink-0 transition-transform ${isDetailSettingsOpen ? "rotate-180" : ""}`} />
-        </button>
-      </div>
+        <p className="my-3.5 text-sm text-muted">表示件数: {visibleRows.length}</p>
 
-      {isDetailSettingsOpen ? (
-        <div id="input-detail-settings">
-          <InputFilters
-            ownedFilter={ownedFilter}
-            onOwnedFilterChange={setOwnedFilter}
-            limitedFilter={limitedFilter}
-            onLimitedFilterChange={setLimitedFilter}
-            limitBreakFilter={limitBreakFilter}
-            onLimitBreakFilterChange={setLimitBreakFilter}
-            purePieceAvailabilityFilter={purePieceAvailabilityFilter}
-            onPurePieceAvailabilityFilterChange={setPurePieceAvailabilityFilter}
-            starFilters={starFilters}
-            setStarFilters={setStarFilters}
-            ue1Filters={ue1Filters}
-            setUe1Filters={setUe1Filters}
-            ue2Filters={ue2Filters}
-            setUe2Filters={setUe2Filters}
-            memorySourceFilters={memorySourceFilters}
-            setMemorySourceFilters={setMemorySourceFilters}
-          />
-
-          <Separator className="mt-4" label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
-
-          <InputMemoryCalcSettings
-            starMemoryCalcMode={starMemoryCalcMode}
-            onStarMemoryCalcModeChange={setStarMemoryCalcMode}
-            ue1MemoryCalcMode={ue1MemoryCalcMode}
-            onUe1MemoryCalcModeChange={setUe1MemoryCalcMode}
-            ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
-            onUe1HeartFragmentCalcModeChange={setUe1HeartFragmentCalcMode}
-            includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
-            onIncludeSameBasePurePieceForUe2Change={setIncludeSameBasePurePieceForUe2}
-          />
-        </div>
-      ) : null}
-
-      <Separator className="mt-4 mb-1" label="必要メモピ/ハートの欠片計算とテーブルの区切り" />
-
-      <p className="my-3.5 text-sm text-muted">表示件数: {visibleRows.length}</p>
-
-      <InputProgressTable
-        visibleRows={visibleRows}
-        purePieceByCharacterName={state.purePieceByCharacterName}
-        purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
-        sortKey={sortKey}
-        sortDirection={sortDirection}
-        onSort={handleSort}
-        onUpdateProgress={onUpdateProgress}
-        onUpdatePurePiece={onUpdateCharacterPurePiece}
-        includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
-        starMemoryCalcMode={starMemoryCalcMode}
-        ue1MemoryCalcMode={ue1MemoryCalcMode}
-        ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
-      />
-    </section>
+        <InputProgressTable
+          visibleRows={visibleRows}
+          purePieceByCharacterName={state.purePieceByCharacterName}
+          purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
+          sortKey={sortKey}
+          sortDirection={sortDirection}
+          onSort={handleSort}
+          onUpdateProgress={onUpdateProgress}
+          onUpdatePurePiece={onUpdateCharacterPurePiece}
+          includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
+          starMemoryCalcMode={starMemoryCalcMode}
+          ue1MemoryCalcMode={ue1MemoryCalcMode}
+          ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
+        />
+      </section>
+    </>
   );
 }
