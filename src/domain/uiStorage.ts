@@ -12,6 +12,7 @@ export type ActiveTab = "input" | "dashboard";
 export type OwnedFilter = "all" | "owned" | "unowned";
 export type LimitedFilter = "all" | "limited" | "normal";
 export type LimitBreakFilter = "all" | "on" | "off";
+export type PurePieceAvailabilityFilter = "all" | "available" | "unavailable";
 export type StarFilter = 1 | 2 | 3 | 4 | 5 | 6;
 export type Ue1Filter = "unimplemented" | "sp" | (typeof UE1_LEVEL_VALUES)[number];
 export type Ue2Filter = "unimplemented" | (typeof UE2_LEVEL_VALUES)[number];
@@ -38,9 +39,11 @@ export type InputViewSettings = {
   ownedFilter: OwnedFilter;
   limitedFilter: LimitedFilter;
   limitBreakFilter: LimitBreakFilter;
+  purePieceAvailabilityFilter: PurePieceAvailabilityFilter;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
   ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
+  includeSameBasePurePieceForUe2: boolean;
   starFilters: StarFilter[];
   ue1Filters: Ue1Filter[];
   ue2Filters: Ue2Filter[];
@@ -59,6 +62,7 @@ const ACTIVE_TAB_VALUES: ActiveTab[] = ["input", "dashboard"];
 const OWNED_FILTER_VALUES: OwnedFilter[] = ["all", "owned", "unowned"];
 const LIMITED_FILTER_VALUES: LimitedFilter[] = ["all", "limited", "normal"];
 const LIMIT_BREAK_FILTER_VALUES: LimitBreakFilter[] = ["all", "on", "off"];
+const PURE_PIECE_AVAILABILITY_FILTER_VALUES: PurePieceAvailabilityFilter[] = ["all", "available", "unavailable"];
 const STAR_MEMORY_CALC_MODE_VALUES: StarMemoryCalcMode[] = ["implemented_max", "star6_max"];
 const UE1_MEMORY_CALC_MODE_VALUES: Ue1MemoryCalcMode[] = ["implemented_max", "sp_max"];
 const UE1_HEART_FRAGMENT_CALC_MODE_VALUES: Ue1HeartFragmentCalcMode[] = ["implemented_max", "all_max"];
@@ -90,9 +94,11 @@ const defaultInputViewSettings: InputViewSettings = {
   ownedFilter: "all",
   limitedFilter: "all",
   limitBreakFilter: "all",
+  purePieceAvailabilityFilter: "all",
   starMemoryCalcMode: "implemented_max",
   ue1MemoryCalcMode: "implemented_max",
   ue1HeartFragmentCalcMode: "implemented_max",
+  includeSameBasePurePieceForUe2: false,
   starFilters: [],
   ue1Filters: [],
   ue2Filters: [],
@@ -108,9 +114,11 @@ const looseInputSettingsSchema = z
     ownedFilter: z.unknown().optional(),
     limitedFilter: z.unknown().optional(),
     limitBreakFilter: z.unknown().optional(),
+    purePieceAvailabilityFilter: z.unknown().optional(),
     starMemoryCalcMode: z.unknown().optional(),
     ue1MemoryCalcMode: z.unknown().optional(),
     ue1HeartFragmentCalcMode: z.unknown().optional(),
+    includeSameBasePurePieceForUe2: z.unknown().optional(),
     starFilters: z.array(z.unknown()).optional(),
     ue1Filters: z.array(z.unknown()).optional(),
     ue2Filters: z.array(z.unknown()).optional(),
@@ -189,6 +197,11 @@ function normalizeInputSettings(rawInput: unknown): InputViewSettings {
       LIMIT_BREAK_FILTER_VALUES,
       defaultInputViewSettings.limitBreakFilter,
     ),
+    purePieceAvailabilityFilter: normalizeEnumValue(
+      raw.purePieceAvailabilityFilter,
+      PURE_PIECE_AVAILABILITY_FILTER_VALUES,
+      defaultInputViewSettings.purePieceAvailabilityFilter,
+    ),
     starMemoryCalcMode: normalizeEnumValue(
       raw.starMemoryCalcMode,
       STAR_MEMORY_CALC_MODE_VALUES,
@@ -204,6 +217,10 @@ function normalizeInputSettings(rawInput: unknown): InputViewSettings {
       UE1_HEART_FRAGMENT_CALC_MODE_VALUES,
       defaultInputViewSettings.ue1HeartFragmentCalcMode,
     ),
+    includeSameBasePurePieceForUe2:
+      typeof raw.includeSameBasePurePieceForUe2 === "boolean"
+        ? raw.includeSameBasePurePieceForUe2
+        : defaultInputViewSettings.includeSameBasePurePieceForUe2,
     starFilters: normalizeArrayWithSet(raw.starFilters, new Set<StarFilter>(STAR_VALUES)),
     ue1Filters: normalizeArrayWithSet(raw.ue1Filters, allowedUe1FilterSet),
     ue2Filters: normalizeArrayWithSet(raw.ue2Filters, allowedUe2FilterSet),

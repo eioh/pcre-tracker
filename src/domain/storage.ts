@@ -9,6 +9,8 @@ type MigratedStoredState = {
   schemaVersion: 1;
   updatedAt: unknown;
   progressByName: Record<string, unknown>;
+  purePieceByCharacterName: Record<string, unknown>;
+  purePieceByBaseName: Record<string, unknown>;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -28,6 +30,26 @@ function createDefaultProgress(character: MasterCharacter): CharacterProgress {
     obtainedDate: null,
     gachaPullCount: 0,
   };
+}
+
+// マスターデータから同名キャラ単位のピュアピ初期値マップを生成する。
+function createDefaultPurePieceByBaseName(masterCharacters: MasterCharacter[]): Record<string, number> {
+  const nextPurePieceByBaseName: Record<string, number> = {};
+  for (const character of masterCharacters) {
+    if (!(character.baseName in nextPurePieceByBaseName)) {
+      nextPurePieceByBaseName[character.baseName] = 0;
+    }
+  }
+  return nextPurePieceByBaseName;
+}
+
+// マスターデータからキャラ名単位のピュアピ初期値マップを生成する。
+function createDefaultPurePieceByCharacterName(masterCharacters: MasterCharacter[]): Record<string, number> {
+  const nextPurePieceByCharacterName: Record<string, number> = {};
+  for (const character of masterCharacters) {
+    nextPurePieceByCharacterName[character.name] = 0;
+  }
+  return nextPurePieceByCharacterName;
 }
 
 // 保存データ全体の最終更新日時を正規化する。
@@ -118,6 +140,15 @@ function toGachaPullCount(value: number): CharacterProgress["gachaPullCount"] {
   return Math.min(300, Math.max(0, Math.floor(value)));
 }
 
+// ピュアピ入力値を 0〜99,999 の整数へ正規化する。
+function toPurePieceCount(value: unknown): number {
+  const numeric = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(numeric)) {
+    return 0;
+  }
+  return Math.min(99999, Math.max(0, Math.floor(numeric)));
+}
+
 function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): CharacterProgress {
   const defaultProgress = createDefaultProgress(character);
   const normalizedRawProgress =
@@ -177,6 +208,8 @@ function migrateToLatestState(raw: unknown): MigratedStoredState | null {
       schemaVersion: 1,
       updatedAt: raw.updatedAt,
       progressByName: raw.progressByName,
+      purePieceByCharacterName: isRecord(raw.purePieceByCharacterName) ? raw.purePieceByCharacterName : {},
+      purePieceByBaseName: isRecord(raw.purePieceByBaseName) ? raw.purePieceByBaseName : {},
     };
   }
 
@@ -185,6 +218,8 @@ function migrateToLatestState(raw: unknown): MigratedStoredState | null {
       schemaVersion: 1,
       updatedAt: raw.updatedAt,
       progressByName: raw.progressByName,
+      purePieceByCharacterName: isRecord(raw.purePieceByCharacterName) ? raw.purePieceByCharacterName : {},
+      purePieceByBaseName: isRecord(raw.purePieceByBaseName) ? raw.purePieceByBaseName : {},
     };
   }
 
@@ -196,16 +231,22 @@ function reconcileWithMaster(
   migratedState: MigratedStoredState | null,
 ): StoredStateV1 {
   const progressByName: StoredStateV1["progressByName"] = {};
+  const purePieceByCharacterName = createDefaultPurePieceByCharacterName(masterCharacters);
+  const purePieceByBaseName = createDefaultPurePieceByBaseName(masterCharacters);
 
   for (const character of masterCharacters) {
     const rawProgress = migratedState?.progressByName[character.name];
     progressByName[character.name] = sanitizeProgress(character, rawProgress);
+    purePieceByCharacterName[character.name] = toPurePieceCount(migratedState?.purePieceByCharacterName[character.name]);
+    purePieceByBaseName[character.baseName] = toPurePieceCount(migratedState?.purePieceByBaseName[character.baseName]);
   }
 
   return {
     schemaVersion: CURRENT_SCHEMA_VERSION,
     updatedAt: toStateUpdatedAt(migratedState?.updatedAt),
     progressByName,
+    purePieceByCharacterName,
+    purePieceByBaseName,
   };
 }
 

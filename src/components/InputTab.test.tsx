@@ -12,6 +12,7 @@ function buildProps() {
     masterCharacters: testMasterCharacters,
     state: buildInitialState(testMasterCharacters),
     onUpdateProgress: vi.fn(),
+    onUpdateCharacterPurePiece: vi.fn(),
     initialSettings: buildDefaultInputViewSettings(),
     onSettingsChange: vi.fn(),
     settingsSyncToken: 0,

@@ -5,6 +5,7 @@ import type { MasterCharacter } from "./types";
 const masterCharacters: MasterCharacter[] = [
   {
     name: "ヒヨリ",
+    baseName: "ヒヨリ",
     limited: false,
     attribute: "火",
     role: "アタッカー",
@@ -47,6 +48,8 @@ describe("loadStoredState", () => {
     expect(hiyori?.ownedMemoryPiece).toBe(0);
     expect(hiyori?.obtainedDate).toBeNull();
     expect(hiyori?.gachaPullCount).toBe(0);
+    expect(loaded.purePieceByCharacterName["ヒヨリ"]).toBe(0);
+    expect(loaded.purePieceByBaseName["ヒヨリ"]).toBe(0);
   });
 
   it("ガチャ回数を0〜300の範囲へ正規化し、日付不正値を補正する", () => {
@@ -133,5 +136,38 @@ describe("loadStoredState", () => {
     const loaded = loadStoredState(masterCharacters);
     const hiyori = loaded.progressByName["ヒヨリ"];
     expect(hiyori?.connectRank).toBe(0);
+  });
+
+  it("ピュアピ所持数を 0〜99,999 の整数へ正規化する", () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: 1,
+        progressByName: {
+          ヒヨリ: {
+            owned: false,
+            limitBreak: false,
+            star: 1,
+            connectRank: 0,
+            ue1Level: 0,
+            ue1SpEquipped: false,
+            ue2Level: null,
+            ownedMemoryPiece: 0,
+            obtainedDate: null,
+            gachaPullCount: 0,
+          },
+        },
+        purePieceByBaseName: {
+          ヒヨリ: 100000.8,
+        },
+        purePieceByCharacterName: {
+          ヒヨリ: -3.2,
+        },
+      }),
+    );
+
+    const loaded = loadStoredState(masterCharacters);
+    expect(loaded.purePieceByBaseName["ヒヨリ"]).toBe(99999);
+    expect(loaded.purePieceByCharacterName["ヒヨリ"]).toBe(0);
   });
 });

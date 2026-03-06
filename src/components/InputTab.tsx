@@ -7,6 +7,7 @@ import type {
   LimitedFilter,
   MemorySourceFilter,
   OwnedFilter,
+  PurePieceAvailabilityFilter,
   SortDirection,
   SortKey,
   StarFilter,
@@ -33,6 +34,7 @@ type InputTabProps = {
   masterCharacters: MasterCharacter[];
   state: StoredStateV1;
   onUpdateProgress: (name: string, patch: ProgressPatch) => void;
+  onUpdateCharacterPurePiece: (name: string, value: number) => void;
   initialSettings: InputViewSettings;
   onSettingsChange: (settings: InputViewSettings) => void;
   settingsSyncToken: number;
@@ -43,6 +45,7 @@ export function InputTab({
   masterCharacters,
   state,
   onUpdateProgress,
+  onUpdateCharacterPurePiece,
   initialSettings,
   onSettingsChange,
   settingsSyncToken,
@@ -55,10 +58,16 @@ export function InputTab({
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>(initialSettings.ownedFilter);
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>(initialSettings.limitedFilter);
   const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>(initialSettings.limitBreakFilter);
+  const [purePieceAvailabilityFilter, setPurePieceAvailabilityFilter] = useState<PurePieceAvailabilityFilter>(
+    initialSettings.purePieceAvailabilityFilter,
+  );
   const [starMemoryCalcMode, setStarMemoryCalcMode] = useState<StarMemoryCalcMode>(initialSettings.starMemoryCalcMode);
   const [ue1MemoryCalcMode, setUe1MemoryCalcMode] = useState<Ue1MemoryCalcMode>(initialSettings.ue1MemoryCalcMode);
   const [ue1HeartFragmentCalcMode, setUe1HeartFragmentCalcMode] = useState<Ue1HeartFragmentCalcMode>(
     initialSettings.ue1HeartFragmentCalcMode,
+  );
+  const [includeSameBasePurePieceForUe2, setIncludeSameBasePurePieceForUe2] = useState(
+    initialSettings.includeSameBasePurePieceForUe2,
   );
   const [starFilters, setStarFilters] = useState<StarFilter[]>(initialSettings.starFilters);
   const [ue1Filters, setUe1Filters] = useState<Ue1Filter[]>(initialSettings.ue1Filters);
@@ -87,6 +96,7 @@ export function InputTab({
     ownedFilter,
     limitedFilter,
     limitBreakFilter,
+    purePieceAvailabilityFilter,
     starMemoryCalcMode,
     ue1MemoryCalcMode,
     ue1HeartFragmentCalcMode,
@@ -97,6 +107,15 @@ export function InputTab({
     sortKey,
     sortDirection,
   });
+  const purePieceByBaseNameFromCharacters = useMemo<Record<string, number>>(() => {
+    const nextTotals: Record<string, number> = {};
+    for (const character of masterCharacters) {
+      const current = nextTotals[character.baseName] ?? 0;
+      const ownedPurePiece = state.purePieceByCharacterName[character.name] ?? 0;
+      nextTotals[character.baseName] = current + ownedPurePiece;
+    }
+    return nextTotals;
+  }, [masterCharacters, state.purePieceByCharacterName]);
 
   // テーブルヘッダークリック時のソート状態遷移を管理する。
   const handleSort = useCallback(
@@ -136,9 +155,11 @@ export function InputTab({
       ownedFilter,
       limitedFilter,
       limitBreakFilter,
+      purePieceAvailabilityFilter,
       starMemoryCalcMode,
       ue1MemoryCalcMode,
       ue1HeartFragmentCalcMode,
+      includeSameBasePurePieceForUe2,
       starFilters,
       ue1Filters,
       ue2Filters,
@@ -152,9 +173,11 @@ export function InputTab({
       ownedFilter,
       limitedFilter,
       limitBreakFilter,
+      purePieceAvailabilityFilter,
       starMemoryCalcMode,
       ue1MemoryCalcMode,
       ue1HeartFragmentCalcMode,
+      includeSameBasePurePieceForUe2,
       starFilters,
       ue1Filters,
       ue2Filters,
@@ -173,9 +196,11 @@ export function InputTab({
     setOwnedFilter(initialSettings.ownedFilter);
     setLimitedFilter(initialSettings.limitedFilter);
     setLimitBreakFilter(initialSettings.limitBreakFilter);
+    setPurePieceAvailabilityFilter(initialSettings.purePieceAvailabilityFilter);
     setStarMemoryCalcMode(initialSettings.starMemoryCalcMode);
     setUe1MemoryCalcMode(initialSettings.ue1MemoryCalcMode);
     setUe1HeartFragmentCalcMode(initialSettings.ue1HeartFragmentCalcMode);
+    setIncludeSameBasePurePieceForUe2(initialSettings.includeSameBasePurePieceForUe2);
     setStarFilters(initialSettings.starFilters);
     setUe1Filters(initialSettings.ue1Filters);
     setUe2Filters(initialSettings.ue2Filters);
@@ -245,6 +270,8 @@ export function InputTab({
             onLimitedFilterChange={setLimitedFilter}
             limitBreakFilter={limitBreakFilter}
             onLimitBreakFilterChange={setLimitBreakFilter}
+            purePieceAvailabilityFilter={purePieceAvailabilityFilter}
+            onPurePieceAvailabilityFilterChange={setPurePieceAvailabilityFilter}
             starFilters={starFilters}
             setStarFilters={setStarFilters}
             ue1Filters={ue1Filters}
@@ -264,6 +291,8 @@ export function InputTab({
             onUe1MemoryCalcModeChange={setUe1MemoryCalcMode}
             ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
             onUe1HeartFragmentCalcModeChange={setUe1HeartFragmentCalcMode}
+            includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
+            onIncludeSameBasePurePieceForUe2Change={setIncludeSameBasePurePieceForUe2}
           />
         </div>
       ) : null}
@@ -274,10 +303,14 @@ export function InputTab({
 
       <InputProgressTable
         visibleRows={visibleRows}
+        purePieceByCharacterName={state.purePieceByCharacterName}
+        purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
         sortKey={sortKey}
         sortDirection={sortDirection}
         onSort={handleSort}
         onUpdateProgress={onUpdateProgress}
+        onUpdatePurePiece={onUpdateCharacterPurePiece}
+        includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
         starMemoryCalcMode={starMemoryCalcMode}
         ue1MemoryCalcMode={ue1MemoryCalcMode}
         ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}

@@ -27,9 +27,11 @@ describe("uiStorage", () => {
         ownedFilter: "owned",
         limitedFilter: "limited",
         limitBreakFilter: "on",
+        purePieceAvailabilityFilter: "available",
         starMemoryCalcMode: "star6_max",
         ue1MemoryCalcMode: "sp_max",
         ue1HeartFragmentCalcMode: "all_max",
+        includeSameBasePurePieceForUe2: true,
         starFilters: [4, 6],
         ue1Filters: [370, "sp"],
         ue2Filters: [5],
@@ -53,6 +55,7 @@ describe("uiStorage", () => {
           searchText: 123,
           isDetailSettingsOpen: "broken",
           ownedFilter: "foo",
+          purePieceAvailabilityFilter: "broken",
           starFilters: [1, 99, 1, "x"],
           ue1Filters: [370, 999, "sp"],
           ue2Filters: [5, 99],
@@ -67,11 +70,13 @@ describe("uiStorage", () => {
     expect(loaded.input.searchText).toBe("");
     expect(loaded.input.isDetailSettingsOpen).toBe(false);
     expect(loaded.input.ownedFilter).toBe("all");
+    expect(loaded.input.purePieceAvailabilityFilter).toBe("all");
     expect(loaded.input.limitedFilter).toBe("all");
     expect(loaded.input.limitBreakFilter).toBe("all");
     expect(loaded.input.starMemoryCalcMode).toBe("implemented_max");
     expect(loaded.input.ue1MemoryCalcMode).toBe("implemented_max");
     expect(loaded.input.ue1HeartFragmentCalcMode).toBe("implemented_max");
+    expect(loaded.input.includeSameBasePurePieceForUe2).toBe(false);
     expect(loaded.input.starFilters).toEqual([1]);
     expect(loaded.input.ue1Filters).toEqual([370, "sp"]);
     expect(loaded.input.ue2Filters).toEqual([5]);
@@ -118,5 +123,18 @@ describe("uiStorage", () => {
 
   it("parseUiStateは壊れたJSONでも既定値を返す", () => {
     expect(parseUiState("not-json")).toEqual(buildDefaultUiState());
+  });
+
+  it("旧activeTabのpurePieceはinputへフォールバックする", () => {
+    window.localStorage.setItem(
+      UI_STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: 1,
+        activeTab: "purePiece",
+        input: buildDefaultUiState().input,
+      }),
+    );
+
+    expect(loadUiState().activeTab).toBe("input");
   });
 });

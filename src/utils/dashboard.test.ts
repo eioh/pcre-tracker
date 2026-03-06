@@ -5,6 +5,7 @@ import type { MasterCharacter, StoredStateV1 } from "../domain/types";
 const masterCharacters: MasterCharacter[] = [
   {
     name: "ヒヨリ",
+    baseName: "ヒヨリ",
     limited: false,
     attribute: "火",
     role: "アタッカー",
@@ -13,6 +14,7 @@ const masterCharacters: MasterCharacter[] = [
   },
   {
     name: "ユイ",
+    baseName: "ユイ",
     limited: false,
     attribute: "光",
     role: "ヒーラー",
@@ -49,6 +51,14 @@ const state: StoredStateV1 = {
       obtainedDate: null,
       gachaPullCount: 0,
     },
+  },
+  purePieceByCharacterName: {
+    ヒヨリ: 0,
+    ユイ: 0,
+  },
+  purePieceByBaseName: {
+    ヒヨリ: 0,
+    ユイ: 0,
   },
 };
 

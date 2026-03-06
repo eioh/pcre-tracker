@@ -179,6 +179,24 @@ export default function App() {
     setUiState((previous) => ({ ...previous, input: settings }));
   }, []);
 
+  // キャラ名単位（☆6用）のピュアピ所持数を更新する。
+  const handleUpdateCharacterPurePiece = useCallback((name: string, value: number) => {
+    setState((previous) => {
+      const nextValue = Math.min(99999, Math.max(0, Math.floor(value)));
+      if (previous.purePieceByCharacterName[name] === nextValue) {
+        return previous;
+      }
+      return {
+        ...previous,
+        updatedAt: new Date().toISOString(),
+        purePieceByCharacterName: {
+          ...previous.purePieceByCharacterName,
+          [name]: nextValue,
+        },
+      };
+    });
+  }, []);
+
   return (
     <div className="mx-auto w-full max-w-[1400px] px-5 pb-9 pt-7">
       <header className="mb-5 flex flex-col items-start justify-between gap-6 lg:flex-row">
@@ -244,6 +262,7 @@ export default function App() {
               masterCharacters={masterCharacters}
               state={state}
               onUpdateProgress={handleUpdateProgress}
+              onUpdateCharacterPurePiece={handleUpdateCharacterPurePiece}
               initialSettings={safeUiState.input}
               onSettingsChange={handleInputSettingsChange}
               settingsSyncToken={inputSettingsSyncToken}

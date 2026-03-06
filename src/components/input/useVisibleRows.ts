@@ -5,6 +5,7 @@ import type {
   LimitedFilter,
   MemorySourceFilter,
   OwnedFilter,
+  PurePieceAvailabilityFilter,
   SortDirection,
   SortKey,
   StarFilter,
@@ -29,6 +30,7 @@ type UseVisibleRowsParams = {
   ownedFilter: OwnedFilter;
   limitedFilter: LimitedFilter;
   limitBreakFilter: LimitBreakFilter;
+  purePieceAvailabilityFilter: PurePieceAvailabilityFilter;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
   ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
@@ -118,6 +120,7 @@ export function useVisibleRows({
   ownedFilter,
   limitedFilter,
   limitBreakFilter,
+  purePieceAvailabilityFilter,
   starMemoryCalcMode,
   ue1MemoryCalcMode,
   ue1HeartFragmentCalcMode,
@@ -173,6 +176,13 @@ export function useVisibleRows({
         continue;
       }
       if (limitBreakFilter === "off" && progress.limitBreak) {
+        continue;
+      }
+      const isPurePieceAvailable = character.implemented.star6 || character.implemented.ue2;
+      if (purePieceAvailabilityFilter === "available" && !isPurePieceAvailable) {
+        continue;
+      }
+      if (purePieceAvailabilityFilter === "unavailable" && isPurePieceAvailable) {
         continue;
       }
       if (hasStarFilter && !selectedStarSet.has(progress.star)) {
@@ -302,6 +312,7 @@ export function useVisibleRows({
   }, [
     limitBreakFilter,
     limitedFilter,
+    purePieceAvailabilityFilter,
     masterCharacters,
     ownedFilter,
     progressByName,

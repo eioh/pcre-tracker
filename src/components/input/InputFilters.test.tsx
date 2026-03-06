@@ -5,6 +5,7 @@ import type {
   LimitedFilter,
   MemorySourceFilter,
   OwnedFilter,
+  PurePieceAvailabilityFilter,
   StarFilter,
   Ue1Filter,
   Ue2Filter,
@@ -21,6 +22,8 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputFilters>>): C
     onLimitedFilterChange: vi.fn<(value: LimitedFilter) => void>(),
     limitBreakFilter: "all",
     onLimitBreakFilterChange: vi.fn<(value: LimitBreakFilter) => void>(),
+    purePieceAvailabilityFilter: "all",
+    onPurePieceAvailabilityFilterChange: vi.fn<(value: PurePieceAvailabilityFilter) => void>(),
     starFilters: [],
     setStarFilters: vi.fn(),
     ue1Filters: [],
@@ -73,6 +76,7 @@ describe("InputFilters", () => {
     expect(props.onOwnedFilterChange).toHaveBeenCalledWith("all");
     expect(props.onLimitedFilterChange).toHaveBeenCalledWith("all");
     expect(props.onLimitBreakFilterChange).toHaveBeenCalledWith("all");
+    expect(props.onPurePieceAvailabilityFilterChange).toHaveBeenCalledWith("all");
     expect(props.setStarFilters).toHaveBeenCalledWith([]);
     expect(props.setUe1Filters).toHaveBeenCalledWith([]);
     expect(props.setUe2Filters).toHaveBeenCalledWith([]);
@@ -119,9 +123,11 @@ describe("InputFilters", () => {
     selectComboboxOption("所持", "所持のみ");
     selectComboboxOption("限定", "限定のみ");
     selectComboboxOption("限界突破", "限界突破済み");
+    selectComboboxOption("ピュアピ", "入手可能のみ");
 
     expect(props.onOwnedFilterChange).toHaveBeenCalledWith("owned");
     expect(props.onLimitedFilterChange).toHaveBeenCalledWith("limited");
     expect(props.onLimitBreakFilterChange).toHaveBeenCalledWith("on");
+    expect(props.onPurePieceAvailabilityFilterChange).toHaveBeenCalledWith("available");
   });
 });
