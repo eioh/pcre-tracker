@@ -70,10 +70,10 @@
   --color-table-wrap-border: #7a94c53d;
   --color-table-wrap-bg: #0b111bcc;
   --color-sort-hover: #dff8ff;
-  --color-row-odd: #091425b5;
-  --color-row-even: #10203ab5;
-  --color-row-hover: #2d42631f;
-  --color-row-hover-sticky: #4d6079;
+  --color-row-odd: #091425;
+  --color-row-even: #10203a;
+  --color-row-hover: #4d6079;
+  --color-row-hover-border: #7a94c533;
 
   /* 入力テーブルのキャラタグ */
   --color-limited-text: #d8aeb3;

@@ -293,7 +293,7 @@ const TableRow = memo(function TableRow({
   }, [progress.gachaPullCount]);
 
   return (
-    <UiTableRow className="odd:[&>td]:bg-row-odd even:[&>td]:bg-row-even hover:[&>td]:bg-row-hover hover:[&>td:nth-child(-n+2)]:bg-row-hover-sticky">
+    <UiTableRow className="odd:[&>td]:bg-row-odd even:[&>td]:bg-row-even hover:[&>td]:bg-row-hover hover:[&>td]:border-row-hover-border">
       <TableCell className="sticky left-0 z-[4] text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
           <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onCheckedChange={handleOwnedChange} />
@@ -595,7 +595,12 @@ export const InputProgressTable = memo(function InputProgressTable({
   ue1MemoryCalcMode,
   ue1HeartFragmentCalcMode,
 }: InputProgressTableProps) {
+  const shadowLayerRef = useRef<HTMLDivElement | null>(null);
   const scrollParentRef = useRef<HTMLDivElement | null>(null);
+  const stickyNameHeadRef = useRef<HTMLTableCellElement | null>(null);
+  const initialScrollLeftRef = useRef<number | null>(null);
+  const [hasStickyShadow, setHasStickyShadow] = useState(false);
+  const [stickyShadowLeft, setStickyShadowLeft] = useState(280);
   const rowVirtualizer = useVirtualizer({
     count: visibleRows.length,
     getScrollElement: () => scrollParentRef.current,
@@ -630,9 +635,67 @@ export const InputProgressTable = memo(function InputProgressTable({
     return resolvedRows;
   }, [virtualRows, visibleRows]);
 
+  useEffect(() => {
+    const scrollElement = scrollParentRef.current;
+    if (!scrollElement) {
+      return;
+    }
+
+    // 横スクロール位置に応じて固定列の影表示を切り替える。
+    const handleScroll = () => {
+      const baseline = initialScrollLeftRef.current ?? 0;
+      setHasStickyShadow(scrollElement.scrollLeft > baseline + 2);
+    };
+
+    initialScrollLeftRef.current = scrollElement.scrollLeft;
+    handleScroll();
+    scrollElement.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      scrollElement.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const shadowLayerElement = shadowLayerRef.current;
+    const stickyNameHeadElement = stickyNameHeadRef.current;
+    if (!shadowLayerElement || !stickyNameHeadElement) {
+      return;
+    }
+
+    // 固定列境界を実測し、ガターや境界線分を含めて影のx座標を合わせる。
+    const updateShadowLeft = () => {
+      const layerRect = shadowLayerElement.getBoundingClientRect();
+      const stickyRect = stickyNameHeadElement.getBoundingClientRect();
+      setStickyShadowLeft(stickyRect.right - layerRect.left);
+    };
+
+    updateShadowLeft();
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            updateShadowLeft();
+          })
+        : null;
+    resizeObserver?.observe(shadowLayerElement);
+    resizeObserver?.observe(stickyNameHeadElement);
+    window.addEventListener("resize", updateShadowLeft);
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", updateShadowLeft);
+    };
+  }, [visibleRows.length]);
+
   return (
-    <div ref={scrollParentRef} className={tableWrapClass}>
-      <Table className="table-fixed">
+    <div ref={shadowLayerRef} className="relative">
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-y-0 z-[8] w-4 bg-linear-to-r from-black/40 to-transparent ${
+          hasStickyShadow ? "opacity-100" : "opacity-0"
+        }`}
+        style={{ left: stickyShadowLeft }}
+      />
+      <div ref={scrollParentRef} className={tableWrapClass}>
+        <Table className="table-fixed">
         <colgroup>
           <col className="w-20" />
           <col className="w-[200px]" />
@@ -657,6 +720,7 @@ export const InputProgressTable = memo(function InputProgressTable({
               <SortHeaderButton label="所持" columnKey="owned" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
             </TableHead>
             <TableHead
+              ref={stickyNameHeadRef}
               aria-sort={getAriaSort("name", sortKey, sortDirection)}
               className="sticky left-20 z-[6] border-r border-table-border bg-table-header-bg text-center"
             >
@@ -780,7 +844,8 @@ export const InputProgressTable = memo(function InputProgressTable({
             </>
           )}
         </TableBody>
-      </Table>
+        </Table>
+      </div>
     </div>
   );
 });
