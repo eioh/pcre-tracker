@@ -2,7 +2,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import * as Popover from "@radix-ui/react-popover";
 import { format, isValid, parseISO } from "date-fns";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { SortDirection, SortKey } from "../../domain/uiStorage";
@@ -38,10 +38,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 
 type InputProgressTableProps = {
   visibleRows: VisibleRow[];
+  purePieceByCharacterName: Record<string, number>;
+  purePieceByBaseNameFromCharacters: Record<string, number>;
   sortKey: SortKey;
   sortDirection: SortDirection;
   onSort: (sortKey: SortKey) => void;
   onUpdateProgress: (name: string, patch: ProgressPatch) => void;
+  onUpdatePurePiece: (name: string, value: number) => void;
+  includeSameBasePurePieceForUe2: boolean;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
   ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
@@ -98,7 +102,11 @@ function SortHeaderButton({ label, columnKey, sortKey, sortDirection, onSort }: 
 type TableRowProps = {
   character: MasterCharacter;
   progress: CharacterProgress;
+  ownedPurePiece: number;
+  ownedPurePieceByBase: number;
   onUpdateProgress: (name: string, patch: ProgressPatch) => void;
+  onUpdatePurePiece: (name: string, value: number) => void;
+  includeSameBasePurePieceForUe2: boolean;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
   ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
@@ -108,13 +116,18 @@ type TableRowProps = {
 const TableRow = memo(function TableRow({
   character,
   progress,
+  ownedPurePiece,
+  ownedPurePieceByBase,
   onUpdateProgress,
+  onUpdatePurePiece,
+  includeSameBasePurePieceForUe2,
   starMemoryCalcMode,
   ue1MemoryCalcMode,
   ue1HeartFragmentCalcMode,
 }: TableRowProps) {
   const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
   const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
+  const isPurePieceImplemented = character.implemented.star6 || character.implemented.ue2;
   const starMax = character.implemented.star6 ? 6 : 5;
   const ue1MaxLevel = UE1_LEVEL_VALUES[UE1_LEVEL_VALUES.length - 1];
   const ue2MaxLevel = UE2_LEVEL_VALUES[UE2_LEVEL_VALUES.length - 1];
@@ -136,7 +149,15 @@ const TableRow = memo(function TableRow({
   const totalRemainingMemoryPiece =
     starRemainingMemoryPiece + connectRankRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
   const adjustedTotalRemainingMemoryPiece = Math.max(0, totalRemainingMemoryPiece - progress.ownedMemoryPiece);
+  const star6PurePieceNeed = character.implemented.star6 && progress.star < 6 ? 50 : 0;
+  const ue2PurePieceNeed = character.implemented.ue2 && progress.ue2Level !== ue2MaxLevel ? 150 : 0;
+  const sameBasePurePieceUsed =
+    includeSameBasePurePieceForUe2 && character.implemented.ue2 ? Math.max(0, ownedPurePieceByBase - ownedPurePiece) : 0;
+  const star6PurePieceSubtotal = Math.max(0, star6PurePieceNeed - ownedPurePiece);
+  const ue2PurePieceSubtotal = Math.max(0, ue2PurePieceNeed - (ownedPurePiece + sameBasePurePieceUsed));
+  const totalPurePieceNeeded = star6PurePieceSubtotal + ue2PurePieceSubtotal;
   const [ownedMemoryPieceInput, setOwnedMemoryPieceInput] = useState(String(progress.ownedMemoryPiece));
+  const [ownedPurePieceInput, setOwnedPurePieceInput] = useState(String(ownedPurePiece));
   const [gachaPullCountInput, setGachaPullCountInput] = useState(String(progress.gachaPullCount));
 
   const handleOwnedChange = useCallback(
@@ -196,6 +217,26 @@ const TableRow = memo(function TableRow({
     },
     [handleOwnedMemoryPieceCommit],
   );
+  const handleOwnedPurePieceChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setOwnedPurePieceInput(event.target.value);
+  }, []);
+  const handleOwnedPurePieceCommit = useCallback(() => {
+    const nextOwnedPurePiece = Math.min(99999, Math.max(0, Math.floor(Number(ownedPurePieceInput) || 0)));
+    setOwnedPurePieceInput(String(nextOwnedPurePiece));
+    if (nextOwnedPurePiece !== ownedPurePiece) {
+      onUpdatePurePiece(character.name, nextOwnedPurePiece);
+    }
+  }, [character.name, onUpdatePurePiece, ownedPurePiece, ownedPurePieceInput]);
+  const handleOwnedPurePieceKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key !== "Enter") {
+        return;
+      }
+      handleOwnedPurePieceCommit();
+      event.currentTarget.blur();
+    },
+    [handleOwnedPurePieceCommit],
+  );
   const selectedObtainedDate = useMemo(() => parseStoredDate(progress.obtainedDate), [progress.obtainedDate]);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const handleObtainedDateChange = useCallback(
@@ -245,17 +286,20 @@ const TableRow = memo(function TableRow({
     setOwnedMemoryPieceInput(String(progress.ownedMemoryPiece));
   }, [progress.ownedMemoryPiece]);
   useEffect(() => {
+    setOwnedPurePieceInput(String(ownedPurePiece));
+  }, [ownedPurePiece]);
+  useEffect(() => {
     setGachaPullCountInput(String(progress.gachaPullCount));
   }, [progress.gachaPullCount]);
 
   return (
-    <UiTableRow className="odd:bg-row-odd even:bg-row-even hover:bg-row-hover">
-      <TableCell className="text-center">
+    <UiTableRow className="odd:[&>td]:bg-row-odd even:[&>td]:bg-row-even hover:[&>td]:bg-row-hover hover:[&>td]:border-row-hover-border">
+      <TableCell className="sticky left-0 z-[4] text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
           <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onCheckedChange={handleOwnedChange} />
         </label>
       </TableCell>
-      <TableCell className="whitespace-nowrap font-bold">
+      <TableCell className="sticky left-20 z-[4] border-r border-table-border whitespace-nowrap font-bold">
         <div className={characterNameCellLayoutClass}>
           <div className={characterTagLineClass}>
             <span className={character.limited ? "text-limited-text" : "text-normal-text"}>{character.limited ? "限定" : "恒常"}</span>
@@ -326,7 +370,7 @@ const TableRow = memo(function TableRow({
           </TableSelect>
         )}
       </TableCell>
-      <TableCell>
+      <TableCell className="border-r border-table-border">
         <TableNumberInput
           type="number"
           inputMode="numeric"
@@ -339,6 +383,30 @@ const TableRow = memo(function TableRow({
           onKeyDown={handleOwnedMemoryPieceKeyDown}
         />
       </TableCell>
+      <TableCell>
+        {isPurePieceImplemented ? (
+          <TableNumberInput
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={99999}
+            step={1}
+            value={ownedPurePieceInput}
+            aria-label={`${character.name}の所持ピュアピ数`}
+            onChange={handleOwnedPurePieceChange}
+            onBlur={handleOwnedPurePieceCommit}
+            onKeyDown={handleOwnedPurePieceKeyDown}
+          />
+        ) : (
+          <TableNumberInput
+            type="text"
+            value="-"
+            disabled
+            aria-label={`${character.name}の所持ピュアピ数（未実装）`}
+            className="text-left text-muted"
+          />
+        )}
+      </TableCell>
       <TableCell className="text-center">
         <Popover.Root open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
           <Popover.Trigger asChild>
@@ -348,9 +416,8 @@ const TableRow = memo(function TableRow({
               className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-input-bg px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
             >
               <span className="tabular-nums">{formatObtainedDate(progress.obtainedDate)}</span>
-              <span className="inline-flex items-center gap-1.5 text-muted">
+              <span className="inline-flex items-center text-muted">
                 <CalendarIcon className="size-4" />
-                <ChevronDown className="size-4" />
               </span>
             </button>
           </Popover.Trigger>
@@ -377,7 +444,7 @@ const TableRow = memo(function TableRow({
           onChange={handleObtainedDateChange}
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="border-r border-table-border">
         <TableNumberInput
           type="number"
           inputMode="numeric"
@@ -429,10 +496,65 @@ const TableRow = memo(function TableRow({
                 <span className="inline-block w-[9em]">所持数</span>
                 <span className="tabular-nums">-{progress.ownedMemoryPiece}</span>
               </span>
-              <div className="h-px bg-white/20" />
+              <div className="mt-1 h-px bg-white/20" />
               <span className="inline-flex items-baseline gap-2 font-bold">
                 <span className="inline-block w-[9em]">合計</span>
                 <span className="tabular-nums">{adjustedTotalRemainingMemoryPiece}</span>
+              </span>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </TableCell>
+      <TableCell className="text-center">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="inline-block w-full cursor-help text-center text-sm font-bold tabular-nums">{totalPurePieceNeeded}</span>
+            </TooltipTrigger>
+            <TooltipContent side="top" align="end" className="grid min-w-[260px] gap-1.5 text-left">
+              <span className="inline-flex items-baseline gap-2">
+                <span className="inline-block w-[12em]">☆6</span>
+                <span className="tabular-nums">+{star6PurePieceNeed}</span>
+              </span>
+              <span className="inline-flex items-baseline gap-2">
+                <span className="inline-block w-[12em]">所持数</span>
+                <span className="tabular-nums">-{ownedPurePiece}</span>
+              </span>
+              <div className="mt-1 h-px bg-white/20" />
+              <span className="inline-flex items-baseline gap-2">
+                <span className="inline-block w-[12em]">小計</span>
+                <span className="tabular-nums">+{star6PurePieceSubtotal}</span>
+              </span>
+              <div className="h-2" />
+              <div className="h-px bg-white/20" />
+              <span className="inline-flex items-baseline gap-2">
+                <span className="inline-block w-[12em]">専用2</span>
+                <span className="tabular-nums">+{ue2PurePieceNeed}</span>
+              </span>
+              <span className="inline-flex items-baseline gap-2">
+                <span className="inline-block w-[12em]">所持数</span>
+                <span />
+              </span>
+              <span className="inline-flex items-baseline gap-2">
+                <span className="inline-block w-[12em]">・{character.name}</span>
+                <span className="tabular-nums">-{ownedPurePiece}</span>
+              </span>
+              {includeSameBasePurePieceForUe2 && character.implemented.ue2 ? (
+                <span className="inline-flex items-baseline gap-2">
+                  <span className="inline-block w-[12em]">・同名別衣装</span>
+                  <span className="tabular-nums">-{sameBasePurePieceUsed}</span>
+                </span>
+              ) : null}
+              <div className="h-px bg-white/20" />
+              <span className="inline-flex items-baseline gap-2 font-bold">
+                <span className="inline-block w-[12em]">小計</span>
+                <span className="tabular-nums">+{ue2PurePieceSubtotal}</span>
+              </span>
+              <div className="h-2" />
+              <div className="h-px bg-white/20" />
+              <span className="inline-flex items-baseline gap-2 font-bold">
+                <span className="inline-block w-[12em]">合計</span>
+                <span className="tabular-nums">+{totalPurePieceNeeded}</span>
               </span>
             </TooltipContent>
           </Tooltip>
@@ -461,15 +583,24 @@ const TableRow = memo(function TableRow({
 // 育成入力テーブル本体を表示し、各行の進捗編集を受け付ける。
 export const InputProgressTable = memo(function InputProgressTable({
   visibleRows,
+  purePieceByCharacterName,
+  purePieceByBaseNameFromCharacters,
   sortKey,
   sortDirection,
   onSort,
   onUpdateProgress,
+  onUpdatePurePiece,
+  includeSameBasePurePieceForUe2,
   starMemoryCalcMode,
   ue1MemoryCalcMode,
   ue1HeartFragmentCalcMode,
 }: InputProgressTableProps) {
+  const shadowLayerRef = useRef<HTMLDivElement | null>(null);
   const scrollParentRef = useRef<HTMLDivElement | null>(null);
+  const stickyNameHeadRef = useRef<HTMLTableCellElement | null>(null);
+  const initialScrollLeftRef = useRef<number | null>(null);
+  const [hasStickyShadow, setHasStickyShadow] = useState(false);
+  const [stickyShadowLeft, setStickyShadowLeft] = useState(280);
   const rowVirtualizer = useVirtualizer({
     count: visibleRows.length,
     getScrollElement: () => scrollParentRef.current,
@@ -504,13 +635,73 @@ export const InputProgressTable = memo(function InputProgressTable({
     return resolvedRows;
   }, [virtualRows, visibleRows]);
 
+  useEffect(() => {
+    const scrollElement = scrollParentRef.current;
+    if (!scrollElement) {
+      return;
+    }
+
+    // 横スクロール位置に応じて固定列の影表示を切り替える。
+    const handleScroll = () => {
+      const baseline = initialScrollLeftRef.current ?? 0;
+      setHasStickyShadow(scrollElement.scrollLeft > baseline + 2);
+    };
+
+    initialScrollLeftRef.current = scrollElement.scrollLeft;
+    handleScroll();
+    scrollElement.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      scrollElement.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const shadowLayerElement = shadowLayerRef.current;
+    const stickyNameHeadElement = stickyNameHeadRef.current;
+    if (!shadowLayerElement || !stickyNameHeadElement) {
+      return;
+    }
+
+    // 固定列境界を実測し、ガターや境界線分を含めて影のx座標を合わせる。
+    const updateShadowLeft = () => {
+      const layerRect = shadowLayerElement.getBoundingClientRect();
+      const stickyRect = stickyNameHeadElement.getBoundingClientRect();
+      setStickyShadowLeft(stickyRect.right - layerRect.left);
+    };
+
+    updateShadowLeft();
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            updateShadowLeft();
+          })
+        : null;
+    resizeObserver?.observe(shadowLayerElement);
+    resizeObserver?.observe(stickyNameHeadElement);
+    window.addEventListener("resize", updateShadowLeft);
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", updateShadowLeft);
+    };
+  }, [visibleRows.length]);
+
   return (
-    <div ref={scrollParentRef} className={tableWrapClass}>
-      <Table className="table-fixed">
+    <div ref={shadowLayerRef} className="relative">
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-y-0 z-[8] w-4 bg-linear-to-r from-black/40 to-transparent ${
+          hasStickyShadow ? "opacity-100" : "opacity-0"
+        }`}
+        style={{ left: stickyShadowLeft }}
+      />
+      <div ref={scrollParentRef} className={tableWrapClass}>
+        <Table className="table-fixed">
         <colgroup>
           <col className="w-20" />
           <col className="w-[200px]" />
           <col className="w-[95px]" />
+          <col className="w-[150px]" />
+          <col className="w-[150px]" />
           <col className="w-[150px]" />
           <col className="w-[150px]" />
           <col className="w-[150px]" />
@@ -525,10 +716,14 @@ export const InputProgressTable = memo(function InputProgressTable({
         </colgroup>
         <TableHeader>
           <UiTableRow>
-            <TableHead aria-sort={getAriaSort("owned", sortKey, sortDirection)} className="text-center">
+            <TableHead aria-sort={getAriaSort("owned", sortKey, sortDirection)} className="sticky left-0 z-[6] bg-table-header-bg text-center">
               <SortHeaderButton label="所持" columnKey="owned" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
             </TableHead>
-            <TableHead aria-sort={getAriaSort("name", sortKey, sortDirection)} className="text-center">
+            <TableHead
+              ref={stickyNameHeadRef}
+              aria-sort={getAriaSort("name", sortKey, sortDirection)}
+              className="sticky left-20 z-[6] border-r border-table-border bg-table-header-bg text-center"
+            >
               <SortHeaderButton label="キャラ" columnKey="name" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
             </TableHead>
             <TableHead aria-sort={getAriaSort("limitBreak", sortKey, sortDirection)} className="text-center">
@@ -567,10 +762,16 @@ export const InputProgressTable = memo(function InputProgressTable({
                 onSort={onSort}
               />
             </TableHead>
+            <TableHead className="text-center">
+              所持ピュアピ
+            </TableHead>
             <TableHead aria-sort={getAriaSort("obtainedDate", sortKey, sortDirection)} className="text-center">
               <SortHeaderButton label="入手日" columnKey="obtainedDate" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
             </TableHead>
-            <TableHead aria-sort={getAriaSort("gachaPullCount", sortKey, sortDirection)} className="text-center">
+            <TableHead
+              aria-sort={getAriaSort("gachaPullCount", sortKey, sortDirection)}
+              className="border-r border-table-border text-center"
+            >
               <SortHeaderButton
                 label="ガチャ回数"
                 columnKey="gachaPullCount"
@@ -593,6 +794,7 @@ export const InputProgressTable = memo(function InputProgressTable({
                 onSort={onSort}
               />
             </TableHead>
+            <TableHead className="text-center">必要ピュアピ合計</TableHead>
             <TableHead className="text-center">メモピ入手</TableHead>
             <TableHead aria-sort={getAriaSort("ue1HeartFragmentNeeded", sortKey, sortDirection)} className="text-center">
               <SortHeaderButton
@@ -608,7 +810,7 @@ export const InputProgressTable = memo(function InputProgressTable({
         <TableBody>
           {visibleRows.length === 0 ? (
             <UiTableRow>
-              <TableCell colSpan={14} className="px-3 py-[18px] text-center text-muted">
+              <TableCell colSpan={16} className="px-3 py-[18px] text-center text-muted">
                 条件に一致するキャラがいません
               </TableCell>
             </UiTableRow>
@@ -616,7 +818,7 @@ export const InputProgressTable = memo(function InputProgressTable({
             <>
               {virtualRows.length > 0 && paddingTop > 0 ? (
                 <UiTableRow aria-hidden="true">
-                  <TableCell colSpan={14} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
+                  <TableCell colSpan={16} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
                 </UiTableRow>
               ) : null}
               {visibleVirtualRows.map(({ virtualRow, row }) => (
@@ -624,7 +826,11 @@ export const InputProgressTable = memo(function InputProgressTable({
                   key={row.character.name}
                   character={row.character}
                   progress={row.progress}
+                  ownedPurePiece={purePieceByCharacterName[row.character.name] ?? 0}
+                  ownedPurePieceByBase={purePieceByBaseNameFromCharacters[row.character.baseName] ?? 0}
                   onUpdateProgress={onUpdateProgress}
+                  onUpdatePurePiece={onUpdatePurePiece}
+                  includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
                   starMemoryCalcMode={starMemoryCalcMode}
                   ue1MemoryCalcMode={ue1MemoryCalcMode}
                   ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
@@ -632,13 +838,14 @@ export const InputProgressTable = memo(function InputProgressTable({
               ))}
               {virtualRows.length > 0 && paddingBottom > 0 ? (
                 <UiTableRow aria-hidden="true">
-                  <TableCell colSpan={14} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
+                  <TableCell colSpan={16} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
                 </UiTableRow>
               ) : null}
             </>
           )}
         </TableBody>
-      </Table>
+        </Table>
+      </div>
     </div>
   );
 });

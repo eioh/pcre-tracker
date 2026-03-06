@@ -54,6 +54,14 @@ const state: StoredStateV1 = {
       gachaPullCount: 0,
     },
   },
+  purePieceByCharacterName: {
+    ヒヨリ: 0,
+    ユイ: 0,
+  },
+  purePieceByBaseName: {
+    ヒヨリ: 0,
+    ユイ: 0,
+  },
 };
 
 // 日付を YYYY-MM-DD へ整形する。

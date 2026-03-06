@@ -54,4 +54,6 @@ export const storedStateV1Schema = z.object({
   schemaVersion: z.literal(1),
   updatedAt: z.string().datetime({ offset: true }),
   progressByName: z.record(characterProgressSchema),
+  purePieceByCharacterName: z.record(z.number().int().min(0)).default({}),
+  purePieceByBaseName: z.record(z.number().int().min(0)).default({}),
 });

@@ -6,6 +6,7 @@ import type {
   LimitedFilter,
   MemorySourceFilter,
   OwnedFilter,
+  PurePieceAvailabilityFilter,
   StarFilter,
   Ue1Filter,
   Ue2Filter,
@@ -25,6 +26,8 @@ type InputFiltersProps = {
   onLimitedFilterChange: (value: LimitedFilter) => void;
   limitBreakFilter: LimitBreakFilter;
   onLimitBreakFilterChange: (value: LimitBreakFilter) => void;
+  purePieceAvailabilityFilter: PurePieceAvailabilityFilter;
+  onPurePieceAvailabilityFilterChange: (value: PurePieceAvailabilityFilter) => void;
   starFilters: StarFilter[];
   setStarFilters: Dispatch<SetStateAction<StarFilter[]>>;
   ue1Filters: Ue1Filter[];
@@ -48,6 +51,8 @@ export const InputFilters = memo(function InputFilters({
   onLimitedFilterChange,
   limitBreakFilter,
   onLimitBreakFilterChange,
+  purePieceAvailabilityFilter,
+  onPurePieceAvailabilityFilterChange,
   starFilters,
   setStarFilters,
   ue1Filters,
@@ -78,6 +83,7 @@ export const InputFilters = memo(function InputFilters({
     onOwnedFilterChange("all");
     onLimitedFilterChange("all");
     onLimitBreakFilterChange("all");
+    onPurePieceAvailabilityFilterChange("all");
     setStarFilters([]);
     setUe1Filters([]);
     setUe2Filters([]);
@@ -131,6 +137,23 @@ export const InputFilters = memo(function InputFilters({
               <SelectItem value="all">すべて</SelectItem>
               <SelectItem value="on">限界突破済み</SelectItem>
               <SelectItem value="off">未限界突破</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid gap-1.5 text-sm text-muted">
+          <Label>ピュアピ</Label>
+          <Select
+            value={purePieceAvailabilityFilter}
+            onValueChange={(value) => onPurePieceAvailabilityFilterChange(value as PurePieceAvailabilityFilter)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">すべて</SelectItem>
+              <SelectItem value="available">入手可能のみ</SelectItem>
+              <SelectItem value="unavailable">入手不可能のみ</SelectItem>
             </SelectContent>
           </Select>
         </div>

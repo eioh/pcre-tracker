@@ -10,6 +10,7 @@ import type { VisibleRow } from "./types";
 function buildCharacter(overrides?: Partial<MasterCharacter>): MasterCharacter {
   return {
     name: "ヒヨリ",
+    baseName: "ヒヨリ",
     limited: false,
     attribute: "火",
     role: "アタッカー",
@@ -50,10 +51,14 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputProgressTable
 
   return {
     visibleRows: [defaultRow],
+    purePieceByCharacterName: { ヒヨリ: 0 },
+    purePieceByBaseNameFromCharacters: { ヒヨリ: 0 },
     sortKey: "name",
     sortDirection: null,
     onSort: vi.fn<(sortKey: SortKey) => void>(),
     onUpdateProgress: vi.fn(),
+    onUpdatePurePiece: vi.fn<(name: string, value: number) => void>(),
+    includeSameBasePurePieceForUe2: false,
     starMemoryCalcMode: "implemented_max",
     ue1MemoryCalcMode: "implemented_max",
     ue1HeartFragmentCalcMode: "implemented_max",
@@ -169,6 +174,120 @@ describe("InputProgressTable", () => {
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ownedMemoryPiece: 42 });
   });
 
+  it("所持ピュアピ入力はフォーカス外れ時にキャラ個別更新として通知する", () => {
+    const onUpdatePurePiece = vi.fn();
+    const props = buildProps({ onUpdatePurePiece });
+    render(<InputProgressTable {...props} />);
+
+    const input = screen.getByRole("spinbutton", { name: "ヒヨリの所持ピュアピ数" });
+    fireEvent.change(input, { target: { value: "77.9" } });
+    fireEvent.blur(input);
+
+    expect(onUpdatePurePiece).toHaveBeenCalledWith("ヒヨリ", 77);
+  });
+
+  it("ピュアピ未実装キャラの所持ピュアピ入力は無効表示する", () => {
+    const row: VisibleRow = {
+      character: buildCharacter({
+        name: "ユイ",
+        implemented: {
+          star6: false,
+          ue1: false,
+          ue1Sp: false,
+          ue2: false,
+        },
+      }),
+      progress: buildProgress({ ue1Level: null, ue2Level: null }),
+    };
+    const props = buildProps({
+      visibleRows: [row],
+      purePieceByCharacterName: { ユイ: 0 },
+      purePieceByBaseNameFromCharacters: { ユイ: 0 },
+    });
+    render(<InputProgressTable {...props} />);
+
+    expect(screen.getByRole("textbox", { name: "ユイの所持ピュアピ数（未実装）" })).toBeDisabled();
+    expect(screen.queryByRole("spinbutton", { name: "ユイの所持ピュアピ数" })).toBeNull();
+  });
+
+  it("必要ピュアピ合計は ☆6+専用2-所持ピュアピ（下限0）で表示する", () => {
+    const props = buildProps({
+      purePieceByCharacterName: { ヒヨリ: 220 },
+      purePieceByBaseNameFromCharacters: { ヒヨリ: 220 },
+      includeSameBasePurePieceForUe2: false,
+    });
+    render(<InputProgressTable {...props} />);
+
+    const tableRows = screen.getAllByRole("row");
+    const bodyRow = tableRows[1] as HTMLTableRowElement;
+    const cells = within(bodyRow).getAllByRole("cell");
+
+    expect(cells[13]).toHaveTextContent("0");
+  });
+
+  it("必要ピュアピ合計は設定ONで同名別衣装のピュアピを専用2計算へ含める", () => {
+    const props = buildProps({
+      purePieceByCharacterName: { ヒヨリ: 10 },
+      purePieceByBaseNameFromCharacters: { ヒヨリ: 40 },
+      includeSameBasePurePieceForUe2: true,
+    });
+    render(<InputProgressTable {...props} />);
+
+    const tableRows = screen.getAllByRole("row");
+    const bodyRow = tableRows[1] as HTMLTableRowElement;
+    const cells = within(bodyRow).getAllByRole("cell");
+
+    expect(cells[13]).toHaveTextContent("150");
+  });
+
+  it("必要ピュアピ合計セルのホバーで内訳ツールチップを表示する", async () => {
+    const props = buildProps({
+      purePieceByCharacterName: { ヒヨリ: 10 },
+      purePieceByBaseNameFromCharacters: { ヒヨリ: 40 },
+      includeSameBasePurePieceForUe2: true,
+    });
+    render(<InputProgressTable {...props} />);
+
+    const tableRows = screen.getAllByRole("row");
+    const bodyRow = tableRows[1] as HTMLTableRowElement;
+    const cells = within(bodyRow).getAllByRole("cell");
+    const totalTrigger = within(cells[13] as HTMLElement).getByText("150");
+    fireEvent.pointerMove(totalTrigger);
+    fireEvent.mouseOver(totalTrigger);
+
+    await waitFor(() => {
+      expect(screen.getAllByText((_, element) => element?.textContent === "+50").length).toBeGreaterThan(0);
+    });
+    expect(screen.getAllByText((_, element) => element?.textContent === "専用2").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "・同名別衣装").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "+150").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "+40").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "-30").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "+110").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "合計").length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, element) => element?.textContent === "+150").length).toBeGreaterThan(0);
+  });
+
+  it("☆6到達済みかつ専用2最大時は必要ピュアピ合計を0で表示する", () => {
+    const row: VisibleRow = {
+      character: buildCharacter(),
+      progress: buildProgress({ star: 6, ue2Level: 5 }),
+    };
+    const props = buildProps({
+      visibleRows: [row],
+      purePieceByCharacterName: { ヒヨリ: 0 },
+      purePieceByBaseNameFromCharacters: { ヒヨリ: 0 },
+      includeSameBasePurePieceForUe2: true,
+    });
+    render(<InputProgressTable {...props} />);
+
+    const tableRows = screen.getAllByRole("row");
+    const bodyRow = tableRows[1] as HTMLTableRowElement;
+    const cells = within(bodyRow).getAllByRole("cell");
+
+    expect(cells[13]).toHaveTextContent("0");
+  });
+
   it("必要メモピ合計は所持メモピ数を引いた下限0の値を表示する", () => {
     const row: VisibleRow = {
       character: buildCharacter(),
@@ -181,7 +300,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[11]).toHaveTextContent("0");
+    expect(cells[12]).toHaveTextContent("0");
   });
 
   it("専用1必要ハートの欠片を表示する", () => {
@@ -192,7 +311,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[13]).toHaveTextContent("318");
+    expect(cells[15]).toHaveTextContent("318");
   });
 
   it("専用1必要ハートの欠片はモード切り替えで未実装キャラも表示できる", () => {
@@ -222,13 +341,13 @@ describe("InputProgressTable", () => {
     let tableRows = screen.getAllByRole("row");
     let bodyRow = tableRows[1] as HTMLTableRowElement;
     let cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[13]).toHaveTextContent("0");
+    expect(cells[15]).toHaveTextContent("0");
 
     rerender(<InputProgressTable {...allMaxProps} />);
     tableRows = screen.getAllByRole("row");
     bodyRow = tableRows[1] as HTMLTableRowElement;
     cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[13]).toHaveTextContent("318");
+    expect(cells[15]).toHaveTextContent("318");
   });
 
   it("コネクトRANK必要素材列にアーツ/ソウル/ガードを表示する", () => {
@@ -242,7 +361,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[10]).toHaveTextContent("120/256/66");
+    expect(cells[11]).toHaveTextContent("120/256/66");
   });
 
   it("メモピ入手列にソース名を表示する", () => {
@@ -265,6 +384,29 @@ describe("InputProgressTable", () => {
     expect(screen.getAllByText("/").length).toBeGreaterThan(0);
     expect(screen.getByText("アタッカー")).toBeInTheDocument();
     expect(screen.getByText("ヒヨリ")).toBeInTheDocument();
+  });
+
+  it("所持列とキャラ列のヘッダーを固定表示するクラスが付与される", () => {
+    const props = buildProps();
+    render(<InputProgressTable {...props} />);
+
+    const ownedHeader = screen.getByRole("columnheader", { name: "所持" });
+    const nameHeader = screen.getByRole("columnheader", { name: "キャラ" });
+
+    expect(ownedHeader).toHaveClass("sticky", "left-0", "z-[6]");
+    expect(nameHeader).toHaveClass("sticky", "left-20", "z-[6]", "border-r");
+  });
+
+  it("所持列とキャラ列のボディセルを固定表示するクラスが付与される", () => {
+    const props = buildProps();
+    render(<InputProgressTable {...props} />);
+
+    const tableRows = screen.getAllByRole("row");
+    const bodyRow = tableRows[1] as HTMLTableRowElement;
+    const cells = within(bodyRow).getAllByRole("cell");
+
+    expect(cells[0]).toHaveClass("sticky", "left-0", "z-[4]");
+    expect(cells[1]).toHaveClass("sticky", "left-20", "z-[4]", "border-r");
   });
 
   it("未実装キャラは専用装備セレクトを無効表示する", () => {
@@ -302,7 +444,7 @@ describe("InputProgressTable", () => {
     const tableRows = screen.getAllByRole("row");
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
-    const totalTrigger = within(cells[11] as HTMLElement).getByText("1210");
+    const totalTrigger = within(cells[12] as HTMLElement).getByText("1210");
     fireEvent.pointerMove(totalTrigger);
     fireEvent.mouseOver(totalTrigger);
 

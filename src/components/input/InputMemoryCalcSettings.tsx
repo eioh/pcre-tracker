@@ -2,6 +2,7 @@ import { memo } from "react";
 import type { Ue1HeartFragmentCalcMode } from "../../utils/ue1HeartFragmentCost";
 import type { Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../../utils/starMemoryCost";
+import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { memoryCalcGridClass, memoryCalcSectionClass } from "./uiStyles";
@@ -13,6 +14,8 @@ type InputMemoryCalcSettingsProps = {
   onUe1MemoryCalcModeChange: (value: Ue1MemoryCalcMode) => void;
   ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
   onUe1HeartFragmentCalcModeChange: (value: Ue1HeartFragmentCalcMode) => void;
+  includeSameBasePurePieceForUe2: boolean;
+  onIncludeSameBasePurePieceForUe2Change: (value: boolean) => void;
 };
 
 // 必要メモピ/ハートの欠片計算の対象モードを切り替える UI を表示する。
@@ -23,6 +26,8 @@ export const InputMemoryCalcSettings = memo(function InputMemoryCalcSettings({
   onUe1MemoryCalcModeChange,
   ue1HeartFragmentCalcMode,
   onUe1HeartFragmentCalcModeChange,
+  includeSameBasePurePieceForUe2,
+  onIncludeSameBasePurePieceForUe2Change,
 }: InputMemoryCalcSettingsProps) {
   return (
     <div className={memoryCalcSectionClass}>
@@ -68,6 +73,17 @@ export const InputMemoryCalcSettings = memo(function InputMemoryCalcSettings({
               <SelectItem value="all_max">専用1最大まで(専用1未実装含む)</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="grid gap-1.5 text-sm text-muted">
+          <Label>必要ピュアピ合計</Label>
+          <label className="inline-flex min-h-10 items-center gap-2 rounded-[12px] border border-white/20 bg-input-bg px-3">
+            <Checkbox
+              checked={includeSameBasePurePieceForUe2}
+              onCheckedChange={(checked) => onIncludeSameBasePurePieceForUe2Change(checked === true)}
+            />
+            <span className="text-sm text-main">専用2に同名別衣装のピュアピを含める</span>
+          </label>
         </div>
       </div>
     </div>

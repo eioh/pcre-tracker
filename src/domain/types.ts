@@ -59,4 +59,6 @@ export type StoredStateV1 = {
   schemaVersion: 1;
   updatedAt: string;
   progressByName: Record<string, CharacterProgress>;
+  purePieceByCharacterName: Record<string, number>;
+  purePieceByBaseName: Record<string, number>;
 };
