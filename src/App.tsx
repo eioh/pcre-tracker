@@ -4,13 +4,14 @@ import { masterCharacters } from "./domain/master";
 // タブ表示時にのみ読み込むことで初期バンドルを軽量化する。
 const DashboardTab = lazy(() => import("./components/DashboardTab").then((m) => ({ default: m.DashboardTab })));
 const InputTab = lazy(() => import("./components/InputTab").then((m) => ({ default: m.InputTab })));
+const CoinShopTab = lazy(() => import("./components/CoinShopTab").then((m) => ({ default: m.CoinShopTab })));
 import {
   applyBackupPayloadToLocalStorage,
   buildBackupPayloadFromLocalStorage,
   parseBackupPayload,
   serializeBackupPayload,
 } from "./domain/backup";
-import { buildInitialState, loadStoredState, saveStoredState } from "./domain/storage";
+import { buildInitialState, loadStoredState, saveStoredState, toPurePieceCount } from "./domain/storage";
 import type { CharacterProgress, StoredStateV1 } from "./domain/types";
 import { buildDefaultUiState, loadUiState, saveUiState, type InputViewSettings } from "./domain/uiStorage";
 import {
@@ -26,7 +27,7 @@ import {
 import { Button } from "./components/ui/button";
 import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { PenLine, LayoutDashboard, Download, Upload, RotateCcw } from "lucide-react";
+import { PenLine, LayoutDashboard, Coins, Download, Upload, RotateCcw } from "lucide-react";
 
 const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
 
@@ -182,7 +183,7 @@ export default function App() {
   // キャラ名単位（☆6用）のピュアピ所持数を更新する。
   const handleUpdateCharacterPurePiece = useCallback((name: string, value: number) => {
     setState((previous) => {
-      const nextValue = Math.min(99999, Math.max(0, Math.floor(value)));
+      const nextValue = toPurePieceCount(value);
       if (previous.purePieceByCharacterName[name] === nextValue) {
         return previous;
       }
@@ -235,7 +236,7 @@ export default function App() {
       <Tabs
         value={safeUiState.activeTab}
         onValueChange={(value) => {
-          if (value !== "input" && value !== "dashboard") {
+          if (value !== "input" && value !== "dashboard" && value !== "coin_shop") {
             return;
           }
           // 初回表示後はInputTabを保持し、タブ再切り替え時の再マウントを回避する。
@@ -253,6 +254,10 @@ export default function App() {
           <TabsTrigger value="dashboard">
             <LayoutDashboard className="size-4" />
             ダッシュボード
+          </TabsTrigger>
+          <TabsTrigger value="coin_shop">
+            <Coins className="size-4" />
+            ショップ
           </TabsTrigger>
         </TabsList>
 
@@ -272,6 +277,11 @@ export default function App() {
         <TabsContent value="dashboard">
           <Suspense fallback={<TabLoadingFallback />}>
             <DashboardTab masterCharacters={masterCharacters} state={state} />
+          </Suspense>
+        </TabsContent>
+        <TabsContent value="coin_shop">
+          <Suspense fallback={<TabLoadingFallback />}>
+            <CoinShopTab />
           </Suspense>
         </TabsContent>
       </Tabs>

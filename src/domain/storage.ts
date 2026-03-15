@@ -133,7 +133,7 @@ function toObtainedDate(value: unknown): CharacterProgress["obtainedDate"] {
 }
 
 // ガチャ回数入力値を 0〜300 の整数へ正規化する。
-function toGachaPullCount(value: number): CharacterProgress["gachaPullCount"] {
+export function toGachaPullCount(value: number): CharacterProgress["gachaPullCount"] {
   if (!Number.isFinite(value)) {
     return 0;
   }
@@ -141,7 +141,7 @@ function toGachaPullCount(value: number): CharacterProgress["gachaPullCount"] {
 }
 
 // ピュアピ入力値を 0〜99,999 の整数へ正規化する。
-function toPurePieceCount(value: unknown): number {
+export function toPurePieceCount(value: unknown): number {
   const numeric = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(numeric)) {
     return 0;

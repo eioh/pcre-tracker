@@ -5427,7 +5427,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "マコト(コマンダー)",
       "まこと(こまんだあ)",
