@@ -4,6 +4,7 @@ import { masterCharacters } from "./domain/master";
 // タブ表示時にのみ読み込むことで初期バンドルを軽量化する。
 const DashboardTab = lazy(() => import("./components/DashboardTab").then((m) => ({ default: m.DashboardTab })));
 const InputTab = lazy(() => import("./components/InputTab").then((m) => ({ default: m.InputTab })));
+const CoinShopTab = lazy(() => import("./components/CoinShopTab").then((m) => ({ default: m.CoinShopTab })));
 import {
   applyBackupPayloadToLocalStorage,
   buildBackupPayloadFromLocalStorage,
@@ -26,7 +27,7 @@ import {
 import { Button } from "./components/ui/button";
 import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { PenLine, LayoutDashboard, Download, Upload, RotateCcw } from "lucide-react";
+import { PenLine, LayoutDashboard, Coins, Download, Upload, RotateCcw } from "lucide-react";
 
 const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
 
@@ -235,7 +236,7 @@ export default function App() {
       <Tabs
         value={safeUiState.activeTab}
         onValueChange={(value) => {
-          if (value !== "input" && value !== "dashboard") {
+          if (value !== "input" && value !== "dashboard" && value !== "coin_shop") {
             return;
           }
           // 初回表示後はInputTabを保持し、タブ再切り替え時の再マウントを回避する。
@@ -253,6 +254,10 @@ export default function App() {
           <TabsTrigger value="dashboard">
             <LayoutDashboard className="size-4" />
             ダッシュボード
+          </TabsTrigger>
+          <TabsTrigger value="coin_shop">
+            <Coins className="size-4" />
+            ショップ
           </TabsTrigger>
         </TabsList>
 
@@ -272,6 +277,11 @@ export default function App() {
         <TabsContent value="dashboard">
           <Suspense fallback={<TabLoadingFallback />}>
             <DashboardTab masterCharacters={masterCharacters} state={state} />
+          </Suspense>
+        </TabsContent>
+        <TabsContent value="coin_shop">
+          <Suspense fallback={<TabLoadingFallback />}>
+            <CoinShopTab />
           </Suspense>
         </TabsContent>
       </Tabs>

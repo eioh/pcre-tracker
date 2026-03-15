@@ -12,7 +12,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "arena_coin",
       "side_story"
     ]
   },
@@ -63,7 +62,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "arena_coin",
       "side_story"
     ]
   },
@@ -80,7 +78,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "dungeon_coin",
       "side_story"
     ]
   },
@@ -97,7 +94,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "dungeon_coin",
       "side_story"
     ]
   },
@@ -113,9 +109,7 @@
       "ue1Sp": true,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "p_arena_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ユキ",
@@ -147,7 +141,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "p_arena_coin",
       "side_story"
     ]
   },
@@ -164,7 +157,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "dungeon_coin",
       "side_story"
     ]
   },
@@ -181,7 +173,6 @@
       "ue2": true
     },
     "memoryPieceSources": [
-      "arena_coin",
       "side_story"
     ]
   },
@@ -198,7 +189,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "p_arena_coin",
       "side_story"
     ]
   },
@@ -215,7 +205,6 @@
       "ue2": true
     },
     "memoryPieceSources": [
-      "arena_coin",
       "side_story"
     ]
   },
@@ -249,7 +238,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "dungeon_coin",
       "side_story"
     ]
   },
@@ -266,7 +254,6 @@
       "ue2": true
     },
     "memoryPieceSources": [
-      "p_arena_coin",
       "side_story"
     ]
   },
@@ -283,7 +270,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "p_arena_coin",
       "side_story"
     ]
   },
@@ -300,7 +286,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "clan_coin",
       "side_story"
     ]
   },
@@ -351,7 +336,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "clan_coin",
       "side_story"
     ]
   },
@@ -368,7 +352,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "arena_coin",
       "side_story"
     ]
   },
@@ -384,9 +367,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "clan_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "リン",
@@ -401,7 +382,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "dungeon_coin",
       "side_story"
     ]
   },
@@ -452,7 +432,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "dungeon_coin",
       "side_story"
     ]
   },
@@ -536,7 +515,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "dungeon_coin",
       "side_story"
     ]
   },
@@ -621,7 +599,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "clan_coin",
       "side_story"
     ]
   },
@@ -638,7 +615,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "clan_coin",
       "side_story"
     ]
   },
@@ -672,7 +648,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "dungeon_coin",
       "side_story"
     ]
   },
@@ -689,7 +664,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "arena_coin",
       "side_story"
     ]
   },
@@ -774,7 +748,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "dungeon_coin",
       "side_story"
     ]
   },
@@ -807,7 +780,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "arena_coin",
       "side_story"
     ]
   },
@@ -824,7 +796,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "p_arena_coin",
       "side_story"
     ]
   },
@@ -841,7 +812,6 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "dungeon_coin",
       "side_story"
     ]
   },
@@ -926,7 +896,6 @@
       "ue2": true
     },
     "memoryPieceSources": [
-      "dungeon_coin",
       "side_story"
     ]
   },
@@ -942,9 +911,7 @@
       "ue1Sp": true,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "アリサ",
@@ -1024,9 +991,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ラビリスタ",
@@ -1040,9 +1005,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "カイザーインサイト",
@@ -1056,9 +1019,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ネネカ",
@@ -1072,9 +1033,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "クリスティーナ",
@@ -1088,9 +1047,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ペコリーヌ（サマー）",
@@ -1104,9 +1061,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "コッコロ（サマー）",
@@ -1136,9 +1091,7 @@
       "ue1Sp": true,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "キャル（サマー）",
@@ -1152,9 +1105,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "タマキ（サマー）",
@@ -1168,9 +1119,7 @@
       "ue1Sp": true,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ミフユ（サマー）",
@@ -1200,9 +1149,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ミヤコ（ハロウィン）",
@@ -1232,9 +1179,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "チカ（クリスマス）",
@@ -1248,9 +1193,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "クルミ（クリスマス）",
@@ -1280,9 +1223,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ヒヨリ（ニューイヤー）",
@@ -1296,9 +1237,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ユイ（ニューイヤー）",
@@ -1312,9 +1251,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "レイ（ニューイヤー）",
@@ -1360,9 +1297,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "アン",
@@ -1457,9 +1392,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ラム",
@@ -1487,9 +1420,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "スズナ（サマー）",
@@ -1503,9 +1434,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "イオ（サマー）",
@@ -1535,9 +1464,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "マコト（サマー）",
@@ -1551,9 +1478,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "カオリ（サマー）",
@@ -1583,9 +1508,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "アオイ（編入生）",
@@ -1666,9 +1589,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ミソギ（ハロウィン）",
@@ -1730,9 +1651,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ノゾミ（クリスマス）",
@@ -1778,9 +1697,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "コッコロ（ニューイヤー）",
@@ -1794,9 +1711,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "キャル（ニューイヤー）",
@@ -1810,9 +1725,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "スズメ（ニューイヤー）",
@@ -1874,9 +1787,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "リン（デレマス）",
@@ -1890,9 +1801,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ミオ（デレマス）",
@@ -1985,9 +1894,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "アンナ（サマー）",
@@ -2033,9 +1940,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ミサト（サマー）",
@@ -2113,9 +2018,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "レイ（ハロウィン）",
@@ -2193,9 +2096,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "サレン（クリスマス）",
@@ -2209,9 +2110,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "clan_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ユカリ（クリスマス）",
@@ -2257,9 +2156,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "コッコロ（儀装束）",
@@ -2273,9 +2170,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ユイ（儀装束）",
@@ -2337,9 +2232,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "p_arena_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "マホ（シンデレラ）",
@@ -2369,9 +2262,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "dungeon_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "チエル（聖学祭）",
@@ -2449,9 +2340,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "arena_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "タマキ（作業服）",
@@ -2497,9 +2386,7 @@
       "ue1Sp": false,
       "ue2": true
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "シズル（サマー）",
@@ -2529,9 +2416,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "チカ（サマー）",
@@ -2545,9 +2430,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "p_arena_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ツムギ（サマー）",
@@ -2609,9 +2492,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ニノン（ハロウィン）",
@@ -2641,9 +2522,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "dungeon_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "クレジッタ",
@@ -2657,9 +2536,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ランファ",
@@ -2673,9 +2550,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ミソラ",
@@ -2689,9 +2564,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "カリン",
@@ -2705,9 +2578,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ネビア",
@@ -2721,9 +2592,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "イオ（ノワール）",
@@ -2785,9 +2654,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "arena_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ミヤコ（クリスマス）",
@@ -2801,9 +2668,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "シズル（ノワール）",
@@ -2817,9 +2682,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "シェフィ（ニューイヤー）",
@@ -2833,9 +2696,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ルカ（ニューイヤー）",
@@ -2865,9 +2726,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ペコリーヌ（オーバーロード）",
@@ -2881,9 +2740,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "キャル（オーバーロード）",
@@ -2897,9 +2754,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ラビリスタ（オーバーロード）",
@@ -2945,9 +2800,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "clan_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "アユミ（怪盗）",
@@ -2961,9 +2814,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "イノリ（怪盗）",
@@ -2993,9 +2844,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "dungeon_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "シノブ（パイレーツ）",
@@ -3089,9 +2938,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ユイ（サマー）",
@@ -3105,9 +2952,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "arena_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "キョウカ（サマー）",
@@ -3153,9 +2998,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "アメス",
@@ -3169,9 +3012,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "マホ（エクスプローラー）",
@@ -3215,9 +3056,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "リン（ハロウィン）",
@@ -3247,9 +3086,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ナナカ（ハロウィン）",
@@ -3279,9 +3116,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "マツリ（ワイルド）",
@@ -3311,9 +3146,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ヨリ（クリスマス）",
@@ -3343,9 +3176,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "dungeon_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ホマレ（ニューイヤー）",
@@ -3359,9 +3190,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ミサト（ニューイヤー）",
@@ -3375,9 +3204,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ミツキ（ニューイヤー）",
@@ -3407,9 +3234,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "カヤ（リベレイター）",
@@ -3439,9 +3264,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "タマキ（カフェ）",
@@ -3487,9 +3310,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "シオリ（レンジャー）",
@@ -3503,9 +3324,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "arena_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ジータ（ウォーロック）",
@@ -3519,9 +3338,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ビカラ",
@@ -3535,9 +3352,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "カリン（アルケミスト）",
@@ -3609,9 +3424,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ユキ（儀装束）",
@@ -3639,9 +3452,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ライラエル",
@@ -3655,9 +3466,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ネネカ（サマー）",
@@ -3671,9 +3480,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "アキノ（サマー）",
@@ -3717,9 +3524,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "クウカ（サマー）",
@@ -3749,9 +3554,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "キャル（編入生）",
@@ -3765,9 +3568,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "スズナ（編入生）",
@@ -3795,9 +3596,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ルカ（サラサリア）",
@@ -3853,9 +3652,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "クレジッタ（クリスマス）",
@@ -3899,9 +3696,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "カスミ（ニューイヤー）",
@@ -3915,9 +3710,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ヒヨリ（アストラル）",
@@ -3931,9 +3724,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "レイ（アストラル）",
@@ -3963,9 +3754,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "エリス",
@@ -3979,9 +3768,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ユニ（ウィンター）",
@@ -3995,9 +3782,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "クロエ（ウィンター）",
@@ -4025,9 +3810,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "アネモネ",
@@ -4041,9 +3824,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ネフィ＝ネラ",
@@ -4057,9 +3838,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "マコト（コマンダー）",
@@ -4101,9 +3880,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ワカナ",
@@ -4117,9 +3894,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "フブキ",
@@ -4133,9 +3908,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "キョウカ（スプリング）",
@@ -4149,9 +3922,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "スズメ（スプリング）",
@@ -4193,9 +3964,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ネア（サマー）",
@@ -4223,9 +3992,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "リリ（サマー）",
@@ -4239,9 +4006,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "アメス（サマー）",
@@ -4255,9 +4020,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ホマレ（サマー）",
@@ -4299,9 +4062,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "レム（サマー）",
@@ -4315,9 +4076,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ノゾミ（アルケミスト）",
@@ -4331,9 +4090,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ルイズマリー",
@@ -4389,9 +4146,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "イオ（クリスマス）",
@@ -4419,9 +4174,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ヴァイオレット",
@@ -4435,9 +4188,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "モニカ（ニューイヤー）",
@@ -4465,9 +4216,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "メドゥーサ",
@@ -4481,9 +4230,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ラビリスタ（アルファ）",
@@ -4497,9 +4244,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ネネカ（アルファ）",
@@ -4513,9 +4258,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "クリスティーナ（アルファ）",
@@ -4529,9 +4272,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "フィオ",
@@ -4545,9 +4286,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ランファ（儀装束）",
@@ -4729,9 +4468,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "シナツ",
@@ -4745,9 +4482,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ヒヨリ（サラサリア）",
@@ -4803,9 +4538,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "サクラ",
@@ -4917,9 +4650,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "リノ（ニューイヤー）",
@@ -4975,9 +4706,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ネフィ＝ネラ（鬼面仏心）",
@@ -5005,9 +4734,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "レイ（プリンセス）",
@@ -5021,9 +4748,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ペコリーヌ（プリンセス）",
@@ -5037,9 +4762,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "コッコロ（プリンセス）",
@@ -5053,9 +4776,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "キャル（プリンセス）",
@@ -5069,9 +4790,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ハツネ＆シオリ",
@@ -5085,9 +4804,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ミソギ＆ミミ＆キョウカ",
@@ -5101,9 +4818,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "アキノ＆サレン",
@@ -5117,9 +4832,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "アン＆グレア",
@@ -5133,9 +4846,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "シズル＆リノ",
@@ -5149,9 +4860,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "シェフィ（プリンセス）",
@@ -5165,9 +4874,7 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [
-      "master_coin"
-    ]
+    "memoryPieceSources": []
   },
   {
     "name": "ペコリーヌ（アストライア）",
