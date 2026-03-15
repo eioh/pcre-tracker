@@ -4903,5 +4903,19 @@
       "ue2": false
     },
     "memoryPieceSources": []
+  },
+  {
+    "name": "シオリ（ウィンター）",
+    "baseName": "シオリ",
+    "limited": true,
+    "attribute": "水",
+    "role": "ブレイカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
   }
 ]
