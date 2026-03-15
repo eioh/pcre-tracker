@@ -247,13 +247,13 @@ export default function App() {
         }}
       >
         <TabsList className="mb-5" aria-label="画面切り替え">
-          <TabsTrigger value="input">
-            <PenLine className="size-4" />
-            育成入力
-          </TabsTrigger>
           <TabsTrigger value="dashboard">
             <LayoutDashboard className="size-4" />
             ダッシュボード
+          </TabsTrigger>
+          <TabsTrigger value="input">
+            <PenLine className="size-4" />
+            育成入力
           </TabsTrigger>
           <TabsTrigger value="coin_shop">
             <Coins className="size-4" />
