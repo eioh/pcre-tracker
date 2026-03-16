@@ -4,6 +4,8 @@ import { toHiragana, toKatakana, toRomaji } from "wanakana";
 
 const sourceMasterPath = resolve(process.cwd(), "src/data/characterMaster.json");
 const coinShopPath = resolve(process.cwd(), "src/data/coinShopMemoryPiece.json");
+const hardQuestPath = resolve(process.cwd(), "src/data/hardQuestMemoryPiece.json");
+const sideStoryPath = resolve(process.cwd(), "src/data/sideStoryMemoryPiece.json");
 const generatedMasterPath = resolve(process.cwd(), "src/data/characterMaster.generated.json");
 
 // 検索用の比較で使う正規化文字列を作る。
@@ -37,7 +39,28 @@ function buildCoinSourceMap() {
   return map;
 }
 
-// マスターデータへ検索トークンとコインショップ情報を統合して保存する。
+// ハードクエストのメモリピース入手データからキャラ名のSetを構築する。
+function buildHardQuestCharacterSet() {
+  const rawText = readFileSync(hardQuestPath, "utf8");
+  const hardQuestData = JSON.parse(rawText);
+  return new Set(Object.values(hardQuestData));
+}
+
+// サイドストーリーのメモリピース入手データからキャラ名のSetを構築する。
+function buildSideStoryCharacterSet() {
+  const rawText = readFileSync(sideStoryPath, "utf8");
+  const sideStoryData = JSON.parse(rawText);
+  /** @type {Set<string>} */
+  const set = new Set();
+  for (const entry of sideStoryData) {
+    for (const name of entry.characters) {
+      set.add(name);
+    }
+  }
+  return set;
+}
+
+// マスターデータへ検索トークンとコインショップ・ハードクエスト・サイドストーリー情報を統合して保存する。
 function generateSearchTokens() {
   const rawText = readFileSync(sourceMasterPath, "utf8");
   const characters = JSON.parse(rawText);
@@ -47,15 +70,19 @@ function generateSearchTokens() {
   }
 
   const coinSourceMap = buildCoinSourceMap();
+  const hardQuestCharacters = buildHardQuestCharacterSet();
+  const sideStoryCharacters = buildSideStoryCharacterSet();
 
   const enriched = characters.map((character) => {
     if (!character || typeof character !== "object" || typeof character.name !== "string") {
       return character;
     }
     const coinSources = coinSourceMap.get(character.name) ?? [];
+    const hardQuestSources = hardQuestCharacters.has(character.name) ? ["hard_quest"] : [];
+    const sideStorySources = sideStoryCharacters.has(character.name) ? ["side_story"] : [];
     return {
       ...character,
-      memoryPieceSources: [...coinSources, ...character.memoryPieceSources],
+      memoryPieceSources: [...coinSources, ...hardQuestSources, ...sideStorySources, ...(character.memoryPieceSources ?? [])],
       searchTokens: buildNameSearchTokens(character.name),
     };
   });

@@ -10,10 +10,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ユイ",
@@ -26,11 +23,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "レイ",
@@ -43,11 +36,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミソギ",
@@ -60,10 +49,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "マツリ",
@@ -76,10 +62,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "アカリ",
@@ -92,10 +75,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミヤコ",
@@ -108,8 +88,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ユキ",
@@ -122,11 +101,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "アンナ",
@@ -139,10 +114,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "マホ",
@@ -155,10 +127,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "リノ",
@@ -171,10 +140,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ハツネ",
@@ -187,10 +153,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ナナカ",
@@ -203,10 +166,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "カスミ",
@@ -219,11 +179,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミサト",
@@ -236,10 +192,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "スズナ",
@@ -252,10 +205,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "カオリ",
@@ -268,10 +218,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "イオ",
@@ -284,10 +231,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミミ",
@@ -300,11 +244,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "クルミ",
@@ -317,11 +257,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ヨリ",
@@ -334,10 +270,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "アヤネ",
@@ -350,10 +283,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "スズメ",
@@ -366,8 +296,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "リン",
@@ -380,10 +309,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "エリコ",
@@ -396,11 +322,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "サレン",
@@ -413,11 +335,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ノゾミ",
@@ -430,10 +348,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ニノン",
@@ -446,10 +361,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "シノブ",
@@ -462,11 +374,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "アキノ",
@@ -479,11 +387,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "マヒル",
@@ -496,11 +400,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ユカリ",
@@ -513,10 +413,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "キョウカ",
@@ -529,11 +426,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "トモ",
@@ -546,11 +439,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "シオリ",
@@ -563,11 +452,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "アオイ",
@@ -580,11 +465,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "チカ",
@@ -597,10 +478,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "マコト",
@@ -613,10 +491,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "イリヤ",
@@ -629,11 +504,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "クウカ",
@@ -646,10 +517,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "タマキ",
@@ -662,10 +530,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ジュン",
@@ -678,11 +543,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミフユ",
@@ -695,11 +556,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "シズル",
@@ -712,11 +569,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミサキ",
@@ -729,11 +582,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミツキ",
@@ -746,10 +595,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "リマ",
@@ -762,10 +608,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "モニカ",
@@ -778,10 +621,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ツムギ",
@@ -794,10 +634,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "アユミ",
@@ -810,10 +647,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ルカ",
@@ -826,11 +660,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ジータ",
@@ -843,11 +673,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ペコリーヌ",
@@ -860,11 +686,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "コッコロ",
@@ -877,11 +699,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "キャル",
@@ -894,10 +712,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ムイミ",
@@ -910,8 +725,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アリサ",
@@ -924,10 +738,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "シェフィ",
@@ -940,10 +751,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "カヤ",
@@ -956,11 +764,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "イノリ",
@@ -973,11 +777,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ホマレ",
@@ -990,8 +790,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ラビリスタ",
@@ -1004,8 +803,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "カイザーインサイト",
@@ -1018,8 +816,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ネネカ",
@@ -1032,8 +829,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クリスティーナ",
@@ -1046,8 +842,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ペコリーヌ（サマー）",
@@ -1060,8 +855,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "コッコロ（サマー）",
@@ -1074,10 +868,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "スズメ（サマー）",
@@ -1090,8 +881,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "キャル（サマー）",
@@ -1104,8 +894,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "タマキ（サマー）",
@@ -1118,8 +907,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミフユ（サマー）",
@@ -1132,10 +920,7 @@
       "ue1": true,
       "ue1Sp": true,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "シノブ（ハロウィン）",
@@ -1148,8 +933,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミヤコ（ハロウィン）",
@@ -1162,10 +946,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミサキ（ハロウィン）",
@@ -1178,8 +959,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "チカ（クリスマス）",
@@ -1192,8 +972,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クルミ（クリスマス）",
@@ -1206,10 +985,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "アヤネ（クリスマス）",
@@ -1222,8 +998,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ヒヨリ（ニューイヤー）",
@@ -1236,8 +1011,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ユイ（ニューイヤー）",
@@ -1250,8 +1024,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "レイ（ニューイヤー）",
@@ -1264,10 +1037,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "エリコ（バレンタイン）",
@@ -1280,10 +1050,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "シズル（バレンタイン）",
@@ -1296,8 +1063,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アン",
@@ -1310,10 +1076,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ルゥ",
@@ -1326,10 +1089,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "グレア",
@@ -1342,10 +1102,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "クウカ（オーエド）",
@@ -1358,10 +1115,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ニノン（オーエド）",
@@ -1374,11 +1128,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "レム",
@@ -1391,8 +1141,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ラム",
@@ -1405,8 +1154,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "エミリア",
@@ -1419,8 +1167,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "スズナ（サマー）",
@@ -1433,8 +1180,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "イオ（サマー）",
@@ -1447,10 +1193,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "サレン（サマー）",
@@ -1463,8 +1206,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "マコト（サマー）",
@@ -1477,8 +1219,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "カオリ（サマー）",
@@ -1491,10 +1232,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "マホ（サマー）",
@@ -1507,8 +1245,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アオイ（編入生）",
@@ -1521,11 +1258,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "クロエ",
@@ -1538,10 +1271,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "チエル",
@@ -1554,11 +1284,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ユニ",
@@ -1571,11 +1297,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "キョウカ（ハロウィン）",
@@ -1588,8 +1310,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミソギ（ハロウィン）",
@@ -1602,10 +1323,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミミ（ハロウィン）",
@@ -1618,10 +1336,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ルナ",
@@ -1634,10 +1349,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "クリスティーナ（クリスマス）",
@@ -1650,8 +1362,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ノゾミ（クリスマス）",
@@ -1664,10 +1375,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "イリヤ（クリスマス）",
@@ -1680,10 +1388,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ペコリーヌ（ニューイヤー）",
@@ -1696,8 +1401,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "コッコロ（ニューイヤー）",
@@ -1710,8 +1414,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "キャル（ニューイヤー）",
@@ -1724,8 +1427,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "スズメ（ニューイヤー）",
@@ -1738,10 +1440,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "カスミ（マジカル）",
@@ -1754,10 +1453,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "シオリ（マジカル）",
@@ -1770,10 +1466,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ウヅキ（デレマス）",
@@ -1786,8 +1479,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "リン（デレマス）",
@@ -1800,8 +1492,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミオ（デレマス）",
@@ -1814,8 +1505,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "リン（レンジャー）",
@@ -1828,10 +1518,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "マヒル（レンジャー）",
@@ -1844,11 +1531,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest",
-      "side_story"
-    ]
+    }
   },
   {
     "name": "リノ（ワンダー）",
@@ -1861,10 +1544,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "アユミ（ワンダー）",
@@ -1877,10 +1557,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ルカ（サマー）",
@@ -1893,8 +1570,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アンナ（サマー）",
@@ -1907,10 +1583,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ナナカ（サマー）",
@@ -1923,10 +1596,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ハツネ（サマー）",
@@ -1939,8 +1609,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミサト（サマー）",
@@ -1953,10 +1622,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ジュン（サマー）",
@@ -1969,10 +1635,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "アカリ（エンジェル）",
@@ -1985,10 +1648,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ヨリ（エンジェル）",
@@ -2001,10 +1661,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ツムギ（ハロウィン）",
@@ -2017,8 +1674,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "レイ（ハロウィン）",
@@ -2031,10 +1687,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "マツリ（ハロウィン）",
@@ -2047,10 +1700,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "モニカ（マジカル）",
@@ -2063,10 +1713,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "トモ（マジカル）",
@@ -2079,10 +1726,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "アキノ（クリスマス）",
@@ -2095,8 +1739,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "サレン（クリスマス）",
@@ -2109,8 +1752,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ユカリ（クリスマス）",
@@ -2123,10 +1765,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ムイミ（ニューイヤー）",
@@ -2139,10 +1778,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ネネカ（ニューイヤー）",
@@ -2155,8 +1791,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "コッコロ（儀装束）",
@@ -2169,8 +1804,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ユイ（儀装束）",
@@ -2183,10 +1817,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "カスミ（サマー）",
@@ -2199,10 +1830,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "リマ（シンデレラ）",
@@ -2215,10 +1843,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "マコト（シンデレラ）",
@@ -2231,8 +1856,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "マホ（シンデレラ）",
@@ -2245,10 +1869,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "クロエ（聖学祭）",
@@ -2261,8 +1882,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "チエル（聖学祭）",
@@ -2275,10 +1895,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ユニ（聖学祭）",
@@ -2291,10 +1908,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "イノリ（タイムトラベル）",
@@ -2307,10 +1921,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "カヤ（タイムトラベル）",
@@ -2323,10 +1934,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "アオイ（作業服）",
@@ -2339,8 +1947,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "タマキ（作業服）",
@@ -2353,10 +1960,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミフユ（作業服）",
@@ -2369,10 +1973,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "エリコ（サマー）",
@@ -2385,8 +1986,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "シズル（サマー）",
@@ -2399,10 +1999,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": true
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ノゾミ（サマー）",
@@ -2415,8 +2012,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "チカ（サマー）",
@@ -2429,8 +2025,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ツムギ（サマー）",
@@ -2443,10 +2038,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミツキ（オーエド）",
@@ -2459,10 +2051,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ユキ（オーエド）",
@@ -2475,10 +2064,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "カオリ（ハロウィン）",
@@ -2491,8 +2077,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ニノン（ハロウィン）",
@@ -2505,10 +2090,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "スズナ（ハロウィン）",
@@ -2521,8 +2103,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クレジッタ",
@@ -2535,8 +2116,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ランファ",
@@ -2549,8 +2129,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミソラ",
@@ -2563,8 +2142,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "カリン",
@@ -2577,8 +2155,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ネビア",
@@ -2591,8 +2168,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "イオ（ノワール）",
@@ -2605,10 +2181,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "クウカ（ノワール）",
@@ -2621,10 +2194,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "マヒル（クリスマス）",
@@ -2637,10 +2207,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "リノ（クリスマス）",
@@ -2653,8 +2220,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミヤコ（クリスマス）",
@@ -2667,8 +2233,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "シズル（ノワール）",
@@ -2681,8 +2246,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "シェフィ（ニューイヤー）",
@@ -2695,8 +2259,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ルカ（ニューイヤー）",
@@ -2709,10 +2272,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "イリヤ（ニューイヤー）",
@@ -2725,8 +2285,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ペコリーヌ（オーバーロード）",
@@ -2739,8 +2298,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "キャル（オーバーロード）",
@@ -2753,8 +2311,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ラビリスタ（オーバーロード）",
@@ -2767,10 +2324,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "クルミ（ステージ）",
@@ -2783,10 +2337,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ミサキ（ステージ）",
@@ -2799,8 +2350,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アユミ（怪盗）",
@@ -2813,8 +2363,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "イノリ（怪盗）",
@@ -2827,10 +2376,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "アンナ（パイレーツ）",
@@ -2843,8 +2389,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "シノブ（パイレーツ）",
@@ -2857,10 +2402,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "アオイ（キャンプ）",
@@ -2873,10 +2415,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ユカリ（キャンプ）",
@@ -2889,10 +2428,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ヴァンピィ",
@@ -2905,10 +2441,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ヒヨリ（サマー）",
@@ -2921,10 +2454,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "レイ（サマー）",
@@ -2937,8 +2467,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ユイ（サマー）",
@@ -2951,8 +2480,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "キョウカ（サマー）",
@@ -2965,10 +2493,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "ミソギ（サマー）",
@@ -2981,10 +2506,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ミミ（サマー）",
@@ -2997,8 +2519,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アメス",
@@ -3011,8 +2532,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "マホ（エクスプローラー）",
@@ -3025,10 +2545,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "アヤネ（エクスプローラー）",
@@ -3041,8 +2558,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ネア",
@@ -3055,8 +2571,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "リン（ハロウィン）",
@@ -3069,10 +2584,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "トモ（ハロウィン）",
@@ -3085,8 +2597,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ナナカ（ハロウィン）",
@@ -3099,10 +2610,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "クリスティーナ（ワイルド）",
@@ -3115,8 +2623,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "マツリ（ワイルド）",
@@ -3129,10 +2636,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "アカリ（クリスマス）",
@@ -3145,8 +2649,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ヨリ（クリスマス）",
@@ -3159,10 +2662,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ジュン（クリスマス）",
@@ -3175,8 +2675,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ホマレ（ニューイヤー）",
@@ -3189,8 +2688,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミサト（ニューイヤー）",
@@ -3203,8 +2701,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミツキ（ニューイヤー）",
@@ -3217,10 +2714,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ノゾミ（リベレイター）",
@@ -3233,8 +2727,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "カヤ（リベレイター）",
@@ -3247,10 +2740,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ムイミ（リベレイター）",
@@ -3263,8 +2753,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "タマキ（カフェ）",
@@ -3277,10 +2766,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "モニカ（カフェ）",
@@ -3293,10 +2779,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "hard_quest"
-    ]
+    }
   },
   {
     "name": "コッコロ（レンジャー）",
@@ -3309,8 +2792,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "シオリ（レンジャー）",
@@ -3323,8 +2805,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ジータ（ウォーロック）",
@@ -3337,8 +2818,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ビカラ",
@@ -3351,8 +2831,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "カリン（アルケミスト）",
@@ -3365,10 +2844,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "リリ（フォールン）",
@@ -3381,8 +2857,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クリア（フォールン）",
@@ -3395,8 +2870,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "プレシア（フォールン）",
@@ -3409,8 +2883,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "イリヤ（儀装束）",
@@ -3423,8 +2896,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ユキ（儀装束）",
@@ -3437,8 +2909,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クローチェ",
@@ -3451,8 +2922,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ライラエル",
@@ -3465,8 +2935,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ネネカ（サマー）",
@@ -3479,8 +2948,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アキノ（サマー）",
@@ -3493,10 +2961,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ユカリ（サマー）",
@@ -3509,8 +2974,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ランファ（サマー）",
@@ -3523,8 +2987,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クウカ（サマー）",
@@ -3537,10 +3000,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "シノブ（サマー）",
@@ -3553,8 +3013,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "キャル（編入生）",
@@ -3567,8 +3026,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "スズナ（編入生）",
@@ -3581,8 +3039,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "サレン（サラサリア）",
@@ -3595,8 +3052,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ルカ（サラサリア）",
@@ -3609,8 +3065,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "リンド",
@@ -3623,8 +3078,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ヴルム",
@@ -3637,8 +3091,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ペコリーヌ（クリスマス）",
@@ -3651,8 +3104,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クレジッタ（クリスマス）",
@@ -3665,8 +3117,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "イノリ（ニューイヤー）",
@@ -3679,10 +3130,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ハツネ（ニューイヤー）",
@@ -3695,8 +3143,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "カスミ（ニューイヤー）",
@@ -3709,8 +3156,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ヒヨリ（アストラル）",
@@ -3723,8 +3169,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "レイ（アストラル）",
@@ -3737,10 +3182,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": [
-      "side_story"
-    ]
+    }
   },
   {
     "name": "ユイ（アストラル）",
@@ -3753,8 +3195,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "エリス",
@@ -3767,8 +3208,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ユニ（ウィンター）",
@@ -3781,8 +3221,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クロエ（ウィンター）",
@@ -3795,8 +3234,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "チエル（ウィンター）",
@@ -3809,8 +3247,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アネモネ",
@@ -3823,8 +3260,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ネフィ＝ネラ",
@@ -3837,8 +3273,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "マコト（コマンダー）",
@@ -3851,8 +3286,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "エリコ（コマンダー）",
@@ -3865,8 +3299,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ヤマト",
@@ -3879,8 +3312,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ワカナ",
@@ -3893,8 +3325,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "フブキ",
@@ -3907,8 +3338,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "キョウカ（スプリング）",
@@ -3921,8 +3351,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "スズメ（スプリング）",
@@ -3935,8 +3364,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クルル",
@@ -3949,8 +3377,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "マホ（ドリームパーク）",
@@ -3963,8 +3390,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ネア（サマー）",
@@ -3977,8 +3403,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミソラ（サマー）",
@@ -3991,8 +3416,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "リリ（サマー）",
@@ -4005,8 +3429,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アメス（サマー）",
@@ -4019,8 +3442,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ホマレ（サマー）",
@@ -4033,8 +3455,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "エミリア（サマー）",
@@ -4047,8 +3468,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "エキドナ（サマー）",
@@ -4061,8 +3481,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "レム（サマー）",
@@ -4075,8 +3494,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ノゾミ（アルケミスト）",
@@ -4089,8 +3507,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ルイズマリー",
@@ -4103,8 +3520,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "イロハ",
@@ -4117,8 +3533,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ソノ",
@@ -4131,8 +3546,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ライラエル（クリスマス）",
@@ -4145,8 +3559,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "イオ（クリスマス）",
@@ -4159,8 +3572,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "グレイス",
@@ -4173,8 +3585,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ヴァイオレット",
@@ -4187,8 +3598,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "モニカ（ニューイヤー）",
@@ -4201,8 +3611,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "サレン（ニューイヤー）",
@@ -4215,8 +3624,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "メドゥーサ",
@@ -4229,8 +3637,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ラビリスタ（アルファ）",
@@ -4243,8 +3650,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ネネカ（アルファ）",
@@ -4257,8 +3663,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クリスティーナ（アルファ）",
@@ -4271,8 +3676,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "フィオ",
@@ -4285,8 +3689,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ランファ（儀装束）",
@@ -4299,8 +3702,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "チカ（儀装束）",
@@ -4313,8 +3715,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クローチェ（エアリアル）",
@@ -4327,8 +3728,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アオイ（パイロット）",
@@ -4341,8 +3741,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ホウオウ",
@@ -4355,8 +3754,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ツムギ（ジオ・ゲヘナ）",
@@ -4369,8 +3767,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "カノン",
@@ -4383,8 +3780,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "エリス（サマー）",
@@ -4397,8 +3793,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "シェフィ（サマー）",
@@ -4411,8 +3806,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "プレシア（サマー）",
@@ -4425,8 +3819,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "クリア（サマー）",
@@ -4439,8 +3832,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アネモネ（サマー）",
@@ -4453,8 +3845,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アイラ",
@@ -4467,8 +3858,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "シナツ",
@@ -4481,8 +3871,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ヒヨリ（サラサリア）",
@@ -4495,8 +3884,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ユキノ",
@@ -4509,8 +3897,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "サツキ",
@@ -4523,8 +3910,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アラクネ",
@@ -4537,8 +3923,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "サクラ",
@@ -4551,8 +3936,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ナーナ",
@@ -4565,8 +3949,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミソラ（クリスマス）",
@@ -4579,8 +3962,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ユイ（クリスマス）",
@@ -4593,8 +3975,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "シズル（ニューイヤー）",
@@ -4607,8 +3988,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ニノン（サマー）",
@@ -4621,8 +4001,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "カスミ（シスター）",
@@ -4635,8 +4014,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "コッコロ（嚮導幼君）",
@@ -4649,8 +4027,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "リノ（ニューイヤー）",
@@ -4663,8 +4040,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ヴァイオレット（イサナミ）",
@@ -4677,8 +4053,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ライラエル（パルフェクト）",
@@ -4691,8 +4066,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ヒヨリ（プリンセス）",
@@ -4705,8 +4079,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ネフィ＝ネラ（鬼面仏心）",
@@ -4719,8 +4092,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ユイ（プリンセス）",
@@ -4733,8 +4105,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "レイ（プリンセス）",
@@ -4747,8 +4118,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ペコリーヌ（プリンセス）",
@@ -4761,8 +4131,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "コッコロ（プリンセス）",
@@ -4775,8 +4144,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "キャル（プリンセス）",
@@ -4789,8 +4157,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ハツネ＆シオリ",
@@ -4803,8 +4170,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ミソギ＆ミミ＆キョウカ",
@@ -4817,8 +4183,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アキノ＆サレン",
@@ -4831,8 +4196,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "アン＆グレア",
@@ -4845,8 +4209,7 @@
       "ue1": true,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "シズル＆リノ",
@@ -4859,8 +4222,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "シェフィ（プリンセス）",
@@ -4873,8 +4235,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ペコリーヌ（アストライア）",
@@ -4887,8 +4248,7 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
   },
   {
     "name": "ワカナ（ウィンター）",
@@ -4901,7 +4261,19 @@
       "ue1": false,
       "ue1Sp": false,
       "ue2": false
-    },
-    "memoryPieceSources": []
+    }
+  },
+  {
+    "name": "シオリ（ウィンター）",
+    "baseName": "シオリ",
+    "limited": true,
+    "attribute": "水",
+    "role": "ブレイカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    }
   }
 ]
