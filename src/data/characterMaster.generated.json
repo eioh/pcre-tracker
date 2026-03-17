@@ -4739,7 +4739,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "hard_quest"
+    ],
     "searchTokens": [
       "リリ(フォールン)",
       "りり(ふぉうるん)",
@@ -6093,7 +6095,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "ランファ(儀装束)",
       "らんふぁ(儀装束)",
@@ -6935,7 +6939,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "ペコリーヌ(アストライア)",
       "ぺこりいぬ(あすとらいあ)",
