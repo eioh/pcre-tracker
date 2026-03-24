@@ -32,6 +32,7 @@ export type DashboardSummary = {
   starDistribution: DistributionItem[];
   ue1Distribution: DistributionItem[];
   ue2Distribution: DistributionItem[];
+  connectRankDistribution: DistributionItem[];
   ue1Sp: {
     implemented: number;
     equipped: number;
@@ -121,6 +122,11 @@ function formatUe2Label(level: number): string {
   return level === 0 ? "未装備(0)" : `Lv${level}`;
 }
 
+// コネクトランク表示用のラベルを生成する。
+function formatConnectRankLabel(rank: number): string {
+  return `RANK ${rank}`;
+}
+
 // マスターと進捗からダッシュボード用の集計結果を生成する。
 export function buildDashboardSummary(
   masterCharacters: MasterCharacter[],
@@ -130,9 +136,12 @@ export function buildDashboardSummary(
   const ue1Order = ["未実装", ...UE1_LEVEL_VALUES.map(formatUe1Label), "SP"];
   const ue2Order = ["未実装", ...UE2_LEVEL_VALUES.map(formatUe2Label)];
 
+  const connectRankOrder = Array.from({ length: 16 }, (_, i) => formatConnectRankLabel(i));
+
   const starCounts = new Map<string, number>(starOrder.map((label) => [label, 0]));
   const ue1Counts = new Map<string, number>(ue1Order.map((label) => [label, 0]));
   const ue2Counts = new Map<string, number>(ue2Order.map((label) => [label, 0]));
+  const connectRankCounts = new Map<string, number>(connectRankOrder.map((label) => [label, 0]));
 
   let ownedCharacters = 0;
   let limitBreakCharacters = 0;
@@ -160,6 +169,8 @@ export function buildDashboardSummary(
     }
     const starLabel = `☆${progress?.star ?? 1}`;
     starCounts.set(starLabel, (starCounts.get(starLabel) ?? 0) + 1);
+    const connectRankLabel = formatConnectRankLabel(progress?.connectRank ?? 0);
+    connectRankCounts.set(connectRankLabel, (connectRankCounts.get(connectRankLabel) ?? 0) + 1);
     if (character.implemented.star6) {
       star6Implemented += 1;
       if (progress?.star === 6) {
@@ -216,6 +227,7 @@ export function buildDashboardSummary(
     starDistribution: starOrder.map((label) => ({ label, count: starCounts.get(label) ?? 0 })),
     ue1Distribution: ue1Order.map((label) => ({ label, count: ue1Counts.get(label) ?? 0 })),
     ue2Distribution: ue2Order.map((label) => ({ label, count: ue2Counts.get(label) ?? 0 })),
+    connectRankDistribution: connectRankOrder.map((label) => ({ label, count: connectRankCounts.get(label) ?? 0 })),
     ue1Sp: {
       implemented: ue1SpImplemented,
       equipped: ue1SpEquipped,

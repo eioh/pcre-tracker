@@ -99,6 +99,11 @@ describe("buildDashboardSummary", () => {
     expect(ue1Sp?.count).toBe(1);
     expect(ue1Unimplemented?.count).toBe(1);
     expect(ue2Lv2?.count).toBe(1);
+
+    const rank15 = summary.connectRankDistribution.find((item) => item.label === "RANK 15");
+    const rank1 = summary.connectRankDistribution.find((item) => item.label === "RANK 1");
+    expect(rank15?.count).toBe(1);
+    expect(rank1?.count).toBe(1);
   });
 });
 
