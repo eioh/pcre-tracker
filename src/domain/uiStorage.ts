@@ -8,7 +8,7 @@ import type { Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
 export const UI_STORAGE_KEY = "pcr_growth_tracker_ui";
 export const CURRENT_UI_SCHEMA_VERSION = 1 as const;
 
-export type ActiveTab = "input" | "dashboard" | "coin_shop";
+export type ActiveTab = "input" | "dashboard" | "coin_shop" | "connect_rank_calc";
 export type OwnedFilter = "all" | "owned" | "unowned";
 export type LimitedFilter = "all" | "limited" | "normal";
 export type LimitBreakFilter = "all" | "on" | "off";
@@ -58,7 +58,7 @@ export type UiStateV1 = {
   input: InputViewSettings;
 };
 
-const ACTIVE_TAB_VALUES: ActiveTab[] = ["input", "dashboard", "coin_shop"];
+const ACTIVE_TAB_VALUES: ActiveTab[] = ["input", "dashboard", "coin_shop", "connect_rank_calc"];
 const OWNED_FILTER_VALUES: OwnedFilter[] = ["all", "owned", "unowned"];
 const LIMITED_FILTER_VALUES: LimitedFilter[] = ["all", "limited", "normal"];
 const LIMIT_BREAK_FILTER_VALUES: LimitBreakFilter[] = ["all", "on", "off"];

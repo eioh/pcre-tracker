@@ -21,7 +21,7 @@ const CONNECT_RANK_REGALIA_COST: Record<number, { bronze: number; silver: number
 };
 
 // 素材不足数の初期値を返す。
-function createEmptyCost(): ConnectRankMaterialCost {
+export function createEmptyCost(): ConnectRankMaterialCost {
   return { arts: 0, soul: 0, guard: 0, bronzeRegalia: 0, silverRegalia: 0, goldRegalia: 0 };
 }
 
@@ -38,6 +38,40 @@ export function sumConnectRankMaterialCost(
     silverRegalia: left.silverRegalia + right.silverRegalia,
     goldRegalia: left.goldRegalia + right.goldRegalia,
   };
+}
+
+// 指定範囲（currentRank+1 〜 targetRank）のコネクトRANK素材数を計算する。
+export function getConnectRankRangeMaterialCost(
+  role: Role,
+  currentRank: CharacterProgress["connectRank"],
+  targetRank: CharacterProgress["connectRank"],
+): ConnectRankMaterialCost {
+  if (targetRank <= currentRank) {
+    return createEmptyCost();
+  }
+
+  type RoleMaterialCost = { arts: number; soul: number; guard: number };
+  const roleTable = (connectRankMaterialCostMaster as Record<string, Record<string, RoleMaterialCost>>)[role];
+  if (!roleTable) {
+    return createEmptyCost();
+  }
+
+  let total = createEmptyCost();
+  for (let rank = currentRank + 1; rank <= targetRank; rank += 1) {
+    const nextCost = roleTable[String(rank)];
+    if (nextCost) {
+      total.arts += nextCost.arts;
+      total.soul += nextCost.soul;
+      total.guard += nextCost.guard;
+    }
+    const regalia = CONNECT_RANK_REGALIA_COST[rank];
+    if (regalia) {
+      total.bronzeRegalia += regalia.bronze;
+      total.silverRegalia += regalia.silver;
+      total.goldRegalia += regalia.gold;
+    }
+  }
+  return total;
 }
 
 // 現在のコネクトRANKからRANK15までに必要な素材数を計算する。
