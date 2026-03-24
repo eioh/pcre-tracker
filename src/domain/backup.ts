@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CONNECT_RANK_CALC_STORAGE_KEY } from "./connectRankCalcStorage";
 import { STORAGE_KEY } from "./storage";
 import { UI_STORAGE_KEY } from "./uiStorage";
 
@@ -11,6 +12,7 @@ export type LocalStorageBackupV1 = {
   storage: {
     [STORAGE_KEY]: BackupStorageValue;
     [UI_STORAGE_KEY]: BackupStorageValue;
+    [CONNECT_RANK_CALC_STORAGE_KEY]?: BackupStorageValue;
   };
 };
 
@@ -20,6 +22,7 @@ const backupPayloadSchema = z.object({
   storage: z.object({
     [STORAGE_KEY]: z.union([z.record(z.unknown()), z.null()]),
     [UI_STORAGE_KEY]: z.union([z.record(z.unknown()), z.null()]),
+    [CONNECT_RANK_CALC_STORAGE_KEY]: z.union([z.record(z.unknown()), z.null()]).optional(),
   }),
 });
 
@@ -73,6 +76,7 @@ export function buildBackupPayloadFromLocalStorage(): LocalStorageBackupV1 {
       storage: {
         [STORAGE_KEY]: null,
         [UI_STORAGE_KEY]: null,
+        [CONNECT_RANK_CALC_STORAGE_KEY]: null,
       },
     };
   }
@@ -83,6 +87,7 @@ export function buildBackupPayloadFromLocalStorage(): LocalStorageBackupV1 {
     storage: {
       [STORAGE_KEY]: parseStorageValue(window.localStorage.getItem(STORAGE_KEY)),
       [UI_STORAGE_KEY]: parseStorageValue(window.localStorage.getItem(UI_STORAGE_KEY)),
+      [CONNECT_RANK_CALC_STORAGE_KEY]: parseStorageValue(window.localStorage.getItem(CONNECT_RANK_CALC_STORAGE_KEY)),
     },
   };
 }
@@ -116,8 +121,12 @@ export function applyBackupPayloadToLocalStorage(payload: LocalStorageBackupV1):
 
   const growthData = stringifyStorageValue(payload.storage[STORAGE_KEY]);
   const uiData = stringifyStorageValue(payload.storage[UI_STORAGE_KEY]);
+  // バックアップに計算タブデータが未指定（旧バックアップ）の場合はundefined。
+  const calcRawValue = payload.storage[CONNECT_RANK_CALC_STORAGE_KEY];
+  const calcData = calcRawValue === undefined ? undefined : stringifyStorageValue(calcRawValue);
   const previousGrowthData = window.localStorage.getItem(STORAGE_KEY);
   const previousUiData = window.localStorage.getItem(UI_STORAGE_KEY);
+  const previousCalcData = window.localStorage.getItem(CONNECT_RANK_CALC_STORAGE_KEY);
 
   try {
     if (growthData === null) {
@@ -131,6 +140,13 @@ export function applyBackupPayloadToLocalStorage(payload: LocalStorageBackupV1):
     } else {
       window.localStorage.setItem(UI_STORAGE_KEY, uiData);
     }
+
+    // 未指定（undefined）の場合はローカルの計算データを削除し、旧バックアップ復元時のデータ残留を防ぐ。
+    if (calcData === undefined || calcData === null) {
+      window.localStorage.removeItem(CONNECT_RANK_CALC_STORAGE_KEY);
+    } else {
+      window.localStorage.setItem(CONNECT_RANK_CALC_STORAGE_KEY, calcData);
+    }
   } catch (error) {
     if (previousGrowthData === null) {
       window.localStorage.removeItem(STORAGE_KEY);
@@ -141,6 +157,11 @@ export function applyBackupPayloadToLocalStorage(payload: LocalStorageBackupV1):
       window.localStorage.removeItem(UI_STORAGE_KEY);
     } else {
       window.localStorage.setItem(UI_STORAGE_KEY, previousUiData);
+    }
+    if (previousCalcData === null) {
+      window.localStorage.removeItem(CONNECT_RANK_CALC_STORAGE_KEY);
+    } else {
+      window.localStorage.setItem(CONNECT_RANK_CALC_STORAGE_KEY, previousCalcData);
     }
     throw error;
   }

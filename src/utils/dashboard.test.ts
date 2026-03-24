@@ -84,6 +84,9 @@ describe("buildDashboardSummary", () => {
     expect(summary.connectRankMaterialNeeded.arts).toBe(54);
     expect(summary.connectRankMaterialNeeded.soul).toBe(120);
     expect(summary.connectRankMaterialNeeded.guard).toBe(256);
+    expect(summary.connectRankMaterialNeeded.bronzeRegalia).toBe(140);
+    expect(summary.connectRankMaterialNeeded.silverRegalia).toBe(80);
+    expect(summary.connectRankMaterialNeeded.goldRegalia).toBe(20);
 
     const ue1Sp = summary.ue1Distribution.find((item) => item.label === "SP");
     const ue1Unimplemented = summary.ue1Distribution.find((item) => item.label === "未実装");
@@ -96,6 +99,11 @@ describe("buildDashboardSummary", () => {
     expect(ue1Sp?.count).toBe(1);
     expect(ue1Unimplemented?.count).toBe(1);
     expect(ue2Lv2?.count).toBe(1);
+
+    const rank15 = summary.connectRankDistribution.find((item) => item.label === "RANK 15");
+    const rank1 = summary.connectRankDistribution.find((item) => item.label === "RANK 1");
+    expect(rank15?.count).toBe(1);
+    expect(rank1?.count).toBe(1);
   });
 });
 

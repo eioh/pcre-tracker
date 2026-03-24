@@ -136,17 +136,27 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
             <>
               {summary.connectRankMaterialNeeded.arts} / {summary.connectRankMaterialNeeded.soul} /{" "}
               {summary.connectRankMaterialNeeded.guard}
+              <br />
+              {summary.connectRankMaterialNeeded.bronzeRegalia} / {summary.connectRankMaterialNeeded.silverRegalia} /{" "}
+              {summary.connectRankMaterialNeeded.goldRegalia}
             </>
           }
-          subText={<>アーツ / ソウル / ガード</>}
+          subText={
+            <>
+              アーツ / ソウル / ガード
+              <br />
+              ブロンズ / シルバー / ゴールド レガリア
+            </>
+          }
           className="xl:col-span-2"
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
         <DistributionChart title="☆分布" items={summary.starDistribution} />
         <DistributionChart title="専用1レベル分布" items={summary.ue1Distribution} />
         <DistributionChart title="専用2レベル分布" items={summary.ue2Distribution} />
+        <DistributionChart title="コネクトRANK分布" items={summary.connectRankDistribution} />
       </div>
 
       <section className="grid gap-3 rounded-2xl border border-panel-border bg-linear-to-br from-panel-from to-panel-to p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">

@@ -86,7 +86,14 @@ describe("DashboardTab", () => {
     expect(within(ownedCard as HTMLElement).getByText("1 / 2")).toBeInTheDocument();
     expect(screen.getByText("所持率 50.0%")).toBeInTheDocument();
     expect(screen.getByText("コネクトRANK必要素材")).toBeInTheDocument();
-    expect(screen.getByText("54 / 120 / 256")).toBeInTheDocument();
+    const materialCard = screen.getByText("コネクトRANK必要素材").parentElement;
+    expect(materialCard).not.toBeNull();
+    expect(within(materialCard as HTMLElement).getByText(/54/)).toBeInTheDocument();
+    expect(within(materialCard as HTMLElement).getByText(/120/)).toBeInTheDocument();
+    expect(within(materialCard as HTMLElement).getByText(/256/)).toBeInTheDocument();
+    expect(within(materialCard as HTMLElement).getByText(/140/)).toBeInTheDocument();
+    expect(within(materialCard as HTMLElement).getByText(/80/)).toBeInTheDocument();
+    expect(within(materialCard as HTMLElement).getByText(/ブロンズ \/ シルバー \/ ゴールド レガリア/)).toBeInTheDocument();
   });
 
   it("分布チャートのタイトルとチャート領域を表示できる", () => {

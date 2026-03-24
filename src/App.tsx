@@ -5,6 +5,9 @@ import { masterCharacters } from "./domain/master";
 const DashboardTab = lazy(() => import("./components/DashboardTab").then((m) => ({ default: m.DashboardTab })));
 const InputTab = lazy(() => import("./components/InputTab").then((m) => ({ default: m.InputTab })));
 const CoinShopTab = lazy(() => import("./components/CoinShopTab").then((m) => ({ default: m.CoinShopTab })));
+const ConnectRankCalcTab = lazy(() =>
+  import("./components/ConnectRankCalcTab").then((m) => ({ default: m.ConnectRankCalcTab })),
+);
 import {
   applyBackupPayloadToLocalStorage,
   buildBackupPayloadFromLocalStorage,
@@ -13,7 +16,8 @@ import {
 } from "./domain/backup";
 import { buildInitialState, loadStoredState, saveStoredState, toPurePieceCount } from "./domain/storage";
 import type { CharacterProgress, StoredStateV1 } from "./domain/types";
-import { buildDefaultUiState, loadUiState, saveUiState, type InputViewSettings } from "./domain/uiStorage";
+import { buildDefaultUiState, loadUiState, saveUiState, type ActiveTab, type InputViewSettings } from "./domain/uiStorage";
+import { buildDefaultConnectRankCalcState, saveConnectRankCalcState } from "./domain/connectRankCalcStorage";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,7 +31,7 @@ import {
 import { Button } from "./components/ui/button";
 import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { PenLine, LayoutDashboard, Coins, Download, Upload, RotateCcw } from "lucide-react";
+import { PenLine, LayoutDashboard, Coins, Calculator, Download, Upload, RotateCcw } from "lucide-react";
 
 const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
 
@@ -74,6 +78,7 @@ export default function App() {
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [messageDialog, setMessageDialog] = useState<{ title: string; description: string; reloadOnClose: boolean } | null>(null);
   const [inputSettingsSyncToken, setInputSettingsSyncToken] = useState(0);
+  const [connectRankCalcResetToken, setConnectRankCalcResetToken] = useState(0);
   const [hasOpenedInput, setHasOpenedInput] = useState(() => uiState.activeTab === "input");
 
   useEffect(() => {
@@ -137,8 +142,10 @@ export default function App() {
   const handleConfirmReset = useCallback(() => {
     setState(buildInitialState(masterCharacters));
     setUiState(buildDefaultUiState());
+    saveConnectRankCalcState(buildDefaultConnectRankCalcState());
     // 外部要因で入力設定を既定値へ戻したことをInputTabへ伝える。
     setInputSettingsSyncToken((previous) => previous + 1);
+    setConnectRankCalcResetToken((previous) => previous + 1);
     setIsResetDialogOpen(false);
   }, []);
 
@@ -236,14 +243,15 @@ export default function App() {
       <Tabs
         value={safeUiState.activeTab}
         onValueChange={(value) => {
-          if (value !== "input" && value !== "dashboard" && value !== "coin_shop") {
+          const validTabs: ActiveTab[] = ["input", "dashboard", "coin_shop", "connect_rank_calc"];
+          if (!validTabs.includes(value as ActiveTab)) {
             return;
           }
           // 初回表示後はInputTabを保持し、タブ再切り替え時の再マウントを回避する。
           if (value === "input") {
             setHasOpenedInput(true);
           }
-          setUiState((previous) => ({ ...previous, activeTab: value }));
+          setUiState((previous) => ({ ...previous, activeTab: value as ActiveTab }));
         }}
       >
         <TabsList className="mb-5" aria-label="画面切り替え">
@@ -258,6 +266,10 @@ export default function App() {
           <TabsTrigger value="coin_shop">
             <Coins className="size-4" />
             ショップ
+          </TabsTrigger>
+          <TabsTrigger value="connect_rank_calc">
+            <Calculator className="size-4" />
+            コネクトランク計算
           </TabsTrigger>
         </TabsList>
 
@@ -282,6 +294,11 @@ export default function App() {
         <TabsContent value="coin_shop">
           <Suspense fallback={<TabLoadingFallback />}>
             <CoinShopTab />
+          </Suspense>
+        </TabsContent>
+        <TabsContent value="connect_rank_calc">
+          <Suspense fallback={<TabLoadingFallback />}>
+            <ConnectRankCalcTab masterCharacters={masterCharacters} state={state} resetToken={connectRankCalcResetToken} />
           </Suspense>
         </TabsContent>
       </Tabs>
