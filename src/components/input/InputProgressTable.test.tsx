@@ -356,12 +356,14 @@ describe("InputProgressTable", () => {
 
     expect(screen.getByText(/コネクトRANK必要素材/)).toBeInTheDocument();
     expect(screen.getByText(/アーツ\/ソウル\/ガード/)).toBeInTheDocument();
+    expect(screen.getByText(/ブロンズ\/シルバー\/ゴールド/)).toBeInTheDocument();
 
     const tableRows = screen.getAllByRole("row");
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
     expect(cells[11]).toHaveTextContent("120/256/66");
+    expect(cells[11]).toHaveTextContent("140/80/20");
   });
 
   it("メモピ入手列にソース名を表示する", () => {

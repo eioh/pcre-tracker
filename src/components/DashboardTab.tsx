@@ -136,9 +136,18 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
             <>
               {summary.connectRankMaterialNeeded.arts} / {summary.connectRankMaterialNeeded.soul} /{" "}
               {summary.connectRankMaterialNeeded.guard}
+              <br />
+              {summary.connectRankMaterialNeeded.bronzeRegalia} / {summary.connectRankMaterialNeeded.silverRegalia} /{" "}
+              {summary.connectRankMaterialNeeded.goldRegalia}
             </>
           }
-          subText={<>アーツ / ソウル / ガード</>}
+          subText={
+            <>
+              アーツ / ソウル / ガード
+              <br />
+              ブロンズ / シルバー / ゴールド レガリア
+            </>
+          }
           className="xl:col-span-2"
         />
       </div>

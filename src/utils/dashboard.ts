@@ -51,6 +51,9 @@ export type DashboardSummary = {
     arts: number;
     soul: number;
     guard: number;
+    bronzeRegalia: number;
+    silverRegalia: number;
+    goldRegalia: number;
   };
 };
 
@@ -145,7 +148,7 @@ export function buildDashboardSummary(
   let connectRankMemoryNeededTotal = 0;
   let ue1MemoryNeededTotal = 0;
   let limitBreakMemoryNeededTotal = 0;
-  let connectRankMaterialNeededTotal = { arts: 0, soul: 0, guard: 0 };
+  let connectRankMaterialNeededTotal = { arts: 0, soul: 0, guard: 0, bronzeRegalia: 0, silverRegalia: 0, goldRegalia: 0 };
 
   for (const character of masterCharacters) {
     const progress = state.progressByName[character.name];

@@ -403,13 +403,22 @@ const TableRow = memo(function TableRow({
         />
       </TableCell>
       <TableCell>
-        <span className="inline-grid w-full grid-cols-[3ch_auto_3ch_auto_3ch] place-content-center items-center gap-x-1 text-center text-sm font-bold tabular-nums whitespace-nowrap">
-          <span className="text-center">{connectRankRemainingMaterial.arts}</span>
-          <span className="text-center">/</span>
-          <span className="text-center">{connectRankRemainingMaterial.soul}</span>
-          <span className="text-center">/</span>
-          <span className="text-center">{connectRankRemainingMaterial.guard}</span>
-        </span>
+        <div className="grid gap-0.5">
+          <span className="inline-grid w-full grid-cols-[4ch_auto_4ch_auto_4ch] place-content-center items-center gap-x-1 text-center text-sm font-bold tabular-nums whitespace-nowrap">
+            <span className="text-center">{connectRankRemainingMaterial.arts}</span>
+            <span className="text-center">/</span>
+            <span className="text-center">{connectRankRemainingMaterial.soul}</span>
+            <span className="text-center">/</span>
+            <span className="text-center">{connectRankRemainingMaterial.guard}</span>
+          </span>
+          <span className="inline-grid w-full grid-cols-[4ch_auto_4ch_auto_4ch] place-content-center items-center gap-x-1 text-center text-sm font-bold tabular-nums whitespace-nowrap">
+            <span className="text-center">{connectRankRemainingMaterial.bronzeRegalia}</span>
+            <span className="text-center">/</span>
+            <span className="text-center">{connectRankRemainingMaterial.silverRegalia}</span>
+            <span className="text-center">/</span>
+            <span className="text-center">{connectRankRemainingMaterial.goldRegalia}</span>
+          </span>
+        </div>
       </TableCell>
       <TableCell>
         <TooltipProvider>
@@ -728,6 +737,8 @@ export const InputProgressTable = memo(function InputProgressTable({
               コネクトRANK必要素材
               <br />
               （アーツ/ソウル/ガード）
+              <br />
+              （ブロンズ/シルバー/ゴールド）
             </TableHead>
             <TableHead aria-sort={getAriaSort("totalMemoryNeeded", sortKey, sortDirection)} className="text-center">
               <SortHeaderButton

@@ -9,22 +9,22 @@ function getCost(role: Role, connectRank: CharacterProgress["connectRank"]) {
 
 describe("getConnectRankRemainingMaterialCost", () => {
   it("アタッカーの未開放(0)はRANK1を含むRANK15までの残素材を計算できる", () => {
-    expect(getCost("アタッカー", 0)).toEqual({ arts: 126, soul: 270, guard: 66 });
+    expect(getCost("アタッカー", 0)).toEqual({ arts: 126, soul: 270, guard: 66, bronzeRegalia: 140, silverRegalia: 80, goldRegalia: 20 });
   });
 
   it("アタッカーのRANK1はRANK15までの残素材を計算できる", () => {
-    expect(getCost("アタッカー", 1)).toEqual({ arts: 120, soul: 256, guard: 66 });
+    expect(getCost("アタッカー", 1)).toEqual({ arts: 120, soul: 256, guard: 66, bronzeRegalia: 140, silverRegalia: 80, goldRegalia: 20 });
   });
 
   it("タンクのRANK7は残素材を計算できる", () => {
-    expect(getCost("タンク", 7)).toEqual({ arts: 41, soul: 82, guard: 162 });
+    expect(getCost("タンク", 7)).toEqual({ arts: 41, soul: 82, guard: 162, bronzeRegalia: 50, silverRegalia: 55, goldRegalia: 20 });
   });
 
   it("バッファーのRANK10は残素材を計算できる", () => {
-    expect(getCost("バッファー", 10)).toEqual({ arts: 106, soul: 28, guard: 66 });
+    expect(getCost("バッファー", 10)).toEqual({ arts: 106, soul: 28, guard: 66, bronzeRegalia: 20, silverRegalia: 30, goldRegalia: 20 });
   });
 
   it("ブースターのRANK15は残素材が0になる", () => {
-    expect(getCost("ブースター", 15)).toEqual({ arts: 0, soul: 0, guard: 0 });
+    expect(getCost("ブースター", 15)).toEqual({ arts: 0, soul: 0, guard: 0, bronzeRegalia: 0, silverRegalia: 0, goldRegalia: 0 });
   });
 });
