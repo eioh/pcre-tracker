@@ -6988,5 +6988,25 @@
       "シオリ(ウィンタア)",
       "shiori(uintaa)"
     ]
+  },
+  {
+    "name": "グレイス（バニー）",
+    "baseName": "グレイス",
+    "limited": true,
+    "attribute": "水",
+    "role": "アタッカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "グレイス(バニー)",
+      "ぐれいす(ばにい)",
+      "グレイス(バニイ)",
+      "gureisu(banii)"
+    ]
   }
 ]
