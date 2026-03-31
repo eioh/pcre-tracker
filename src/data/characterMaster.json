@@ -4275,5 +4275,18 @@
       "ue1Sp": false,
       "ue2": false
     }
+  },
+  {
+    "name": "グレイス（バニー）",
+    "baseName": "グレイス",
+    "limited": true,
+    "attribute": "水",
+    "role": "アタッカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    }
   }
 ]
