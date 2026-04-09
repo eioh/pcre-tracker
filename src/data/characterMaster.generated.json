@@ -7008,5 +7008,24 @@
       "グレイス(バニイ)",
       "gureisu(banii)"
     ]
+  },
+  {
+    "name": "キョウカ（ゴシック）",
+    "baseName": "キョウカ",
+    "limited": true,
+    "attribute": "闇",
+    "role": "ブレイカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "キョウカ(ゴシック)",
+      "きょうか(ごしっく)",
+      "kyouka(goshikku)"
+    ]
   }
 ]
