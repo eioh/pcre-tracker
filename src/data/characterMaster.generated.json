@@ -3231,7 +3231,7 @@
       "star6": false,
       "ue1": true,
       "ue1Sp": false,
-      "ue2": false
+      "ue2": true
     },
     "memoryPieceSources": [
       "arena_coin"
@@ -3273,7 +3273,7 @@
       "star6": false,
       "ue1": true,
       "ue1Sp": false,
-      "ue2": false
+      "ue2": true
     },
     "memoryPieceSources": [
       "hard_quest"
@@ -6131,7 +6131,7 @@
     "role": "ブースター",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
@@ -6151,7 +6151,7 @@
     "role": "デバッファー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
@@ -6170,7 +6170,7 @@
     "role": "ヒーラー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
