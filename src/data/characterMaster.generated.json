@@ -4247,7 +4247,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "clan_coin"
+    ],
     "searchTokens": [
       "アヤネ(エクスプローラー)",
       "あやね(えくすぷろうらあ)",
@@ -6135,7 +6137,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "クローチェ(エアリアル)",
       "くろうちぇ(えありある)",
@@ -6155,7 +6159,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "アオイ(パイロット)",
       "あおい(ぱいろっと)",
@@ -6174,7 +6180,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "ホウオウ",
       "ほうおう",
