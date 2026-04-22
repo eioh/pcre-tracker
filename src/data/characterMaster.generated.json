@@ -4839,7 +4839,7 @@
     "role": "アタッカー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
