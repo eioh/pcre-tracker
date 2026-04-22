@@ -4302,5 +4302,19 @@
       "ue2": false
     },
     "memoryPieceSources": []
+  },
+  {
+    "name": "キャル（覇瞳天星）",
+    "baseName": "キャル",
+    "limited": true,
+    "attribute": "闇",
+    "role": "デバッファー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
   }
 ]
