@@ -4316,5 +4316,33 @@
       "ue2": false
     },
     "memoryPieceSources": []
+  },
+  {
+    "name": "ミホ（ガルパン）",
+    "baseName": "ミホ（ガルパン）",
+    "limited": false,
+    "attribute": "火",
+    "role": "ヒーラー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "マホ（ガルパン）",
+    "baseName": "マホ（ガルパン）",
+    "limited": true,
+    "attribute": "火",
+    "role": "アタッカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
   }
 ]
