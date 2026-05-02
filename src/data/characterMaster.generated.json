@@ -7054,5 +7054,43 @@
       "きゃる(覇瞳天星)",
       "kyaru(覇瞳天星)"
     ]
+  },
+  {
+    "name": "ミホ（ガルパン）",
+    "baseName": "ミホ（ガルパン）",
+    "limited": false,
+    "attribute": "火",
+    "role": "ヒーラー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "ミホ(ガルパン)",
+      "みほ(がるぱん)",
+      "miho(garupan)"
+    ]
+  },
+  {
+    "name": "マホ（ガルパン）",
+    "baseName": "マホ（ガルパン）",
+    "limited": true,
+    "attribute": "火",
+    "role": "アタッカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "マホ(ガルパン)",
+      "まほ(がるぱん)",
+      "maho(garupan)"
+    ]
   }
 ]
