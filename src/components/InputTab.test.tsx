@@ -56,6 +56,29 @@ describe("InputTab", () => {
     expect(screen.getByText("必要メモピ/ハートの欠片計算")).toBeInTheDocument();
   });
 
+  it("詳細フィルタ未適用時はフィルタ適用中バッジを表示しない", () => {
+    const props = buildProps();
+    render(<InputTab {...props} />);
+
+    expect(screen.queryByText("フィルタ適用中")).not.toBeInTheDocument();
+  });
+
+  it("詳細設定を閉じていて詳細フィルタ適用中ならバッジを表示する", () => {
+    const props = buildProps();
+    const initialSettings = { ...props.initialSettings, ownedFilter: "owned" as const };
+    render(<InputTab {...props} initialSettings={initialSettings} />);
+
+    expect(screen.getByText("フィルタ適用中")).toBeInTheDocument();
+  });
+
+  it("詳細設定を開いている間はフィルタ適用中バッジを表示しない", () => {
+    const props = buildProps();
+    const initialSettings = { ...props.initialSettings, isDetailSettingsOpen: true, ownedFilter: "owned" as const };
+    render(<InputTab {...props} initialSettings={initialSettings} />);
+
+    expect(screen.queryByText("フィルタ適用中")).not.toBeInTheDocument();
+  });
+
   it("settingsSyncTokenが変わらない限りinitialSettings変更ではローカル入力を維持する", async () => {
     const props = buildProps();
     const { rerender } = render(<InputTab {...props} />);
