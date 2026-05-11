@@ -5804,7 +5804,7 @@
     "role": "バッファー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
@@ -5843,7 +5843,7 @@
     "role": "デバッファー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
@@ -7091,6 +7091,25 @@
       "マホ(ガルパン)",
       "まほ(がるぱん)",
       "maho(garupan)"
+    ]
+  },
+  {
+    "name": "エリカ（ガルパン）",
+    "baseName": "エリカ（ガルパン）",
+    "limited": true,
+    "attribute": "風",
+    "role": "デバッファー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "エリカ(ガルパン)",
+      "えりか(がるぱん)",
+      "erika(garupan)"
     ]
   }
 ]

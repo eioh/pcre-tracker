@@ -23,6 +23,7 @@ import { InputProgressTable } from "./input/InputProgressTable";
 import type { ProgressPatch } from "./input/types";
 import { panelClass } from "./input/uiStyles";
 import { useVisibleRows } from "./input/useVisibleRows";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -142,6 +143,29 @@ export function InputTab({
     return nextTotals;
   }, [masterCharacters, state.purePieceByCharacterName]);
 
+  // 詳細設定を閉じた状態でも絞り込み中だと分かるよう、表示件数に影響する詳細フィルタだけを判定する。
+  const hasActiveDetailFilter = useMemo(
+    () =>
+      ownedFilter !== "all" ||
+      limitedFilter !== "all" ||
+      limitBreakFilter !== "all" ||
+      purePieceAvailabilityFilter !== "all" ||
+      starFilters.length > 0 ||
+      ue1Filters.length > 0 ||
+      ue2Filters.length > 0 ||
+      memorySourceFilters.length > 0,
+    [
+      ownedFilter,
+      limitedFilter,
+      limitBreakFilter,
+      purePieceAvailabilityFilter,
+      starFilters,
+      ue1Filters,
+      ue2Filters,
+      memorySourceFilters,
+    ],
+  );
+
   // テーブルヘッダークリック時のソート状態遷移を管理する。
   const handleSort = useCallback(
     (nextSortKey: SortKey): void => {
@@ -258,7 +282,7 @@ export function InputTab({
   return (
     <>
       <section className={`${panelClass} mb-4`}>
-        <div className={isDetailSettingsOpen ? "mb-3" : ""}>
+        <div className={`flex flex-wrap items-center gap-2 ${isDetailSettingsOpen ? "mb-3" : ""}`}>
           <button
             type="button"
             aria-expanded={isDetailSettingsOpen}
@@ -269,6 +293,9 @@ export function InputTab({
             <span>詳細設定</span>
             <ChevronDown className={`size-4 shrink-0 transition-transform ${isDetailSettingsOpen ? "rotate-180" : ""}`} />
           </button>
+          {!isDetailSettingsOpen && hasActiveDetailFilter ? (
+            <Badge className="border-accent/40 bg-accent/10 text-accent">フィルタ適用中</Badge>
+          ) : null}
         </div>
 
         {shouldRenderDetailSettings ? (
@@ -354,7 +381,6 @@ export function InputTab({
           includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
           starMemoryCalcMode={starMemoryCalcMode}
           ue1MemoryCalcMode={ue1MemoryCalcMode}
-          ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
         />
       </section>
     </>

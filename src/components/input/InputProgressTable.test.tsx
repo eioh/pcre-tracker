@@ -61,7 +61,6 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputProgressTable
     includeSameBasePurePieceForUe2: false,
     starMemoryCalcMode: "implemented_max",
     ue1MemoryCalcMode: "implemented_max",
-    ue1HeartFragmentCalcMode: "implemented_max",
     ...overrides,
   };
 }
@@ -114,15 +113,6 @@ describe("InputProgressTable", () => {
     fireEvent.click(screen.getByRole("button", { name: /ガチャ回数/ }));
 
     expect(props.onSort).toHaveBeenCalledWith("gachaPullCount");
-  });
-
-  it("専用1必要ハートの欠片列ヘッダー押下でソートキーを親へ通知できる", () => {
-    const props = buildProps();
-    render(<InputProgressTable {...props} />);
-
-    fireEvent.click(screen.getByRole("button", { name: /専用1必要ハートの欠片/ }));
-
-    expect(props.onSort).toHaveBeenCalledWith("ue1HeartFragmentNeeded");
   });
 
   it("所持チェック変更で進捗更新を通知する", () => {
@@ -222,7 +212,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[13]).toHaveTextContent("0");
+    expect(cells[12]).toHaveTextContent("0");
   });
 
   it("必要ピュアピ合計は設定ONで同名別衣装のピュアピを専用2計算へ含める", () => {
@@ -237,7 +227,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[13]).toHaveTextContent("150");
+    expect(cells[12]).toHaveTextContent("150");
   });
 
   it("必要ピュアピ合計セルのホバーで内訳ツールチップを表示する", async () => {
@@ -251,7 +241,7 @@ describe("InputProgressTable", () => {
     const tableRows = screen.getAllByRole("row");
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
-    const totalTrigger = within(cells[13] as HTMLElement).getByText("150");
+    const totalTrigger = within(cells[12] as HTMLElement).getByText("150");
     fireEvent.pointerMove(totalTrigger);
     fireEvent.mouseOver(totalTrigger);
 
@@ -285,7 +275,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[13]).toHaveTextContent("0");
+    expect(cells[12]).toHaveTextContent("0");
   });
 
   it("必要メモピ合計は所持メモピ数を引いた下限0の値を表示する", () => {
@@ -300,70 +290,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[12]).toHaveTextContent("0");
-  });
-
-  it("専用1必要ハートの欠片を表示する", () => {
-    const props = buildProps();
-    render(<InputProgressTable {...props} />);
-
-    const tableRows = screen.getAllByRole("row");
-    const bodyRow = tableRows[1] as HTMLTableRowElement;
-    const cells = within(bodyRow).getAllByRole("cell");
-
-    expect(cells[15]).toHaveTextContent("318");
-  });
-
-  it("専用1必要ハートの欠片はモード切り替えで未実装キャラも表示できる", () => {
-    const row: VisibleRow = {
-      character: buildCharacter({
-        name: "ユイ",
-        implemented: {
-          star6: true,
-          ue1: false,
-          ue1Sp: false,
-          ue2: false,
-        },
-      }),
-      progress: buildProgress({ ue1Level: null }),
-    };
-
-    const implementedOnlyProps = buildProps({
-      visibleRows: [row],
-      ue1HeartFragmentCalcMode: "implemented_max",
-    });
-    const allMaxProps = buildProps({
-      visibleRows: [row],
-      ue1HeartFragmentCalcMode: "all_max",
-    });
-
-    const { rerender } = render(<InputProgressTable {...implementedOnlyProps} />);
-    let tableRows = screen.getAllByRole("row");
-    let bodyRow = tableRows[1] as HTMLTableRowElement;
-    let cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[15]).toHaveTextContent("0");
-
-    rerender(<InputProgressTable {...allMaxProps} />);
-    tableRows = screen.getAllByRole("row");
-    bodyRow = tableRows[1] as HTMLTableRowElement;
-    cells = within(bodyRow).getAllByRole("cell");
-    expect(cells[15]).toHaveTextContent("318");
-  });
-
-  it("コネクトRANK必要素材列にアーツ/ソウル/ガードを表示する", () => {
-    const props = buildProps();
-    render(<InputProgressTable {...props} />);
-
-    expect(screen.getByText(/コネクトRANK必要素材/)).toBeInTheDocument();
-    expect(screen.getByText(/アーツ\/ソウル\/ガード/)).toBeInTheDocument();
-    expect(screen.getByText(/ブロンズ\/シルバー\/ゴールド/)).toBeInTheDocument();
-
-    const tableRows = screen.getAllByRole("row");
-    const bodyRow = tableRows[1] as HTMLTableRowElement;
-    const cells = within(bodyRow).getAllByRole("cell");
-
-    expect(cells[11]).toHaveTextContent("120/256/66");
-    expect(cells[11]).toHaveTextContent("140/80/20");
+    expect(cells[11]).toHaveTextContent("0");
   });
 
   it("メモピ入手列にソース名を表示する", () => {
@@ -446,7 +373,7 @@ describe("InputProgressTable", () => {
     const tableRows = screen.getAllByRole("row");
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
-    const totalTrigger = within(cells[12] as HTMLElement).getByText("1210");
+    const totalTrigger = within(cells[11] as HTMLElement).getByText("1210");
     fireEvent.pointerMove(totalTrigger);
     fireEvent.mouseOver(totalTrigger);
 

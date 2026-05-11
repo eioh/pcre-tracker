@@ -8,12 +8,7 @@ import { toGachaPullCount, toPurePieceCount } from "../../domain/storage";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { SortDirection, SortKey } from "../../domain/uiStorage";
 import { getConnectRankRemainingMemoryPieceCount } from "../../utils/connectRankMemoryCost";
-import { getConnectRankRemainingMaterialCost } from "../../utils/connectRankMaterialCost";
 import { getLimitBreakRemainingMemoryPieceCount } from "../../utils/limitBreakMemoryCost";
-import {
-  getUe1RemainingHeartFragmentCountByMode,
-  type Ue1HeartFragmentCalcMode,
-} from "../../utils/ue1HeartFragmentCost";
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import { getStarRemainingMemoryPieceCount, type StarMemoryCalcMode } from "../../utils/starMemoryCost";
 import { attributeTextClassMap, memorySourceLabelMap, roleTextClassMap, sourceChipClassMap } from "./constants";
@@ -55,7 +50,6 @@ type InputProgressTableProps = {
   includeSameBasePurePieceForUe2: boolean;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
-  ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
 };
 
 // ソート状態をth要素のaria-sort値に変換する。
@@ -116,7 +110,6 @@ type TableRowProps = {
   includeSameBasePurePieceForUe2: boolean;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
-  ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
 };
 
 // テーブル行コンポーネント。行単位でメモ化し不要な再レンダリングを防ぐ。
@@ -130,7 +123,6 @@ const TableRow = memo(function TableRow({
   includeSameBasePurePieceForUe2,
   starMemoryCalcMode,
   ue1MemoryCalcMode,
-  ue1HeartFragmentCalcMode,
 }: TableRowProps) {
   const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
   const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
@@ -150,8 +142,6 @@ const TableRow = memo(function TableRow({
   const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
   const connectRankRemainingMemoryPiece = getConnectRankRemainingMemoryPieceCount(progress);
   const ue1RemainingMemoryPiece = getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode);
-  const connectRankRemainingMaterial = getConnectRankRemainingMaterialCost(character.role, progress.connectRank);
-  const ue1RemainingHeartFragment = getUe1RemainingHeartFragmentCountByMode(character, progress, ue1HeartFragmentCalcMode);
   const limitBreakRemainingMemoryPiece = getLimitBreakRemainingMemoryPieceCount(character, progress);
   const totalRemainingMemoryPiece =
     starRemainingMemoryPiece + connectRankRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
@@ -403,24 +393,6 @@ const TableRow = memo(function TableRow({
         />
       </TableCell>
       <TableCell>
-        <div className="grid gap-0.5">
-          <span className="inline-grid w-full grid-cols-[4ch_auto_4ch_auto_4ch] place-content-center items-center gap-x-1 text-center text-sm font-bold tabular-nums whitespace-nowrap">
-            <span className="text-center">{connectRankRemainingMaterial.arts}</span>
-            <span className="text-center">/</span>
-            <span className="text-center">{connectRankRemainingMaterial.soul}</span>
-            <span className="text-center">/</span>
-            <span className="text-center">{connectRankRemainingMaterial.guard}</span>
-          </span>
-          <span className="inline-grid w-full grid-cols-[4ch_auto_4ch_auto_4ch] place-content-center items-center gap-x-1 text-center text-sm font-bold tabular-nums whitespace-nowrap">
-            <span className="text-center">{connectRankRemainingMaterial.bronzeRegalia}</span>
-            <span className="text-center">/</span>
-            <span className="text-center">{connectRankRemainingMaterial.silverRegalia}</span>
-            <span className="text-center">/</span>
-            <span className="text-center">{connectRankRemainingMaterial.goldRegalia}</span>
-          </span>
-        </div>
-      </TableCell>
-      <TableCell>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -526,9 +498,6 @@ const TableRow = memo(function TableRow({
           )}
         </div>
       </TableCell>
-      <TableCell>
-        <span className="inline-block w-full text-center text-sm font-bold tabular-nums">{ue1RemainingHeartFragment}</span>
-      </TableCell>
     </UiTableRow>
   );
 });
@@ -546,7 +515,6 @@ export const InputProgressTable = memo(function InputProgressTable({
   includeSameBasePurePieceForUe2,
   starMemoryCalcMode,
   ue1MemoryCalcMode,
-  ue1HeartFragmentCalcMode,
 }: InputProgressTableProps) {
   const shadowLayerRef = useRef<HTMLDivElement | null>(null);
   const scrollParentRef = useRef<HTMLDivElement | null>(null);
@@ -733,13 +701,6 @@ export const InputProgressTable = memo(function InputProgressTable({
                 onSort={onSort}
               />
             </TableHead>
-            <TableHead className="text-center">
-              コネクトRANK必要素材
-              <br />
-              （アーツ/ソウル/ガード）
-              <br />
-              （ブロンズ/シルバー/ゴールド）
-            </TableHead>
             <TableHead aria-sort={getAriaSort("totalMemoryNeeded", sortKey, sortDirection)} className="text-center">
               <SortHeaderButton
                 label="必要メモピ合計"
@@ -751,21 +712,12 @@ export const InputProgressTable = memo(function InputProgressTable({
             </TableHead>
             <TableHead className="text-center">必要ピュアピ合計</TableHead>
             <TableHead className="text-center">メモピ入手</TableHead>
-            <TableHead aria-sort={getAriaSort("ue1HeartFragmentNeeded", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton
-                label="専用1必要ハートの欠片"
-                columnKey="ue1HeartFragmentNeeded"
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={onSort}
-              />
-            </TableHead>
           </UiTableRow>
         </TableHeader>
         <TableBody>
           {visibleRows.length === 0 ? (
             <UiTableRow>
-              <TableCell colSpan={16} className="px-3 py-[18px] text-center text-muted">
+              <TableCell colSpan={14} className="px-3 py-[18px] text-center text-muted">
                 条件に一致するキャラがいません
               </TableCell>
             </UiTableRow>
@@ -773,7 +725,7 @@ export const InputProgressTable = memo(function InputProgressTable({
             <>
               {virtualRows.length > 0 && paddingTop > 0 ? (
                 <UiTableRow aria-hidden="true">
-                  <TableCell colSpan={16} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
+                  <TableCell colSpan={14} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
                 </UiTableRow>
               ) : null}
               {visibleVirtualRows.map(({ virtualRow, row }) => (
@@ -788,12 +740,11 @@ export const InputProgressTable = memo(function InputProgressTable({
                   includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
                   starMemoryCalcMode={starMemoryCalcMode}
                   ue1MemoryCalcMode={ue1MemoryCalcMode}
-                  ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
                 />
               ))}
               {virtualRows.length > 0 && paddingBottom > 0 ? (
                 <UiTableRow aria-hidden="true">
-                  <TableCell colSpan={16} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
+                  <TableCell colSpan={14} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
                 </UiTableRow>
               ) : null}
             </>
