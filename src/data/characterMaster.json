@@ -1074,7 +1074,7 @@
     "implemented": {
       "star6": false,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     }
   },
@@ -1087,7 +1087,7 @@
     "implemented": {
       "star6": false,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     }
   },
@@ -1100,7 +1100,7 @@
     "implemented": {
       "star6": false,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     }
   },
