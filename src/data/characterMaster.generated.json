@@ -1796,7 +1796,7 @@
     "implemented": {
       "star6": false,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     },
     "memoryPieceSources": [
@@ -1817,7 +1817,7 @@
     "implemented": {
       "star6": false,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     },
     "memoryPieceSources": [
@@ -1838,7 +1838,7 @@
     "implemented": {
       "star6": false,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     },
     "memoryPieceSources": [
@@ -4824,7 +4824,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "hard_quest"
+    ],
     "searchTokens": [
       "ユキ(儀装束)",
       "ゆき(儀装束)",
@@ -5808,7 +5810,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "ルイズマリー",
       "るいずまりい",
@@ -7048,7 +7052,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "キャル(覇瞳天星)",
       "きゃる(覇瞳天星)",
