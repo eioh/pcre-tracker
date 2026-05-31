@@ -9,6 +9,7 @@ import type {
   StarFilter,
   Ue1Filter,
   Ue2Filter,
+  AdventureMemoryPieceFilter,
 } from "../../domain/uiStorage";
 import { describe, expect, it, vi } from "vitest";
 import { InputFilters } from "./InputFilters";
@@ -22,6 +23,8 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputFilters>>): C
     onLimitedFilterChange: vi.fn<(value: LimitedFilter) => void>(),
     limitBreakFilter: "all",
     onLimitBreakFilterChange: vi.fn<(value: LimitBreakFilter) => void>(),
+    adventureMemoryPieceFilter: "all",
+    onAdventureMemoryPieceFilterChange: vi.fn<(value: AdventureMemoryPieceFilter) => void>(),
     purePieceAvailabilityFilter: "all",
     onPurePieceAvailabilityFilterChange: vi.fn<(value: PurePieceAvailabilityFilter) => void>(),
     starFilters: [],
@@ -64,6 +67,7 @@ describe("InputFilters", () => {
       ownedFilter: "owned",
       limitedFilter: "limited",
       limitBreakFilter: "on",
+      adventureMemoryPieceFilter: "on",
       starFilters: [6],
       ue1Filters: ["sp"],
       ue2Filters: [5],
@@ -76,6 +80,7 @@ describe("InputFilters", () => {
     expect(props.onOwnedFilterChange).toHaveBeenCalledWith("all");
     expect(props.onLimitedFilterChange).toHaveBeenCalledWith("all");
     expect(props.onLimitBreakFilterChange).toHaveBeenCalledWith("all");
+    expect(props.onAdventureMemoryPieceFilterChange).toHaveBeenCalledWith("all");
     expect(props.onPurePieceAvailabilityFilterChange).toHaveBeenCalledWith("all");
     expect(props.setStarFilters).toHaveBeenCalledWith([]);
     expect(props.setUe1Filters).toHaveBeenCalledWith([]);
@@ -123,11 +128,13 @@ describe("InputFilters", () => {
     selectComboboxOption("所持", "所持のみ");
     selectComboboxOption("限定", "限定のみ");
     selectComboboxOption("限界突破", "限界突破済み");
+    selectComboboxOption("アドベンチャー", "メモピ枠のみ");
     selectComboboxOption("ピュアピ", "入手可能のみ");
 
     expect(props.onOwnedFilterChange).toHaveBeenCalledWith("owned");
     expect(props.onLimitedFilterChange).toHaveBeenCalledWith("limited");
     expect(props.onLimitBreakFilterChange).toHaveBeenCalledWith("on");
+    expect(props.onAdventureMemoryPieceFilterChange).toHaveBeenCalledWith("on");
     expect(props.onPurePieceAvailabilityFilterChange).toHaveBeenCalledWith("available");
   });
 });

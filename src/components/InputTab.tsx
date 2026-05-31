@@ -3,6 +3,7 @@ import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } f
 import type { CharacterProgress, MasterCharacter, StoredStateV1 } from "../domain/types";
 import type {
   InputViewSettings,
+  AdventureMemoryPieceFilter,
   LimitBreakFilter,
   LimitedFilter,
   MemorySourceFilter,
@@ -62,6 +63,9 @@ export function InputTab({
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>(initialSettings.ownedFilter);
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>(initialSettings.limitedFilter);
   const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>(initialSettings.limitBreakFilter);
+  const [adventureMemoryPieceFilter, setAdventureMemoryPieceFilter] = useState<AdventureMemoryPieceFilter>(
+    initialSettings.adventureMemoryPieceFilter,
+  );
   const [purePieceAvailabilityFilter, setPurePieceAvailabilityFilter] = useState<PurePieceAvailabilityFilter>(
     initialSettings.purePieceAvailabilityFilter,
   );
@@ -122,6 +126,7 @@ export function InputTab({
     ownedFilter,
     limitedFilter,
     limitBreakFilter,
+    adventureMemoryPieceFilter,
     purePieceAvailabilityFilter,
     starMemoryCalcMode,
     ue1MemoryCalcMode,
@@ -149,6 +154,7 @@ export function InputTab({
       ownedFilter !== "all" ||
       limitedFilter !== "all" ||
       limitBreakFilter !== "all" ||
+      adventureMemoryPieceFilter !== "all" ||
       purePieceAvailabilityFilter !== "all" ||
       starFilters.length > 0 ||
       ue1Filters.length > 0 ||
@@ -158,6 +164,7 @@ export function InputTab({
       ownedFilter,
       limitedFilter,
       limitBreakFilter,
+      adventureMemoryPieceFilter,
       purePieceAvailabilityFilter,
       starFilters,
       ue1Filters,
@@ -204,6 +211,7 @@ export function InputTab({
       ownedFilter,
       limitedFilter,
       limitBreakFilter,
+      adventureMemoryPieceFilter,
       purePieceAvailabilityFilter,
       starMemoryCalcMode,
       ue1MemoryCalcMode,
@@ -222,6 +230,7 @@ export function InputTab({
       ownedFilter,
       limitedFilter,
       limitBreakFilter,
+      adventureMemoryPieceFilter,
       purePieceAvailabilityFilter,
       starMemoryCalcMode,
       ue1MemoryCalcMode,
@@ -247,6 +256,7 @@ export function InputTab({
     setOwnedFilter(initialSettings.ownedFilter);
     setLimitedFilter(initialSettings.limitedFilter);
     setLimitBreakFilter(initialSettings.limitBreakFilter);
+    setAdventureMemoryPieceFilter(initialSettings.adventureMemoryPieceFilter);
     setPurePieceAvailabilityFilter(initialSettings.purePieceAvailabilityFilter);
     setStarMemoryCalcMode(initialSettings.starMemoryCalcMode);
     setUe1MemoryCalcMode(initialSettings.ue1MemoryCalcMode);
@@ -314,6 +324,8 @@ export function InputTab({
                 onLimitedFilterChange={setLimitedFilter}
                 limitBreakFilter={limitBreakFilter}
                 onLimitBreakFilterChange={setLimitBreakFilter}
+                adventureMemoryPieceFilter={adventureMemoryPieceFilter}
+                onAdventureMemoryPieceFilterChange={setAdventureMemoryPieceFilter}
                 purePieceAvailabilityFilter={purePieceAvailabilityFilter}
                 onPurePieceAvailabilityFilterChange={setPurePieceAvailabilityFilter}
                 starFilters={starFilters}

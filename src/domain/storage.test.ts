@@ -45,6 +45,7 @@ describe("loadStoredState", () => {
     expect(hiyori?.ue1Level).toBe(140);
     expect(hiyori?.ue1SpEquipped).toBe(false);
     expect(hiyori?.ue2Level).toBeNull();
+    expect(hiyori?.adventureMemoryPieceTarget).toBe(false);
     expect(hiyori?.ownedMemoryPiece).toBe(0);
     expect(hiyori?.obtainedDate).toBeNull();
     expect(hiyori?.gachaPullCount).toBe(0);

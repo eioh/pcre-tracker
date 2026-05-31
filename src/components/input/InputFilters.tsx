@@ -2,6 +2,7 @@ import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import { memo, type Dispatch, type SetStateAction } from "react";
 import type { CharacterProgress } from "../../domain/types";
 import type {
+  AdventureMemoryPieceFilter,
   LimitBreakFilter,
   LimitedFilter,
   MemorySourceFilter,
@@ -26,6 +27,8 @@ type InputFiltersProps = {
   onLimitedFilterChange: (value: LimitedFilter) => void;
   limitBreakFilter: LimitBreakFilter;
   onLimitBreakFilterChange: (value: LimitBreakFilter) => void;
+  adventureMemoryPieceFilter: AdventureMemoryPieceFilter;
+  onAdventureMemoryPieceFilterChange: (value: AdventureMemoryPieceFilter) => void;
   purePieceAvailabilityFilter: PurePieceAvailabilityFilter;
   onPurePieceAvailabilityFilterChange: (value: PurePieceAvailabilityFilter) => void;
   starFilters: StarFilter[];
@@ -51,6 +54,8 @@ export const InputFilters = memo(function InputFilters({
   onLimitedFilterChange,
   limitBreakFilter,
   onLimitBreakFilterChange,
+  adventureMemoryPieceFilter,
+  onAdventureMemoryPieceFilterChange,
   purePieceAvailabilityFilter,
   onPurePieceAvailabilityFilterChange,
   starFilters,
@@ -83,6 +88,7 @@ export const InputFilters = memo(function InputFilters({
     onOwnedFilterChange("all");
     onLimitedFilterChange("all");
     onLimitBreakFilterChange("all");
+    onAdventureMemoryPieceFilterChange("all");
     onPurePieceAvailabilityFilterChange("all");
     setStarFilters([]);
     setUe1Filters([]);
@@ -137,6 +143,23 @@ export const InputFilters = memo(function InputFilters({
               <SelectItem value="all">すべて</SelectItem>
               <SelectItem value="on">限界突破済み</SelectItem>
               <SelectItem value="off">未限界突破</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid gap-1.5 text-sm text-muted">
+          <Label>アドベンチャー</Label>
+          <Select
+            value={adventureMemoryPieceFilter}
+            onValueChange={(value) => onAdventureMemoryPieceFilterChange(value as AdventureMemoryPieceFilter)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">すべて</SelectItem>
+              <SelectItem value="on">メモピ枠のみ</SelectItem>
+              <SelectItem value="off">メモピ枠以外</SelectItem>
             </SelectContent>
           </Select>
         </div>

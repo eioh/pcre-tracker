@@ -12,6 +12,7 @@ export type ActiveTab = "input" | "dashboard" | "coin_shop" | "connect_rank_calc
 export type OwnedFilter = "all" | "owned" | "unowned";
 export type LimitedFilter = "all" | "limited" | "normal";
 export type LimitBreakFilter = "all" | "on" | "off";
+export type AdventureMemoryPieceFilter = "all" | "on" | "off";
 export type PurePieceAvailabilityFilter = "all" | "available" | "unavailable";
 export type StarFilter = 1 | 2 | 3 | 4 | 5 | 6;
 export type Ue1Filter = "unimplemented" | "sp" | (typeof UE1_LEVEL_VALUES)[number];
@@ -39,6 +40,7 @@ export type InputViewSettings = {
   ownedFilter: OwnedFilter;
   limitedFilter: LimitedFilter;
   limitBreakFilter: LimitBreakFilter;
+  adventureMemoryPieceFilter: AdventureMemoryPieceFilter;
   purePieceAvailabilityFilter: PurePieceAvailabilityFilter;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
@@ -62,6 +64,7 @@ const ACTIVE_TAB_VALUES: ActiveTab[] = ["input", "dashboard", "coin_shop", "conn
 const OWNED_FILTER_VALUES: OwnedFilter[] = ["all", "owned", "unowned"];
 const LIMITED_FILTER_VALUES: LimitedFilter[] = ["all", "limited", "normal"];
 const LIMIT_BREAK_FILTER_VALUES: LimitBreakFilter[] = ["all", "on", "off"];
+const ADVENTURE_MEMORY_PIECE_FILTER_VALUES: AdventureMemoryPieceFilter[] = ["all", "on", "off"];
 const PURE_PIECE_AVAILABILITY_FILTER_VALUES: PurePieceAvailabilityFilter[] = ["all", "available", "unavailable"];
 const STAR_MEMORY_CALC_MODE_VALUES: StarMemoryCalcMode[] = ["implemented_max", "star6_max"];
 const UE1_MEMORY_CALC_MODE_VALUES: Ue1MemoryCalcMode[] = ["implemented_max", "sp_max"];
@@ -94,6 +97,7 @@ const defaultInputViewSettings: InputViewSettings = {
   ownedFilter: "all",
   limitedFilter: "all",
   limitBreakFilter: "all",
+  adventureMemoryPieceFilter: "all",
   purePieceAvailabilityFilter: "all",
   starMemoryCalcMode: "implemented_max",
   ue1MemoryCalcMode: "implemented_max",
@@ -114,6 +118,7 @@ const looseInputSettingsSchema = z
     ownedFilter: z.unknown().optional(),
     limitedFilter: z.unknown().optional(),
     limitBreakFilter: z.unknown().optional(),
+    adventureMemoryPieceFilter: z.unknown().optional(),
     purePieceAvailabilityFilter: z.unknown().optional(),
     starMemoryCalcMode: z.unknown().optional(),
     ue1MemoryCalcMode: z.unknown().optional(),
@@ -196,6 +201,11 @@ function normalizeInputSettings(rawInput: unknown): InputViewSettings {
       raw.limitBreakFilter,
       LIMIT_BREAK_FILTER_VALUES,
       defaultInputViewSettings.limitBreakFilter,
+    ),
+    adventureMemoryPieceFilter: normalizeEnumValue(
+      raw.adventureMemoryPieceFilter,
+      ADVENTURE_MEMORY_PIECE_FILTER_VALUES,
+      defaultInputViewSettings.adventureMemoryPieceFilter,
     ),
     purePieceAvailabilityFilter: normalizeEnumValue(
       raw.purePieceAvailabilityFilter,

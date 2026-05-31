@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type {
+  AdventureMemoryPieceFilter,
   LimitBreakFilter,
   LimitedFilter,
   MemorySourceFilter,
@@ -30,6 +31,7 @@ type UseVisibleRowsParams = {
   ownedFilter: OwnedFilter;
   limitedFilter: LimitedFilter;
   limitBreakFilter: LimitBreakFilter;
+  adventureMemoryPieceFilter: AdventureMemoryPieceFilter;
   purePieceAvailabilityFilter: PurePieceAvailabilityFilter;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
@@ -120,6 +122,7 @@ export function useVisibleRows({
   ownedFilter,
   limitedFilter,
   limitBreakFilter,
+  adventureMemoryPieceFilter,
   purePieceAvailabilityFilter,
   starMemoryCalcMode,
   ue1MemoryCalcMode,
@@ -176,6 +179,12 @@ export function useVisibleRows({
         continue;
       }
       if (limitBreakFilter === "off" && progress.limitBreak) {
+        continue;
+      }
+      if (adventureMemoryPieceFilter === "on" && progress.adventureMemoryPieceTarget !== true) {
+        continue;
+      }
+      if (adventureMemoryPieceFilter === "off" && progress.adventureMemoryPieceTarget === true) {
         continue;
       }
       const isPurePieceAvailable = character.implemented.star6 || character.implemented.ue2;
@@ -311,6 +320,7 @@ export function useVisibleRows({
     return sortedRows.map(({ character, progress }) => ({ character, progress }));
   }, [
     limitBreakFilter,
+    adventureMemoryPieceFilter,
     limitedFilter,
     purePieceAvailabilityFilter,
     masterCharacters,

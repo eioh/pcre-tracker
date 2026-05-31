@@ -10,6 +10,7 @@ export type ProgressPatch = Partial<
     | "ue1Level"
     | "ue1SpEquipped"
     | "ue2Level"
+    | "adventureMemoryPieceTarget"
     | "ownedMemoryPiece"
     | "obtainedDate"
     | "gachaPullCount"
