@@ -495,7 +495,8 @@
       "ue2": true
     },
     "memoryPieceSources": [
-      "clan_coin"
+      "clan_coin",
+      "side_story"
     ],
     "searchTokens": [
       "スズメ",
@@ -7135,6 +7136,25 @@
       "ルルィ",
       "るるぃ",
       "rurui"
+    ]
+  },
+  {
+    "name": "リリ（ヴァルキュリア）",
+    "baseName": "リリ",
+    "limited": true,
+    "attribute": "光",
+    "role": "ブレイカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "リリ(ヴァルキュリア)",
+      "りり(ゔぁるきゅりあ)",
+      "riri(vuarukyuria)"
     ]
   }
 ]
