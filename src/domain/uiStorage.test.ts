@@ -27,6 +27,7 @@ describe("uiStorage", () => {
         ownedFilter: "owned",
         limitedFilter: "limited",
         limitBreakFilter: "on",
+        adventureMemoryPieceFilter: "on",
         purePieceAvailabilityFilter: "available",
         starMemoryCalcMode: "star6_max",
         ue1MemoryCalcMode: "sp_max",
@@ -55,6 +56,7 @@ describe("uiStorage", () => {
           searchText: 123,
           isDetailSettingsOpen: "broken",
           ownedFilter: "foo",
+          adventureMemoryPieceFilter: "broken",
           purePieceAvailabilityFilter: "broken",
           starFilters: [1, 99, 1, "x"],
           ue1Filters: [370, 999, "sp"],
@@ -73,6 +75,7 @@ describe("uiStorage", () => {
     expect(loaded.input.purePieceAvailabilityFilter).toBe("all");
     expect(loaded.input.limitedFilter).toBe("all");
     expect(loaded.input.limitBreakFilter).toBe("all");
+    expect(loaded.input.adventureMemoryPieceFilter).toBe("all");
     expect(loaded.input.starMemoryCalcMode).toBe("implemented_max");
     expect(loaded.input.ue1MemoryCalcMode).toBe("implemented_max");
     expect(loaded.input.ue1HeartFragmentCalcMode).toBe("implemented_max");

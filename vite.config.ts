@@ -16,6 +16,10 @@ export default defineConfig({
   },
   server: {
     port: 5273,
+    watch: {
+      usePolling: true,
+      interval: 500,
+    },
   },
   build: {
     rollupOptions: {

@@ -177,6 +177,10 @@ const TableRow = memo(function TableRow({
     (checked: boolean | "indeterminate") => onUpdateProgress(character.name, { limitBreak: checked === true }),
     [onUpdateProgress, character.name],
   );
+  const handleAdventureMemoryPieceTargetChange = useCallback(
+    (checked: boolean | "indeterminate") => onUpdateProgress(character.name, { adventureMemoryPieceTarget: checked === true }),
+    [onUpdateProgress, character.name],
+  );
   const handleStarChange = useCallback(
     (value: string) => onUpdateProgress(character.name, { star: Number(value) as CharacterProgress["star"] }),
     [onUpdateProgress, character.name],
@@ -304,7 +308,16 @@ const TableRow = memo(function TableRow({
           </TableSelect>
         )}
       </TableCell>
-      <TableCell className="border-r border-table-border">
+      <TableCell className="text-center">
+        <label className={`${tableSwitchClass} w-full justify-center`}>
+          <TableCheckbox
+            checked={progress.adventureMemoryPieceTarget === true}
+            aria-label={`${character.name}のアドベンチャーメモピ枠`}
+            onCheckedChange={handleAdventureMemoryPieceTargetChange}
+          />
+        </label>
+      </TableCell>
+      <TableCell>
         <TableNumberInput
           type="number"
           inputMode="numeric"
@@ -625,13 +638,12 @@ export const InputProgressTable = memo(function InputProgressTable({
           <col className="w-[150px]" />
           <col className="w-[150px]" />
           <col className="w-[150px]" />
-          <col className="w-[150px]" />
+          <col className="w-[130px]" />
           <col className="w-[150px]" />
           <col className="w-[150px]" />
           <col className="w-[170px]" />
           <col className="w-[150px]" />
           <col className="w-[160px]" />
-          <col className="w-[150px]" />
           <col className="w-[150px]" />
           <col className="w-[170px]" />
         </colgroup>
@@ -674,6 +686,7 @@ export const InputProgressTable = memo(function InputProgressTable({
             <TableHead aria-sort={getAriaSort("ue2", sortKey, sortDirection)} className="text-center">
               <SortHeaderButton label="専用2" columnKey="ue2" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
             </TableHead>
+            <TableHead className="text-center">アドベンチャー</TableHead>
             <TableHead aria-sort={getAriaSort("ownedMemoryPiece", sortKey, sortDirection)} className="text-center">
               <SortHeaderButton
                 label="所持メモピ"
@@ -717,7 +730,7 @@ export const InputProgressTable = memo(function InputProgressTable({
         <TableBody>
           {visibleRows.length === 0 ? (
             <UiTableRow>
-              <TableCell colSpan={14} className="px-3 py-[18px] text-center text-muted">
+              <TableCell colSpan={15} className="px-3 py-[18px] text-center text-muted">
                 条件に一致するキャラがいません
               </TableCell>
             </UiTableRow>
@@ -725,7 +738,7 @@ export const InputProgressTable = memo(function InputProgressTable({
             <>
               {virtualRows.length > 0 && paddingTop > 0 ? (
                 <UiTableRow aria-hidden="true">
-                  <TableCell colSpan={14} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
+                  <TableCell colSpan={15} className="h-0 border-0 p-0" style={{ height: `${paddingTop}px` }} />
                 </UiTableRow>
               ) : null}
               {visibleVirtualRows.map(({ virtualRow, row }) => (
@@ -744,7 +757,7 @@ export const InputProgressTable = memo(function InputProgressTable({
               ))}
               {virtualRows.length > 0 && paddingBottom > 0 ? (
                 <UiTableRow aria-hidden="true">
-                  <TableCell colSpan={14} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
+                  <TableCell colSpan={15} className="h-0 border-0 p-0" style={{ height: `${paddingBottom}px` }} />
                 </UiTableRow>
               ) : null}
             </>

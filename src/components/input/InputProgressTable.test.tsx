@@ -35,6 +35,7 @@ function buildProgress(overrides?: Partial<CharacterProgress>): CharacterProgres
     ue1Level: 0,
     ue1SpEquipped: false,
     ue2Level: 0,
+    adventureMemoryPieceTarget: false,
     ownedMemoryPiece: 0,
     obtainedDate: null,
     gachaPullCount: 0,
@@ -125,6 +126,16 @@ describe("InputProgressTable", () => {
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { owned: false });
   });
 
+  it("アドベンチャーメモピ枠チェック変更で進捗更新を通知する", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({ onUpdateProgress });
+    render(<InputProgressTable {...props} />);
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "ヒヨリのアドベンチャーメモピ枠" }));
+
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { adventureMemoryPieceTarget: true });
+  });
+
   it("テーブル内セレクト変更で星・専用1・専用2を更新できる", () => {
     const onUpdateProgress = vi.fn();
     const row: VisibleRow = {
@@ -212,7 +223,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[12]).toHaveTextContent("0");
+    expect(cells[13]).toHaveTextContent("0");
   });
 
   it("必要ピュアピ合計は設定ONで同名別衣装のピュアピを専用2計算へ含める", () => {
@@ -227,7 +238,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[12]).toHaveTextContent("150");
+    expect(cells[13]).toHaveTextContent("150");
   });
 
   it("必要ピュアピ合計セルのホバーで内訳ツールチップを表示する", async () => {
@@ -241,7 +252,7 @@ describe("InputProgressTable", () => {
     const tableRows = screen.getAllByRole("row");
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
-    const totalTrigger = within(cells[12] as HTMLElement).getByText("150");
+    const totalTrigger = within(cells[13] as HTMLElement).getByText("150");
     fireEvent.pointerMove(totalTrigger);
     fireEvent.mouseOver(totalTrigger);
 
@@ -275,7 +286,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[12]).toHaveTextContent("0");
+    expect(cells[13]).toHaveTextContent("0");
   });
 
   it("必要メモピ合計は所持メモピ数を引いた下限0の値を表示する", () => {
@@ -290,7 +301,7 @@ describe("InputProgressTable", () => {
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
 
-    expect(cells[11]).toHaveTextContent("0");
+    expect(cells[12]).toHaveTextContent("0");
   });
 
   it("メモピ入手列にソース名を表示する", () => {
@@ -373,7 +384,7 @@ describe("InputProgressTable", () => {
     const tableRows = screen.getAllByRole("row");
     const bodyRow = tableRows[1] as HTMLTableRowElement;
     const cells = within(bodyRow).getAllByRole("cell");
-    const totalTrigger = within(cells[11] as HTMLElement).getByText("1210");
+    const totalTrigger = within(cells[12] as HTMLElement).getByText("1210");
     fireEvent.pointerMove(totalTrigger);
     fireEvent.mouseOver(totalTrigger);
 
