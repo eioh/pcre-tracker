@@ -6,7 +6,6 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import { toGachaPullCount, toPurePieceCount } from "../../domain/storage";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
-import type { SortDirection, SortKey } from "../../domain/uiStorage";
 import { getConnectRankRemainingMemoryPieceCount } from "../../utils/connectRankMemoryCost";
 import { getLimitBreakRemainingMemoryPieceCount } from "../../utils/limitBreakMemoryCost";
 import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
@@ -17,8 +16,6 @@ import type { ProgressPatch, VisibleRow } from "./types";
 import {
   characterNameCellLayoutClass,
   characterTagLineClass,
-  sortButtonClass,
-  sortIndicatorClass,
   tableSwitchClass,
   tableWrapClass,
 } from "./uiStyles";
@@ -42,31 +39,12 @@ type InputProgressTableProps = {
   visibleRows: VisibleRow[];
   purePieceByCharacterName: Record<string, number>;
   purePieceByBaseNameFromCharacters: Record<string, number>;
-  sortKey: SortKey;
-  sortDirection: SortDirection;
-  onSort: (sortKey: SortKey) => void;
   onUpdateProgress: (name: string, patch: ProgressPatch) => void;
   onUpdatePurePiece: (name: string, value: number) => void;
   includeSameBasePurePieceForUe2: boolean;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
 };
-
-// ソート状態をth要素のaria-sort値に変換する。
-function getAriaSort(columnKey: SortKey, sortKey: SortKey, sortDirection: SortDirection): "none" | "ascending" | "descending" {
-  if (sortKey !== columnKey || sortDirection === null) {
-    return "none";
-  }
-  return sortDirection === "asc" ? "ascending" : "descending";
-}
-
-// ソート中の列に矢印記号を表示する。
-function renderSortIndicator(columnKey: SortKey, sortKey: SortKey, sortDirection: SortDirection): string {
-  if (sortKey !== columnKey || sortDirection === null) {
-    return "";
-  }
-  return sortDirection === "asc" ? "▲" : "▼";
-}
 
 // 保存用の日付文字列をDateへ変換し、不正値なら undefined を返す。
 function parseStoredDate(value: string | null): Date | undefined {
@@ -80,24 +58,6 @@ function parseStoredDate(value: string | null): Date | undefined {
 // Date型を保存用の YYYY-MM-DD 文字列へ変換する。
 function toStoredDateString(value: Date): string {
   return format(value, "yyyy-MM-dd");
-}
-
-type SortHeaderButtonProps = {
-  label: string;
-  columnKey: SortKey;
-  sortKey: SortKey;
-  sortDirection: SortDirection;
-  onSort: (sortKey: SortKey) => void;
-};
-
-// テーブルヘッダーのソートボタンを統一表示する。
-function SortHeaderButton({ label, columnKey, sortKey, sortDirection, onSort }: SortHeaderButtonProps) {
-  return (
-    <Button variant="ghost" className={`${sortButtonClass} relative w-full justify-center rounded-none px-0 py-0`} onClick={() => onSort(columnKey)}>
-      {label}
-      <span className={`${sortIndicatorClass} absolute right-0`}>{renderSortIndicator(columnKey, sortKey, sortDirection)}</span>
-    </Button>
-  );
 }
 
 type TableRowProps = {
@@ -520,9 +480,6 @@ export const InputProgressTable = memo(function InputProgressTable({
   visibleRows,
   purePieceByCharacterName,
   purePieceByBaseNameFromCharacters,
-  sortKey,
-  sortDirection,
-  onSort,
   onUpdateProgress,
   onUpdatePurePiece,
   includeSameBasePurePieceForUe2,
@@ -649,80 +606,26 @@ export const InputProgressTable = memo(function InputProgressTable({
         </colgroup>
         <TableHeader>
           <UiTableRow>
-            <TableHead aria-sort={getAriaSort("owned", sortKey, sortDirection)} className="sticky left-0 z-[6] bg-table-header-bg text-center">
-              <SortHeaderButton label="所持" columnKey="owned" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
+            <TableHead className="sticky left-0 z-[6] bg-table-header-bg text-center">
+              所持
             </TableHead>
             <TableHead
               ref={stickyNameHeadRef}
-              aria-sort={getAriaSort("name", sortKey, sortDirection)}
               className="sticky left-20 z-[6] border-r border-table-border bg-table-header-bg text-center"
             >
-              <SortHeaderButton label="キャラ" columnKey="name" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
+              キャラ
             </TableHead>
-            <TableHead aria-sort={getAriaSort("limitBreak", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton
-                label="限界突破"
-                columnKey="limitBreak"
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={onSort}
-              />
-            </TableHead>
-            <TableHead aria-sort={getAriaSort("star", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton label="☆" columnKey="star" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
-            </TableHead>
-            <TableHead aria-sort={getAriaSort("connectRank", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton
-                label="コネクトRANK"
-                columnKey="connectRank"
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={onSort}
-              />
-            </TableHead>
-            <TableHead aria-sort={getAriaSort("ue1", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton label="専用1" columnKey="ue1" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
-            </TableHead>
-            <TableHead aria-sort={getAriaSort("ue2", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton label="専用2" columnKey="ue2" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
-            </TableHead>
+            <TableHead className="text-center">限界突破</TableHead>
+            <TableHead className="text-center">☆</TableHead>
+            <TableHead className="text-center">コネクトRANK</TableHead>
+            <TableHead className="text-center">専用1</TableHead>
+            <TableHead className="text-center">専用2</TableHead>
             <TableHead className="text-center">アドベンチャー</TableHead>
-            <TableHead aria-sort={getAriaSort("ownedMemoryPiece", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton
-                label="所持メモピ"
-                columnKey="ownedMemoryPiece"
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={onSort}
-              />
-            </TableHead>
-            <TableHead className="text-center">
-              所持ピュアピ
-            </TableHead>
-            <TableHead aria-sort={getAriaSort("obtainedDate", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton label="入手日" columnKey="obtainedDate" sortKey={sortKey} sortDirection={sortDirection} onSort={onSort} />
-            </TableHead>
-            <TableHead
-              aria-sort={getAriaSort("gachaPullCount", sortKey, sortDirection)}
-              className="border-r border-table-border text-center"
-            >
-              <SortHeaderButton
-                label="ガチャ回数"
-                columnKey="gachaPullCount"
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={onSort}
-              />
-            </TableHead>
-            <TableHead aria-sort={getAriaSort("totalMemoryNeeded", sortKey, sortDirection)} className="text-center">
-              <SortHeaderButton
-                label="必要メモピ合計"
-                columnKey="totalMemoryNeeded"
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={onSort}
-              />
-            </TableHead>
+            <TableHead className="text-center">所持メモピ</TableHead>
+            <TableHead className="text-center">所持ピュアピ</TableHead>
+            <TableHead className="text-center">入手日</TableHead>
+            <TableHead className="border-r border-table-border text-center">ガチャ回数</TableHead>
+            <TableHead className="text-center">必要メモピ合計</TableHead>
             <TableHead className="text-center">必要ピュアピ合計</TableHead>
             <TableHead className="text-center">メモピ入手</TableHead>
           </UiTableRow>

@@ -173,26 +173,11 @@ export function InputTab({
     ],
   );
 
-  // テーブルヘッダークリック時のソート状態遷移を管理する。
-  const handleSort = useCallback(
-    (nextSortKey: SortKey): void => {
-      if (sortKey !== nextSortKey) {
-        setSortKey(nextSortKey);
-        setSortDirection("asc");
-        return;
-      }
-      if (sortDirection === "asc") {
-        setSortDirection("desc");
-        return;
-      }
-      if (sortDirection === "desc") {
-        setSortDirection(null);
-        return;
-      }
-      setSortDirection("asc");
-    },
-    [sortKey, sortDirection],
-  );
+  // ソート列の変更時に列キーを保存し、未ソート状態ならすぐ並び替えが効くよう昇順へ切り替える。
+  const handleSortKeyChange = useCallback((nextSortKey: SortKey): void => {
+    setSortKey(nextSortKey);
+    setSortDirection((previousDirection) => previousDirection ?? "asc");
+  }, []);
 
   // 詳細設定セクションの開閉状態を切り替える。
   const handleDetailSettingsToggle = useCallback((): void => {
@@ -336,6 +321,10 @@ export function InputTab({
                 setUe2Filters={setUe2Filters}
                 memorySourceFilters={memorySourceFilters}
                 setMemorySourceFilters={setMemorySourceFilters}
+                sortKey={sortKey}
+                onSortKeyChange={handleSortKeyChange}
+                sortDirection={sortDirection}
+                onSortDirectionChange={setSortDirection}
               />
 
               <Separator className="mt-4" label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
@@ -391,9 +380,6 @@ export function InputTab({
           visibleRows={visibleRows}
           purePieceByCharacterName={state.purePieceByCharacterName}
           purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
-          sortKey={sortKey}
-          sortDirection={sortDirection}
-          onSort={handleSort}
           onUpdateProgress={onUpdateProgress}
           onUpdatePurePiece={onUpdateCharacterPurePiece}
           includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}

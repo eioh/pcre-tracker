@@ -1,7 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ComponentProps } from "react";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
-import type { SortKey } from "../../domain/uiStorage";
 import { describe, expect, it, vi } from "vitest";
 import { InputProgressTable } from "./InputProgressTable";
 import type { VisibleRow } from "./types";
@@ -54,9 +53,6 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputProgressTable
     visibleRows: [defaultRow],
     purePieceByCharacterName: { ヒヨリ: 0 },
     purePieceByBaseNameFromCharacters: { ヒヨリ: 0 },
-    sortKey: "name",
-    sortDirection: null,
-    onSort: vi.fn<(sortKey: SortKey) => void>(),
     onUpdateProgress: vi.fn(),
     onUpdatePurePiece: vi.fn<(name: string, value: number) => void>(),
     includeSameBasePurePieceForUe2: false,
@@ -80,41 +76,15 @@ describe("InputProgressTable", () => {
     expect(screen.getByText("条件に一致するキャラがいません")).toBeInTheDocument();
   });
 
-  it("ヘッダー押下でソートキーを親へ通知できる", () => {
+  it("テーブルヘッダーはソートボタンではなく静的な見出しとして表示する", () => {
     const props = buildProps();
     render(<InputProgressTable {...props} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /必要メモピ合計/ }));
-
-    expect(props.onSort).toHaveBeenCalledWith("totalMemoryNeeded");
+    expect(screen.getByRole("columnheader", { name: "所持メモピ" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /所持メモピ/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /必要メモピ合計/ })).toBeNull();
   });
 
-  it("所持メモピ列ヘッダー押下でソートキーを親へ通知できる", () => {
-    const props = buildProps();
-    render(<InputProgressTable {...props} />);
-
-    fireEvent.click(screen.getByRole("button", { name: /所持メモピ/ }));
-
-    expect(props.onSort).toHaveBeenCalledWith("ownedMemoryPiece");
-  });
-
-  it("入手日列ヘッダー押下でソートキーを親へ通知できる", () => {
-    const props = buildProps();
-    render(<InputProgressTable {...props} />);
-
-    fireEvent.click(screen.getByRole("button", { name: "入手日" }));
-
-    expect(props.onSort).toHaveBeenCalledWith("obtainedDate");
-  });
-
-  it("ガチャ回数列ヘッダー押下でソートキーを親へ通知できる", () => {
-    const props = buildProps();
-    render(<InputProgressTable {...props} />);
-
-    fireEvent.click(screen.getByRole("button", { name: /ガチャ回数/ }));
-
-    expect(props.onSort).toHaveBeenCalledWith("gachaPullCount");
-  });
 
   it("所持チェック変更で進捗更新を通知する", () => {
     const onUpdateProgress = vi.fn();
@@ -362,7 +332,7 @@ describe("InputProgressTable", () => {
       }),
       progress: buildProgress(),
     };
-    const props = buildProps({ visibleRows: [row], sortDirection: "asc" });
+    const props = buildProps({ visibleRows: [row] });
     render(<InputProgressTable {...props} />);
 
     const tableRows = screen.getAllByRole("row");

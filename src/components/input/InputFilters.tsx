@@ -8,6 +8,8 @@ import type {
   MemorySourceFilter,
   OwnedFilter,
   PurePieceAvailabilityFilter,
+  SortDirection,
+  SortKey,
   StarFilter,
   Ue1Filter,
   Ue2Filter,
@@ -39,14 +41,34 @@ type InputFiltersProps = {
   setUe2Filters: Dispatch<SetStateAction<Ue2Filter[]>>;
   memorySourceFilters: MemorySourceFilter[];
   setMemorySourceFilters: Dispatch<SetStateAction<MemorySourceFilter[]>>;
+  sortKey: SortKey;
+  onSortKeyChange: (value: SortKey) => void;
+  sortDirection: SortDirection;
+  onSortDirectionChange: (value: SortDirection) => void;
 };
+
+const sortKeyOptions: Array<{ value: SortKey; label: string }> = [
+  { value: "owned", label: "所持" },
+  { value: "name", label: "キャラ" },
+  { value: "limited", label: "限定" },
+  { value: "limitBreak", label: "限界突破" },
+  { value: "star", label: "☆" },
+  { value: "connectRank", label: "コネクトRANK" },
+  { value: "ue1", label: "専用1" },
+  { value: "ue2", label: "専用2" },
+  { value: "ownedMemoryPiece", label: "所持メモピ" },
+  { value: "obtainedDate", label: "入手日" },
+  { value: "gachaPullCount", label: "ガチャ回数" },
+  { value: "totalMemoryNeeded", label: "必要メモピ合計" },
+  { value: "ue1HeartFragmentNeeded", label: "必要ハートの欠片" },
+];
 
 // ラベル配列をスラッシュ区切りの文字列へ整形する。
 function buildSummary(labels: string[]): string {
   return labels.join(" / ");
 }
 
-// 育成入力画面のフィルタ操作 UI を表示する。
+// 育成入力画面のソートとフィルタ操作 UI を表示する。
 export const InputFilters = memo(function InputFilters({
   ownedFilter,
   onOwnedFilterChange,
@@ -66,6 +88,10 @@ export const InputFilters = memo(function InputFilters({
   setUe2Filters,
   memorySourceFilters,
   setMemorySourceFilters,
+  sortKey,
+  onSortKeyChange,
+  sortDirection,
+  onSortDirectionChange,
 }: InputFiltersProps) {
   const selectedMemorySourceLabels = buildSummary(
     memorySourceFilters.map((filter) => (filter === "none" ? "情報なし" : memorySourceLabelMap[filter])),
@@ -98,6 +124,41 @@ export const InputFilters = memo(function InputFilters({
 
   return (
     <>
+      <p className={`${sectionLabelClass} mb-1`}>ソート</p>
+      <div className={`${inputToolbarClass} mb-4`}>
+        <div className="grid gap-1.5 text-sm text-muted">
+          <Label>ソート列</Label>
+          <Select value={sortKey} onValueChange={(value) => onSortKeyChange(value as SortKey)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {sortKeyOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid gap-1.5 text-sm text-muted">
+          <Label>ソート順</Label>
+          <Select
+            value={sortDirection ?? "none"}
+            onValueChange={(value) => onSortDirectionChange(value === "none" ? null : (value as SortDirection))}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">なし</SelectItem>
+              <SelectItem value="asc">昇順</SelectItem>
+              <SelectItem value="desc">降順</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       <p className={`${sectionLabelClass} mb-1`}>フィルタ</p>
       <div className="mb-2">
         <Button

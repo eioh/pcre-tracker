@@ -7,9 +7,6 @@ export const memoryCalcSectionClass = "mt-0.5 pt-1";
 export const memoryCalcGridClass = "grid grid-cols-1 gap-3 md:grid-cols-3";
 export const tableWrapClass =
   "h-[70vh] overflow-auto rounded-[8px] border border-table-wrap-border bg-table-wrap-bg [overscroll-behavior-x:contain] [scrollbar-gutter:stable] [contain:layout_paint_size]";
-export const sortButtonClass =
-  "inline-flex cursor-pointer items-center gap-1.5 whitespace-nowrap border-0 bg-transparent p-0 text-inherit hover:text-sort-hover";
-export const sortIndicatorClass = "min-w-[0.85em] text-[0.72rem] text-accent";
 export const tableSwitchClass = "inline-flex items-center gap-2 whitespace-nowrap text-sm";
 export const sourceChipBaseClass = "rounded-full border px-2 py-0.5 text-[0.72rem] whitespace-nowrap";
 export const characterNameCellLayoutClass = "grid gap-1";
