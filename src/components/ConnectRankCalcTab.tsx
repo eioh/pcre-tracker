@@ -130,7 +130,7 @@ export function ConnectRankCalcTab({ masterCharacters, state, resetToken }: Prop
   }, [rowCosts]);
 
   return (
-    <section className="rounded-[20px] border border-white/30 bg-linear-to-br from-section-from to-section-to p-6">
+    <section className="grid gap-3">
       {/* キャラ追加エリア */}
       <CharacterCombobox candidates={availableCharacters} onSelect={handleAddCharacter} resetToken={resetToken} />
 
@@ -140,7 +140,7 @@ export function ConnectRankCalcTab({ masterCharacters, state, resetToken }: Prop
           <p className="text-sm text-muted">キャラクターを追加して素材を計算できます</p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-[8px] border border-table-wrap-border bg-table-wrap-bg">
           <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow>
@@ -173,7 +173,7 @@ export function ConnectRankCalcTab({ masterCharacters, state, resetToken }: Prop
               ))}
             </TableBody>
             <TableFooter>
-              <TableRow>
+              <TableRow className="bg-row-even hover:bg-row-even">
                 <TableCell className="font-semibold">集計</TableCell>
                 <TableCell />
                 <TableCell />

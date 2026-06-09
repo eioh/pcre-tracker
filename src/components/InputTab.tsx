@@ -371,7 +371,13 @@ export function InputTab({
                 placeholder="例: ヒヨリ"
               />
             </div>
-            <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={handleSearchReset}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="shrink-0 border-danger/60 bg-danger-bg/40 text-danger hover:border-danger-strong hover:text-danger-strong"
+              onClick={handleSearchReset}
+            >
               リセット
             </Button>
           </div>

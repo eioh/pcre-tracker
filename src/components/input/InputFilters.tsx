@@ -100,7 +100,13 @@ export const InputFilters = memo(function InputFilters({
     <>
       <p className={`${sectionLabelClass} mb-1`}>フィルタ</p>
       <div className="mb-2">
-        <Button type="button" variant="outline" size="sm" onClick={resetFilters}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="border-danger/60 bg-danger-bg/40 text-danger hover:border-danger-strong hover:text-danger-strong"
+          onClick={resetFilters}
+        >
           リセット
         </Button>
       </div>

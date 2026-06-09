@@ -14,7 +14,7 @@ export function StatCard({ title, value, subText, className }: StatCardProps) {
   return (
     <Card
       className={cn(
-        "rounded-2xl border-panel-border bg-linear-to-br from-panel-from to-panel-to p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+        "rounded-[8px] border-panel-border bg-linear-to-br from-panel-from to-panel-to p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
         className,
       )}
     >

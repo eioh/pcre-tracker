@@ -14,7 +14,7 @@ const COIN_TYPES: MemoryPieceSource[] = [
 // コインショップで交換可能なメモリーピース一覧を表示するタブ。
 export function CoinShopTab() {
   return (
-    <section className="rounded-[20px] border border-white/30 bg-linear-to-br from-section-from to-section-to p-6">
+    <section className="grid gap-5">
       <Tabs defaultValue="dungeon_coin">
         <TabsList className="mb-5">
           {COIN_TYPES.map((coinType) => (
