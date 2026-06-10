@@ -5829,7 +5829,7 @@
     "role": "アタッカー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
@@ -6202,7 +6202,7 @@
     "role": "バッファー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
@@ -6221,7 +6221,7 @@
     "role": "ブレイカー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
@@ -7155,6 +7155,25 @@
       "リリ(ヴァルキュリア)",
       "りり(ゔぁるきゅりあ)",
       "riri(vuarukyuria)"
+    ]
+  },
+  {
+    "name": "プレシア（ヴァルキュリア）",
+    "baseName": "プレシア",
+    "limited": true,
+    "attribute": "光",
+    "role": "バッファー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "プレシア(ヴァルキュリア)",
+      "ぷれしあ(ゔぁるきゅりあ)",
+      "pureshia(vuarukyuria)"
     ]
   }
 ]
