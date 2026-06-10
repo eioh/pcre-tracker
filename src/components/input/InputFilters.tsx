@@ -163,7 +163,7 @@ export const InputFilters = memo(function InputFilters({
       </div>
       <p className={`${sectionLabelClass} mb-1`}>フィルタ</p>
       <div className="mb-2 flex flex-wrap gap-2">
-        <Button type="button" variant="default" size="sm" onClick={onApplyDisplaySettings}>
+        <Button type="button" variant="default" size="sm" className="bg-none bg-accent" onClick={onApplyDisplaySettings}>
           表示に適用
         </Button>
         <Button
