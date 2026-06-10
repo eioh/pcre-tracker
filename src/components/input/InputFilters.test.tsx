@@ -41,6 +41,7 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputFilters>>): C
     onSortKeyChange: vi.fn<(value: SortKey) => void>(),
     sortDirection: null,
     onSortDirectionChange: vi.fn<(value: SortDirection) => void>(),
+    onApplyDisplaySettings: vi.fn(),
     ...overrides,
   };
 }
@@ -153,5 +154,14 @@ describe("InputFilters", () => {
 
     expect(props.onSortKeyChange).toHaveBeenCalledWith("totalMemoryNeeded");
     expect(props.onSortDirectionChange).toHaveBeenCalledWith("desc");
+  });
+
+  it("表示に適用ボタンで手動適用を通知する", () => {
+    const props = buildProps();
+    render(<InputFilters {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "表示に適用" }));
+
+    expect(props.onApplyDisplaySettings).toHaveBeenCalledTimes(1);
   });
 });
