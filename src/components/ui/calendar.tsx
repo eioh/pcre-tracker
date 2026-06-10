@@ -40,9 +40,9 @@ export function Calendar({ className, classNames, showOutsideDays = true, style,
         dropdowns: cn(defaultClassNames.dropdowns, "flex items-center gap-2"),
         dropdown: cn(
           defaultClassNames.dropdown,
-          "appearance-none rounded-lg border border-white/20 bg-[#090e17] px-2 py-1 text-sm text-main outline-none focus:border-accent",
+          "appearance-none rounded-lg border border-white/20 bg-input-bg px-2 py-1 text-sm text-main outline-none focus:border-accent",
         ),
-        selected: cn(defaultClassNames.selected, "bg-accent text-[#071218] hover:bg-accent"),
+        selected: cn(defaultClassNames.selected, "bg-accent text-accent-text hover:bg-accent"),
         today: cn(defaultClassNames.today, "border border-white/50 text-white"),
         ...classNames,
       }}

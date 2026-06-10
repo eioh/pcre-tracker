@@ -1,11 +1,9 @@
-import * as Popover from "@radix-ui/react-popover";
-import { CalendarIcon, ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { MasterCharacter, StoredStateV1 } from "../domain/types";
 import { buildDashboardSummary, buildGachaPullChartItems } from "../utils/dashboard";
-import { Calendar } from "./ui/calendar";
 import { DistributionChart } from "./ui/distribution-chart";
 import { GachaPullChart } from "./ui/gacha-pull-chart";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { StatCard } from "./ui/stat-card";
 
 type DashboardTabProps = {
@@ -18,28 +16,19 @@ function formatPercent(value: number): string {
   return `${value.toFixed(1)}%`;
 }
 
-// 指定日付を YYYY-MM-DD 形式へ整形する。
-function toDateOnlyString(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+// 指定年の1月1日を YYYY-MM-DD 形式で返す。
+function toYearStartDateOnlyString(year: number): string {
+  return `${year}-01-01`;
 }
 
-// 今年1月1日の YYYY-MM-DD 文字列を返す。
-function getCurrentYearStartDateOnlyString(today: Date): string {
-  return `${today.getFullYear()}-01-01`;
+// 指定年の12月31日を YYYY-MM-DD 形式で返す。
+function toYearEndDateOnlyString(year: number): string {
+  return `${year}-12-31`;
 }
 
-// YYYY-MM-DD 文字列を Date オブジェクトに変換する。
-function parseDate(dateString: string): Date {
-  const parts = dateString.split("-").map(Number);
-  return new Date(parts[0]!, parts[1]! - 1, parts[2]!);
-}
-
-// YYYY-MM-DD 文字列を YYYY/MM/DD 表示用文字列に変換する。
-function formatDisplayDate(dateString: string): string {
-  return dateString.replaceAll("-", "/");
+// 年選択用に開始年から終了年までの数値配列を作る。
+function buildYearOptions(startYear: number, endYear: number): number[] {
+  return Array.from({ length: endYear - startYear + 1 }, (_, index) => startYear + index);
 }
 
 // 表示範囲内のガチャ回数平均を算出し、小数1桁へ丸める。
@@ -54,10 +43,12 @@ function calculateAveragePullCount(values: number[]): number {
 // 全体の育成進捗サマリーをカードと分布で表示する。
 export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
   const today = useMemo(() => new Date(), []);
-  const [fromDate, setFromDate] = useState(() => getCurrentYearStartDateOnlyString(today));
-  const [toDate, setToDate] = useState(() => toDateOnlyString(today));
-  const [isFromDatePickerOpen, setIsFromDatePickerOpen] = useState(false);
-  const [isToDatePickerOpen, setIsToDatePickerOpen] = useState(false);
+  const currentYear = today.getFullYear();
+  const [fromYear, setFromYear] = useState(currentYear);
+  const [toYear, setToYear] = useState(currentYear);
+  const yearOptions = useMemo(() => buildYearOptions(2018, currentYear + 1), [currentYear]);
+  const fromDate = useMemo(() => toYearStartDateOnlyString(fromYear), [fromYear]);
+  const toDate = useMemo(() => toYearEndDateOnlyString(toYear), [toYear]);
   const summary = useMemo(() => buildDashboardSummary(masterCharacters, state), [masterCharacters, state]);
   const gachaPullChartItems = useMemo(
     () => buildGachaPullChartItems(masterCharacters, state, fromDate, toDate),
@@ -73,7 +64,7 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
   const star6Rate = summary.star6.implemented === 0 ? 0 : (summary.star6.promoted / summary.star6.implemented) * 100;
 
   return (
-    <section className="grid gap-5 rounded-[20px] border border-white/30 bg-linear-to-br from-section-from to-section-to p-5 shadow-panel">
+    <section className="grid gap-5">
       <header className="grid gap-1">
         <h2 className="m-0 text-[0.95rem] font-semibold tracking-[0.1em] text-sub">進捗ダッシュボード</h2>
       </header>
@@ -159,7 +150,7 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
         <DistributionChart title="コネクトRANK分布" items={summary.connectRankDistribution} />
       </div>
 
-      <section className="grid gap-3 rounded-2xl border border-panel-border bg-linear-to-br from-panel-from to-panel-to p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+      <section className="grid gap-3 rounded-[8px] border border-panel-border bg-linear-to-br from-panel-from to-panel-to p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h3 className="mb-1 mt-0 text-sm font-semibold tracking-[0.06em]">ガチャ回数推移</h3>
@@ -169,79 +160,39 @@ export function DashboardTab({ masterCharacters, state }: DashboardTabProps) {
           </div>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <div className="grid gap-1 text-xs text-muted">
-              開始日
-              <Popover.Root open={isFromDatePickerOpen} onOpenChange={setIsFromDatePickerOpen}>
-                <Popover.Trigger asChild>
-                  <button
-                    type="button"
-                    className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-input-bg px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-                  >
-                    <span className="tabular-nums">{formatDisplayDate(fromDate)}</span>
-                    <span className="inline-flex items-center gap-1.5 text-muted">
-                      <CalendarIcon className="size-4" />
-                      <ChevronDown className="size-4" />
-                    </span>
-                  </button>
-                </Popover.Trigger>
-                <Popover.Portal>
-                  <Popover.Content
-                    side="bottom"
-                    align="center"
-                    className="z-50 rounded-[12px] border border-white/20 bg-popover-bg p-2 shadow-panel"
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={parseDate(fromDate)}
-                      onSelect={(date) => {
-                        if (date) {
-                          setFromDate(toDateOnlyString(date));
-                          setIsFromDatePickerOpen(false);
-                        }
-                      }}
-                    />
-                  </Popover.Content>
-                </Popover.Portal>
-              </Popover.Root>
+              開始年
+              <Select value={String(fromYear)} onValueChange={(value) => setFromYear(Number(value))}>
+                <SelectTrigger className="font-bold">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {yearOptions.map((year) => (
+                    <SelectItem key={year} value={String(year)}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid gap-1 text-xs text-muted">
-              終了日
-              <Popover.Root open={isToDatePickerOpen} onOpenChange={setIsToDatePickerOpen}>
-                <Popover.Trigger asChild>
-                  <button
-                    type="button"
-                    className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-input-bg px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-                  >
-                    <span className="tabular-nums">{formatDisplayDate(toDate)}</span>
-                    <span className="inline-flex items-center gap-1.5 text-muted">
-                      <CalendarIcon className="size-4" />
-                      <ChevronDown className="size-4" />
-                    </span>
-                  </button>
-                </Popover.Trigger>
-                <Popover.Portal>
-                  <Popover.Content
-                    side="bottom"
-                    align="center"
-                    className="z-50 rounded-[12px] border border-white/20 bg-popover-bg p-2 shadow-panel"
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={parseDate(toDate)}
-                      onSelect={(date) => {
-                        if (date) {
-                          setToDate(toDateOnlyString(date));
-                          setIsToDatePickerOpen(false);
-                        }
-                      }}
-                    />
-                  </Popover.Content>
-                </Popover.Portal>
-              </Popover.Root>
+              終了年
+              <Select value={String(toYear)} onValueChange={(value) => setToYear(Number(value))}>
+                <SelectTrigger className="font-bold">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {yearOptions.map((year) => (
+                    <SelectItem key={year} value={String(year)}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
-        {fromDate > toDate ? (
-          <p className="m-0 text-sm text-muted">開始日が終了日より後です。範囲を見直してください。</p>
+        {fromYear > toYear ? (
+          <p className="m-0 text-sm text-muted">開始年が終了年より後です。範囲を見直してください。</p>
         ) : (
           <GachaPullChart items={gachaPullChartItems} averagePullCount={averagePullCount} />
         )}

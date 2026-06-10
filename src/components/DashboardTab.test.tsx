@@ -64,14 +64,6 @@ const state: StoredStateV1 = {
   },
 };
 
-// 日付を YYYY-MM-DD へ整形する。
-function formatDateOnly(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
 // DashboardTabの表示対象をテスト用データで描画する。
 function renderDashboard(overrideState?: StoredStateV1): void {
   render(<DashboardTab masterCharacters={masterCharacters} state={overrideState ?? state} />);
@@ -120,20 +112,19 @@ describe("DashboardTab", () => {
     expect(screen.getByText("データがありません")).toBeInTheDocument();
   });
 
-  it("ガチャ回数グラフと日付範囲入力を表示できる", () => {
+  it("ガチャ回数グラフと年範囲入力を表示できる", () => {
     renderDashboard();
 
     expect(screen.getByText("ガチャ回数推移")).toBeInTheDocument();
-    expect(screen.getByText("開始日")).toBeInTheDocument();
-    expect(screen.getByText("終了日")).toBeInTheDocument();
+    expect(screen.getByText("開始年")).toBeInTheDocument();
+    expect(screen.getByText("終了年")).toBeInTheDocument();
 
     const today = new Date();
-    expect(screen.getByText(`${today.getFullYear()}/01/01`)).toBeInTheDocument();
-    expect(screen.getByText(formatDateOnly(today).replaceAll("-", "/"))).toBeInTheDocument();
+    expect(screen.getAllByText(String(today.getFullYear()))).toHaveLength(2);
     expect(screen.getByText("表示範囲の平均: 120.0回")).toBeInTheDocument();
   });
 
-  it("日付範囲で絞り込み、データがなければ空表示になる", () => {
+  it("年範囲で絞り込み、データがなければ空表示になる", () => {
     const outOfRangeState: StoredStateV1 = {
       ...state,
       progressByName: {

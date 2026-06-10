@@ -15,7 +15,7 @@ export function Separator({ className, orientation = "horizontal", decorative, l
       decorative={resolvedDecorative}
       orientation={orientation}
       className={cn(
-        orientation === "horizontal" ? "h-px w-full bg-[#7a94c547]" : "h-full w-px bg-[#7a94c547]",
+        orientation === "horizontal" ? "h-px w-full bg-filter-separator" : "h-full w-px bg-filter-separator",
         className,
       )}
       {...props}

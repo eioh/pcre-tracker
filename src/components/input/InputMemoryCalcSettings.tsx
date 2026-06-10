@@ -31,7 +31,7 @@ export const InputMemoryCalcSettings = memo(function InputMemoryCalcSettings({
 }: InputMemoryCalcSettingsProps) {
   return (
     <div className={memoryCalcSectionClass}>
-      <p className="mb-2.5 mt-0 text-sm font-semibold text-[#c8d8f6]">必要メモピ/ハートの欠片計算</p>
+      <p className="mb-2.5 mt-0 text-sm font-semibold text-sub">必要メモピ/ハートの欠片計算</p>
       <div className={memoryCalcGridClass}>
         <div className="grid gap-1.5 text-sm text-muted">
           <Label>☆</Label>

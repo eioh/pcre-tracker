@@ -6,6 +6,8 @@ import type {
   MemorySourceFilter,
   OwnedFilter,
   PurePieceAvailabilityFilter,
+  SortDirection,
+  SortKey,
   StarFilter,
   Ue1Filter,
   Ue2Filter,
@@ -35,6 +37,10 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputFilters>>): C
     setUe2Filters: vi.fn(),
     memorySourceFilters: [],
     setMemorySourceFilters: vi.fn(),
+    sortKey: "name",
+    onSortKeyChange: vi.fn<(value: SortKey) => void>(),
+    sortDirection: null,
+    onSortDirectionChange: vi.fn<(value: SortDirection) => void>(),
     ...overrides,
   };
 }
@@ -136,5 +142,16 @@ describe("InputFilters", () => {
     expect(props.onLimitBreakFilterChange).toHaveBeenCalledWith("on");
     expect(props.onAdventureMemoryPieceFilterChange).toHaveBeenCalledWith("on");
     expect(props.onPurePieceAvailabilityFilterChange).toHaveBeenCalledWith("available");
+  });
+
+  it("ソート列とソート順の変更を通知する", () => {
+    const props = buildProps();
+    render(<InputFilters {...props} />);
+
+    selectComboboxOption("ソート列", "必要メモピ合計");
+    selectComboboxOption("ソート順", "降順");
+
+    expect(props.onSortKeyChange).toHaveBeenCalledWith("totalMemoryNeeded");
+    expect(props.onSortDirectionChange).toHaveBeenCalledWith("desc");
   });
 });

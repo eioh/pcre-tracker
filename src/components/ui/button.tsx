@@ -8,7 +8,7 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border border-transparent bg-linear-to-r from-accent to-accent-strong text-[#e8fffb] [text-shadow:0_1px_0_rgba(0,0,0,0.28)]",
+          "border border-transparent bg-linear-to-r from-accent to-accent-strong text-accent-text [text-shadow:0_1px_0_rgba(255,255,255,0.18)]",
         outline: "border border-white/20 bg-white/5 text-main hover:border-accent",
         ghost: "border border-transparent bg-transparent text-muted hover:text-main",
       },

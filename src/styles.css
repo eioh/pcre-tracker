@@ -6,37 +6,41 @@
   --font-inter: "Inter", sans-serif;
   --font-orbitron: "Orbitron", sans-serif;
 
-  --color-bg-start: #0a1018;
-  --color-bg-end: #14192b;
-  --color-main: #ecf3ff;
-  --color-muted: #9aaccc;
-  --color-accent: #3cc8a7;
-  --color-accent-strong: #00f6d0;
+  --color-bg-start: #010101;
+  --color-bg-end: #050505;
+  --color-main: #f1f5f9;
+  --color-muted: #a8b0ba;
+  --color-accent: #4f8dff;
+  --color-accent-strong: #45e6ff;
+  --color-accent-text: #04111f;
+  --color-danger: #ff6b6b;
+  --color-danger-strong: #ff8a8a;
+  --color-danger-bg: #3a0d0dcc;
 
-  --color-input-bg: #090e17d9;
-  --color-popover-bg: #090e17f5;
-  --color-selected: #112336;
-  --color-checked-bg: #0b2a24;
+  --color-input-bg: #060607e8;
+  --color-popover-bg: #040405f7;
+  --color-selected: #10243f;
+  --color-checked-bg: #0b335f;
 
   --shadow-panel: 0 20px 48px rgba(0, 0, 0, 0.45);
 
   /* パネル/カード共通 */
-  --color-panel-border: #6180b359;
-  --color-panel-from: #0d1627e8;
-  --color-panel-to: #0a111de0;
+  --color-panel-border: #aeb7c62e;
+  --color-panel-from: #090a0bef;
+  --color-panel-to: #040405e8;
 
   /* セクション（DashboardTab の外枠） */
-  --color-section-from: #131a27cc;
-  --color-section-to: #0d1421f2;
+  --color-section-from: #070708e8;
+  --color-section-to: #030303f5;
 
   /* テキスト補助色 */
-  --color-sub: #c8d8f6;
+  --color-sub: #cbd5e1;
 
   /* チャート配色 */
   --color-chart-bar: #4f8dff;
   --color-chart-ref: #9ac0ff;
   --color-chart-accent: #45e6ff;
-  --color-chart-grid: rgba(255, 255, 255, 0.12);
+  --color-chart-grid: rgba(203, 213, 225, 0.12);
   --color-chart-cursor: rgba(69, 230, 255, 0.08);
 
   /* バッジ: normal */
@@ -50,13 +54,13 @@
   --color-badge-limited-text: #ffb19f;
 
   /* テーブルセレクト: maxed */
-  --color-maxed-border: #74d6c6;
-  --color-maxed-bg: #0b1a22;
-  --color-maxed-text: #d9fff7;
+  --color-maxed-border: #4f8dff;
+  --color-maxed-bg: #0b2545;
+  --color-maxed-text: #dbeafe;
 
   /* テーブル */
-  --color-table-border: #7a94c533;
-  --color-table-header-bg: #101825f5;
+  --color-table-border: #cbd5e124;
+  --color-table-header-bg: #090a0bf5;
 
   /* テーブルセレクト: disabled */
   --color-disabled-border: #788aad38;
@@ -64,16 +68,16 @@
   --color-disabled-text: #9fb0cf;
 
   /* 入力フィルタ */
-  --color-filter-separator: #7a94c547;
+  --color-filter-separator: #cbd5e124;
 
   /* 入力テーブルラッパー */
-  --color-table-wrap-border: #7a94c53d;
-  --color-table-wrap-bg: #0b111bcc;
-  --color-sort-hover: #dff8ff;
-  --color-row-odd: #091425;
-  --color-row-even: #10203a;
-  --color-row-hover: #4d6079;
-  --color-row-hover-border: #7a94c533;
+  --color-table-wrap-border: #cbd5e124;
+  --color-table-wrap-bg: #030303e0;
+  --color-sort-hover: #9ac0ff;
+  --color-row-odd: #050505;
+  --color-row-even: #0d0e0f;
+  --color-row-hover: #25282c;
+  --color-row-hover-border: #cbd5e124;
 
   /* 入力テーブルのキャラタグ */
   --color-limited-text: #d8aeb3;
@@ -122,30 +126,30 @@
 }
 
 :root {
-  --background: 222 40% 8%;
-  --foreground: 213 100% 96%;
-  --card: 220 38% 11%;
-  --card-foreground: 213 100% 96%;
-  --popover: 220 38% 11%;
-  --popover-foreground: 213 100% 96%;
-  --primary: 164 56% 51%;
-  --primary-foreground: 165 100% 96%;
-  --secondary: 219 31% 23%;
-  --secondary-foreground: 213 100% 96%;
-  --muted: 220 28% 23%;
-  --muted-foreground: 218 33% 72%;
-  --accent: 165 100% 48%;
-  --accent-foreground: 165 100% 96%;
-  --border: 216 29% 60%;
-  --input: 219 34% 20%;
-  --ring: 165 100% 48%;
+  --background: 0 0% 1%;
+  --foreground: 0 0% 96%;
+  --card: 0 0% 5%;
+  --card-foreground: 0 0% 96%;
+  --popover: 0 0% 4%;
+  --popover-foreground: 0 0% 96%;
+  --primary: 218 100% 66%;
+  --primary-foreground: 209 79% 7%;
+  --secondary: 0 0% 11%;
+  --secondary-foreground: 0 0% 96%;
+  --muted: 0 0% 12%;
+  --muted-foreground: 0 0% 72%;
+  --accent: 218 100% 66%;
+  --accent-foreground: 209 79% 7%;
+  --border: 0 0% 58%;
+  --input: 0 0% 10%;
+  --ring: 218 100% 66%;
 }
 
 @layer base {
   * {
     box-sizing: border-box;
     scrollbar-width: thin;
-    scrollbar-color: #5f8fb9 #0c1423;
+    scrollbar-color: #68717c #050505;
   }
 
   *::-webkit-scrollbar {
@@ -154,30 +158,27 @@
   }
 
   *::-webkit-scrollbar-track {
-    background: linear-gradient(180deg, #0c1423, #08101c);
-    border: 1px solid rgba(122, 148, 197, 0.2);
+    background: linear-gradient(180deg, #050505, #020202);
+    border: 1px solid rgba(203, 213, 225, 0.18);
   }
 
   *::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #2e5378, #1d3f61);
-    border: 2px solid #0c1423;
+    background: linear-gradient(180deg, #4d5661, #343a42);
+    border: 2px solid #050505;
     border-radius: 9999px;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #3a6a96, #285375);
+    background: linear-gradient(180deg, #68717c, #454c55);
   }
 
   *::-webkit-scrollbar-corner {
-    background: #08101c;
+    background: #020202;
   }
 
   body {
     @apply min-h-screen font-sans text-main;
-    background:
-      radial-gradient(circle at 20% 20%, rgba(60, 200, 167, 0.15), transparent 45%),
-      radial-gradient(circle at 80% 0%, rgba(88, 125, 255, 0.16), transparent 50%),
-      linear-gradient(155deg, var(--color-bg-start), var(--color-bg-end));
+    background: linear-gradient(155deg, var(--color-bg-start), var(--color-bg-end));
   }
 
   #root {

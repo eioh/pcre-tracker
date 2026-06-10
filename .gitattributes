@@ -1,0 +1,10 @@
+# OS差で改行コードだけの差分が出ないよう、リポジトリ内のテキストはLFに統一する。
+* text=auto eol=lf
+
+# 画像やバイナリ成果物は改行変換の対象外にする。
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary

@@ -46,45 +46,54 @@ function GachaPullTooltipContent({ active, payload }: TooltipContentProps<ValueT
   );
 }
 
-// キャラ名を横軸にしたガチャ回数の棒グラフを表示する。
+// キャラ名を縦軸に並べ、ガチャ回数を横棒で表示する。
 export function GachaPullChart({ items, averagePullCount }: GachaPullChartProps) {
   if (items.length === 0) {
     return <p className="m-0 text-sm text-muted">該当データがありません</p>;
   }
 
-  const chartWidth = Math.max(720, items.length * 46);
+  const chartHeight = Math.max(320, items.length * 44);
   return (
-    <div className="overflow-x-auto">
-      <ChartContainer config={chartConfig} className="h-[320px] min-w-[720px]" style={{ width: `${chartWidth}px` }}>
-        <BarChart width={chartWidth} height={320} data={items} margin={{ top: 16, right: 12, bottom: 16, left: 0 }}>
-          <CartesianGrid vertical={false} stroke="var(--color-chart-grid)" />
+    <div className="max-h-[520px] overflow-y-auto pr-2">
+      <ChartContainer config={chartConfig} className="min-h-[320px] min-w-[720px]" style={{ height: `${chartHeight}px` }}>
+        <BarChart
+          width={720}
+          height={chartHeight}
+          data={items}
+          layout="vertical"
+          margin={{ top: 16, right: 28, bottom: 8, left: 8 }}
+        >
+          <CartesianGrid horizontal={false} stroke="var(--color-chart-grid)" />
           <XAxis
+            type="number"
+            allowDecimals={false}
+            tickLine={false}
+            axisLine={false}
+            tick={{ fill: "var(--color-sub)", fontSize: 12 }}
+          />
+          <YAxis
+            type="category"
             dataKey="name"
+            width={96}
             tickFormatter={(value) => formatCharacterNameForAxis(String(value))}
-            interval={0}
-            angle={-35}
-            textAnchor="end"
-            height={88}
-            tickMargin={10}
             tickLine={false}
             axisLine={false}
             tick={{ fill: "var(--color-sub)", fontSize: 11 }}
           />
-          <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fill: "var(--color-sub)", fontSize: 12 }} />
           <ChartTooltip cursor={{ fill: "var(--color-chart-cursor)" }} content={GachaPullTooltipContent} />
           <ReferenceLine
-            y={averagePullCount}
+            x={averagePullCount}
             stroke="var(--color-chart-ref)"
             strokeDasharray="6 4"
             ifOverflow="extendDomain"
             label={{
               value: `平均 ${averagePullCount.toFixed(1)}`,
-              position: "insideTopRight",
+              position: "insideTop",
               fill: "var(--color-sub)",
               fontSize: 11,
             }}
           />
-          <Bar dataKey="gachaPullCount" fill="var(--color-chart-bar)" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="gachaPullCount" fill="var(--color-chart-bar)" radius={[0, 6, 6, 0]} />
         </BarChart>
       </ChartContainer>
     </div>
