@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import type { StoredStateV1 } from "../domain/types";
 import { buildInitialState } from "../domain/storage";
 import { buildDefaultInputViewSettings } from "../domain/uiStorage";
 import { masterCharacters } from "../domain/master";
@@ -27,6 +28,28 @@ function getSearchInput(): HTMLInputElement {
 // 詳細設定を開いて内部入力欄へアクセスできる状態にする。
 function openDetailSettings(): void {
   fireEvent.click(screen.getByRole("button", { name: "詳細設定" }));
+}
+
+// 表示中テーブルの先頭データ行に含まれるキャラ名を取得する。
+function getFirstBodyRowName(characterNames: string[]): string {
+  const firstBodyRow = screen.getAllByRole("row")[1];
+  expect(firstBodyRow).toBeDefined();
+  const matchedName = characterNames.find((name) => firstBodyRow?.textContent?.includes(name));
+  expect(matchedName).toBeDefined();
+  return matchedName as string;
+}
+
+// 指定キャラの所持メモピだけを差し替えたテスト用stateを生成する。
+function buildStateWithMemoryPieces(baseState: StoredStateV1, memoryPieceByName: Record<string, number>): StoredStateV1 {
+  const nextProgressByName = { ...baseState.progressByName };
+  for (const [name, ownedMemoryPiece] of Object.entries(memoryPieceByName)) {
+    const progress = nextProgressByName[name];
+    if (!progress) {
+      continue;
+    }
+    nextProgressByName[name] = { ...progress, ownedMemoryPiece };
+  }
+  return { ...baseState, progressByName: nextProgressByName };
 }
 
 describe("InputTab", () => {
@@ -147,5 +170,38 @@ describe("InputTab", () => {
     await waitFor(() => {
       expect(screen.queryByText("必要メモピ/ハートの欠片計算")).not.toBeInTheDocument();
     });
+  });
+
+  it("テーブル値が変わっても手動適用までは現在のソート順を維持する", () => {
+    const props = buildProps();
+    const characterNames = props.masterCharacters.slice(0, 2).map((character) => character.name);
+    const [firstName, secondName] = characterNames;
+    expect(firstName).toBeDefined();
+    expect(secondName).toBeDefined();
+    const initialState = buildStateWithMemoryPieces(props.state, {
+      [firstName as string]: 100,
+      [secondName as string]: 0,
+    });
+    const updatedState = buildStateWithMemoryPieces(initialState, {
+      [firstName as string]: 0,
+      [secondName as string]: 999,
+    });
+    const initialSettings = {
+      ...props.initialSettings,
+      isDetailSettingsOpen: true,
+      sortKey: "ownedMemoryPiece" as const,
+      sortDirection: "desc" as const,
+    };
+    const { rerender } = render(<InputTab {...props} state={initialState} initialSettings={initialSettings} />);
+
+    expect(getFirstBodyRowName(characterNames)).toBe(firstName);
+
+    rerender(<InputTab {...props} state={updatedState} initialSettings={initialSettings} />);
+
+    expect(getFirstBodyRowName(characterNames)).toBe(firstName);
+
+    fireEvent.click(screen.getByRole("button", { name: "表示に適用" }));
+
+    expect(getFirstBodyRowName(characterNames)).toBe(secondName);
   });
 });

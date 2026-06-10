@@ -20,7 +20,7 @@ const SelectTrigger = React.forwardRef<
       )}
       {...props}
     >
-      {children}
+      <span className="flex min-w-0 flex-1 items-center">{children}</span>
       <SelectPrimitive.Icon asChild>
         <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-70" aria-hidden="true" />
       </SelectPrimitive.Icon>

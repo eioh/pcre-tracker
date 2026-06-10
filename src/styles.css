@@ -54,9 +54,10 @@
   --color-badge-limited-text: #ffb19f;
 
   /* テーブルセレクト: maxed */
-  --color-maxed-border: #4f8dff;
-  --color-maxed-bg: #0b2545;
-  --color-maxed-text: #dbeafe;
+  --color-maxed-border: #4b5563;
+  --color-maxed-bg: #060607e8;
+  --color-maxed-text: #f1f5f9;
+  --color-maxed-dot: #67aaf2;
 
   /* テーブル */
   --color-table-border: #cbd5e124;

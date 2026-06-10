@@ -43,6 +43,44 @@ type InputTabProps = {
   settingsSyncToken: number;
 };
 
+type AppliedDisplaySettings = Pick<
+  InputViewSettings,
+  | "ownedFilter"
+  | "limitedFilter"
+  | "limitBreakFilter"
+  | "adventureMemoryPieceFilter"
+  | "purePieceAvailabilityFilter"
+  | "starMemoryCalcMode"
+  | "ue1MemoryCalcMode"
+  | "ue1HeartFragmentCalcMode"
+  | "starFilters"
+  | "ue1Filters"
+  | "ue2Filters"
+  | "memorySourceFilters"
+  | "sortKey"
+  | "sortDirection"
+>;
+
+// フィルタ・ソートへ適用する設定だけを取り出す。
+function buildAppliedDisplaySettings(settings: InputViewSettings): AppliedDisplaySettings {
+  return {
+    ownedFilter: settings.ownedFilter,
+    limitedFilter: settings.limitedFilter,
+    limitBreakFilter: settings.limitBreakFilter,
+    adventureMemoryPieceFilter: settings.adventureMemoryPieceFilter,
+    purePieceAvailabilityFilter: settings.purePieceAvailabilityFilter,
+    starMemoryCalcMode: settings.starMemoryCalcMode,
+    ue1MemoryCalcMode: settings.ue1MemoryCalcMode,
+    ue1HeartFragmentCalcMode: settings.ue1HeartFragmentCalcMode,
+    starFilters: settings.starFilters,
+    ue1Filters: settings.ue1Filters,
+    ue2Filters: settings.ue2Filters,
+    memorySourceFilters: settings.memorySourceFilters,
+    sortKey: settings.sortKey,
+    sortDirection: settings.sortDirection,
+  };
+}
+
 // 育成入力画面の状態管理と各 UI コンポーネントの合成を行う。
 export function InputTab({
   masterCharacters,
@@ -83,6 +121,12 @@ export function InputTab({
   const [memorySourceFilters, setMemorySourceFilters] = useState<MemorySourceFilter[]>(initialSettings.memorySourceFilters);
   const [sortKey, setSortKey] = useState<SortKey>(initialSettings.sortKey);
   const [sortDirection, setSortDirection] = useState<SortDirection>(initialSettings.sortDirection);
+  const [appliedDisplaySettings, setAppliedDisplaySettings] = useState<AppliedDisplaySettings>(() =>
+    buildAppliedDisplaySettings(initialSettings),
+  );
+  const [appliedProgressByName, setAppliedProgressByName] = useState<Record<string, CharacterProgress>>(() => ({
+    ...state.progressByName,
+  }));
 
   useEffect(() => {
     // 検索入力の連続更新中は反映を遅らせ、全件フィルタ計算の頻度を抑える。
@@ -121,23 +165,31 @@ export function InputTab({
 
   const visibleRows = useVisibleRows({
     masterCharacters,
-    progressByName: state.progressByName,
+    progressByName: appliedProgressByName,
     searchText: deferredSearchText,
-    ownedFilter,
-    limitedFilter,
-    limitBreakFilter,
-    adventureMemoryPieceFilter,
-    purePieceAvailabilityFilter,
-    starMemoryCalcMode,
-    ue1MemoryCalcMode,
-    ue1HeartFragmentCalcMode,
-    starFilters,
-    ue1Filters,
-    ue2Filters,
-    memorySourceFilters,
-    sortKey,
-    sortDirection,
+    ownedFilter: appliedDisplaySettings.ownedFilter,
+    limitedFilter: appliedDisplaySettings.limitedFilter,
+    limitBreakFilter: appliedDisplaySettings.limitBreakFilter,
+    adventureMemoryPieceFilter: appliedDisplaySettings.adventureMemoryPieceFilter,
+    purePieceAvailabilityFilter: appliedDisplaySettings.purePieceAvailabilityFilter,
+    starMemoryCalcMode: appliedDisplaySettings.starMemoryCalcMode,
+    ue1MemoryCalcMode: appliedDisplaySettings.ue1MemoryCalcMode,
+    ue1HeartFragmentCalcMode: appliedDisplaySettings.ue1HeartFragmentCalcMode,
+    starFilters: appliedDisplaySettings.starFilters,
+    ue1Filters: appliedDisplaySettings.ue1Filters,
+    ue2Filters: appliedDisplaySettings.ue2Filters,
+    memorySourceFilters: appliedDisplaySettings.memorySourceFilters,
+    sortKey: appliedDisplaySettings.sortKey,
+    sortDirection: appliedDisplaySettings.sortDirection,
   });
+  const visibleRowsWithCurrentProgress = useMemo(
+    () =>
+      visibleRows.map(({ character, progress }) => ({
+        character,
+        progress: state.progressByName[character.name] ?? progress,
+      })),
+    [state.progressByName, visibleRows],
+  );
   const purePieceByBaseNameFromCharacters = useMemo<Record<string, number>>(() => {
     const nextTotals: Record<string, number> = {};
     for (const character of masterCharacters) {
@@ -151,26 +203,16 @@ export function InputTab({
   // 詳細設定を閉じた状態でも絞り込み中だと分かるよう、表示件数に影響する詳細フィルタだけを判定する。
   const hasActiveDetailFilter = useMemo(
     () =>
-      ownedFilter !== "all" ||
-      limitedFilter !== "all" ||
-      limitBreakFilter !== "all" ||
-      adventureMemoryPieceFilter !== "all" ||
-      purePieceAvailabilityFilter !== "all" ||
-      starFilters.length > 0 ||
-      ue1Filters.length > 0 ||
-      ue2Filters.length > 0 ||
-      memorySourceFilters.length > 0,
-    [
-      ownedFilter,
-      limitedFilter,
-      limitBreakFilter,
-      adventureMemoryPieceFilter,
-      purePieceAvailabilityFilter,
-      starFilters,
-      ue1Filters,
-      ue2Filters,
-      memorySourceFilters,
-    ],
+      appliedDisplaySettings.ownedFilter !== "all" ||
+      appliedDisplaySettings.limitedFilter !== "all" ||
+      appliedDisplaySettings.limitBreakFilter !== "all" ||
+      appliedDisplaySettings.adventureMemoryPieceFilter !== "all" ||
+      appliedDisplaySettings.purePieceAvailabilityFilter !== "all" ||
+      appliedDisplaySettings.starFilters.length > 0 ||
+      appliedDisplaySettings.ue1Filters.length > 0 ||
+      appliedDisplaySettings.ue2Filters.length > 0 ||
+      appliedDisplaySettings.memorySourceFilters.length > 0,
+    [appliedDisplaySettings],
   );
 
   // ソート列の変更時に列キーを保存し、未ソート状態ならすぐ並び替えが効くよう昇順へ切り替える。
@@ -188,6 +230,51 @@ export function InputTab({
   const handleSearchReset = useCallback((): void => {
     setSearchText("");
   }, []);
+
+  // 現在のフィルタ・ソート設定と進捗を表示条件へ手動反映する。
+  const handleApplyDisplaySettings = useCallback((): void => {
+    setAppliedDisplaySettings(
+      buildAppliedDisplaySettings({
+        searchText,
+        isDetailSettingsOpen,
+        ownedFilter,
+        limitedFilter,
+        limitBreakFilter,
+        adventureMemoryPieceFilter,
+        purePieceAvailabilityFilter,
+        starMemoryCalcMode,
+        ue1MemoryCalcMode,
+        ue1HeartFragmentCalcMode,
+        includeSameBasePurePieceForUe2,
+        starFilters,
+        ue1Filters,
+        ue2Filters,
+        memorySourceFilters,
+        sortKey,
+        sortDirection,
+      }),
+    );
+    setAppliedProgressByName({ ...state.progressByName });
+  }, [
+    adventureMemoryPieceFilter,
+    includeSameBasePurePieceForUe2,
+    isDetailSettingsOpen,
+    limitBreakFilter,
+    limitedFilter,
+    memorySourceFilters,
+    ownedFilter,
+    purePieceAvailabilityFilter,
+    searchText,
+    sortDirection,
+    sortKey,
+    starFilters,
+    starMemoryCalcMode,
+    state.progressByName,
+    ue1Filters,
+    ue1HeartFragmentCalcMode,
+    ue1MemoryCalcMode,
+    ue2Filters,
+  ]);
 
   const currentSettings = useMemo<InputViewSettings>(
     () => ({
@@ -253,6 +340,8 @@ export function InputTab({
     setMemorySourceFilters(initialSettings.memorySourceFilters);
     setSortKey(initialSettings.sortKey);
     setSortDirection(initialSettings.sortDirection);
+    setAppliedDisplaySettings(buildAppliedDisplaySettings(initialSettings));
+    setAppliedProgressByName({ ...state.progressByName });
 
     queueMicrotask(() => {
       isSyncingFromParentRef.current = false;
@@ -325,6 +414,7 @@ export function InputTab({
                 onSortKeyChange={handleSortKeyChange}
                 sortDirection={sortDirection}
                 onSortDirectionChange={setSortDirection}
+                onApplyDisplaySettings={handleApplyDisplaySettings}
               />
 
               <Separator className="mt-4" label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
@@ -374,10 +464,10 @@ export function InputTab({
 
         <Separator className="mt-4 mb-1" label="検索エリアとテーブルの区切り" />
 
-        <p className="my-3.5 text-sm text-muted">表示件数: {visibleRows.length}</p>
+        <p className="my-3.5 text-sm text-muted">表示件数: {visibleRowsWithCurrentProgress.length}</p>
 
         <InputProgressTable
-          visibleRows={visibleRows}
+          visibleRows={visibleRowsWithCurrentProgress}
           purePieceByCharacterName={state.purePieceByCharacterName}
           purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
           onUpdateProgress={onUpdateProgress}
