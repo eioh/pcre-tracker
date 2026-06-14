@@ -126,6 +126,20 @@ export const InputFilters = memo(function InputFilters({
 
   return (
     <>
+      <div className="mb-2 flex flex-wrap gap-2">
+        <Button type="button" variant="default" size="sm" className="bg-none bg-accent" onClick={onApplyDisplaySettings}>
+          表示に適用
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="border-danger/60 bg-danger-bg/40 text-danger hover:border-danger-strong hover:text-danger-strong"
+          onClick={resetFilters}
+        >
+          リセット
+        </Button>
+      </div>
       <p className={`${sectionLabelClass} mb-1`}>ソート</p>
       <div className={`${inputToolbarClass} mb-4`}>
         <div className="grid gap-1.5 text-sm text-muted">
@@ -162,20 +176,6 @@ export const InputFilters = memo(function InputFilters({
         </div>
       </div>
       <p className={`${sectionLabelClass} mb-1`}>フィルタ</p>
-      <div className="mb-2 flex flex-wrap gap-2">
-        <Button type="button" variant="default" size="sm" className="bg-none bg-accent" onClick={onApplyDisplaySettings}>
-          表示に適用
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="border-danger/60 bg-danger-bg/40 text-danger hover:border-danger-strong hover:text-danger-strong"
-          onClick={resetFilters}
-        >
-          リセット
-        </Button>
-      </div>
       <div className={inputToolbarClass}>
         <div className="grid gap-1.5 text-sm text-muted">
           <Label>所持</Label>

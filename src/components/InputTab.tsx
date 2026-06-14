@@ -61,7 +61,7 @@ type AppliedDisplaySettings = Pick<
   | "sortDirection"
 >;
 
-// フィルタ・ソートへ適用する設定だけを取り出す。
+// 入力された画面設定から、テーブルのフィルタ・ソート・必要数計算に使う値だけを返す。
 function buildAppliedDisplaySettings(settings: InputViewSettings): AppliedDisplaySettings {
   return {
     ownedFilter: settings.ownedFilter,
@@ -121,9 +121,6 @@ export function InputTab({
   const [memorySourceFilters, setMemorySourceFilters] = useState<MemorySourceFilter[]>(initialSettings.memorySourceFilters);
   const [sortKey, setSortKey] = useState<SortKey>(initialSettings.sortKey);
   const [sortDirection, setSortDirection] = useState<SortDirection>(initialSettings.sortDirection);
-  const [appliedDisplaySettings, setAppliedDisplaySettings] = useState<AppliedDisplaySettings>(() =>
-    buildAppliedDisplaySettings(initialSettings),
-  );
   const [appliedProgressByName, setAppliedProgressByName] = useState<Record<string, CharacterProgress>>(() => ({
     ...state.progressByName,
   }));
@@ -159,6 +156,71 @@ export function InputTab({
       window.clearTimeout(timerId);
     };
   }, [isDetailSettingsOpen]);
+
+  // ソート列の変更時に列キーを保存し、未ソート状態ならすぐ並び替えが効くよう昇順へ切り替える。
+  const handleSortKeyChange = useCallback((nextSortKey: SortKey): void => {
+    setSortKey(nextSortKey);
+    setSortDirection((previousDirection) => previousDirection ?? "asc");
+  }, []);
+
+  // 詳細設定セクションの開閉状態を切り替える。
+  const handleDetailSettingsToggle = useCallback((): void => {
+    setIsDetailSettingsOpen((previous) => !previous);
+  }, []);
+
+  // キャラ検索文字列を初期化する。
+  const handleSearchReset = useCallback((): void => {
+    setSearchText("");
+  }, []);
+
+  // テーブル編集後の進捗スナップショットを現在値へ更新し、ソート順や絞り込みを再計算できるようにする。
+  const handleApplyDisplaySettings = useCallback((): void => {
+    setAppliedProgressByName({ ...state.progressByName });
+  }, [state.progressByName]);
+
+  const currentSettings = useMemo<InputViewSettings>(
+    () => ({
+      searchText,
+      isDetailSettingsOpen,
+      ownedFilter,
+      limitedFilter,
+      limitBreakFilter,
+      adventureMemoryPieceFilter,
+      purePieceAvailabilityFilter,
+      starMemoryCalcMode,
+      ue1MemoryCalcMode,
+      ue1HeartFragmentCalcMode,
+      includeSameBasePurePieceForUe2,
+      starFilters,
+      ue1Filters,
+      ue2Filters,
+      memorySourceFilters,
+      sortKey,
+      sortDirection,
+    }),
+    [
+      searchText,
+      isDetailSettingsOpen,
+      ownedFilter,
+      limitedFilter,
+      limitBreakFilter,
+      adventureMemoryPieceFilter,
+      purePieceAvailabilityFilter,
+      starMemoryCalcMode,
+      ue1MemoryCalcMode,
+      ue1HeartFragmentCalcMode,
+      includeSameBasePurePieceForUe2,
+      starFilters,
+      ue1Filters,
+      ue2Filters,
+      memorySourceFilters,
+      sortKey,
+      sortDirection,
+    ],
+  );
+
+  // 現在の詳細設定を入力として、表示件数とテーブル行へ即時反映する設定値を生成する。
+  const appliedDisplaySettings = useMemo(() => buildAppliedDisplaySettings(currentSettings), [currentSettings]);
 
   // デバウンス後の検索テキストをさらに低優先度で反映し、入力中のブロッキングを防ぐ。
   const deferredSearchText = useDeferredValue(debouncedSearchText);
@@ -215,108 +277,6 @@ export function InputTab({
     [appliedDisplaySettings],
   );
 
-  // ソート列の変更時に列キーを保存し、未ソート状態ならすぐ並び替えが効くよう昇順へ切り替える。
-  const handleSortKeyChange = useCallback((nextSortKey: SortKey): void => {
-    setSortKey(nextSortKey);
-    setSortDirection((previousDirection) => previousDirection ?? "asc");
-  }, []);
-
-  // 詳細設定セクションの開閉状態を切り替える。
-  const handleDetailSettingsToggle = useCallback((): void => {
-    setIsDetailSettingsOpen((previous) => !previous);
-  }, []);
-
-  // キャラ検索文字列を初期化する。
-  const handleSearchReset = useCallback((): void => {
-    setSearchText("");
-  }, []);
-
-  // 現在のフィルタ・ソート設定と進捗を表示条件へ手動反映する。
-  const handleApplyDisplaySettings = useCallback((): void => {
-    setAppliedDisplaySettings(
-      buildAppliedDisplaySettings({
-        searchText,
-        isDetailSettingsOpen,
-        ownedFilter,
-        limitedFilter,
-        limitBreakFilter,
-        adventureMemoryPieceFilter,
-        purePieceAvailabilityFilter,
-        starMemoryCalcMode,
-        ue1MemoryCalcMode,
-        ue1HeartFragmentCalcMode,
-        includeSameBasePurePieceForUe2,
-        starFilters,
-        ue1Filters,
-        ue2Filters,
-        memorySourceFilters,
-        sortKey,
-        sortDirection,
-      }),
-    );
-    setAppliedProgressByName({ ...state.progressByName });
-  }, [
-    adventureMemoryPieceFilter,
-    includeSameBasePurePieceForUe2,
-    isDetailSettingsOpen,
-    limitBreakFilter,
-    limitedFilter,
-    memorySourceFilters,
-    ownedFilter,
-    purePieceAvailabilityFilter,
-    searchText,
-    sortDirection,
-    sortKey,
-    starFilters,
-    starMemoryCalcMode,
-    state.progressByName,
-    ue1Filters,
-    ue1HeartFragmentCalcMode,
-    ue1MemoryCalcMode,
-    ue2Filters,
-  ]);
-
-  const currentSettings = useMemo<InputViewSettings>(
-    () => ({
-      searchText,
-      isDetailSettingsOpen,
-      ownedFilter,
-      limitedFilter,
-      limitBreakFilter,
-      adventureMemoryPieceFilter,
-      purePieceAvailabilityFilter,
-      starMemoryCalcMode,
-      ue1MemoryCalcMode,
-      ue1HeartFragmentCalcMode,
-      includeSameBasePurePieceForUe2,
-      starFilters,
-      ue1Filters,
-      ue2Filters,
-      memorySourceFilters,
-      sortKey,
-      sortDirection,
-    }),
-    [
-      searchText,
-      isDetailSettingsOpen,
-      ownedFilter,
-      limitedFilter,
-      limitBreakFilter,
-      adventureMemoryPieceFilter,
-      purePieceAvailabilityFilter,
-      starMemoryCalcMode,
-      ue1MemoryCalcMode,
-      ue1HeartFragmentCalcMode,
-      includeSameBasePurePieceForUe2,
-      starFilters,
-      ue1Filters,
-      ue2Filters,
-      memorySourceFilters,
-      sortKey,
-      sortDirection,
-    ],
-  );
-
   useEffect(() => {
     // 親からの明示同期トリガー時のみ、入力画面のローカル設定を外部値へ合わせる。
     isSyncingFromParentRef.current = true;
@@ -340,7 +300,6 @@ export function InputTab({
     setMemorySourceFilters(initialSettings.memorySourceFilters);
     setSortKey(initialSettings.sortKey);
     setSortDirection(initialSettings.sortDirection);
-    setAppliedDisplaySettings(buildAppliedDisplaySettings(initialSettings));
     setAppliedProgressByName({ ...state.progressByName });
 
     queueMicrotask(() => {
