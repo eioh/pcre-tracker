@@ -60,12 +60,9 @@ function openMultiSelect(title: string): void {
   fireEvent.click(trigger as HTMLButtonElement);
 }
 
-// フィルタエリア内のリセットボタンを取得する。
+// リセットボタンの配置変更に影響されないよう、アクセシブル名で取得する。
 function getFilterResetButton(): HTMLButtonElement {
-  const filterTitle = screen.getByText("フィルタ");
-  const resetContainer = filterTitle.nextElementSibling;
-  expect(resetContainer).not.toBeNull();
-  return within(resetContainer as HTMLElement).getByRole("button", { name: "リセット" }) as HTMLButtonElement;
+  return screen.getByRole("button", { name: "リセット" }) as HTMLButtonElement;
 }
 
 describe("InputFilters", () => {
@@ -163,5 +160,15 @@ describe("InputFilters", () => {
     fireEvent.click(screen.getByRole("button", { name: "表示に適用" }));
 
     expect(props.onApplyDisplaySettings).toHaveBeenCalledTimes(1);
+  });
+
+  it("表示に適用ボタンをソート設定より前に表示する", () => {
+    const props = buildProps();
+    render(<InputFilters {...props} />);
+
+    const applyButton = screen.getByRole("button", { name: "表示に適用" });
+    const sortLabel = screen.getByText("ソート");
+
+    expect(applyButton.compareDocumentPosition(sortLabel)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 });

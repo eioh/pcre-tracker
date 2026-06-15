@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { StoredStateV1 } from "../domain/types";
 import { buildInitialState } from "../domain/storage";
@@ -30,6 +30,16 @@ function openDetailSettings(): void {
   fireEvent.click(screen.getByRole("button", { name: "詳細設定" }));
 }
 
+// ラベルに対応するセレクトを開き、指定した表示名の項目を選択する。
+function selectComboboxOption(label: string, optionLabel: string): void {
+  const labelElement = screen.getAllByText(label).find((element) => element.tagName.toLowerCase() === "label");
+  expect(labelElement).toBeDefined();
+  const field = labelElement?.closest("div");
+  expect(field).not.toBeNull();
+  fireEvent.click(within(field as HTMLElement).getByRole("combobox"));
+  fireEvent.click(screen.getByRole("option", { name: optionLabel }));
+}
+
 // 表示中テーブルの先頭データ行に含まれるキャラ名を取得する。
 function getFirstBodyRowName(characterNames: string[]): string {
   const firstBodyRow = screen.getAllByRole("row")[1];
@@ -48,6 +58,19 @@ function buildStateWithMemoryPieces(baseState: StoredStateV1, memoryPieceByName:
       continue;
     }
     nextProgressByName[name] = { ...progress, ownedMemoryPiece };
+  }
+  return { ...baseState, progressByName: nextProgressByName };
+}
+
+// 指定キャラの所持状態だけを差し替えたテスト用stateを生成する。
+function buildStateWithOwnedFlags(baseState: StoredStateV1, ownedByName: Record<string, boolean>): StoredStateV1 {
+  const nextProgressByName = { ...baseState.progressByName };
+  for (const [name, owned] of Object.entries(ownedByName)) {
+    const progress = nextProgressByName[name];
+    if (!progress) {
+      continue;
+    }
+    nextProgressByName[name] = { ...progress, owned };
   }
   return { ...baseState, progressByName: nextProgressByName };
 }
@@ -155,6 +178,23 @@ describe("InputTab", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("詳細設定のフィルタ変更は表示に適用ボタンなしでテーブルへ反映される", () => {
+    const props = buildProps();
+    const [ownedCharacter, unownedCharacter] = props.masterCharacters;
+    expect(ownedCharacter).toBeDefined();
+    expect(unownedCharacter).toBeDefined();
+    const ownedByName = Object.fromEntries(props.masterCharacters.map((character) => [character.name, false]));
+    const state = buildStateWithOwnedFlags(props.state, { ...ownedByName, [ownedCharacter?.name ?? ""]: true });
+    render(<InputTab {...props} state={state} />);
+
+    expect(screen.getByText("表示件数: 5")).toBeInTheDocument();
+
+    openDetailSettings();
+    selectComboboxOption("所持", "所持のみ");
+
+    expect(screen.getByText("表示件数: 1")).toBeInTheDocument();
   });
 
   it("settingsSyncToken更新時は詳細設定の開閉状態も再同期する", async () => {
