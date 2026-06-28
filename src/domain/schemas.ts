@@ -51,10 +51,42 @@ export const characterProgressSchema = z.object({
   gachaPullCount: z.number().finite().default(0),
 });
 
+export const clanBattleMemberSchema = z.object({
+  id: z.string().min(1),
+  characterName: z.string().min(1),
+  support: z.boolean().default(false),
+  limitBreak: z.boolean().default(false),
+  star: z.number().int().min(1).max(6).default(1),
+  connectRank: z.number().int().min(0).max(15).default(0),
+  ue1Level: z.union([z.null(), ue1LevelSchema]),
+  ue1SpEquipped: z.boolean().default(false),
+  ue2Level: z.union([z.null(), ue2LevelSchema]),
+});
+
+export const clanBattleFormationSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1).default("新しい編成"),
+  damage: z.number().finite().default(0),
+  timeline: z.string().default(""),
+  members: z.array(clanBattleMemberSchema).default([]),
+});
+
+export const clanBattleMonthGroupSchema = z.object({
+  id: z.string().min(1),
+  year: z.number().int().min(2000).max(2100),
+  month: z.number().int().min(1).max(12),
+  formations: z.array(clanBattleFormationSchema).default([]),
+});
+
+export const clanBattleStateSchema = z.object({
+  groups: z.array(clanBattleMonthGroupSchema).default([]),
+});
+
 export const storedStateV1Schema = z.object({
   schemaVersion: z.literal(1),
   updatedAt: z.string().datetime({ offset: true }),
   progressByName: z.record(characterProgressSchema),
   purePieceByCharacterName: z.record(z.number().int().min(0)).default({}),
   purePieceByBaseName: z.record(z.number().int().min(0)).default({}),
+  clanBattle: clanBattleStateSchema.default({ groups: [] }),
 });
