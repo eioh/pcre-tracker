@@ -1454,7 +1454,7 @@
       "star6": true,
       "ue1": true,
       "ue1Sp": false,
-      "ue2": false
+      "ue2": true
     },
     "memoryPieceSources": [
       "side_story"
@@ -1498,7 +1498,7 @@
       "star6": true,
       "ue1": true,
       "ue1Sp": false,
-      "ue2": false
+      "ue2": true
     },
     "memoryPieceSources": [
       "master_coin"
@@ -4933,7 +4933,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "clan_coin"
+    ],
     "searchTokens": [
       "ユカリ(サマー)",
       "ゆかり(さまあ)",
@@ -6206,7 +6208,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "ツムギ(ジオ・ゲヘナ)",
       "つむぎ(じお・げへな)",
@@ -6225,7 +6229,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "カノン",
       "かのん",
@@ -7174,6 +7180,25 @@
       "プレシア(ヴァルキュリア)",
       "ぷれしあ(ゔぁるきゅりあ)",
       "pureshia(vuarukyuria)"
+    ]
+  },
+  {
+    "name": "クリア（ヴァルキュリア）",
+    "baseName": "クリア",
+    "limited": true,
+    "attribute": "光",
+    "role": "タンク",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "クリア(ヴァルキュリア)",
+      "くりあ(ゔぁるきゅりあ)",
+      "kuria(vuarukyuria)"
     ]
   }
 ]

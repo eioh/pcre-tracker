@@ -56,10 +56,41 @@ export type CharacterProgress = {
   gachaPullCount: number;
 };
 
+export type ClanBattleMemberSnapshot = Pick<
+  CharacterProgress,
+  "limitBreak" | "star" | "connectRank" | "ue1Level" | "ue1SpEquipped" | "ue2Level"
+>;
+
+export type ClanBattleMember = ClanBattleMemberSnapshot & {
+  id: string;
+  characterName: string;
+  support: boolean;
+};
+
+export type ClanBattleFormation = {
+  id: string;
+  name: string;
+  damage: number;
+  timeline: string;
+  members: ClanBattleMember[];
+};
+
+export type ClanBattleMonthGroup = {
+  id: string;
+  year: number;
+  month: number;
+  formations: ClanBattleFormation[];
+};
+
+export type ClanBattleState = {
+  groups: ClanBattleMonthGroup[];
+};
+
 export type StoredStateV1 = {
   schemaVersion: 1;
   updatedAt: string;
   progressByName: Record<string, CharacterProgress>;
   purePieceByCharacterName: Record<string, number>;
   purePieceByBaseName: Record<string, number>;
+  clanBattle: ClanBattleState;
 };

@@ -8,6 +8,7 @@ const CoinShopTab = lazy(() => import("./components/CoinShopTab").then((m) => ({
 const ConnectRankCalcTab = lazy(() =>
   import("./components/ConnectRankCalcTab").then((m) => ({ default: m.ConnectRankCalcTab })),
 );
+const ClanBattleTab = lazy(() => import("./components/ClanBattleTab").then((m) => ({ default: m.ClanBattleTab })));
 import {
   applyBackupPayloadToLocalStorage,
   buildBackupPayloadFromLocalStorage,
@@ -15,7 +16,7 @@ import {
   serializeBackupPayload,
 } from "./domain/backup";
 import { buildInitialState, loadStoredState, saveStoredState, toPurePieceCount } from "./domain/storage";
-import type { CharacterProgress, StoredStateV1 } from "./domain/types";
+import type { CharacterProgress, ClanBattleState, StoredStateV1 } from "./domain/types";
 import { buildDefaultUiState, loadUiState, saveUiState, type ActiveTab, type InputViewSettings } from "./domain/uiStorage";
 import { buildDefaultConnectRankCalcState, saveConnectRankCalcState } from "./domain/connectRankCalcStorage";
 import {
@@ -31,7 +32,7 @@ import {
 import { Button } from "./components/ui/button";
 import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { PenLine, LayoutDashboard, Coins, Calculator, Download, Upload, RotateCcw } from "lucide-react";
+import { PenLine, LayoutDashboard, Coins, Calculator, Download, Upload, RotateCcw, Swords } from "lucide-react";
 
 const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
 
@@ -97,6 +98,9 @@ export default function App() {
 
   // 現在のlocalStorage内容をバックアップJSONとしてダウンロードする。
   const handleExportBackup = useCallback(() => {
+    // 直前の編集がdebounce保存待ちでもバックアップへ含まれるよう、現在のstateを先に同期する。
+    saveStoredState(state);
+    saveUiState(uiState);
     const payload = buildBackupPayloadFromLocalStorage();
     const blob = new Blob([serializeBackupPayload(payload)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -105,7 +109,7 @@ export default function App() {
     anchor.download = `pcr-growth-tracker-${new Date().toISOString().slice(0, 10)}.json`;
     anchor.click();
     URL.revokeObjectURL(url);
-  }, []);
+  }, [state, uiState]);
 
   // 選択したバックアップファイルをインポート確認ダイアログへ渡す。
   const handleSelectImportFile = useCallback((file: File) => {
@@ -206,6 +210,15 @@ export default function App() {
     });
   }, []);
 
+  // クラバト編成データを更新し、保存データ全体の最終更新時刻を最新化する。
+  const handleUpdateClanBattle = useCallback((clanBattle: ClanBattleState) => {
+    setState((previous) => ({
+      ...previous,
+      updatedAt: new Date().toISOString(),
+      clanBattle,
+    }));
+  }, []);
+
   return (
     <div className="mx-auto w-full max-w-[1400px] px-5 pb-9 pt-7">
       <header className="mb-5 flex flex-col items-start justify-between gap-6 lg:flex-row">
@@ -244,7 +257,7 @@ export default function App() {
       <Tabs
         value={safeUiState.activeTab}
         onValueChange={(value) => {
-          const validTabs: ActiveTab[] = ["input", "dashboard", "coin_shop", "connect_rank_calc"];
+          const validTabs: ActiveTab[] = ["input", "dashboard", "coin_shop", "connect_rank_calc", "clan_battle"];
           if (!validTabs.includes(value as ActiveTab)) {
             return;
           }
@@ -263,6 +276,10 @@ export default function App() {
           <TabsTrigger value="input">
             <PenLine className="size-4" />
             育成入力
+          </TabsTrigger>
+          <TabsTrigger value="clan_battle">
+            <Swords className="size-4" />
+            クラバト編成
           </TabsTrigger>
           <TabsTrigger value="coin_shop">
             <Coins className="size-4" />
@@ -290,6 +307,11 @@ export default function App() {
         <TabsContent value="dashboard">
           <Suspense fallback={<TabLoadingFallback />}>
             <DashboardTab masterCharacters={masterCharacters} state={state} />
+          </Suspense>
+        </TabsContent>
+        <TabsContent value="clan_battle">
+          <Suspense fallback={<TabLoadingFallback />}>
+            <ClanBattleTab masterCharacters={masterCharacters} state={state} onChange={handleUpdateClanBattle} />
           </Suspense>
         </TabsContent>
         <TabsContent value="coin_shop">

@@ -867,7 +867,7 @@
       "star6": true,
       "ue1": true,
       "ue1Sp": false,
-      "ue2": false
+      "ue2": true
     }
   },
   {
@@ -893,7 +893,7 @@
       "star6": true,
       "ue1": true,
       "ue1Sp": false,
-      "ue2": false
+      "ue2": true
     }
   },
   {
@@ -4393,6 +4393,20 @@
     "limited": true,
     "attribute": "光",
     "role": "バッファー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "クリア（ヴァルキュリア）",
+    "baseName": "クリア",
+    "limited": true,
+    "attribute": "光",
+    "role": "タンク",
     "implemented": {
       "star6": false,
       "ue1": false,
