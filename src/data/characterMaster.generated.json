@@ -1323,7 +1323,7 @@
     "role": "デバッファー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
@@ -7199,6 +7199,26 @@
       "クリア(ヴァルキュリア)",
       "くりあ(ゔぁるきゅりあ)",
       "kuria(vuarukyuria)"
+    ]
+  },
+  {
+    "name": "シェフィ（ヴァードラッヘ）",
+    "baseName": "シェフィ",
+    "limited": true,
+    "attribute": "闇",
+    "role": "アタッカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "シェフィ(ヴァードラッヘ)",
+      "しぇふぃ(ゔぁあどらっへ)",
+      "シェフィ(ヴァアドラッヘ)",
+      "shefyi(vuaadorahhe)"
     ]
   }
 ]
