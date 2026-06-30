@@ -787,7 +787,7 @@
     "role": "デバッファー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     }
@@ -4407,6 +4407,20 @@
     "limited": true,
     "attribute": "光",
     "role": "タンク",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "シェフィ（ヴァードラッヘ）",
+    "baseName": "シェフィ",
+    "limited": true,
+    "attribute": "闇",
+    "role": "アタッカー",
     "implemented": {
       "star6": false,
       "ue1": false,
