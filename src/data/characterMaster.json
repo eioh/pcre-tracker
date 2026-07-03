@@ -3523,6 +3523,19 @@
     }
   },
   {
+    "name": "ルイズマリー（サマー）",
+    "baseName": "ルイズマリー",
+    "limited": true,
+    "attribute": "水",
+    "role": "バッファー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    }
+  },
+  {
     "name": "イロハ",
     "baseName": "イロハ",
     "limited": false,
