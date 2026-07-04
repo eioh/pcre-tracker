@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages
+name: Deploy to Cloudflare Workers
 
 on:
   push:
@@ -9,11 +9,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: "pages"
+  group: "deploy-workers"
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -39,31 +39,21 @@ jobs:
       - name: Verify generated master data
         run: git diff --exit-code -- src/data/characterMaster.generated.json
 
+      # worker-configuration.d.ts は gitignore 済みのため、型チェック/ビルド前に生成する。
+      - name: Generate Worker types
+        run: npm run cf-typegen
+
       - name: Test
         run: npm run test:ci
 
       - name: Build
-        env:
-          GITHUB_PAGES: "true"
         run: npm run build
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v5
+      # ビルド直後に同一 job 内でデプロイする（dist・wrangler.jsonc・Worker ソースが揃った状態を保つため）。
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
         with:
-          path: ./dist
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # vite build が dist/ に成果物と生成 wrangler.json を出力済みのため、deploy のみ実行する。
+          command: deploy

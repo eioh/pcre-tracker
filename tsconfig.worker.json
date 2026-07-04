@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    // wrangler types が生成する worker-configuration.d.ts（Cloudflare ランタイム型 + Env）を型解決に含める。
+    "types": ["./worker-configuration.d.ts"],
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.worker.tsbuildinfo"
+  },
+  "include": ["worker", "worker-configuration.d.ts"]
+}

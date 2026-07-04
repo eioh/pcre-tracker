@@ -9,3 +9,8 @@ vitest.config.js
 vitest.config.d.ts
 
 .codex/
+
+# wrangler types で生成する Cloudflare ランタイム型定義（CI/ローカルで再生成する）。
+worker-configuration.d.ts
+# @cloudflare/vite-plugin のローカル状態ディレクトリ。
+.wrangler/

@@ -1,14 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-
-const isGitHubPages =
-  (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.GITHUB_PAGES ===
-  "true";
+import { cloudflare } from "@cloudflare/vite-plugin";
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  base: isGitHubPages ? "/pcre-tracker/" : "/",
+  // cloudflare() は wrangler.jsonc を読み取り、Worker 実行環境と Static Assets 配信を
+  // vite dev / build に統合する。base は Workers がドメイン直下配信のため "/" に統一する。
+  plugins: [react(), tailwindcss(), cloudflare()],
+  base: "/",
   resolve: {
     alias: {
       "@": "/src",
