@@ -351,6 +351,22 @@ export function buildInitialState(masterCharacters: MasterCharacter[]): StoredSt
   return reconcileWithMaster(masterCharacters, null);
 }
 
+// 2 つの StoredStateV1 が updatedAt を除いて深く等価かを判定する。
+// buildInitialState() は呼び出し時刻を updatedAt に埋め込むため、初期状態判定では updatedAt を比較対象から除外する
+// （設計書「ローカルが初期状態の判定方法」二次判定）。
+export function isStoredStateEqualIgnoringUpdatedAt(a: StoredStateV1, b: StoredStateV1): boolean {
+  // updatedAt を除いた残りのフィールドを JSON 直列化して比較する。
+  // progressByName / purePieceByCharacterName / purePieceByBaseName はマスター順で生成されるため、
+  // 同一マスターから作った 2 値であればキー順も一致し、直列化比較で安全に同値判定できる。
+  const stripUpdatedAt = ({ updatedAt: _updatedAt, ...rest }: StoredStateV1) => rest;
+  return JSON.stringify(stripUpdatedAt(a)) === JSON.stringify(stripUpdatedAt(b));
+}
+
+// 現在のマスターデータで生成した初期状態と一致するか（updatedAt 除外）で「ローカルが初期状態」を判定する。
+export function isStoredStateInitial(state: StoredStateV1, masterCharacters: MasterCharacter[]): boolean {
+  return isStoredStateEqualIgnoringUpdatedAt(state, buildInitialState(masterCharacters));
+}
+
 export function loadStoredState(masterCharacters: MasterCharacter[]): StoredStateV1 {
   if (typeof window === "undefined") {
     return buildInitialState(masterCharacters);

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { masterCharacters } from "./domain/master";
 
 // タブ表示時にのみ読み込むことで初期バンドルを軽量化する。
@@ -33,6 +33,8 @@ import { Button } from "./components/ui/button";
 import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { PenLine, LayoutDashboard, Coins, Calculator, Download, Upload, RotateCcw, Swords } from "lucide-react";
+import { SyncHeader } from "./components/SyncHeader";
+import { useSync } from "./hooks/useSync";
 
 const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
 
@@ -96,6 +98,23 @@ export default function App() {
     saveUiState(uiState);
   }, [uiState]);
 
+  // useSync へ常に最新の state を渡すためのゲッター（参照安定・値は最新）。
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  const getState = useCallback(() => stateRef.current, []);
+
+  // サーバーデータ採用時: 既存インポート復元と同じ「ダイアログ表示 → リロード」パターンで反映する（設計判断 6）。
+  const handleServerDataAdopted = useCallback(() => {
+    setMessageDialog({
+      title: "サーバーのデータを反映しました",
+      description: "サーバー側の育成データを取り込みました。閉じると画面を再読み込みします。",
+      reloadOnClose: true,
+    });
+  }, []);
+
+  // 同期層（セッション監視・起動時 GET・デバウンス PUT・競合ダイアログ）。
+  const sync = useSync({ getState, masterCharacters, onServerDataAdopted: handleServerDataAdopted });
+
   // 現在のlocalStorage内容をバックアップJSONとしてダウンロードする。
   const handleExportBackup = useCallback(() => {
     // 直前の編集がdebounce保存待ちでもバックアップへ含まれるよう、現在のstateを先に同期する。
@@ -126,6 +145,13 @@ export default function App() {
       const text = await pendingImportFile.text();
       const payload = parseBackupPayload(text);
       applyBackupPayloadToLocalStorage(payload);
+      // インポートはユーザーが自分のデータを持ち込む操作のため、安全側として touched を立てる（設計判断 8）。
+      // これによりログイン後の引き継ぎ判定で「実データあり」と確定し、サーバーデータでの無断上書きを防ぐ。
+      // ログイン中の場合はさらに同期メタの localChangeSeq を進めて永続 dirty 化する（PUT 予約はしない）。
+      // notifyLocalChange ではなくインポート専用経路を使う理由: インメモリ state はインポート前の旧データの
+      // ままなので、リロード前にデバウンス PUT が走ると旧 state がインポート結果を上書き・送信してしまう。
+      // 同期はリロード後の起動フローが dirty を検出し、正しいインポート済みデータで行う。
+      sync.notifyLocalDataImported();
       setMessageDialog({
         title: "インポート完了",
         description: "インポートが完了しました。閉じると画面を再読み込みします。",
@@ -141,7 +167,7 @@ export default function App() {
       setIsImporting(false);
       setPendingImportFile(null);
     }
-  }, [pendingImportFile]);
+  }, [pendingImportFile, sync]);
 
   // 保存データを初期化し、UI設定も既定値へ戻す。
   const handleConfirmReset = useCallback(() => {
@@ -152,7 +178,9 @@ export default function App() {
     setInputSettingsSyncToken((previous) => previous + 1);
     setConnectRankCalcResetToken((previous) => previous + 1);
     setIsResetDialogOpen(false);
-  }, []);
+    // 初期化はユーザー操作による保存データ変更のため、同期カウンタを進めてサーバーへも反映させる。
+    sync.notifyLocalChange();
+  }, [sync]);
 
   // 結果メッセージを閉じ、必要なら画面を再読み込みする。
   const handleCloseMessageDialog = useCallback(() => {
@@ -183,8 +211,10 @@ export default function App() {
           },
         };
       });
+      // ユーザー編集操作: touched を立て、同期カウンタを進める（設計判断 8）。
+      sync.notifyLocalChange();
     },
-    [],
+    [sync],
   );
 
   const safeUiState = uiState ?? buildDefaultUiState();
@@ -193,31 +223,47 @@ export default function App() {
   }, []);
 
   // キャラ名単位（☆6用）のピュアピ所持数を更新する。
-  const handleUpdateCharacterPurePiece = useCallback((name: string, value: number) => {
-    setState((previous) => {
-      const nextValue = toPurePieceCount(value);
-      if (previous.purePieceByCharacterName[name] === nextValue) {
-        return previous;
-      }
-      return {
-        ...previous,
-        updatedAt: new Date().toISOString(),
-        purePieceByCharacterName: {
-          ...previous.purePieceByCharacterName,
-          [name]: nextValue,
-        },
-      };
-    });
-  }, []);
+  const handleUpdateCharacterPurePiece = useCallback(
+    (name: string, value: number) => {
+      setState((previous) => {
+        const nextValue = toPurePieceCount(value);
+        if (previous.purePieceByCharacterName[name] === nextValue) {
+          return previous;
+        }
+        return {
+          ...previous,
+          updatedAt: new Date().toISOString(),
+          purePieceByCharacterName: {
+            ...previous.purePieceByCharacterName,
+            [name]: nextValue,
+          },
+        };
+      });
+      // ユーザー編集操作: touched を立て、同期カウンタを進める（設計判断 8）。
+      sync.notifyLocalChange();
+    },
+    [sync],
+  );
 
   // クラバト編成データを更新し、保存データ全体の最終更新時刻を最新化する。
-  const handleUpdateClanBattle = useCallback((clanBattle: ClanBattleState) => {
-    setState((previous) => ({
-      ...previous,
-      updatedAt: new Date().toISOString(),
-      clanBattle,
-    }));
-  }, []);
+  const handleUpdateClanBattle = useCallback(
+    (clanBattle: ClanBattleState) => {
+      setState((previous) => ({
+        ...previous,
+        updatedAt: new Date().toISOString(),
+        clanBattle,
+      }));
+      // ユーザー編集操作: touched を立て、同期カウンタを進める（設計判断 8）。
+      sync.notifyLocalChange();
+    },
+    [sync],
+  );
+
+  // 計算タブが自身の状態を保存したときの同期トリガ（設計判断 3）。
+  const handleConnectRankCalcSaved = useCallback(() => {
+    // 計算タブ編集も育成データ同様「実データあり」の根拠となるため touched を立て、同期カウンタを進める。
+    sync.notifyLocalChange();
+  }, [sync]);
 
   return (
     <div className="mx-auto w-full max-w-[1400px] px-5 pb-9 pt-7">
@@ -230,6 +276,12 @@ export default function App() {
 
         <div className="flex w-full flex-col items-start gap-2.5 lg:w-auto lg:items-end">
           <div className="flex flex-wrap items-center gap-2">
+            <SyncHeader
+              isLoggedIn={sync.isLoggedIn}
+              isSessionPending={sync.isSessionPending}
+              userLabel={sync.userLabel}
+              status={sync.status}
+            />
             <Button variant="outline" onClick={handleExportBackup}>
               <Download className="size-4" aria-hidden="true" />
               エクスポート
@@ -321,7 +373,12 @@ export default function App() {
         </TabsContent>
         <TabsContent value="connect_rank_calc">
           <Suspense fallback={<TabLoadingFallback />}>
-            <ConnectRankCalcTab masterCharacters={masterCharacters} state={state} resetToken={connectRankCalcResetToken} />
+            <ConnectRankCalcTab
+              masterCharacters={masterCharacters}
+              state={state}
+              resetToken={connectRankCalcResetToken}
+              onStateSaved={handleConnectRankCalcSaved}
+            />
           </Suspense>
         </TabsContent>
       </Tabs>
@@ -378,6 +435,34 @@ export default function App() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={handleCloseMessageDialog}>閉じる</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/*
+        同期の競合ダイアログ（引き継ぎ分岐 3 / 409 / 起動時競合）。双方の updatedAt を提示し、
+        「サーバーのデータを使う」/「この端末のデータを使う」の二択。自動マージはしない（設計判断 7）。
+        ダイアログ外クリック等での閉操作では選択を確定しない（誤操作でデータを失わないよう保留する）。
+      */}
+      <AlertDialog open={sync.conflict !== null}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>データの競合を検出しました</AlertDialogTitle>
+            <AlertDialogDescription>
+              サーバーとこの端末の育成データが異なります。どちらのデータを使うか選択してください。もう一方のデータは上書きされます。
+              {sync.conflict ? (
+                <>
+                  <br />
+                  サーバー側の更新: {formatUpdatedAt(sync.conflict.serverUpdatedAt)}
+                  <br />
+                  この端末の更新: {formatUpdatedAt(sync.conflict.localUpdatedAt)}
+                </>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => void sync.resolveConflictUseLocal()}>この端末のデータを使う</AlertDialogCancel>
+            <AlertDialogAction onClick={() => sync.resolveConflictUseServer()}>サーバーのデータを使う</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
