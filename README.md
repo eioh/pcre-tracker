@@ -1,6 +1,8 @@
 # プリコネ育成トラッカー
 
-プリンセスコネクト Re:Dive の育成状況をブラウザ保存で管理する React + TypeScript + Zod アプリです。
+プリンセスコネクト Re:Dive の育成状況を管理する React + TypeScript + Zod アプリです。未ログインでもブラウザ保存（localStorage）で全機能を利用でき、GitHub / Google でログインすると複数端末間でデータを同期できます。
+
+本番: https://pkne.app
 
 ## 技術スタック
 
@@ -40,22 +42,23 @@ npx wrangler d1 migrations apply pcre-tracker-db --local  # ローカル（minif
 
 ## 保存先
 
-- `localStorage` キー: `pcr_growth_tracker`
-- 保存データには `schemaVersion` を持たせ、将来の項目追加時にマイグレーションできる構成です。
+- `localStorage` キー: `pcr_growth_tracker`（育成データ）ほか。保存データには `schemaVersion` を持たせ、将来の項目追加時にマイグレーションできる構成です。
+- ログイン時は育成データとコネクトランク計算タブの 2 キーを D1（`/api/data`）へ同期します（UI 状態は端末ローカルのみ）。localStorage はログイン時もローカルキャッシュ兼オフライン動作用として維持されます。
+- 設計の詳細は `docs/design/workers-migration.md` を参照してください。
 
 ## デプロイ（Cloudflare Workers + Static Assets）
 
-- ホスティングは Cloudflare Workers + Static Assets です（GitHub Pages からの移行 Phase 1）。
+- ホスティングは Cloudflare Workers + Static Assets です（カスタムドメイン `pkne.app` で稼働中）。
 - `main` ブランチへの push で `.github/workflows/deploy.yml` が `wrangler deploy` により自動デプロイします。
 - ビルド構成: `vite build` で静的アセットを `dist/client/`、Worker とデプロイ用 `wrangler.json` を `dist/pcre_tracker/` に出力します。`@cloudflare/vite-plugin` が `assets.directory` を自動設定するため、`wrangler.jsonc` では手動指定していません。
 - ローカルでのデプロイは `npm run deploy`（`vite build && wrangler deploy`）で実行できます。
 
-### 事前準備（ユーザー作業）
+### セットアップ手順（本番は設定済み。再構築時の参考）
 
-- GitHub リポジトリの Secrets に以下を登録してください:
+- GitHub リポジトリの Secrets に以下を登録します:
   - `CLOUDFLARE_API_TOKEN`（Workers デプロイ権限を持つ API トークン。D1 の編集権限も必要）
   - `CLOUDFLARE_ACCOUNT_ID`（Cloudflare アカウント ID）
-- カスタムドメインは未確定のため `wrangler.jsonc` に `routes` は未設定です。ドメイン確定後に追記してください。
+- カスタムドメインは `wrangler.jsonc` の `routes` に設定済みです（`pkne.app`）。
 
 #### D1 データベースの作成
 
@@ -63,7 +66,7 @@ npx wrangler d1 migrations apply pcre-tracker-db --local  # ローカル（minif
 npx wrangler d1 create pcre-tracker-db --location apac
 ```
 
-- 出力された `database_id` で `wrangler.jsonc` の `d1_databases[0].database_id`（プレースホルダの全ゼロ UUID）を置き換えてください。
+- 出力された `database_id` を `wrangler.jsonc` の `d1_databases[0].database_id` に設定します（本番 ID は設定済み）。
 - 本番 DB へのマイグレーションは CI（`.github/workflows/deploy.yml`）がデプロイ前に `wrangler d1 migrations apply pcre-tracker-db --remote` で自動適用します。
 
 #### OAuth アプリの登録
@@ -82,4 +85,4 @@ npx wrangler secret put GOOGLE_CLIENT_ID
 npx wrangler secret put GOOGLE_CLIENT_SECRET
 ```
 
-- あわせて `BETTER_AUTH_URL`（本番 URL）と `ALLOWED_ORIGINS`（許可オリジン。カンマ区切り）をカスタムドメイン確定後に設定してください（`wrangler.jsonc` の `vars` またはシークレットとして登録）。
+- `BETTER_AUTH_URL`（本番 URL）と `ALLOWED_ORIGINS`（許可オリジン。カンマ区切り）は `wrangler.jsonc` の `vars` に設定済みです（`https://pkne.app`）。
