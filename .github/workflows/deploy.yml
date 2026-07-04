@@ -49,6 +49,16 @@ jobs:
       - name: Build
         run: npm run build
 
+      # デプロイ前に D1 マイグレーションを本番 DB に適用する（未適用分のみが実行される）。
+      # DB 未作成（database_id がプレースホルダ）のうちは deploy と同様に実行不能だが、
+      # ユーザー作業（D1 作成・secrets 登録）完了後に一体で動く構成にしている。
+      - name: Apply D1 migrations
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: d1 migrations apply pcre-tracker-db --remote
+
       # ビルド直後に同一 job 内でデプロイする（dist・wrangler.jsonc・Worker ソースが揃った状態を保つため）。
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3

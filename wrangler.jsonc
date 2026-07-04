@@ -7,6 +7,26 @@
   "compatibility_date": "2026-07-04",
   // Worker のエントリポイント。/api/* のリクエストのみがここに到達する。
   "main": "./worker/index.ts",
+  // better-auth（D1 ネイティブ対応）が Node 互換 API を必要とするため付与する（設計書・調査済み前提）。
+  "compatibility_flags": ["nodejs_compat"],
+  // D1 データベースのバインディング。Worker からは env.DB として参照する。
+  "d1_databases": [
+    {
+      // Worker コードからアクセスするためのバインディング名（設計書指定）。
+      "binding": "DB",
+      // Cloudflare ダッシュボード/CLI 上での DB 名。
+      "database_name": "pcre-tracker-db",
+      // プレースホルダ（全ゼロ UUID）。ローカル miniflare は ID を API 照会しないためこのままで開発・テスト可能。
+      // デプロイ前に `wrangler d1 create pcre-tracker-db --location apac`（設計書指定のロケーション）で作成し、
+      // 出力された実 UUID に置き換えること。
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  // Cron Trigger。期限切れ rate_limit 行を日次で掃除する（scheduled ハンドラで処理。設計書「乱用対策」節）。
+  "triggers": {
+    // 毎日 UTC 0:00 に 1 回実行する。
+    "crons": ["0 0 * * *"]
+  },
   "assets": {
     // NOTE: @cloudflare/vite-plugin 利用時は assets.directory を手動指定しない。
     //   vite build 実行時にプラグインが dist/<worker-name>/ 配下へデプロイ用の

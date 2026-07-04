@@ -18,5 +18,15 @@
     "types": ["./worker-configuration.d.ts"],
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.worker.tsbuildinfo"
   },
-  "include": ["worker", "worker-configuration.d.ts"]
+  // worker 本体に加え、Worker から import する DOM 非依存のドメインモジュール（同期スキーマ関連）を含める。
+  "include": [
+    "worker",
+    "worker-configuration.d.ts",
+    "src/domain/sync.ts",
+    "src/domain/storageKeys.ts",
+    "src/domain/connectRankCalcSchema.ts",
+    "src/domain/schemas.ts",
+    "src/domain/levels.ts",
+    "src/domain/types.ts"
+  ]
 }

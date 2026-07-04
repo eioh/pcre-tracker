@@ -18,12 +18,20 @@ export default defineProject({
       // ディレクトリ内の *.sql をマイグレーション番号順に読み込む（0 件なら空配列）。
       const migrations = await readD1Migrations("migrations");
       return {
+        // wrangler.jsonc を読み込み、D1 バインディング（DB）や compatibility flags をテスト環境へ反映する。
+        wrangler: { configPath: "./wrangler.jsonc" },
         // テストと同一アイソレートで動かす Worker のエントリポイント（SELF 経由の fetch に必要）。
         main: "./worker/index.ts",
         miniflare: {
-          // setup ファイルからマイグレーション一覧を参照できるよう、テスト用バインディングとして渡す。
-          // Phase 2 で D1 バインディング（DB）が追加されるまでは適用対象がないため実質 no-op。
-          bindings: { TEST_MIGRATIONS: migrations },
+          bindings: {
+            // setup ファイルからマイグレーション一覧を参照できるよう、テスト用バインディングとして渡す。
+            TEST_MIGRATIONS: migrations,
+            // 認証系の環境変数。CI には .dev.vars が存在しないため、テストはここで固定値を渡して
+            // 環境に依存せず（hermetic に）動くようにする。シークレットはテスト専用のダミー値。
+            BETTER_AUTH_SECRET: "test-secret-for-vitest-do-not-use-in-production",
+            BETTER_AUTH_URL: "http://localhost:5273",
+            ALLOWED_ORIGINS: "http://localhost:5273",
+          },
         },
       };
     }),

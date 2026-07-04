@@ -1,31 +1,20 @@
-import { z } from "zod";
+// キー定数・型・スキーマ・初期状態生成は DOM 非依存モジュールへ切り出した（Worker から参照するため）。
+// 既存のブラウザ側 import 経路を壊さないよう、ここから re-export して後方互換を保つ。
+export { CONNECT_RANK_CALC_STORAGE_KEY } from "./storageKeys";
+export {
+  buildDefaultConnectRankCalcState,
+  connectRankCalcEntrySchema,
+  connectRankCalcStateSchema,
+  type ConnectRankCalcEntry,
+  type ConnectRankCalcStateV1,
+} from "./connectRankCalcSchema";
 
-export const CONNECT_RANK_CALC_STORAGE_KEY = "pcr_growth_tracker_connect_rank_calc";
-
-export type ConnectRankCalcEntry = {
-  characterName: string;
-  targetRank: number;
-};
-
-export type ConnectRankCalcStateV1 = {
-  schemaVersion: 1;
-  entries: ConnectRankCalcEntry[];
-};
-
-const connectRankCalcEntrySchema = z.object({
-  characterName: z.string(),
-  targetRank: z.number().int().min(1).max(15),
-});
-
-const connectRankCalcStateSchema = z.object({
-  schemaVersion: z.literal(1),
-  entries: z.array(connectRankCalcEntrySchema),
-});
-
-// 初期状態を返す。
-export function buildDefaultConnectRankCalcState(): ConnectRankCalcStateV1 {
-  return { schemaVersion: 1, entries: [] };
-}
+import { CONNECT_RANK_CALC_STORAGE_KEY } from "./storageKeys";
+import {
+  buildDefaultConnectRankCalcState,
+  connectRankCalcStateSchema,
+  type ConnectRankCalcStateV1,
+} from "./connectRankCalcSchema";
 
 // 保存文字列を解析し、現在仕様の計算タブ状態へ正規化する。
 export function parseConnectRankCalcState(rawText: string): ConnectRankCalcStateV1 {

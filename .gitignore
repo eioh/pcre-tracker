@@ -12,5 +12,7 @@ vitest.config.d.ts
 
 # wrangler types で生成する Cloudflare ランタイム型定義（CI/ローカルで再生成する）。
 worker-configuration.d.ts
+# ローカル開発用のシークレット・環境変数（.dev.vars.example をコピーして作成する）。
+.dev.vars
 # @cloudflare/vite-plugin のローカル状態ディレクトリ。
 .wrangler/

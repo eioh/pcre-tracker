@@ -20,7 +20,18 @@
     "types": ["./worker-configuration.d.ts", "@cloudflare/vitest-pool-workers/types"],
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.worker-test.tsbuildinfo"
   },
-  // smoke.test.ts が worker/index.ts を import するため、Worker 本体も型チェック対象に含める
+  // テストが worker/index.ts 等を import するため、Worker 本体も型チェック対象に含める
   // （tsconfig.worker.json とファイルが重複するが、いずれも noEmit のため出力衝突は起きない）。
-  "include": ["test/worker", "worker", "worker-configuration.d.ts"]
+  // Worker・テストから import する DOM 非依存のドメインモジュール（同期スキーマ関連）も含める。
+  "include": [
+    "test/worker",
+    "worker",
+    "worker-configuration.d.ts",
+    "src/domain/sync.ts",
+    "src/domain/storageKeys.ts",
+    "src/domain/connectRankCalcSchema.ts",
+    "src/domain/schemas.ts",
+    "src/domain/levels.ts",
+    "src/domain/types.ts"
+  ]
 }

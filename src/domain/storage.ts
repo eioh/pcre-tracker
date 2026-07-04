@@ -1,9 +1,11 @@
 import { buildDefaultClanBattleState, normalizeClanBattleState } from "./clanBattle";
 import { characterProgressSchema } from "./schemas";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "./levels";
+import { STORAGE_KEY } from "./storageKeys";
 import type { CharacterProgress, ClanBattleFormation, ClanBattleMember, ClanBattleState, MasterCharacter, StoredStateV1 } from "./types";
 
-export const STORAGE_KEY = "pcr_growth_tracker";
+// STORAGE_KEY は DOM 非依存モジュールへ切り出したものを再輸出し、既存 import 経路の後方互換を保つ。
+export { STORAGE_KEY } from "./storageKeys";
 export const CURRENT_SCHEMA_VERSION = 1 as const;
 
 type MigratedStoredState = {
