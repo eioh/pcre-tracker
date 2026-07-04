@@ -1,0 +1,52 @@
+{
+  // wrangler 設定スキーマ（エディタ補完・検証用）。
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Worker 名。Cloudflare 上のプロジェクト名およびデフォルトの *.workers.dev サブドメインに使われる。
+  "name": "pcre-tracker",
+  // Workers ランタイムの互換性基準日（実装日）。
+  "compatibility_date": "2026-07-04",
+  // Worker のエントリポイント。/api/* のリクエストのみがここに到達する。
+  "main": "./worker/index.ts",
+  // better-auth（D1 ネイティブ対応）が Node 互換 API を必要とするため付与する（設計書・調査済み前提）。
+  "compatibility_flags": ["nodejs_compat"],
+  // D1 データベースのバインディング。Worker からは env.DB として参照する。
+  "d1_databases": [
+    {
+      // Worker コードからアクセスするためのバインディング名（設計書指定）。
+      "binding": "DB",
+      // Cloudflare ダッシュボード/CLI 上での DB 名。
+      "database_name": "pcre-tracker-db",
+      // `wrangler d1 create pcre-tracker-db --location apac`（設計書指定のロケーション）で作成した本番 DB の ID。
+      "database_id": "1371669d-a27e-4e73-8eb2-c478fadd0d9d"
+    }
+  ],
+  // Cron Trigger。期限切れ rate_limit 行を日次で掃除する（scheduled ハンドラで処理。設計書「乱用対策」節）。
+  "triggers": {
+    // 毎日 UTC 0:00 に 1 回実行する。
+    "crons": ["0 0 * * *"]
+  },
+  "assets": {
+    // NOTE: @cloudflare/vite-plugin 利用時は assets.directory を手動指定しない。
+    //   vite build 実行時にプラグインが dist/<worker-name>/ 配下へデプロイ用の
+    //   wrangler.json を生成し、その directory がクライアントビルド出力（dist/client）を
+    //   指すよう自動設定される（公式ドキュメント準拠）。
+    // Worker コードから静的アセットへアクセスするためのバインディング名。
+    "binding": "ASSETS",
+    // 存在しないパスへのリクエストで index.html を返し、SPA のクライアントルーティングに対応する（設計書指定）。
+    "not_found_handling": "single-page-application",
+    // /api/* を静的アセットより優先して Worker に到達させる（設計書指定）。
+    "run_worker_first": ["/api/*"]
+  },
+  // 本番のカスタムドメイン（設計書指定: workers.dev は本番運用に使わない）。
+  // Cloudflare Registrar で取得済みのゾーンが前提で、デプロイ時に Worker へ自動で紐付く。
+  "routes": [
+    { "pattern": "pkne.app", "custom_domain": true }
+  ],
+  // 非機密の本番環境変数。ローカル開発では .dev.vars、Worker テストではテスト用バインディングが優先される。
+  "vars": {
+    // better-auth の baseURL（自動推定に依存せず明示設定する。設計書指定）。
+    "BETTER_AUTH_URL": "https://pkne.app",
+    // /api/data の CSRF 検証と better-auth trustedOrigins で許可するオリジン（カンマ区切り）。
+    "ALLOWED_ORIGINS": "https://pkne.app"
+  }
+}

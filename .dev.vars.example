@@ -1,0 +1,21 @@
+# ローカル開発用の環境変数テンプレート。
+# このファイルを .dev.vars にコピーして値を設定する（.dev.vars は gitignore 済み。コミット禁止）。
+# 本番では BETTER_AUTH_SECRET / GITHUB_* / GOOGLE_* を `wrangler secret put` で登録し、
+# BETTER_AUTH_URL / ALLOWED_ORIGINS はカスタムドメイン確定後に本番値を設定する。
+
+# better-auth の署名・暗号化シークレット。ローカルは任意のランダム文字列でよい（例: openssl rand -base64 32）。
+BETTER_AUTH_SECRET=replace-with-random-secret
+
+# better-auth の baseURL（自動推定に依存せず明示設定する）。ローカルは vite dev の URL。
+BETTER_AUTH_URL=http://localhost:5273
+
+# /api/data の CSRF 検証と better-auth trustedOrigins で許可するオリジン（カンマ区切り）。
+ALLOWED_ORIGINS=http://localhost:5273
+
+# GitHub OAuth（ローカル開発用に別途登録した開発用 OAuth アプリの値。未設定でも起動は可能だがログイン不可）。
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+
+# Google OAuth（同上）。
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=

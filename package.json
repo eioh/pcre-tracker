@@ -8,7 +8,9 @@
     "generate": "node scripts/generate-search-tokens.mjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -b",
+    "cf-typegen": "wrangler types",
+    "deploy": "vite build && wrangler deploy",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ci": "TMPDIR=/tmp vitest run"
@@ -24,6 +26,7 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tanstack/react-virtual": "^3.13.19",
+    "better-auth": "^1.6.23",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -37,6 +40,9 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@better-auth/cli": "^1.4.21",
+    "@cloudflare/vite-plugin": "^1.43.0",
+    "@cloudflare/vitest-pool-workers": "^0.18.0",
     "@tailwindcss/vite": "^4.2.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
@@ -47,6 +53,7 @@
     "tailwindcss": "^4.2.0",
     "typescript": "^5.9.2",
     "vite": "^7.1.3",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.9",
+    "wrangler": "^4.107.0"
   }
 }

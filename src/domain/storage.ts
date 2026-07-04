@@ -1,8 +1,11 @@
+import { buildDefaultClanBattleState, normalizeClanBattleState } from "./clanBattle";
 import { characterProgressSchema } from "./schemas";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "./levels";
-import type { CharacterProgress, MasterCharacter, StoredStateV1 } from "./types";
+import { STORAGE_KEY } from "./storageKeys";
+import type { CharacterProgress, ClanBattleFormation, ClanBattleMember, ClanBattleState, MasterCharacter, StoredStateV1 } from "./types";
 
-export const STORAGE_KEY = "pcr_growth_tracker";
+// STORAGE_KEY は DOM 非依存モジュールへ切り出したものを再輸出し、既存 import 経路の後方互換を保つ。
+export { STORAGE_KEY } from "./storageKeys";
 export const CURRENT_SCHEMA_VERSION = 1 as const;
 
 type MigratedStoredState = {
@@ -11,6 +14,7 @@ type MigratedStoredState = {
   progressByName: Record<string, unknown>;
   purePieceByCharacterName: Record<string, unknown>;
   purePieceByBaseName: Record<string, unknown>;
+  clanBattle: unknown;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -200,6 +204,93 @@ function sanitizeProgress(character: MasterCharacter, rawProgress: unknown): Cha
   return normalized;
 }
 
+// クラバト保存データを検証し、壊れた値や旧データでは空の状態へ戻す。
+function sanitizeClanBattleState(rawClanBattle: unknown, masterCharacters: MasterCharacter[]): ClanBattleState {
+  const looseState = toLooseClanBattleState(rawClanBattle);
+  if (!looseState) {
+    return buildDefaultClanBattleState();
+  }
+  return normalizeClanBattleState(looseState, masterCharacters);
+}
+
+// クラバト保存データを緩く読み取り、壊れた子要素だけを落として復元候補を作る。
+function toLooseClanBattleState(rawClanBattle: unknown): ClanBattleState | null {
+  if (!isRecord(rawClanBattle) || !Array.isArray(rawClanBattle.groups)) {
+    return null;
+  }
+
+  return {
+    groups: rawClanBattle.groups
+      .map(toLooseClanBattleMonthGroup)
+      .filter((group): group is ClanBattleState["groups"][number] => group !== null),
+  };
+}
+
+// 年月グループ単位で最低限の型を確認し、編成配列は個別に救済する。
+function toLooseClanBattleMonthGroup(rawGroup: unknown): ClanBattleState["groups"][number] | null {
+  if (!isRecord(rawGroup) || !Array.isArray(rawGroup.formations)) {
+    return null;
+  }
+  return {
+    id: toNonEmptyString(rawGroup.id, "group"),
+    year: toFiniteNumber(rawGroup.year),
+    month: toFiniteNumber(rawGroup.month),
+    formations: rawGroup.formations
+      .map(toLooseClanBattleFormation)
+      .filter((formation): formation is ClanBattleFormation => formation !== null),
+  };
+}
+
+// 編成単位で最低限の型を確認し、メンバー配列は個別に救済する。
+function toLooseClanBattleFormation(rawFormation: unknown): ClanBattleFormation | null {
+  if (!isRecord(rawFormation) || !Array.isArray(rawFormation.members)) {
+    return null;
+  }
+  return {
+    id: toNonEmptyString(rawFormation.id, "formation"),
+    name: toNonEmptyString(rawFormation.name, "新しい編成"),
+    damage: toFiniteNumber(rawFormation.damage),
+    timeline: typeof rawFormation.timeline === "string" ? rawFormation.timeline : "",
+    members: rawFormation.members.map(toLooseClanBattleMember).filter((member): member is ClanBattleMember => member !== null),
+  };
+}
+
+// メンバー単位で最低限の型を確認し、数値系は後段の正規化で範囲補正できる形にする。
+function toLooseClanBattleMember(rawMember: unknown): ClanBattleMember | null {
+  if (!isRecord(rawMember) || typeof rawMember.characterName !== "string" || rawMember.characterName.trim() === "") {
+    return null;
+  }
+  return {
+    id: toNonEmptyString(rawMember.id, "member"),
+    characterName: rawMember.characterName,
+    support: rawMember.support === true,
+    limitBreak: rawMember.limitBreak === true,
+    star: toFiniteNumber(rawMember.star) as CharacterProgress["star"],
+    connectRank: toFiniteNumber(rawMember.connectRank) as CharacterProgress["connectRank"],
+    ue1Level: toFiniteNumberOrNull(rawMember.ue1Level) as CharacterProgress["ue1Level"],
+    ue1SpEquipped: rawMember.ue1SpEquipped === true,
+    ue2Level: toFiniteNumberOrNull(rawMember.ue2Level) as CharacterProgress["ue2Level"],
+  };
+}
+
+// 空文字でない文字列だけを採用し、それ以外は指定した代替値を返す。
+function toNonEmptyString(value: unknown, fallback: string): string {
+  return typeof value === "string" && value.trim() ? value : fallback;
+}
+
+// 有限数だけを採用し、それ以外は0へ戻す。
+function toFiniteNumber(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
+// nullまたは有限数だけを採用し、それ以外は0へ戻す。
+function toFiniteNumberOrNull(value: unknown): number | null {
+  if (value === null) {
+    return null;
+  }
+  return toFiniteNumber(value);
+}
+
 function migrateToLatestState(raw: unknown): MigratedStoredState | null {
   if (!isRecord(raw)) {
     return null;
@@ -212,6 +303,7 @@ function migrateToLatestState(raw: unknown): MigratedStoredState | null {
       progressByName: raw.progressByName,
       purePieceByCharacterName: isRecord(raw.purePieceByCharacterName) ? raw.purePieceByCharacterName : {},
       purePieceByBaseName: isRecord(raw.purePieceByBaseName) ? raw.purePieceByBaseName : {},
+      clanBattle: isRecord(raw.clanBattle) ? raw.clanBattle : buildDefaultClanBattleState(),
     };
   }
 
@@ -222,6 +314,7 @@ function migrateToLatestState(raw: unknown): MigratedStoredState | null {
       progressByName: raw.progressByName,
       purePieceByCharacterName: isRecord(raw.purePieceByCharacterName) ? raw.purePieceByCharacterName : {},
       purePieceByBaseName: isRecord(raw.purePieceByBaseName) ? raw.purePieceByBaseName : {},
+      clanBattle: isRecord(raw.clanBattle) ? raw.clanBattle : buildDefaultClanBattleState(),
     };
   }
 
@@ -235,6 +328,7 @@ function reconcileWithMaster(
   const progressByName: StoredStateV1["progressByName"] = {};
   const purePieceByCharacterName = createDefaultPurePieceByCharacterName(masterCharacters);
   const purePieceByBaseName = createDefaultPurePieceByBaseName(masterCharacters);
+  const clanBattle = sanitizeClanBattleState(migratedState?.clanBattle, masterCharacters);
 
   for (const character of masterCharacters) {
     const rawProgress = migratedState?.progressByName[character.name];
@@ -249,6 +343,7 @@ function reconcileWithMaster(
     progressByName,
     purePieceByCharacterName,
     purePieceByBaseName,
+    clanBattle,
   };
 }
 

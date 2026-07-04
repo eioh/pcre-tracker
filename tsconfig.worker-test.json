@@ -1,0 +1,37 @@
+{
+  // Worker 側テスト（test/worker/**）専用の型チェック設定。
+  // @cloudflare/vitest-pool-workers（miniflare）実行環境の型と、cloudflare:test モジュールの
+  // 型拡張（applyD1Migrations / env / D1Migration など）を解決するために独立させている。
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    // Cloudflare ランタイム型（Env / D1Database / Fetcher 等）と cloudflare:test の型拡張を読み込む。
+    "types": ["./worker-configuration.d.ts", "@cloudflare/vitest-pool-workers/types"],
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.worker-test.tsbuildinfo"
+  },
+  // テストが worker/index.ts 等を import するため、Worker 本体も型チェック対象に含める
+  // （tsconfig.worker.json とファイルが重複するが、いずれも noEmit のため出力衝突は起きない）。
+  // Worker・テストから import する DOM 非依存のドメインモジュール（同期スキーマ関連）も含める。
+  "include": [
+    "test/worker",
+    "worker",
+    "worker-configuration.d.ts",
+    "src/domain/sync.ts",
+    "src/domain/storageKeys.ts",
+    "src/domain/connectRankCalcSchema.ts",
+    "src/domain/schemas.ts",
+    "src/domain/levels.ts",
+    "src/domain/types.ts"
+  ]
+}
