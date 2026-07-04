@@ -10,5 +10,11 @@
     "noEmit": true,
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.node.tsbuildinfo"
   },
-  "include": ["vite.config.ts", "vitest.config.ts", "scripts/**/*.mjs"]
+  "include": [
+    "vite.config.ts",
+    "vitest.config.ts",
+    "vitest.config.front.ts",
+    "vitest.config.worker.ts",
+    "scripts/**/*.mjs"
+  ]
 }
