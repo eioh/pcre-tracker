@@ -54,7 +54,7 @@ export type UseSyncResult = {
   isLoggedIn: boolean;
   // セッション確認中か（初期表示のちらつき抑止用）。
   isSessionPending: boolean;
-  // ログインユーザーの表示名 or メール（メニュー表示用。表示のみ、二次利用はしない）。
+  // ログインユーザーの表示名（メニュー表示用。表示のみ。email はフォールバックに使わない。設計判断 4）。
   userLabel: string | null;
   // 同期ステータス。
   status: SyncStatus;
@@ -72,6 +72,10 @@ export type UseSyncResult = {
   resolveConflictUseServer: () => void;
   // 競合ダイアログで「この端末のデータを使う」を選んだとき（PUT を伴うため非同期）。
   resolveConflictUseLocal: () => Promise<void>;
+  // アカウント削除の直前に呼ぶ。予約済みデバウンス PUT をキャンセルし、世代を進めて in-flight PUT の
+  // 完了処理（メタ書き込み・再予約）を無効化する。削除〜リロードの間に PUT が走って削除済み行を
+  // 再作成するのを防ぐ（Phase 4）。
+  stopSync: () => void;
 };
 
 // useSync の呼び出しに必要な依存。
@@ -94,7 +98,13 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
 
   // 現在のセッションユーザー ID（未ログインなら null）。
   const userId = session.data?.user.id ?? null;
-  const userLabel = session.data?.user.name || session.data?.user.email || null;
+  // 表示名のみを表示ラベルに使う。email はフォールバックにも使わない（PII 方針。設計判断 4）。
+  // 設計書「PII の扱い」節が email の画面表示（二次利用）を禁じているため、DOM に email を出さない。
+  // さらに、GitHub/Google の表示名はユーザー設定次第でメールアドレスと同一文字列になり得るため、
+  // name が email 形式（`@` を含む）の場合も null に落とす。null 時は SyncHeader が汎用表記
+  // 「ログイン中」を表示し、ポリシーの「メールアドレスは画面上には表示しません」との矛盾を防ぐ。
+  const rawUserName = session.data?.user.name || null;
+  const userLabel = rawUserName !== null && !rawUserName.includes("@") ? rawUserName : null;
 
   const [status, setStatus] = useState<SyncStatus>("loading");
   const [conflict, setConflict] = useState<ConflictInfo | null>(null);
@@ -185,6 +195,18 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     // 永続 dirty 化のみ（PUT 予約なし）。リロード後の起動フローで同期される。
     saveSyncMeta({ ...meta, localChangeSeq: meta.localChangeSeq + 1 });
   }, [userId, readMeta]);
+
+  // アカウント削除の直前に同期を停止する（Phase 4）。
+  // 世代を進めて in-flight の PUT/GET の完了処理を黙って中断させ、予約済みデバウンス PUT もキャンセルする。
+  // これにより、削除リクエスト〜リロードの間に PUT が走って削除済みの app_state 行を再作成する
+  // レースを閉じる（削除成功後はサーバーがセッションも失効させるため、以降の PUT は 401 になる）。
+  const stopSync = useCallback(() => {
+    syncGenerationRef.current += 1;
+    if (putTimerRef.current !== null) {
+      window.clearTimeout(putTimerRef.current);
+      putTimerRef.current = null;
+    }
+  }, []);
 
   // 直前の PUT を実行する内部処理（デバウンス満了時・明示 flush 時に呼ぶ）。
   const runPut = useCallback(async () => {
@@ -632,6 +654,7 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       notifyLocalDataImported,
       resolveConflictUseServer,
       resolveConflictUseLocal,
+      stopSync,
     }),
     [
       isLoggedIn,
@@ -643,6 +666,7 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       notifyLocalDataImported,
       resolveConflictUseServer,
       resolveConflictUseLocal,
+      stopSync,
     ],
   );
 }

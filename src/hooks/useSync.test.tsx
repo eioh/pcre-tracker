@@ -1,9 +1,11 @@
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // authClient の useSession をテストから差し替えられるようモック化する。
+// authClient は SyncHeader（DOM 統合テスト用ハーネス）が import するためスタブを含める。
 const mockUseSession = vi.fn();
 vi.mock("../lib/authClient", () => ({
+  authClient: { deleteUser: vi.fn() },
   useSession: () => mockUseSession(),
   signIn: { social: vi.fn() },
   signOut: vi.fn(),
@@ -15,6 +17,7 @@ import { CONNECT_RANK_CALC_STORAGE_KEY, STORAGE_KEY } from "../domain/storageKey
 import { SYNC_FORMAT_VERSION, type SyncPayloadV1 } from "../domain/sync";
 import { loadSyncMeta, saveSyncMeta } from "../domain/syncMeta";
 import { useSync } from "./useSync";
+import { SyncHeader } from "../components/SyncHeader";
 import type { StoredStateV1 } from "../domain/types";
 
 // ログイン済みセッションを返すよう mockUseSession を設定する。
@@ -559,5 +562,73 @@ describe("useSync: 未ログイン時は同期通信ゼロ", () => {
     await new Promise((r) => setTimeout(r, 0));
     expect(fetchMock).not.toHaveBeenCalled();
     expect(result.current.status).toBe("logged_out");
+  });
+});
+
+describe("useSync: userLabel の PII 是正（email 形式の表示名）", () => {
+  // useSync の userLabel を実際に SyncHeader へ渡して描画する DOM 統合ハーネス。
+  function HeaderHarness({ state }: { state: StoredStateV1 }) {
+    const sync = useSync({ getState: () => state, masterCharacters, onServerDataAdopted: vi.fn() });
+    return (
+      <SyncHeader
+        isLoggedIn={sync.isLoggedIn}
+        isSessionPending={sync.isSessionPending}
+        userLabel={sync.userLabel}
+        status={sync.status}
+        onOpenPrivacyPolicy={vi.fn()}
+        onDeleteRequestStart={vi.fn()}
+        onBeforeAccountDeleted={vi.fn()}
+      />
+    );
+  }
+
+  it("表示名が email 形式なら userLabel は null になる", () => {
+    // GitHub/Google の表示名はユーザー設定次第でメールアドレスと同一文字列になり得る。
+    mockUseSession.mockReturnValue({
+      data: { user: { id: "u1", email: "user@example.com", name: "user@example.com" } },
+      isPending: false,
+      isRefetching: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 404 })));
+
+    const state = buildInitialState(masterCharacters);
+    const { result } = renderUseSync(state);
+    expect(result.current.userLabel).toBeNull();
+  });
+
+  it("表示名が email 形式のとき DOM に email が出ず汎用表記「ログイン中」になる", async () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { id: "u1", email: "user@example.com", name: "user@example.com" } },
+      isPending: false,
+      isRefetching: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    // サーバー空（404）→ ローカル初期状態 → noop で同期フローは静かに完了する。
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 404 })));
+
+    const state = buildInitialState(masterCharacters);
+    render(<HeaderHarness state={state} />);
+
+    // 汎用表記が表示され、email（@ を含む文字列）は DOM に一切現れない。
+    await waitFor(() => expect(screen.getByText("ログイン中")).toBeInTheDocument());
+    expect(document.body.textContent ?? "").not.toMatch(/@/);
+  });
+
+  it("表示名が通常の文字列ならそのまま userLabel に使う", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { id: "u1", email: "user@example.com", name: "テスト表示名" } },
+      isPending: false,
+      isRefetching: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 404 })));
+
+    const state = buildInitialState(masterCharacters);
+    const { result } = renderUseSync(state);
+    expect(result.current.userLabel).toBe("テスト表示名");
   });
 });
