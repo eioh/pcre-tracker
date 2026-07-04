@@ -11,3 +11,12 @@ export const STORAGE_KEY = "pcr_growth_tracker";
 
 // コネクトランク計算タブの保存キー。
 export const CONNECT_RANK_CALC_STORAGE_KEY = "pcr_growth_tracker_connect_rank_calc";
+
+// ユーザーが初めて編集操作を行ったことを示すフラグの保存キー。
+// 「ローカルに実データあり」判定の一次判定に使う（設計書「初回ログイン時のデータ引き継ぎ」節）。
+// 端末ローカルの判定専用データであり、同期対象（SyncPayloadV1）にもバックアップ対象（LocalStorageBackupV1）にも含めない。
+export const TOUCHED_STORAGE_KEY = "pcr_growth_tracker_touched";
+
+// 同期メタ情報（サーバー revision・ローカル変更カウンタ等）の保存キー。
+// touched フラグと同様に端末ローカル専用であり、同期対象・バックアップ対象外。
+export const SYNC_META_STORAGE_KEY = "pcr_growth_tracker_sync";

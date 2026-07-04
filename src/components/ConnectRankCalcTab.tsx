@@ -27,11 +27,16 @@ type Props = {
   masterCharacters: MasterCharacter[];
   state: StoredStateV1;
   resetToken: number;
+  // 計算タブが自身の状態を localStorage へ保存したことを親へ通知する任意コールバック（同期トリガ用。設計判断 3）。
+  onStateSaved?: () => void;
 };
 
 // コネクトランク計算タブのメインコンポーネント。
-export function ConnectRankCalcTab({ masterCharacters, state, resetToken }: Props) {
+export function ConnectRankCalcTab({ masterCharacters, state, resetToken, onStateSaved }: Props) {
   const [calcState, setCalcState] = useState<ConnectRankCalcStateV1>(() => loadConnectRankCalcState());
+
+  // ユーザー操作による保存とマウント直後の初回保存を区別するため、初回実行済みフラグを保持する。
+  const hasMountedRef = useRef(false);
 
   // resetTokenの変更で状態を初期化する。
   useEffect(() => {
@@ -42,7 +47,13 @@ export function ConnectRankCalcTab({ masterCharacters, state, resetToken }: Prop
   // calcState変更時にlocalStorageへ永続化する。
   useEffect(() => {
     saveConnectRankCalcState(calcState);
-  }, [calcState]);
+    // マウント直後の初回保存では同期トリガを発火しない（ユーザー編集ではないため。touched を誤って立てないのと同趣旨）。
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+    onStateSaved?.();
+  }, [calcState, onStateSaved]);
 
   // 追加済みキャラ名のセット。
   const addedNames = useMemo(() => new Set(calcState.entries.map((e) => e.characterName)), [calcState.entries]);

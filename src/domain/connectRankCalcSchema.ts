@@ -35,3 +35,9 @@ export const connectRankCalcStateSchema = z.object({
 export function buildDefaultConnectRankCalcState(): ConnectRankCalcStateV1 {
   return { schemaVersion: 1, entries: [] };
 }
+
+// 計算タブ状態がデフォルト（空エントリ）と等価かを判定する。
+// 「ローカルが初期状態」判定で、計算タブ側が未使用かどうかを確認するために使う。
+export function isConnectRankCalcStateDefault(state: ConnectRankCalcStateV1): boolean {
+  return state.entries.length === 0;
+}

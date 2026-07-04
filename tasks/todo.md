@@ -1,91 +1,67 @@
-# Cloudflare Workers 移行 Phase 2: better-auth + D1 導入、`/api/data` 実装
+# Cloudflare Workers 移行 Phase 3: フロントエンド同期層
 
-参照設計書: `docs/design/workers-migration.md`（確定済み設計。再調査・再検討は不要。本計画はその実装手順）
-Phase 1 の記録は git 履歴（cf1394e の tasks/todo.md）を参照。
+参照設計書: `docs/design/workers-migration.md`（確定済み設計。特に「同期方式」「初回ログイン時のデータ引き継ぎ」「未ログイン時の扱い」節）
+Phase 1・2 の記録は git 履歴（cf1394e / 1299687 の tasks/todo.md）を参照。本番は https://pkne.app で稼働中。
 
 ## スコープ
 
-- 段階的移行計画の **Phase 2 のみ**: better-auth + D1 の導入と `/api/data` の実装（サーバー側）。
-- **フロントエンドの同期層（UI からの同期呼び出し・ログイン UI）は Phase 3**。本フェーズは Worker 側 API とテストまで。
-- 実際の D1 データベース作成・OAuth アプリ登録・secrets 設定はユーザー作業。**プレースホルダ `database_id`（全ゼロ UUID）でローカル開発・テストを完結**させる（Cloudflare 公式サンプルと同じ手法。ローカル miniflare は ID を API 照会しない）。
+- 段階的移行計画の **Phase 3 のみ**: ログイン UI、同期層（デバウンス PUT・409 競合ダイアログ）、初回ログイン時の引き継ぎフロー。
+- **未ログイン時は現状の localStorage ローカルモードを完全維持**（挙動変更ゼロ。設計書指定）。
+- アカウント削除 UI・プライバシーポリシー・移行案内は **Phase 4**。
 
-## 調査済みの技術前提（実装時に再調査不要）
+## 調査済みの現状（実装時に再調査不要）
 
-- better-auth 最新安定版 1.6.x。**v1.5+ で D1 ネイティブ対応**: `betterAuth({ database: env.DB })` と D1 バインディングを直接渡す。追加アダプタ・パッケージ不要。原子性は D1 `batch()` を内部使用。
-- **インスタンスはリクエストごとに生成**（env はリクエスト時にしか得られないため、fetch ハンドラ内でファクトリ関数から生成。モジュールスコープ生成は不可）。
-- **`nodejs_compat` フラグが必要**。compatibility_date は 2024-09-23 以降が条件で、現状（2026-07-04）は満たしている。
-- スキーマ生成: `npx @better-auth/cli generate` で SQL 出力 → wrangler の migration ファイルに転記 → `wrangler d1 migrations apply <DB> --local`。（CLI の `migrate` は D1 に接続不可のため使わない）
-- **D1 は外部キー制約がデフォルト有効**（公式明記。接続ごとのプラグマ設定は不要かつ無効化不可）。`ON DELETE CASCADE` は機能する。設計書の「foreign_keys プラグマ確認」はこの公式仕様確認をもって消化。CASCADE 検証テストは設計書どおり実施する。
-- テスト: `@cloudflare/vitest-pool-workers` 現行版（0.18.x）は **Vitest 4.1+ 必須**（peerDeps）。API は `cloudflareTest()` Vite プラグイン方式。D1 へのマイグレーション適用は `readD1Migrations()` + `applyD1Migrations()`。jsdom 環境とは共存不可のため **Vitest multi-project 構成で分離**する。
-- Cron: `triggers.crons` + `scheduled` ハンドラ（fetch と同居する `ExportedHandler`）。ローカルは `/cdn-cgi/handler/scheduled` への HTTP リクエストで手動発火可能（vite-plugin 対応済み）。
-- アカウント削除: `user.deleteUser.enabled: true` で better-auth 組み込みの delete-user エンドポイント（`/api/auth/*` 配下）が有効化される。独自エンドポイント不要。
+- `App.tsx`: `state: StoredStateV1` を useState で保持、400ms デバウンスで `saveStoredState`。Context・カスタムフック不使用の単一コンポーネント。ヘッダー右側にエクスポート/インポート/初期化ボタン群 + 「最終更新」表示（ログイン UI・同期ステータスの自然な配置場所）。
+- **コネクトランク計算タブは App.tsx と独立**: `ConnectRankCalcTab.tsx` が自前で `loadConnectRankCalcState()` / 即時 `saveConnectRankCalcState()`。同期層は App の state だけでは完結しない。
+- ダイアログは `AlertDialog` のみ（`messageDialog` state に内容を積んで単一ダイアログで表示するパターンが App.tsx に既存）。トースト機構なし。データフェッチライブラリなし（素の fetch）。
+- `src/domain/sync.ts`（Phase 2 実装済み）: `SyncPayloadV1` 型 + `parseSyncPayloadV1`。DOM 非依存でクライアントから再利用可。
+- better-auth はデフォルト basePath `/api/auth`。クライアントは `better-auth/react` の `createAuthClient`（baseURL はデフォルト=同一オリジンで一致）。
+- `/api/data` API（Phase 2 実装済み）: GET → `{ revision, payload, updatedAt }` or 404。PUT `{ baseRevision: number|null, payload }` → 200 `{ revision }` / 401 / 409 / 400 / 413 / 429。PUT は Origin + Content-Type: application/json 必須。
+- `reconcileWithMaster` は storage.ts の非 export。「初期状態判定」は storage.ts 内に判定関数を新設して export するのが自然。
+- レート制限は 30 回/5 分。正常系クライアントは「分 1 回未満」の書き込み頻度が設計前提。
+
+## 設計判断（本計画で確定。実装時の再検討不要）
+
+1. **同期メタ情報**: 新規 localStorage キー `pcr_growth_tracker_sync` を端末ローカルに持つ。内容は `{ userId: string, revision: number, localChangeSeq: number, lastSyncedSeq: number }`。touched フラグ（`pcr_growth_tracker_touched`）と同様に **同期対象外・バックアップ対象外**。
+   - **dirty は boolean で持たない**。ローカル編集ごとに `localChangeSeq` を単調増加させ、`localChangeSeq > lastSyncedSeq` を dirty とみなす。PUT は開始時点の seq を控え、**成功時にその seq を `lastSyncedSeq` に記録する**（PUT 中に発生した後続編集は `localChangeSeq > lastSyncedSeq` のまま残り、次のデバウンス PUT で送られる。「送っていない編集を同期済み扱いにする」余地を型レベルで排除）。
+   - **`userId` でセッションユーザーと突き合わせる**。ログイン時に同期メタの `userId` が現セッションと不一致（別アカウントへの切替）の場合は同期メタを無効化して破棄し、**「初回ログイン時のデータ引き継ぎ」フローに落とす**。このときローカルに未同期変更（dirty）や実データがあれば自動 PUT はせず、必ず確認ダイアログ（分岐 3）に倒す。前アカウントのローカルキャッシュを新アカウントのサーバーデータへ無断で上書き・アップロードすることは絶対にしない。
+2. **同期ペイロードの生成**: 育成データは App の in-memory state（正規化済み）、計算タブは同期直前に `loadConnectRankCalcState()`（読み込み時正規化を通る）で取得。**localStorage の raw 値からは構築しない**（設計書指定）。
+3. **同期トリガ**: ログイン中、(a) App の state 変更、(b) 計算タブの保存、のいずれかで `localChangeSeq` を加算し、**10 秒デバウンス**で PUT（レート制限 30 回/5 分に対し十分低頻度）。計算タブ→App への変更通知は、ConnectRankCalcTab に任意の `onStateSaved` コールバック prop を追加する（最小変更。カスタムイベントや Context は導入しない）。PUT 成功で `revision` 更新 + PUT 開始時 seq を `lastSyncedSeq` へ記録（設計判断 1 参照）。
+4. **起動時・ログイン直後のフロー**（セッション検出時に GET。**その前に同期メタの `userId` 突き合わせを必ず行う** — 不一致なら設計判断 1 のとおりメタ破棄 + 引き継ぎフローへ）:
+   - GET 404（サーバー空）: ローカルが「実データあり」→ 引き継ぎ分岐 1（`baseRevision: null` でアップロード）。ローカルが「初期状態」→ 何もしない（次の変更から同期開始）。
+   - GET 200 & `revision === 同期メタの revision`: 同期済み。dirty なら PUT。
+   - GET 200 & `revision !== 同期メタの revision` & **dirty でない**: 他端末の更新。**サーバーデータを黙って採用**（競合ではなくキャッシュ更新。自動マージには当たらない）。ただし**採用（localStorage 書き込み）の直前に、GET 判定時に控えた `localChangeSeq` と現在値を再比較**し、進んでいたら（GET 処理中にユーザー編集が入っていたら）黙って採用せず競合ダイアログに倒す（非同期処理の完了時は開始時点の前提を必ず再検証する）。
+   - GET 200 & `revision !== 同期メタの revision` & **dirty**: 競合。確認ダイアログ（分岐 3 と同じ UI）。
+   - 同期メタが存在しない初回ログイン: 設計書の 3 分岐（下記 5・6）。
+5. **「ローカルに実データあり」判定**（設計書の優先順位どおり）:
+   - 一次: touched フラグが**あれば**「実データあり」確定。**なければ初期状態と断定せず**二次判定へ。
+   - 二次: `buildInitialState()` と `loadStoredState()` の結果を `updatedAt` 除外で深い比較（storage.ts に判定関数を新設）+ 計算タブはデフォルト状態との比較。両方一致なら「初期状態」。
+   - 判定不能・曖昧は「実データあり」側（分岐 3 のダイアログ）に倒す。
+6. **サーバーデータの採用（分岐 2・競合でサーバー優先選択時・起動時の黙って採用、すべて共通）**: `parseSyncPayloadV1` で検証 → 2 キーを localStorage へ書き込み + 同期メタ更新 → **既存のインポート復元と同じ「ダイアログ表示 → ページリロード」パターン**で反映（計算タブが localStorage をマウント時に読む構造のため、リロードが最も確実で既存前例に合致)。
+   - **共通ルール（自動採用の直前再検証）**: ユーザーの明示選択を経ない自動採用（起動時の黙って採用・初回引き継ぎ分岐 2）では、**localStorage 書き込み直前に、判定時に控えた `localChangeSeq` と現在値を必ず再比較**する。進んでいた場合（判定〜採用の間にユーザー編集が入った場合）は自動採用を中止し、競合ダイアログ（分岐 3）に倒す。ユーザーが競合ダイアログで明示的に「サーバー優先」を選んだ場合はその選択が最新の意思なのでそのまま採用してよい。
+7. **競合ダイアログ**（分岐 3 / 409 / 起動時競合）: 既存 `AlertDialog` パターンを踏襲し、双方の `updatedAt` を表示して「サーバーのデータを使う」/「この端末のデータを使う」の二択。自動マージなし（設計書指定）。ローカル優先選択時は GET で得た最新 `revision` を `baseRevision` に PUT（再度 409 なら再度ダイアログ）。
+8. **touched フラグのセット位置**: ユーザーの編集操作による state 更新経路（App.tsx の更新ハンドラ・ConnectRankCalcTab の state 更新）でセットする。**保存関数（save*）内ではセットしない**（マウント直後の自動保存で誤って立つのを防ぐ）。バックアップインポートや「サーバーデータ採用」での書き込みでは立てない（→ インポートは編集扱いにするか実装時に整理し、判定根拠をコメントに明記）。※インポートはユーザーが自分のデータを持ち込む操作なので touched を立てるのが安全側。
+9. **同期ステータス表示**: ヘッダーに小さなステータステキスト（未ログイン時は非表示 or ログインボタンのみ / 同期済み / 同期中 / エラー）。**同期エラーで モーダルは出さない**（次回変更時・次回起動時に自動リトライ。恒常エラーはステータス表示で気付ける）。401 検出時はセッション切れとしてログアウト状態表示に戻す。
+10. **ログイン UI**: ヘッダーに「ログイン」ボタン → `AlertDialog` で GitHub / Google の 2 ボタン + **「GitHub と Google は別アカウント扱いになる」旨の注意書き**（設計書の明記要件）。ログイン中はメニュー（ログアウト）+ 同期ステータス。`signIn.social({ provider, callbackURL: "/" })`。
+11. **同期ロジックの配置**: 判定・比較・ペイロード構築などの純粋ロジックは `src/domain/syncClient.ts`（DOM 非依存、テスト容易）に、React 統合（セッション監視・デバウンス・fetch）は `src/hooks/useSync.ts` カスタムフックに分離。App.tsx への追加は最小限に留める。
 
 ## Todo
 
-- [x] 1. **Vitest 4 アップグレード**（vitest-pool-workers の前提条件）
-  - `vitest` を 4.1+ へ、`@vitest/*` 関連・`@testing-library/*` の互換確認。公式 3→4 移行ガイドに従う
-  - 既存 126 テストが全パスすることを確認してから次へ進む（壊れたら本タスク内で修正）
-  - 万一互換問題が解決不能な場合のフォールバック: vitest-pool-workers 0.12.x（Vitest 3 対応最終版）に固定。ただしまず 4 系移行を試す
-- [x] 2. **テスト基盤: Vitest multi-project 構成**
-  - フロント（jsdom、既存 `vitest.config.ts` 相当）と Worker（`@cloudflare/vitest-pool-workers`、`cloudflareTest({ wrangler: { configPath: "./wrangler.jsonc" } })`）を projects で分離
-  - Worker 側 setup で `readD1Migrations()` + `applyD1Migrations()` により D1 にマイグレーション適用
-  - `npm test` で両プロジェクトが走ること
-- [x] 3. **wrangler.jsonc 更新**
-  - `compatibility_flags: ["nodejs_compat"]` 追加
-  - `d1_databases`: binding `DB`、`database_id` はプレースホルダ全ゼロ UUID + 「デプロイ前に `wrangler d1 create`（location hint `apac`、設計書指定）で置換」コメント
-  - `triggers.crons`: 日次 1 回（rate_limit 掃除用）
-- [x] 4. **D1 マイグレーション作成**（`migrations/`）
-  - better-auth CLI で生成した auth テーブル（user/session/account/verification）の SQL
-  - `app_state`（user_id PK・FK `ON DELETE CASCADE` / payload TEXT / revision INTEGER / updated_at / payload_format_version INTEGER）— 設計書「スキーマ」節の通り
-  - `rate_limit`（複合 PK (user_id, window_start)・FK `ON DELETE CASCADE` / count INTEGER）
-- [x] 5. **better-auth 統合**（`worker/auth.ts` 等）
-  - env を受け取るファクトリでリクエストごとに生成。`database: env.DB`
-  - `baseURL`（env 変数、明示設定）/ `trustedOrigins` / `secret`（`BETTER_AUTH_SECRET`）
-  - socialProviders: GitHub / Google（clientId/clientSecret は env から）
-  - Cookie: `HttpOnly` / `Secure` / `SameSite=Lax`（better-auth デフォルトを確認し、不足があれば明示設定）
-  - `user.deleteUser.enabled: true`（アカウント削除。設計書指定）
-  - `/api/auth/*` を better-auth ハンドラにルーティング
-  - `.dev.vars.example` をコミット（キー一覧のみ）、`.dev.vars` を .gitignore に追加
-- [x] 6. **`SyncPayloadV1` スキーマ**（`src/domain/sync.ts` 新設。Phase 3 でクライアントからも使うため src/domain に置く）
-  - 設計書の型定義どおり: `formatVersion: 1` + 対象 2 キー（両方 object 必須、optional/null 不可）
-  - **深い検証**: `StoredStateV1` / `ConnectRankCalcStateV1` の既存 Zod スキーマまで検証する。浅い `z.record(z.unknown())` は不可（設計書「入力検証」節）
-  - **DOM 非依存モジュールへの分離（必須）**: `STORAGE_KEY`（storage.ts）や `CONNECT_RANK_CALC_STORAGE_KEY` + 計算タブ schema（connectRankCalcStorage.ts）は `window`/`localStorage` を含むファイルにあるため、Worker から直接 import しない。storage キー定数と Zod スキーマを DOM 非依存のモジュール（例: `src/domain/storageKeys.ts` / スキーマ分離ファイル）へ切り出し、既存ブラウザコードはそこから re-export して後方互換を保つ。Worker/sync.ts は分離後のモジュールのみ import する
-  - マスターデータとの照合・`reconcileWithMaster` 相当の補正はサーバーでは**行わない**（設計書「信頼境界」節）
-- [x] 7. **`/api/data` 実装**（`worker/` 配下）
-  - 共通ミドルウェア（設計書「CSRF 対策」節の 3 点、better-auth 管轄外の独自 API に必須）:
-    1. Origin ヘッダ検証: **PUT（状態変更）は Origin 必須かつ許可オリジン一致**（不一致・欠落は拒否）。**GET は Origin 欠落を許可**（same-origin fetch の GET は Origin を送らないのが通常のため）。ただし GET でも Origin が付いていて不一致なら拒否。許可リストは env から
-    2. 状態変更リクエスト（PUT）の `Content-Type: application/json` 必須化
-    3. 許可メソッド限定（`/api/data` は GET / PUT のみ、他は 405）
-  - 認証: better-auth のセッション検証で `user_id` を取得。未認証は 401。**全クエリを `WHERE user_id = ?` でスコープ**（クライアント提供 ID は一切使わない — 設計書「データ隔離」節）
-  - `GET /api/data`: 行あり → `{ revision, payload, updatedAt }`、行なし → 404 JSON
-  - `PUT /api/data`: リクエスト `{ baseRevision: number | null, payload: SyncPayloadV1 }`
-    - ボディサイズ上限 512KB（JSON parse 前に Content-Length とボディ実サイズで確認、超過 413）
-    - Zod 深い検証（不正 400）
-    - `baseRevision: null`（初回）→ `INSERT ... ON CONFLICT(user_id) DO NOTHING`、挿入 0 件なら 409
-    - `baseRevision: number` → `UPDATE ... SET revision = revision + 1 WHERE user_id = ? AND revision = ?`、更新 0 件なら 409
-    - 競合判定はサーバー発行 `revision` のみ（クライアントの `updatedAt` は使わない）
-  - レート制限（PUT のみ）: 固定ウィンドウ 30 回/5 分、`INSERT ... ON CONFLICT(user_id, window_start) DO UPDATE SET count = count + 1 RETURNING count`、超過 429。`/api/auth/*` は対象外（設計書どおり）
-- [x] 8. **Cron ハンドラ**: `scheduled` で期限切れ `rate_limit` 行を日次削除
-- [x] 9. **テスト**（設計書の必須要件を含む）
-  - **データ隔離**: ユーザー A のセッションで B のデータが読めない・書けない（必須）
-  - **退会連動削除**: user 行削除で `app_state` / `rate_limit` / セッション系が CASCADE 削除される（必須。可能なら better-auth の delete-user API 経由、困難なら user 行削除で CASCADE を直接検証し、deleteUser 有効化は別途アサート）
-  - 楽観ロック: revision 不一致 409 / 初回 INSERT 競合 409 / 正常更新で revision +1
-  - 入力検証: キー欠落・null・深い検証違反の 400、512KB 超の 413
-  - CSRF ミドルウェア: 不正 Origin 拒否、Content-Type 不正拒否、未許可メソッド 405
-  - レート制限: 31 回目の PUT が 429
-  - 既存フロントテスト 126 件の全パス維持
-- [x] 10. **CI 更新**: デプロイ前に `wrangler d1 migrations apply <DB> --remote` ステップを追加（DB 未作成のうちは deploy 同様に実行不能だが、secrets 登録後に一体で動く構成にする）
-- [x] 11. **README 更新**: ローカル開発（.dev.vars 準備、マイグレーション適用）、ユーザー作業（D1 作成 `--location apac` 相当、OAuth アプリ登録、`wrangler secret put` 一覧）
-- [x] 12. **検証**: `npm run typecheck` / `npm test`（フロント + Worker 両プロジェクト）/ `npm run build` 全成功。`vite dev` で `/api/auth/*` 応答と `/api/data` の 401 を確認
-- [x] 13. **レビュー**: Claude レビューエージェント + codex（gpt-5.5）ダブルレビュー。指摘対応
-- [x] 14. **コミット**（`develop`、Conventional Commits）
+- [x] 1. `src/domain/syncMeta.ts`(仮): 同期メタ（`pcr_growth_tracker_sync`）と touched フラグ（`pcr_growth_tracker_touched`）の読み書き（storageKeys.ts にキー定数追加。バックアップ・同期対象外であることをコメント明記）
+- [x] 2. storage.ts: 初期状態判定関数（`updatedAt` 除外の深い比較）を新設・export。connectRankCalcStorage 側も同様のデフォルト比較を用意
+- [x] 3. `src/domain/syncClient.ts`: ペイロード構築（in-memory state + loadConnectRankCalcState から）、`/api/data` GET/PUT の fetch ラッパ（credentials 同送、レスポンス検証に parseSyncPayloadV1 使用）、起動時フロー・引き継ぎ 3 分岐の判定ロジック（純関数中心）
+- [x] 4. 認証クライアント: `src/lib/authClient.ts`（`better-auth/react` の `createAuthClient`。公式 docs でクライアント API を裏取りしてから実装）
+- [x] 5. `src/hooks/useSync.ts`: セッション監視（useSession）、起動時 GET フロー、10 秒デバウンス PUT、409 → 競合ダイアログ用 state、401 → ログアウト扱い
+- [x] 6. App.tsx 統合: ヘッダーにログイン UI・同期ステータス、競合/引き継ぎダイアログ（既存 messageDialog パターン踏襲）、touched フラグのセット（編集ハンドラ経由）、ConnectRankCalcTab への `onStateSaved` prop 追加
+- [x] 7. テスト（front project、jsdom + fetch モック）: 初期状態判定（touched あり/なし × 初期/実データ）、引き継ぎ 3 分岐、起動時フロー 4 ケース（404/一致/黙って採用/競合）、409 → ローカル優先 → 再 PUT、ペイロードが正規化経由で構築されること、**PUT 中の後続編集が dirty のまま残ること（seq 競合）**、**同期メタの userId 不一致でメタ破棄 + 引き継ぎフローに落ち自動 PUT されないこと**。既存 126 件 + worker 26 件の全パス維持
+- [x] 8. 検証: `npm run typecheck` / `npm test` / `npm run build` 全成功。`vite dev` で (a) 未ログイン時に従来 UI が無変化で動くこと、(b) ログインダイアログが開き GitHub/Google ボタンと注意書きが表示されること、(c) 未ログインで /api/data への通信が発生しないこと を確認
+- [x] 9. レビュー: Claude レビューエージェント + codex（gpt-5.5）ダブルレビュー。指摘対応
+- [x] 10. コミット（`develop`、Conventional Commits）
 
-## ユーザー側作業（コード外・本計画のスコープ外）
+## ユーザー側作業・注意（スコープ外）
 
-- `wrangler d1 create <name> --location apac` 実行と `database_id` の差し替え
-- GitHub / Google の OAuth アプリ登録（本番 + ローカル用の 2 系統、callback URL: `https://<domain>/api/auth/callback/<provider>`）
-- `wrangler secret put`: `BETTER_AUTH_SECRET` / `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` / `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`
-- カスタムドメイン確定と `baseURL` / 許可オリジンの本番値設定
+- 実 OAuth ログインの動作確認（ローカルは `.dev.vars` の開発用 OAuth クライアント、本番は pkne.app）。**Google OAuth 同意画面が「テスト」モードのままなら本人以外はログイン不可 → 公開設定を確認**
+- 動作確認後、必要なら Phase 4（アカウント削除 UI・プライバシーポリシー・移行案内）へ
 
 ## レビューセクション
 
@@ -93,17 +69,18 @@ Phase 1 の記録は git 履歴（cf1394e の tasks/todo.md）を参照。
 
 ### 実装結果
 
-- Todo 1〜12 完了。テスト 152 件全パス（front 126 + worker 26）、`typecheck` / `build` / `wrangler deploy --dry-run` / `d1 migrations apply --local` 成功。`vite dev` で `/api/auth/ok` 200・`/api/data` 401 を確認。
-- 計画からの正当な差異: (1) `@better-auth/cli` は本体とバージョン非連動（1.4.21）で、generate には実 DB introspection が必要なため `node:sqlite` インメモリ DB を渡す `auth-cli.config.ts` を用意。(2) `cloudflareTest()` は `main` 上書き時に wrangler.jsonc を自動で読まないため `wrangler.configPath` を明示。(3) テストのセッション生成は better-auth 公式 `testUtils` プラグイン（テスト専用インスタンス）を採用 — Cookie 手動偽造より安定。
+- Todo 1〜8 完了。最終テスト **197 件全パス**（front 171 = 既存 126 + Phase 3 新規 45 / worker 26）、typecheck / build 成功。実ブラウザで「未ログイン時の UI 無変化」「ログインダイアログ（GitHub/Google + 別アカウント注意書き）」「未ログイン時 /api/data 通信ゼロ」を確認。
+- 構成: 純ロジックは `syncClient.ts` / `syncMeta.ts`（DOM 非依存）、React 統合は `useSync.ts`、UI は `SyncHeader.tsx`。better-auth クライアントは `createAuthClient()` デフォルト設定で成立。
 
-### ダブルレビュー結果（いずれも致命的指摘なし）
+### ダブルレビュー結果（計 3 巡で致命的 5 件を検出 → 全修正・回帰テスト化）
 
-- **Claude（Opus）**: データ隔離（全クエリがセッション由来 user_id でスコープ）、CSRF 3 点のバイパス経路なし（Content-Type のパラメータ付き値も正しく処理）、512KB 上限が parse 前・Content-Length 詐称にも実バイト数で耐性、楽観ロック SQL が設計書一致、レート制限の原子性、Worker の import グラフに DOM 依存ゼロ、CASCADE 実効性をテストで実証、を確認。
-- **codex（gpt-5.5）**: `.dev.vars` なしの fresh checkout 相当で cf-typegen / test / build が成立すること、deploy 対象に秘密情報が含まれないことまで独自検証。
-- 軽微指摘（対応不要と判断）: ボディ全バッファリング後のサイズ判定（Cloudflare 側 100MB 上限が防壁、設計書要件は充足）、本番 `vars`（`BETTER_AUTH_URL` / `ALLOWED_ORIGINS`）はユーザー登録前提で README 手順化済み、など。
+- **1 巡目**: codex 2 件（GET 中アカウント切替の stale userId closure、ログイン中インポートの stale state PUT）+ Claude/Opus 1 件（`noop` 分岐が stale メタを書き戻し GET 中の編集を恒久未同期化）。
+- **2 巡目（codex）**: 残存 2 件（409 経由の競合ダイアログが userId 非紐付け、in-flight PUT の完了処理がインポート後も生存）。
+- 対策: `latestUserIdRef` による await 復帰後照合、`ConflictInfo.userId` 刻印と解決時照合、世代カウンタ `syncGenerationRef` による in-flight 処理の無効化、`noop` 分岐の fresh メタ読み直し、インポート専用 `notifyLocalDataImported`（永続 dirty 化のみ・PUT 予約なし）。
+- 全 5 件に**ミューテーション確認付き回帰テスト**（修正を revert すると該当テストが fail することを実測）。最終巡で両レビューとも致命的指摘なし。
 
-### 残課題（Phase 3 以降・ユーザー作業）
+### 残課題（ユーザー作業 / Phase 4）
 
-- ユーザー作業: `wrangler d1 create pcre-tracker-db --location apac` + `database_id` 差し替え、OAuth アプリ登録（本番/ローカル）、`wrangler secret put` 5 種、本番 `vars` 設定（README 記載）
-- npm audit が推移的依存で 5 件報告 → 別途対応検討
-- Phase 3: フロントエンド同期層（ログイン UI・同期呼び出し・初回ログイン時の引き継ぎフロー）
+- 実 OAuth ログインの動作確認（本番 pkne.app / ローカル）。Google OAuth 同意画面が「テスト」モードなら公開設定が必要
+- Phase 4: アカウント削除 UI・プライバシーポリシー・移行案内
+- npm audit 推移的依存 5 件（未対応）
