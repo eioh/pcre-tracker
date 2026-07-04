@@ -16,10 +16,8 @@
       "binding": "DB",
       // Cloudflare ダッシュボード/CLI 上での DB 名。
       "database_name": "pcre-tracker-db",
-      // プレースホルダ（全ゼロ UUID）。ローカル miniflare は ID を API 照会しないためこのままで開発・テスト可能。
-      // デプロイ前に `wrangler d1 create pcre-tracker-db --location apac`（設計書指定のロケーション）で作成し、
-      // 出力された実 UUID に置き換えること。
-      "database_id": "00000000-0000-0000-0000-000000000000"
+      // `wrangler d1 create pcre-tracker-db --location apac`（設計書指定のロケーション）で作成した本番 DB の ID。
+      "database_id": "1371669d-a27e-4e73-8eb2-c478fadd0d9d"
     }
   ],
   // Cron Trigger。期限切れ rate_limit 行を日次で掃除する（scheduled ハンドラで処理。設計書「乱用対策」節）。
@@ -38,11 +36,17 @@
     "not_found_handling": "single-page-application",
     // /api/* を静的アセットより優先して Worker に到達させる（設計書指定）。
     "run_worker_first": ["/api/*"]
+  },
+  // 本番のカスタムドメイン（設計書指定: workers.dev は本番運用に使わない）。
+  // Cloudflare Registrar で取得済みのゾーンが前提で、デプロイ時に Worker へ自動で紐付く。
+  "routes": [
+    { "pattern": "pkne.app", "custom_domain": true }
+  ],
+  // 非機密の本番環境変数。ローカル開発では .dev.vars、Worker テストではテスト用バインディングが優先される。
+  "vars": {
+    // better-auth の baseURL（自動推定に依存せず明示設定する。設計書指定）。
+    "BETTER_AUTH_URL": "https://pkne.app",
+    // /api/data の CSRF 検証と better-auth trustedOrigins で許可するオリジン（カンマ区切り）。
+    "ALLOWED_ORIGINS": "https://pkne.app"
   }
-  // TODO(Phase 1 スコープ外): カスタムドメイン確定後に routes 設定を追加する。
-  //   ドメイン名が未定のため（設計書「未確定事項」）、現時点では route を含めない。
-  //   例:
-  //   "routes": [
-  //     { "pattern": "example.com", "custom_domain": true }
-  //   ]
 }
