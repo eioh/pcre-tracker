@@ -34,7 +34,9 @@ import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { PenLine, LayoutDashboard, Coins, Calculator, Download, Upload, RotateCcw, Swords } from "lucide-react";
 import { SyncHeader } from "./components/SyncHeader";
+import { PrivacyPolicyPage } from "./components/PrivacyPolicyPage";
 import { useSync } from "./hooks/useSync";
+import { clearSyncMeta } from "./domain/syncMeta";
 
 const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
 
@@ -84,6 +86,38 @@ export default function App() {
   const [inputSettingsSyncToken, setInputSettingsSyncToken] = useState(0);
   const [connectRankCalcResetToken, setConnectRankCalcResetToken] = useState(0);
   const [hasOpenedInput, setHasOpenedInput] = useState(() => uiState.activeTab === "input");
+  // 現在のパス名（SPA フォールバックでの簡易ルーティング用。設計判断 1）。
+  const [pathname, setPathname] = useState(() => window.location.pathname);
+
+  // ブラウザの戻る/進む操作でパス名の state を追随させる。
+  useEffect(() => {
+    const handlePopState = () => {
+      setPathname(window.location.pathname);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  // プライバシーポリシーページへ遷移する（history を積んで戻る導線を確保する）。
+  const handleOpenPrivacyPolicy = useCallback(() => {
+    window.history.pushState(null, "", "/privacy");
+    setPathname("/privacy");
+    window.scrollTo(0, 0);
+  }, []);
+
+  // ポリシーページからアプリ本体（トップ）へ戻る。
+  const handleClosePrivacyPolicy = useCallback(() => {
+    window.history.pushState(null, "", "/");
+    setPathname("/");
+    window.scrollTo(0, 0);
+  }, []);
+
+  // アカウント削除成功の直前に呼ぶ。同期メタのみ破棄し、touched と育成データは残す（設計判断 3）。
+  const handleBeforeAccountDeleted = useCallback(() => {
+    clearSyncMeta();
+  }, []);
 
   useEffect(() => {
     const timerId = window.setTimeout(() => {
@@ -265,6 +299,11 @@ export default function App() {
     sync.notifyLocalChange();
   }, [sync]);
 
+  // `/privacy` パスではプライバシーポリシーページを描画する（SPA フォールバックにより固定 URL になる。設計判断 1）。
+  if (pathname === "/privacy") {
+    return <PrivacyPolicyPage onBack={handleClosePrivacyPolicy} />;
+  }
+
   return (
     <div className="mx-auto w-full max-w-[1400px] px-5 pb-9 pt-7">
       <header className="mb-5 flex flex-col items-start justify-between gap-6 lg:flex-row">
@@ -281,6 +320,9 @@ export default function App() {
               isSessionPending={sync.isSessionPending}
               userLabel={sync.userLabel}
               status={sync.status}
+              onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
+              onDeleteRequestStart={sync.stopSync}
+              onBeforeAccountDeleted={handleBeforeAccountDeleted}
             />
             <Button variant="outline" onClick={handleExportBackup}>
               <Download className="size-4" aria-hidden="true" />
@@ -466,6 +508,17 @@ export default function App() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* フッター: ログイン前でも読めるプライバシーポリシーへの導線（設計判断 1）。 */}
+      <footer className="mt-9 border-t border-white/10 pt-5 text-center text-xs text-muted">
+        <button
+          type="button"
+          className="text-accent underline underline-offset-2"
+          onClick={handleOpenPrivacyPolicy}
+        >
+          プライバシーポリシー
+        </button>
+      </footer>
     </div>
   );
 }

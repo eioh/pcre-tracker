@@ -6,8 +6,9 @@
 
 ## 実装状況（2026-07-04 時点）
 
-- **Phase 1〜3 は実装・リリース済み**。本番はカスタムドメイン **https://pkne.app** で稼働中（D1 作成済み、OAuth・secrets 設定済み）。
-- **Phase 4（移行案内・プライバシーポリシーの整備、アカウント削除 UI）は未実施**。サーバー側の退会 API（better-auth の delete-user、CASCADE 削除）は Phase 2 で実装・テスト済みだが、フロントの削除導線とプライバシーポリシーページが未着手。
+- **Phase 1〜4 まで実装済み。移行計画は完了**。本番はカスタムドメイン **https://pkne.app** で稼働中（D1 作成済み、OAuth・secrets 設定済み）。
+- Phase 1〜3（Workers + Static Assets 化、better-auth + D1・`/api/data`、フロント同期層）は実装・リリース済み。
+- **Phase 4（プライバシーポリシー整備・アカウント削除 UI）完了**: フロントに固定 URL `/privacy` のプライバシーポリシーページ（フッター＋ログインダイアログからリンク）と、ログイン中メニューからのアカウント削除導線（`authClient.deleteUser()` → 確認ダイアログ → 同期メタ破棄 → リロード。fresh session 切れ時は再ログイン案内）を追加した。サーバー側の退会 API（better-auth の delete-user、CASCADE 削除）は Phase 2 で実装・テスト済み。あわせて SyncHeader の PII 是正（email をラベル表示のフォールバックから除去）を実施。移行案内は不要と決着（下記「未確定事項」参照）。
 
 ## 背景と課題
 
@@ -274,7 +275,7 @@ type SyncPayloadV1 = {
 
 - **Workers Rate Limiting binding** → **決着（2026-07-04）**: 使用せず、設計書記載の代替案どおり D1 上のユーザー毎カウンタ（`rate_limit` テーブル）で実装した。
 - **カスタムドメインのドメイン名の選定** → **決着（2026-07-04）**: `pkne.app`（Cloudflare Registrar で取得）。
-- **旧 GitHub Pages URL からの誘導方法**（リダイレクトページを設置するか、案内のみに留めるか）→ **未決着**。Phase 4 の移行案内とあわせて判断する。
+- **旧 GitHub Pages URL からの誘導方法**（リダイレクトページを設置するか、案内のみに留めるか）→ **決着（2026-07-04）**: ユーザー判断により案内不要（本人のみ利用のため旧サイトは放置）。旧 GitHub Pages に対する作業は行わない。
 
 ## 段階的移行計画
 
