@@ -16,3 +16,5 @@ worker-configuration.d.ts
 .dev.vars
 # @cloudflare/vite-plugin のローカル状態ディレクトリ。
 .wrangler/
+# Codex CLI が生成するニュース画像キャッシュ（コードと無関係）。
+.codex-news-cache/
