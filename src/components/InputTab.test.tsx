@@ -75,6 +75,23 @@ function buildStateWithOwnedFlags(baseState: StoredStateV1, ownedByName: Record<
   return { ...baseState, progressByName: nextProgressByName };
 }
 
+// モバイル判定（max-width: 767px）へ常にマッチする matchMedia のスタブを生成する。
+function stubMobileMatchMedia(): void {
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn().mockImplementation((query: string) => ({
+      matches: query === "(max-width: 767px)",
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    })),
+  );
+}
+
 describe("InputTab", () => {
   it("検索欄のリセットボタンで文字列を空へ戻せる", async () => {
     const props = buildProps();
@@ -243,5 +260,27 @@ describe("InputTab", () => {
     fireEvent.click(screen.getByRole("button", { name: "表示に適用" }));
 
     expect(getFirstBodyRowName(characterNames)).toBe(secondName);
+  });
+
+  it("デスクトップ幅ではテーブルレイアウトを表示しモバイル一覧は出さない", () => {
+    // setup.ts の matchMedia スタブは常に非マッチ（= デスクトップ扱い）を返す。
+    const props = buildProps();
+    render(<InputTab {...props} />);
+
+    expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /の編集シートを開く/ })).not.toBeInTheDocument();
+  });
+
+  it("モバイル幅では一覧レイアウトを表示しテーブルは出さない", () => {
+    stubMobileMatchMedia();
+    try {
+      const props = buildProps();
+      render(<InputTab {...props} />);
+
+      expect(screen.queryByRole("table")).not.toBeInTheDocument();
+      expect(screen.getAllByRole("button", { name: /の編集シートを開く/ }).length).toBeGreaterThan(0);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

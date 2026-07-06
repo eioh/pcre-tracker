@@ -18,8 +18,10 @@ import type {
 import type { Ue1HeartFragmentCalcMode } from "../utils/ue1HeartFragmentCost";
 import type { Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../utils/starMemoryCost";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { InputFilters } from "./input/InputFilters";
 import { InputMemoryCalcSettings } from "./input/InputMemoryCalcSettings";
+import { InputProgressList } from "./input/InputProgressList";
 import { InputProgressTable } from "./input/InputProgressTable";
 import type { ProgressPatch } from "./input/types";
 import { panelClass } from "./input/uiStyles";
@@ -93,6 +95,8 @@ export function InputTab({
 }: InputTabProps) {
   const mountedRef = useRef(false);
   const isSyncingFromParentRef = useRef(false);
+  // 768px 未満ではモバイル向け一覧、それ以外はテーブルを表示する（両方の同時マウントは仮想化計測と aria の二重化を招くため禁止）。
+  const isMobile = useIsMobile();
   const [searchText, setSearchText] = useState(initialSettings.searchText);
   const [debouncedSearchText, setDebouncedSearchText] = useState(initialSettings.searchText);
   const [isDetailSettingsOpen, setIsDetailSettingsOpen] = useState(initialSettings.isDetailSettingsOpen);
@@ -425,16 +429,29 @@ export function InputTab({
 
         <p className="my-3.5 text-sm text-muted">表示件数: {visibleRowsWithCurrentProgress.length}</p>
 
-        <InputProgressTable
-          visibleRows={visibleRowsWithCurrentProgress}
-          purePieceByCharacterName={state.purePieceByCharacterName}
-          purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
-          onUpdateProgress={onUpdateProgress}
-          onUpdatePurePiece={onUpdateCharacterPurePiece}
-          includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
-          starMemoryCalcMode={starMemoryCalcMode}
-          ue1MemoryCalcMode={ue1MemoryCalcMode}
-        />
+        {isMobile ? (
+          <InputProgressList
+            visibleRows={visibleRowsWithCurrentProgress}
+            purePieceByCharacterName={state.purePieceByCharacterName}
+            purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
+            onUpdateProgress={onUpdateProgress}
+            onUpdatePurePiece={onUpdateCharacterPurePiece}
+            includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
+            starMemoryCalcMode={starMemoryCalcMode}
+            ue1MemoryCalcMode={ue1MemoryCalcMode}
+          />
+        ) : (
+          <InputProgressTable
+            visibleRows={visibleRowsWithCurrentProgress}
+            purePieceByCharacterName={state.purePieceByCharacterName}
+            purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
+            onUpdateProgress={onUpdateProgress}
+            onUpdatePurePiece={onUpdateCharacterPurePiece}
+            includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
+            starMemoryCalcMode={starMemoryCalcMode}
+            ue1MemoryCalcMode={ue1MemoryCalcMode}
+          />
+        )}
       </section>
     </>
   );
