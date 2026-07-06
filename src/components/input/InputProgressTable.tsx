@@ -586,7 +586,7 @@ export const InputProgressTable = memo(function InputProgressTable({
         style={{ left: stickyShadowLeft }}
       />
       <div ref={scrollParentRef} className={tableWrapClass}>
-        <Table className="table-fixed">
+        <Table className="min-w-[1280px] table-fixed">
         <colgroup>
           <col className="w-20" />
           <col className="w-[200px]" />
