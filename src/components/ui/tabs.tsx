@@ -12,7 +12,7 @@ export function TabsList({ className, ...props }: React.ComponentProps<typeof Ta
   return (
     <TabsPrimitive.List
       className={cn(
-        "inline-flex items-center gap-1 border-b border-white/15",
+        "inline-flex max-w-full items-center gap-1 overflow-x-auto border-b border-white/15 [overscroll-behavior-x:contain]",
         className,
       )}
       {...props}
@@ -25,7 +25,7 @@ export function TabsTrigger({ className, ...props }: React.ComponentProps<typeof
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        "inline-flex cursor-pointer items-center gap-2 border-b-2 border-transparent px-4 pb-3 pt-2 text-sm font-medium text-muted transition-colors hover:text-main data-[state=active]:border-accent data-[state=active]:font-bold data-[state=active]:text-accent",
+        "inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 border-transparent px-4 pb-3 pt-2 text-sm font-medium text-muted transition-colors hover:text-main data-[state=active]:border-accent data-[state=active]:font-bold data-[state=active]:text-accent",
         className,
       )}
       {...props}
