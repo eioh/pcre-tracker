@@ -1,69 +1,104 @@
-# Cloudflare Workers 移行 Phase 4: アカウント削除 UI・プライバシーポリシー
+# 育成入力タブのスマホ対応(〜375px)実装計画
 
-参照設計書: `docs/design/workers-migration.md`（「PII の扱い」「アカウント削除・プライバシーポリシー」節）
-Phase 1〜3 は完了済み（本番 https://pkne.app 稼働中）。本フェーズで移行計画は完了する。
+## 背景・ゴール
 
-## スコープ
+- 現状、育成入力タブのテーブルは実幅約 2,205px(`table-fixed` + colgroup。`ui/table.tsx` の `min-w-[1280px]` は下限に過ぎない)で、スマホ(375px)では約6画面分の横スクロールが必要で実用不可。
+- ゴール: **768px 未満の画面幅で横スクロールゼロの育成入力 UI** を提供する。デスクトップの既存テーブルは現状維持(リグレッションゼロ)。
+- スコープ外: PWA 化、他タブ(ダッシュボード/クラバト/ショップ/計算)のモバイル調整、hover 依存 UI の全面改修。これらは本対応後に別途実施。
 
-- **アカウント削除 UI**: サーバー側（better-auth delete-user + CASCADE 削除）は Phase 2 で実装・テスト済み。フロントの削除導線のみ追加。
-- **プライバシーポリシーページ**: 設計書の記載必須項目を満たすページを新設。
-- **移行案内は不要と決着**（2026-07-04 ユーザー判断: 旧 GitHub Pages は本人のみ利用のため案内不要。旧サイトは放置）。設計書の未決着事項にこの決着を反映する。
+## 現状分析(要点)
 
-## 設計判断（本計画で確定）
+- テーブルは `src/components/input/InputProgressTable.tsx`。全15列(所持/キャラ/限界突破/☆/RANK/専用1/専用2/アドベンチャー/所持メモピ/所持ピュアピ/入手日/ガチャ回数/必要メモピ合計/必要ピュアピ合計/メモピ入手)。
+- `@tanstack/react-virtual` による `<tr>` 仮想化(estimateSize 72、overscan 8)、sticky 2列(left-0 / left-20)+スクロール影の実測描画(ResizeObserver、約50行)。横スクロールを無くせば影機構ごと不要。
+- 派生値計算(必要メモピ/ピュアピ内訳、maxed 判定等)と編集ハンドラは `TableRow`(memo 化)内に直書き → モバイル UI で再利用するには抽出が必要(InputProgressTable.tsx:87-115 付近)。
+- 状態更新は `onUpdateProgress(name, patch)` / `onUpdatePurePiece(name, value)` → `App.tsx handleUpdateProgress`(App.tsx:229)→ `setState` + `sync.notifyLocalChange()`。モバイル UI も同じ props を呼べば localStorage 保存・D1 同期は不変。
+- 表示行の合成(フィルタ・ソート)は `useVisibleRows` → `InputTab` の `visibleRowsWithCurrentProgress`。レイアウト非依存で再利用可。
+- `ui/table.tsx` の使用箇所は `InputProgressTable.tsx` と `ConnectRankCalcTab.tsx` の2箇所のみ。後者は `className="min-w-[900px]"` を渡しており tailwind-merge で既に 1280px を上書き済み。
+- `useMediaQuery` 系フックは存在しない。viewport meta は設定済み。
 
-1. **プライバシーポリシーの配置**: SPA フォールバック（全パスが index.html を返す）を利用し、`location.pathname === "/privacy"` のとき App がポリシーページを描画する。リンク可能な固定 URL `https://pkne.app/privacy` になる。フッター（アプリ最下部）とログインダイアログ内の 2 箇所からリンクする（ログイン前に読める動線が必要なため）。
-2. **ポリシー記載内容**（設計書の明記要件をすべて含む）:
-   - 保存する情報: メールアドレス・プロバイダ ID・表示名・OAuth トークン（access/refresh token、scope。better-auth の `account` テーブルのデフォルト動作）+ 同期対象の育成データ
-   - メールアドレス等は認証目的にのみ使用し、画面表示・通知送信等の二次利用はしない
-   - 未ログイン時はサーバーへデータを送信しない（localStorage のみ）
-   - アカウント削除機能があり、削除時は認証情報・同期データが連動削除される
-   - **削除後も D1 Time Travel（7 日間の PITR）により削除済みデータが復元可能な状態で最大 7 日間残存する**（設計書の明記必須事項）
-   - GitHub / Google は別アカウント扱いになる旨
-3. **アカウント削除 UI**: ログイン中メニュー（SyncHeader）に「アカウント削除」を追加。破壊的操作なので二段構え: AlertDialog で削除内容（サーバー上の認証情報・同期データが削除される / この端末の localStorage データは残る / 7 日間の残存）を明示 → 確認して実行。
-   - 実装は `authClient.deleteUser()`（better-auth 組み込み `/api/auth/delete-user`。独自 API 不要）。クライアント API の正確なシグネチャは公式 docs / 型定義で裏取り。
-   - **fresh session 要件**: パスワードなし（ソーシャルのみ）の場合、better-auth はセッションの鮮度（デフォルト freshAge 24 時間）を要求し、古いセッションでは `SESSION_EXPIRED` エラーになる。エラー時は「再ログインしてからやり直してください」と案内する（freshAge の設定変更はしない。セキュリティ上の意図された挙動のため）。
-   - 削除成功後: 同期メタ（`pcr_growth_tracker_sync`）を破棄（userId が無効になるため。touched フラグと localStorage の育成データは**残す** — ローカルモードとして継続利用可能）。完了ダイアログを表示してリロード。
-4. **既存 UI の PII 方針違反の是正**: 現行 SyncHeader は `userLabel` として表示名または **email** を画面表示しており、設計書「保存した email をアプリ画面上での表示…等の二次利用はしない」（PII の扱い節）に違反している。**email の表示（フォールバック含む）を削除**し、表示は「表示名のみ。表示名がなければ汎用表記（例: ログイン中）」とする。表示名の表示は GitHub/Google 別アカウント問題でどのアカウントか識別する実用目的があり、設計書が明示的に禁じているのは email のため許容。プライバシーポリシーには「表示名はログイン状態の表示に使用する。メールアドレスは画面表示しない」と実態どおり記載する。
-5. **旧 GitHub Pages**: 作業なし（放置）。設計書の未決着事項を「決着: 案内不要（本人のみ利用のため）」に更新。
+## 方式の決定
 
-## Todo
+3案(A: カード縦展開 / B: 列選択コンパクトテーブル / C: マスター/ディテール)を比較し、**C案: マスター/ディテール(一覧+ボトムシート編集)** を採用。
 
-- [x] 1. `src/components/PrivacyPolicyPage.tsx`: ポリシーページ（上記記載内容。既存のスタイル・CSS 変数に準拠）。App.tsx で `/privacy` パス時に描画 + フッターリンク追加 + ログインダイアログ（SyncHeader）にリンク追加
-- [x] 2. SyncHeader: ログイン中メニューに「アカウント削除」→ 確認 AlertDialog → `authClient.deleteUser()` → 成功時は同期メタ破棄 + 完了ダイアログ + リロード / `SESSION_EXPIRED` 時は再ログイン案内
-- [x] 2b. SyncHeader の PII 是正: `userLabel` から email フォールバックを削除（表示名のみ、なければ汎用表記）。テストで email が DOM に出ないことを検証
-- [x] 3. 設計書更新: 「実装状況」を Phase 4 完了に、未決着事項（旧 URL 誘導）を決着に更新
-- [x] 4. テスト（front project）: `/privacy` パスでポリシーページが描画される・必須記載事項（7 日間残存・トークン保存・二次利用なし）が含まれる、削除フロー（確認 → deleteUser 呼び出し → メタ破棄、SESSION_EXPIRED 時の案内、キャンセル時に何も起きない）
-- [x] 5. 検証: `npm run typecheck` / `npm test`（全件）/ `npm run build` 成功。`vite dev` で `/privacy` の表示・削除確認ダイアログの表示を確認
-- [x] 6. レビュー: Claude レビューエージェント + codex（gpt-5.5）ダブルレビュー。指摘対応
-- [x] 7. コミット（`develop`、Conventional Commits）
+理由:
+1. 375px で横スクロールゼロを実現できる唯一の案(B は Select trigger 最小幅の制約で物理的に2〜3列しか収まらない)。
+2. 固定高の一覧行は仮想スクロールと最も相性が良く、sticky 列・影計算というモバイルで壊れやすい機構を丸ごと回避。
+3. 編集はシート内で既存 `onUpdateProgress` を即時呼ぶだけで、state 更新・D1 同期経路に一切手を入れない。
+4. デスクトップのテーブルは無傷でリグレッションリスク最小。
+5. タッチで機能しない Tooltip(必要メモピ内訳)を、シート内インライン内訳表示で同時に解決。
 
-## ユーザー側作業（スコープ外）
+### 決定事項(旧・未決事項)
 
-- 本番での実アカウント削除の動作確認（削除 → 再ログインで新規アカウントになること）
-- Google OAuth 同意画面の公開設定（未確認のままなら）
+1. ブレークポイントは **768px(Tailwind `md` 未満)でモバイルレイアウト**。shadcn の `useIsMobile` 慣例に合わせる。タブレット縦(768px〜)は既存テーブル+sticky 列で許容。
+2. 一覧行のサマリーは **所持チェック・キャラ名/タグ・☆・RANK・必要メモピ合計**。行高は **64px に物理固定**(`h-16 overflow-hidden`)し、収まらないテキストは truncate する。可変高+`measureElement` 方式は複雑化するため不採用。
+3. シートは1キャラ完結。前後キャラへの送りナビ(< >)は初期スコープ外。
+4. シート内は折りたたみなしで全項目を縦に配置(見出しでグルーピングのみ)。
 
-## レビューセクション
+### 切替方式
 
-実施日: 2026-07-04
+CSS のみの切替(両レイアウト同時マウント+`hidden`)は不可:
+- 非表示側の `useVirtualizer` が高さ0の scrollElement を計測して全行 or 0行レンダリングになる
+- フォーム要素の aria-label が二重化する
 
-### 実装結果
+→ **matchMedia フック(`useIsMobile`)+条件レンダリング**で片方のみマウントする。
 
-- Todo 1〜5 + 2b 完了。最終テスト **211 件全パス**、typecheck / build 成功。`/privacy` の実機表示・フッター/ログインダイアログのリンク・削除確認ダイアログを確認済み。
-- better-auth `deleteUser` はソースレベルで裏取り（引数なし呼び出しで即削除経路、`SESSION_EXPIRED` は HTTP 400 + `error.code`、成功時はセッション Cookie も削除）。
-- 削除中の同期 PUT レースは Phase 3 の世代カウンタ + `stopSync()` で閉鎖（削除済み `app_state` 行の再作成防止）。
+## 変更ファイル一覧
 
-### ダブルレビュー結果
+| ファイル | 種別 | 内容 |
+|---|---|---|
+| `src/hooks/useIsMobile.ts` | 新規 | `window.matchMedia("(max-width: 767px)")` を `useSyncExternalStore` で購読するフック(SPA のため SSR 考慮不要) |
+| `src/components/input/rowDerived.ts` | 新規 | `TableRow` 内の派生値計算を純関数 `computeRowDerived(character, progress, ownedPurePiece, ownedPurePieceByBase, opts)` に抽出。単体テスト追加 |
+| `src/components/input/progressFields.tsx` | 新規 | フィールド単位の共通コンポーネント(StarSelect / ConnectRankSelect / Ue1Select / Ue2Select / ObtainedDatePicker / クランプ付き数値入力)。テーブル行とシートの両方から使用 |
+| `src/components/ui/sheet.tsx` | 新規 | `npx shadcn@latest add sheet` で雛形取得(Radix Dialog ベース)。`side="bottom"` のボトムシート。色は `styles.css` の CSS 変数準拠にカスタマイズ |
+| `src/components/input/InputProgressList.tsx` | 新規 | モバイル一覧。props は `InputProgressTable` と同一。div ベース `useVirtualizer`(estimateSize 64)。**行は `h-16 overflow-hidden` で物理的に固定高とし、キャラ名・タグ・サマリーは `min-w-0` + `truncate` で1行に切り詰めて 64px 内に収める**(`estimateSize` は高さを保証しないため、折り返しによる実 DOM 高とのズレ=行の重なり・スクロール破綻を構造的に防ぐ)。行タップで編集シートを開く |
+| `src/components/input/InputCharacterEditSheet.tsx` | 新規 | 編集シート。progressFields を縦配置、必要メモピ/ピュアピの内訳をインライン表示。編集は即時 `onUpdateProgress`(下書きバッファなし) |
+| `src/components/input/InputProgressTable.tsx` | 変更 | 派生値計算・フィールド UI を rowDerived / progressFields 利用に置換(挙動不変)。`Table` に `className="min-w-[1280px] table-fixed"` を明示 |
+| `src/components/ui/table.tsx` | 変更 | `min-w-[1280px]` を共有コンポーネントから削除(呼び出し側指定に統一)。ConnectRankCalcTab は実挙動変化ゼロ |
+| `src/components/InputTab.tsx` | 変更 | `useIsMobile()` で `InputProgressTable` / `InputProgressList` を条件レンダリング(渡す props は同一) |
 
-- **計画段階（codex）**: 既存 SyncHeader が email をラベル表示しており設計書の PII 方針（email の二次利用禁止）に違反 → Todo 2b として是正を計画に追加。
-- **実装後**: Claude（Opus）は致命的なし（確認ダイアログ文言・二重発火ガード・stopSync のレース閉鎖・ポリシー内容と設計書の完全一致・email の DOM 非出現を検証）。codex は 1 件（表示名自体が email 形式の場合の矛盾）→ `@` を含む name を null に落として汎用表記へフォールバックする修正 + テスト 3 件で対応。最終確認で両者とも致命的指摘なし。
-- 軽微（対応不要と判断）: 削除失敗後は次回編集まで PUT が再開しない（データ喪失なし・次回編集で自然復帰する意図的挙動）。
+### 実装上の要点
 
-### 移行計画クローズ
+- **シートの選択キャラは name(string)で保持**し、レンダリング毎に `visibleRows` から最新 row を引く(progress オブジェクトは編集の度に再生成されるため、参照保持だと古い値を表示してしまう)。
+- シート表示中に対象キャラがフィルタで消えた場合は「row が見つからなければシートを閉じる」。
+- モバイルの仮想スクロールコンテナは `h-[70vh]` でなく `h-[70dvh]`(モバイルブラウザの動的ツールバー対策)を採用。
+- 仮想化の計測未確定時フォールバック(先頭行表示)は既存テーブルの防御コード(InputProgressTable.tsx:507-527)と同じ戦略を一覧にも移植(jsdom テストもこの経路で通す)。
 
-Phase 1〜4 すべて完了。設計書の未確定事項もすべて決着（Rate Limiting binding → D1 カウンタ / ドメイン → pkne.app / 旧 URL 誘導 → 案内不要）。
+## 段階分割(コミット単位)
 
-### 残課題（ユーザー作業）
+`feature/*` ブランチで作業(AGENTS.md 準拠)。
 
-- 本番での実アカウント削除の動作確認（削除 → 再ログインで新規アカウント）
-- Google OAuth 同意画面の公開設定（未確認のままなら）
-- npm audit 推移的依存 5 件（未対応）
+### ステップ1: `refactor: 共有テーブルの最小幅指定を呼び出し側へ移動`
+- `ui/table.tsx` から `min-w-[1280px]` を削除、`InputProgressTable` 側に付与
+- 検証: `npm test` / `npm run typecheck`。デスクトップで育成入力・コネクトランク計算タブの見た目確認
+
+### ステップ2: `refactor: 育成入力行の派生値計算とフィールドUIを共通化`
+- `rowDerived.ts` + `progressFields.tsx` を抽出し、`InputProgressTable` を置換(挙動不変)
+- 検証: 既存 `InputProgressTable.test.tsx` が**無修正で通ること**(挙動不変の証明)。`rowDerived` の単体テスト追加
+
+### ステップ3: `feat: モバイル判定フック useIsMobile を追加`
+- フック+テスト(`src/test/setup.ts` に matchMedia モックが無ければ追加)
+
+### ステップ4: `feat: 育成入力タブにモバイル向け一覧と編集シートを追加`
+- `sheet.tsx`(shadcn add)、`InputProgressList`、`InputCharacterEditSheet`、`InputTab` の切替
+- テスト: 一覧レンダリング(行タップ→シート表示)、シート内編集で `onUpdateProgress` が正しい patch で呼ばれること、フィルタ0件時の空表示。既存テストのヘルパー(`buildCharacter` / `buildProgress` / `selectOptionFromCombobox`)を流用
+- 手動確認(`npm run dev` + DevTools 375px):
+  - 横スクロールが発生しないこと
+  - 仮想化が効いていること(DOM 行数が画面分+overscan のみ)
+  - シート編集が一覧・ダッシュボードに即反映されること
+  - ログイン状態で D1 同期が走ること(SyncHeader の同期表示)
+  - 768px 前後のリサイズでレイアウトが切り替わること
+  - PR にスクリーンショット添付(規約)
+
+### ステップ5(必要に応じて): `fix: モバイル表示の微調整`
+- シートの safe-area(iOS ホームバー)、日付ピッカーのタッチ操作、フォントサイズ等
+
+## リスク
+
+- テーブル行とシートで UI ロジックが二重化し将来乖離する → ステップ2の共通化が計画の要。progressFields を唯一の実装にする
+- `useVirtualizer` + jsdom はテストで計測不能 → 既存テーブルと同じフォールバック行戦略で検証
+- Radix Dialog(Sheet)内の Select / Popover(入手日 Calendar)のネスト → Radix はポータルのネストに対応しているが、focus trap との干渉を手動確認
+- 767↔768px リサイズで仮想スクロール位置がリセットされる → 実害は小さいが既知の挙動として PR に明記
+
+## レビュー
+
+(実装完了後に記入)
