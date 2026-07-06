@@ -99,6 +99,31 @@ CSS のみの切替(両レイアウト同時マウント+`hidden`)は不可:
 - Radix Dialog(Sheet)内の Select / Popover(入手日 Calendar)のネスト → Radix はポータルのネストに対応しているが、focus trap との干渉を手動確認
 - 767↔768px リサイズで仮想スクロール位置がリセットされる → 実害は小さいが既知の挙動として PR に明記
 
-## レビュー
+## レビュー(2026-07-07 実装完了)
 
-(実装完了後に記入)
+### 実施結果
+
+- [x] ステップ1: `8861240` 共有テーブルの最小幅指定を呼び出し側へ移動
+- [x] ステップ2: `c25e9f9` 派生値計算(rowDerived.ts)とフィールド UI(progressFields.tsx)を共通化。既存 InputProgressTable.test.tsx は無修正で通過(挙動不変を証明)
+- [x] ステップ3: `f8a5552` useIsMobile フック追加
+- [x] ステップ4: `cc6b2fa` モバイル一覧(InputProgressList)+編集シート(InputCharacterEditSheet)+ InputTab 切替
+- [x] ステップ5: `b817e9f` タブナビゲーションのスマホ幅対応(flex 縮小で縦書きに潰れていたため横スクロール化)
+
+### 検証結果
+
+- `npm test` 241 テスト全通過(新規 18 追加)、`npm run typecheck` 通過
+- 375px 実機確認: ページ横スクロールゼロ(scrollWidth == viewport)、仮想化有効(341行中 DOM 17行)、行タップ→シート表示、シート編集(所持メモピ)→ localStorage 即時保存、768px 境界でテーブル⇔一覧切替、タブバーはバー内のみ横スクロール
+- D1 同期はコード経路不変(既存 onUpdateProgress を呼ぶのみ)のためログイン状態での確認は本番デプロイ後に実施
+
+### 計画からの逸脱
+
+- shadcn CLI の sheet 雛形がリポジトリ非準拠(umbrella `radix-ui` パッケージ、未解決エイリアス)だったため、既存慣例(個別 `@radix-ui/react-dialog`、相対 import、alert-dialog.tsx の流儀)で書き直した
+- shadcn 雛形のアニメーションは `tailwindcss-animate` 前提のため省略(既存 alert-dialog と同様)
+- ステップ5でタブナビゲーション修正を追加(計画時は「他タブのモバイル調整」としてスコープ外扱いだったが、育成入力画面のナビとして実用を阻害するため最小修正)
+
+### 残課題(スコープ外・今後の対応候補)
+
+- PWA 化(manifest / apple-touch-icon / theme-color / Service Worker)
+- 他タブ(ダッシュボード・クラバト・ショップ・計算)のモバイル微調整(ガチャチャート min-w-[720px] など)
+- hover 依存 UI(122箇所)のタッチフィードバック改善
+- ヘッダーのボタン群(エクスポート等)のモバイル集約
