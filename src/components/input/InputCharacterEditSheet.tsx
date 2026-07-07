@@ -14,7 +14,7 @@ import {
   Ue2Stepper,
 } from "./mobileFields";
 import { computeRowDerived } from "./rowDerived";
-import type { ProgressPatch, VisibleRow } from "./types";
+import type { ProgressPatch, SaveStatus, VisibleRow } from "./types";
 import { sectionLabelClass, tableSwitchClass } from "./uiStyles";
 import { Badge } from "../ui/badge";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../ui/sheet";
@@ -32,11 +32,22 @@ type InputCharacterEditSheetProps = {
   includeSameBasePurePieceForUe2: boolean;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
+  /** 保存インジケータの表示ステータス。省略時は「保存済み」扱い。 */
+  saveStatus?: SaveStatus;
 };
 
-type SheetBodyProps = Omit<InputCharacterEditSheetProps, "row" | "onOpenChange"> & {
+type SheetBodyProps = Omit<InputCharacterEditSheetProps, "row" | "onOpenChange" | "saveStatus"> & {
   character: MasterCharacter;
   progress: CharacterProgress;
+  saveStatus: SaveStatus;
+};
+
+// 保存ステータスごとの表示文言とトーン色。同期エラーのみ danger 系で強調し、他は muted 系で控えめに表示する。
+const saveStatusDisplayMap: Record<SaveStatus, { text: string; toneClass: string }> = {
+  saving: { text: "保存中...", toneClass: "text-muted" },
+  saved: { text: "保存済み ✓", toneClass: "text-muted" },
+  syncing: { text: "同期中...", toneClass: "text-muted" },
+  error: { text: "同期エラー", toneClass: "text-danger" },
 };
 
 // シート内のフィールド1件分をラベル付きで縦に並べる。
@@ -70,6 +81,7 @@ const SheetBody = memo(function SheetBody({
   includeSameBasePurePieceForUe2,
   starMemoryCalcMode,
   ue1MemoryCalcMode,
+  saveStatus,
 }: SheetBodyProps) {
   // 必要メモピ・ピュアピの内訳や最大強化判定などの派生値を一括計算する（テーブル行と同一ロジック）。
   const {
@@ -121,7 +133,10 @@ const SheetBody = memo(function SheetBody({
           <span className={roleTextClassMap[character.role]}>{character.role}</span>
         </div>
         <SheetTitle className="text-lg">{character.name}</SheetTitle>
-        <SheetDescription>変更は即時保存されます</SheetDescription>
+        {/* 保存状態の変化（保存中→保存済み等）を支援技術にも通知するため aria-live を付与する */}
+        <SheetDescription aria-live="polite" className={saveStatusDisplayMap[saveStatus].toneClass}>
+          {saveStatusDisplayMap[saveStatus].text}
+        </SheetDescription>
       </SheetHeader>
 
       {/* 最重要情報「あと何個必要か」をファーストビューで確認できるよう、ヘッダー直下へコンパクトに表示する。
@@ -280,12 +295,12 @@ const SheetBody = memo(function SheetBody({
 });
 
 // モバイル向けのキャラ編集ボトムシート。progressFields の共通フィールドを縦に配置し、編集は即時保存する。
-export function InputCharacterEditSheet({ row, onOpenChange, ...bodyProps }: InputCharacterEditSheetProps) {
+export function InputCharacterEditSheet({ row, onOpenChange, saveStatus = "saved", ...bodyProps }: InputCharacterEditSheetProps) {
   return (
     <Sheet open={row !== null} onOpenChange={onOpenChange}>
       {/* iOS の safe-area（ホームバー）を padding で回避しつつ、はみ出す分は縦スクロールで閲覧する */}
       <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+1.25rem)]">
-        {row ? <SheetBody character={row.character} progress={row.progress} {...bodyProps} /> : null}
+        {row ? <SheetBody character={row.character} progress={row.progress} saveStatus={saveStatus} {...bodyProps} /> : null}
       </SheetContent>
     </Sheet>
   );

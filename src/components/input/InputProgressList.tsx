@@ -8,7 +8,7 @@ import { cn } from "../../lib/utils";
 import { attributeTextClassMap, roleTextClassMap } from "./constants";
 import { InputCharacterEditSheet } from "./InputCharacterEditSheet";
 import { computeRowDerived } from "./rowDerived";
-import type { ProgressPatch, VisibleRow } from "./types";
+import type { ProgressPatch, SaveStatus, VisibleRow } from "./types";
 import { TableCheckbox } from "../ui/table-checkbox";
 
 type InputProgressListProps = {
@@ -20,6 +20,8 @@ type InputProgressListProps = {
   includeSameBasePurePieceForUe2: boolean;
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
+  /** 編集シートに表示する保存ステータス。省略時は「保存済み」扱い。 */
+  saveStatus?: SaveStatus;
 };
 
 type ListRowProps = {
@@ -118,6 +120,7 @@ export const InputProgressList = memo(function InputProgressList({
   includeSameBasePurePieceForUe2,
   starMemoryCalcMode,
   ue1MemoryCalcMode,
+  saveStatus = "saved",
 }: InputProgressListProps) {
   const listRef = useRef<HTMLDivElement | null>(null);
   // 選択キャラは name で保持し、レンダリング毎に visibleRows から最新 row を引く
@@ -259,6 +262,7 @@ export const InputProgressList = memo(function InputProgressList({
         includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
         starMemoryCalcMode={starMemoryCalcMode}
         ue1MemoryCalcMode={ue1MemoryCalcMode}
+        saveStatus={saveStatus}
       />
     </>
   );

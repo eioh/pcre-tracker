@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { masterCharacters } from "./domain/master";
 
 // タブ表示時にのみ読み込むことで初期バンドルを軽量化する。
@@ -19,6 +19,7 @@ import { buildInitialState, loadStoredState, saveStoredState, toPurePieceCount }
 import type { CharacterProgress, ClanBattleState, StoredStateV1 } from "./domain/types";
 import { buildDefaultUiState, loadUiState, saveUiState, type ActiveTab, type InputViewSettings } from "./domain/uiStorage";
 import { buildDefaultConnectRankCalcState, saveConnectRankCalcState } from "./domain/connectRankCalcStorage";
+import type { SaveStatus } from "./components/input/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -123,9 +124,21 @@ export default function App() {
     clearSyncMeta();
   }, []);
 
+  // localStorage への debounce 保存が予約中かどうか（モバイル編集シートの保存インジケータ用）。
+  const [isLocalSavePending, setIsLocalSavePending] = useState(false);
+  // 直近に保存予約した state の参照。初回マウント（StrictMode の再実行を含む）では state が
+  // 変化していないため、「保存中」を表示しない判定基準に使う。
+  const lastScheduledSaveStateRef = useRef(state);
+
   useEffect(() => {
+    // state が実際に変化したときのみ「保存中」を立てる（初回マウント時の書き戻しでは表示しない）。
+    if (lastScheduledSaveStateRef.current !== state) {
+      lastScheduledSaveStateRef.current = state;
+      setIsLocalSavePending(true);
+    }
     const timerId = window.setTimeout(() => {
       saveStoredState(state);
+      setIsLocalSavePending(false);
     }, STORED_STATE_SAVE_DEBOUNCE_MS);
     return () => {
       window.clearTimeout(timerId);
@@ -152,6 +165,22 @@ export default function App() {
 
   // 同期層（セッション監視・起動時 GET・デバウンス PUT・競合ダイアログ）。
   const sync = useSync({ getState, masterCharacters, onServerDataAdopted: handleServerDataAdopted });
+
+  // モバイル編集シートへ渡す保存ステータス。ローカル保存中を最優先し、ログイン時のみ同期の
+  // 進行中/エラーを補助表示する。sync.status の idle は編集直後でも（PUT の 10 秒 debounce により）
+  // 最大10秒続くため、「同期済み」とは表示せずローカル保存完了＝保存済みとして扱う。
+  const sheetSaveStatus = useMemo<SaveStatus>(() => {
+    if (isLocalSavePending) {
+      return "saving";
+    }
+    if (sync.isLoggedIn && sync.status === "syncing") {
+      return "syncing";
+    }
+    if (sync.isLoggedIn && sync.status === "error") {
+      return "error";
+    }
+    return "saved";
+  }, [isLocalSavePending, sync.isLoggedIn, sync.status]);
 
   // 現在のlocalStorage内容をバックアップJSONとしてダウンロードする。
   const handleExportBackup = useCallback(() => {
@@ -421,6 +450,7 @@ export default function App() {
               initialSettings={safeUiState.input}
               onSettingsChange={handleInputSettingsChange}
               settingsSyncToken={inputSettingsSyncToken}
+              saveStatus={sheetSaveStatus}
             />
           </Suspense>
         </TabsContent>

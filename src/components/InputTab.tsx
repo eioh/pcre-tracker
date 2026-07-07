@@ -25,7 +25,7 @@ import { InputFilters } from "./input/InputFilters";
 import { InputMemoryCalcSettings } from "./input/InputMemoryCalcSettings";
 import { InputProgressList } from "./input/InputProgressList";
 import { InputProgressTable } from "./input/InputProgressTable";
-import type { ProgressPatch } from "./input/types";
+import type { ProgressPatch, SaveStatus } from "./input/types";
 import { panelClass } from "./input/uiStyles";
 import { useVisibleRows } from "./input/useVisibleRows";
 import { Badge } from "./ui/badge";
@@ -45,6 +45,8 @@ type InputTabProps = {
   initialSettings: InputViewSettings;
   onSettingsChange: (settings: InputViewSettings) => void;
   settingsSyncToken: number;
+  /** モバイル編集シートに表示する保存ステータス（デスクトップ分岐では未使用）。省略時は「保存済み」扱い。 */
+  saveStatus?: SaveStatus;
 };
 
 type AppliedDisplaySettings = Pick<
@@ -120,6 +122,7 @@ export function InputTab({
   initialSettings,
   onSettingsChange,
   settingsSyncToken,
+  saveStatus = "saved",
 }: InputTabProps) {
   const mountedRef = useRef(false);
   const isSyncingFromParentRef = useRef(false);
@@ -514,6 +517,7 @@ export function InputTab({
           includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
           starMemoryCalcMode={starMemoryCalcMode}
           ue1MemoryCalcMode={ue1MemoryCalcMode}
+          saveStatus={saveStatus}
         />
       </>
     );

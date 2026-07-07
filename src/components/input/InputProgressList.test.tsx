@@ -107,7 +107,25 @@ describe("InputProgressList", () => {
     const dialog = openEditSheet("ヒヨリ");
 
     expect(within(dialog).getByText("ヒヨリ")).toBeInTheDocument();
-    expect(within(dialog).getByText("変更は即時保存されます")).toBeInTheDocument();
+    // saveStatus 未指定時は既定の「保存済み」を表示する。
+    expect(within(dialog).getByText("保存済み ✓")).toBeInTheDocument();
+  });
+
+  it("saveStatusに応じて保存インジケータの文言を切り替える", () => {
+    const props = buildProps({ saveStatus: "saving" });
+    const { rerender } = render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    expect(within(dialog).getByText("保存中...")).toBeInTheDocument();
+
+    rerender(<InputProgressList {...props} saveStatus="syncing" />);
+    expect(within(dialog).getByText("同期中...")).toBeInTheDocument();
+
+    rerender(<InputProgressList {...props} saveStatus="error" />);
+    expect(within(dialog).getByText("同期エラー")).toBeInTheDocument();
+
+    rerender(<InputProgressList {...props} saveStatus="saved" />);
+    expect(within(dialog).getByText("保存済み ✓")).toBeInTheDocument();
   });
 
   it("シート内のステッパーでRANK・専用2を1段ずつ歩進できる", () => {
