@@ -1,123 +1,124 @@
-# スマホ UI フェーズ1: 画面骨格の再設計 実装計画
+# スマホ UI フェーズ2: 入力の高速化 実装計画
 
-前フェーズ(育成入力のモバイル一覧+編集シート、コミット 8861240〜b817e9f)は完了済み。本フェーズはその上に積む。作業ブランチ: `feature/mobile-input-layout`。
+フェーズ0(モバイル一覧+編集シート)・フェーズ1(骨格再設計、コミット cc3e800 / 311e947 / 809d61a)は完了済み。作業ブランチ: `feature/mobile-input-layout`。
 
 ## 背景・ゴール
 
-実測済みの課題(いずれも 375×812 での測定):
-- ファーストビューの 72% をヘッダー(タイトル+ログイン/エクスポート/インポート/初期化+最終更新)・タブ・詳細設定・検索が占有し、キャラ一覧は下部 227px のみ
-- 「詳細設定」展開時は高さ 1,286px・セレクト 10 個が縦一列に挿入される
-- 一覧が `h-[70dvh]` の内部スクローラーで、ページスクロールと二重(ページ 1,283px + 内部 21,824px)
+編集シート(InputCharacterEditSheet)内の入力操作コストが高い:
+- ☆(1〜6)・コネクトRANK(0〜15)・専用1/専用2 が Select ドロップダウン。「1つ上げる」が大半なのに毎回3操作(タップ→スクロール→タップ)。RANK は16択で画面の半分を覆う
+- 数値入力(所持メモピ/所持ピュアピ/ガチャ回数)はソフトキーボード必須
+- 最重要情報「あと何個必要?」がシート最下部
+- 保存フィードバックが固定文言のみ
 
-ゴール: **768px 未満で「コンパクトヘッダー+sticky 検索/チップバー+ページスクロール1本の一覧」という骨格にする。デスクトップ(768px 以上)は見た目・挙動とも一切不変。**
+ゴール: **モバイル編集シートの主要操作を1〜2タップ化し、必要数を最上部に、保存状態を可視化する。デスクトップ(768px 以上)のテーブル内 UI は一切不変。**
 
-スコープ外: ステッパー化などの入力 UI 改善(フェーズ2)、下部固定ナビ(フェーズ3)、タブ切替時のスクロール位置復元。
+スコープ外: 入手日(Popover+Calendar は低頻度入力のため現状維持)、ステッパーの長押し連打、下部固定ナビ(フェーズ3)。
 
 ## 前提(コード調査で確認済みの事実)
 
-- ヘッダーは App.tsx:309-349 に直書き。エクスポート/インポート/初期化のハンドラは `useCallback` 済みで props 化しやすく、確認ダイアログ群は App ルートに独立(ヘッダー構造に非依存 → メニュー化してもダイアログは無改修)
-- `SyncHeader.tsx` の `formatSyncStatus` はモジュール内プライベート(ステータス表示だけ取り出す口がない → export する)
-- InputTab のフィルタ/ソート/計算モード state はローカル useState → `onSettingsChange` → App `uiState.input` → `saveUiState` の一方向。`InputFilters` / `InputMemoryCalcSettings` は純 presentational で置き場所を変えても状態経路は無傷。`inputToolbarClass` は lg 未満 `grid-cols-1` なのでシートに入れても自然に縦1列
-- `hasActiveDetailFilter`(InputTab.tsx:270-282)が既に9種の詳細フィルタの非デフォルト判定を持つ(件数化の土台)
-- `@tanstack/react-virtual@^3.13.19` に `useWindowVirtualizer` あり(確認済み)
-- sticky の障害物なし: `tableWrapClass` の `[contain:layout_paint_size]` はデスクトップテーブル専用(使用箇所は InputProgressTable.tsx:391 のみ)。モバイル一覧の祖先チェーン(body / App ルート / Tabs / TabsContent / section)に overflow 指定なし。ただし詳細設定アニメーション用ラッパー(InputTab.tsx:352 の `overflow-hidden`)の内側には sticky を置かないこと
-- `TabsContent value="input"` は初回表示後 forceMount + `display:none`。非表示中は offsetTop が計測不能になる点に注意(リスク2参照)
-- `InputViewSettings`(uiStorage.ts)のスキーマ変更は不要
+- `StarSelect` / `ConnectRankSelect` / `Ue1Select` / `Ue2Select` / 数値入力3種は**デスクトップテーブルとモバイルシートで共用**(progressFields.tsx)。直接ステッパー化するとテーブルが壊れる
+- `UE1_LEVEL_VALUES = [0, 30, 50, 70, ..., 370]`(31要素、**非連続値**)。「+1」ではなく配列インデックスで1段進める必要がある。`ue1CompositeValue` は `"sp" | "0".."370" | "null"` の複合値で、SP 選択時は `{ ue1Level: 370, ue1SpEquipped: true }` の複合パッチ(progressFields.tsx:99-129 の Ue1Select と同一ロジックが必要)
+- `UE2_LEVEL_VALUES = [0..5]` 連続値。`connectRank` は 0..15、`star` は 1..6 のリテラル union(キャスト必要)。`starMax` は `character.implemented.star6 ? 6 : 5`
+- 保存経路: 編集 → `handleUpdateProgress`(App.tsx:238-261)→ setState + `sync.notifyLocalChange()`。localStorage 保存は 400ms debounce(App.tsx:126-133)。同期 PUT は 10 秒 debounce(useSync.ts)。**ステッパー連打はタイマー貼り直しのみで PUT レートに影響なし(対策不要と確認済み)**
+- `sync.status` は編集直後〜PUT 開始まで最大10秒 `idle` のままなので、保存インジケータの一次情報源には使えない(判断5の根拠)
+- `useClampedNumberInput` は draft 文字列 + blur/Enter コミット方式。クランプ関数 `clampOwnedMemoryPiece` はモジュールプライベート(export 追加が必要)
+- テスト: `InputProgressTable.test.tsx` はデスクトップ専用(無修正通過=不変の証明)。`InputProgressList.test.tsx` の combobox 系4アサーション+「変更は即時保存されます」文言検証(116行)は書き換え必須。数値系は spinbutton ロール+aria-label 参照のため input を残せば無修正で通る
 
 ## 設計判断(確定)
 
-1. **スマホのヘッダー構成**: タイトル(縮小)+ 同期ステータス(ログイン時のみ、短いテキスト。収まらなければドットに落とす)+ 「⋯」ボタンの1〜2行。サブタイトル2行はスマホ非表示。エクスポート/インポート/初期化/最終更新/ログイン導線は ⋯ メニューへ(未ログイン時はメニュー先頭に「ログイン」)
-2. **⋯メニューは既存 Sheet(`side="bottom"`)を再利用**(DropdownMenu の新規依存は追加しない)。項目タップ時はシートを閉じてから App 側ハンドラを呼ぶ
-3. **分岐方法**: `MobileHeader` コンポーネント新設 + App.tsx で `isMobile ? <MobileHeader/> : (既存 JSX 無改変)`。CSS だけの分岐(両方マウント)は SyncHeader のダイアログ・aria 二重化のため不可(前フェーズと同じ判断)
-4. **window スクロール化**: モバイル専用の `InputProgressList` 内部で `useVirtualizer` → `useWindowVirtualizer` に置換(コンポーネント境界が既に分岐を担うため追加分岐不要)。行配置は `translateY(start - scrollMargin)`。jsdom 用フォールバック行戦略は維持。**`scrollMargin` は ref 直参照ではなく state で管理**する: ref 更新は再レンダーを起こさず、ヘッダー高の変化・sticky バーの変化・タブ再表示・回転/リサイズで offsetTop が変わっても virtualizer に反映されないため(ズレると行の空白・重なり・タップ位置ズレになる)。`useLayoutEffect` + `ResizeObserver`(一覧要素と祖先の変化)+ `window resize` で `getBoundingClientRect().top + window.scrollY` を再計測して setState し、変化時は `virtualizer.measure()` を呼ぶ
-5. **sticky 検索/チップバー**: モバイルでは section② のパネル枠をやめ、「sticky バー(検索+チップ+フィルタボタン、不透明背景+z-10)」+「素の一覧」に組み替え。表示件数はチップ行の右端
-6. **フィルタシート**: `InputFilterSheet` は `open` / `onOpenChange` / `children` のみ受ける薄いコンポーネント。配線済み `<InputFilters/>` + `<Separator/>` + `<InputMemoryCalcSettings/>` は InputTab 側で children として渡す(30 props の再宣言をしない)
-7. **チップ**: 初期は「所持のみ」「未所持のみ」の2個(`setOwnedFilter` トグル、相互排他)。チップ行は `overflow-x-auto` にして将来の追加(限定のみ等)を容易に。チップとシート内 Select は同一 state なので自動同期
-8. **適用中バッジ**: `activeDetailFilterCount`(useMemo)を追加し「フィルタ」ボタンに件数表示。既存 `hasActiveDetailFilter` は `count > 0` に置換(デスクトップのバッジ挙動は不変)。ソート・計算モードは件数に含めない(現行の線引きを踏襲)
-9. **シートの開閉はローカル state**(永続化しない)。シート閉時の自動「表示に適用」はしない(デスクトップと挙動差を作らない)
-10. **詳細設定パネル(section①)はモバイルで非レンダリング**(フィルタシートに置換)。`isDetailSettingsOpen` state はデスクトップ用に残す
+1. **分岐方法: モバイル専用コンポーネントを `src/components/input/mobileFields.tsx` に新設**。progressFields.tsx への変更はクランプ関数の export 追加のみ(既存 export 無改変=デスクトップ完全不変)。共通の見た目は mobileFields 内の `StepperShell` プリミティブ1つに集約(shadcn カタログに無い UI のため ui/ でなく input/ 配下)
+2. **専用1の SP は最上段のステップとして統合**: ステップ列 = `[...UE1_LEVEL_VALUES, "sp"(ue1Sp 実装時のみ)]`。Lv.370 で「+」→ SP、SP で「−」→ Lv.370。既存 Select の選択肢順と同一のメンタルモデル。RANK(0=未開放)・UE2 も同じ「値リスト+インデックス歩進」方式で統一。未実装は disabled「-」表示
+3. **☆はセグメンテッドコントロール**: 常に 1〜6 の6ボタンを描画し、star6 未実装キャラは「6」を disabled(レイアウトジャンプ回避+情報量)。`aria-pressed` 付きボタン群(radiogroup より既存テスト流儀と親和)。選択中+isAtMax は maxed スタイル(TableSelect の appearance="maxed" と同じ CSS 変数)
+4. **数値ステッパー**: `[−][number input][+]`。input は type/aria-label とも既存と同一(既存テスト無修正)。+/− は即コミット、直接入力は従来通り blur/Enter。`useClampedNumberInput` に `stepBy(delta)` を追加(draft 文字列基準でクランプ後歩進→即コミット。既存4プロパティ不変)。−/+ ボタンは `min-h-11 min-w-11`(44px)
+5. **保存インジケータの情報源はローカル保存 debounce を一次+ログイン時は sync を補助**: App に `isLocalSavePending` state(保存 effect 拡張、初回マウントは ref スキップ)。`sheetSaveStatus: "saving" | "saved" | "syncing" | "error"` に合成(優先度 saving > syncing/error(ログイン時) > saved)し、`InputTab → InputProgressList → InputCharacterEditSheet` へ prop 1個をバケツリレー(単一プロパティなので Context は過剰)。`SheetDescription` を動的表示に置換、`aria-live="polite"`。sync.status の生値を出さない理由: 編集直後も最大10秒 idle のままで「同期済み」と誤表示されるため
+6. **必要数はコンパクトサマリー方式**: ヘッダー直下に「必要メモピ / 必要ピュアピ」の2値サマリー(太字 tabular-nums)を新設し、内訳セクションは現位置維持。内訳ごと上へ移すと☆/RANK がファーストビュー(85dvh)から追い出され、入力高速化の主目的と衝突するため
+7. **saveStatus は optional prop(デフォルト "saved")**にして既存テストの props 追加を最小化
 
 ## 実装ステップ(コミット単位)
 
-### ステップ1: `feat: スマホ向けコンパクトヘッダーとメニューシートを追加`
+### ステップ1: `feat: 編集シートの☆をセグメンテッドコントロール化`
+- `mobileFields.tsx` 新規: `StarSegmentedControl`(StarSelect と同シグネチャ、grid-cols-6、min-h-11)
+- `InputCharacterEditSheet.tsx`: ☆を差し替え(1行占有に変更)
+- テスト: ☆の combobox 検証をボタンタップに書き換え(「6」タップで `{ star: 6 }`、未実装キャラの「6」disabled)
+- 検証: `npm test`(**InputProgressTable.test.tsx 無修正通過**)/ `npm run typecheck`
 
-| ファイル | 種別 | 内容 |
-|---|---|---|
-| `src/components/SyncHeader.tsx` | 変更 | `formatSyncStatus` に export を付けるのみ |
-| `src/components/MobileHeader.tsx` | 新規 | コンパクトヘッダー+⋯メニュー(Sheet)。props: `updatedAt`、`onExportBackup`、`onSelectImportFile: (file: File) => void`、`onRequestReset`、SyncHeader 用一式。**インポート項目は既存 `FileImportButton`(hidden file input 内蔵)をメニュー項目スタイルで埋め込む**(`onSelectImportFile` をメニュー項目から直接呼ぶ設計は File が無く成立しない)。ファイル選択完了時にシートを閉じてからハンドラを呼ぶ。他項目はタップで `setOpen(false)` → ハンドラ |
-| `src/App.tsx` | 変更 | `useIsMobile()` 追加、header 内を `isMobile ? <MobileHeader/> : (既存 JSX)` で分岐。ハンドラはそのまま渡す |
+### ステップ2: `feat: 編集シートのRANKと専用装備をステッパー化`
+- `mobileFields.tsx`: `StepperShell` + 値リスト歩進ヘルパー + `ConnectRankStepper` / `Ue1Stepper` / `Ue2Stepper`
+- `InputCharacterEditSheet.tsx`: 3フィールド差し替え
+- テスト: combobox テストを「+」歩進・SP 到達・上下限 disabled の検証へ書き換え。**「Lv.130 の + が Lv.140 を返す」非連続区間のテストを必ず追加**。期待パッチ(`{ ue1Level: 370, ue1SpEquipped: true }` 等)は不変
 
-- テスト: `MobileHeader.test.tsx` 新規(⋯タップでメニュー表示、項目タップでハンドラ発火+シートが閉じる、未ログイン時にログインが出る)。既存 `App.test.tsx` がデスクトップ経路のまま通ること
-- 手動確認(375px): ヘッダー占有の縮小、メニューからエクスポート/インポート/初期化/ログインの各ダイアログ動作(**Sheet 上に AlertDialog が重なるネストと focus trap を重点確認**)。768px 以上で差分ゼロ
+### ステップ3: `feat: 編集シートの数値入力にステッパーを追加`
+- `useClampedNumberInput.ts`: `stepBy(delta)` 追加(既存 API 不変)
+- `progressFields.tsx`: クランプ関数の export 追加のみ
+- `mobileFields.tsx`: `OwnedMemoryPieceStepper` / `OwnedPurePieceStepper` / `GachaPullCountStepper`
+- `InputCharacterEditSheet.tsx`: 3入力差し替え
+- テスト: +/− 即コミット、入力途中(未 blur)に + を押した場合の draft 基準歩進、上限(ガチャ300)/下限0 disabled
 
-### ステップ2: `feat: モバイル一覧をページスクロールへ変更し検索バーを固定表示にする`
+### ステップ4: `feat: 編集シートに必要数サマリーをヘッダー直下へ追加`
+- `InputCharacterEditSheet.tsx`: ヘッダー直下に2値サマリーボックス(`adjustedTotalRemainingMemoryPiece` / ピュアピ合計)。内訳は現位置維持
+- テスト: サマリー表示の検証追加
 
-| ファイル | 種別 | 内容 |
-|---|---|---|
-| `src/components/input/InputProgressList.tsx` | 変更 | `useWindowVirtualizer` へ置換、`h-[70dvh] overflow-y-auto` を撤去し自然高、`translateY(start - scrollMargin)`、フォールバック維持。scrollMargin は state 管理(useLayoutEffect + ResizeObserver + resize で再計測、設計判断4参照) |
-| `src/components/InputTab.tsx` | 変更 | return を `isMobile` で JSX 分岐(state・ハンドラは共有)。モバイル側: sticky 検索バー+表示件数+一覧。詳細設定パネルはこのステップでは従来通り表示(差分の独立性のため。ステップ3で置換) |
-
-- テスト: `InputProgressList.test.tsx` がフォールバック経路で通ること(必要最小の修正のみ)。`InputTab.test.tsx` のモバイルテストが通ること
-- 手動確認(375px): ページスクロール1本(document.scrollingElement.scrollHeight が一覧全長を含む・内部スクローラー不在)、DOM 行数が画面分+overscan のみ、検索バー固定、タブ切替→復帰でクラッシュしない。768px 以上: テーブルの内部スクロールは従来通り
-
-### ステップ3: `feat: モバイルのフィルタをボトムシートへ移動しクイックフィルタチップを追加`
-
-| ファイル | 種別 | 内容 |
-|---|---|---|
-| `src/components/input/InputFilterSheet.tsx` | 新規 | `open` / `onOpenChange` / `children`。Sheet `side="bottom"` + `max-h-[85dvh]` + 内部スクロール |
-| `src/components/InputTab.tsx` | 変更 | `activeDetailFilterCount` 追加(`hasActiveDetailFilter` を置換)。sticky バーにチップ2個+「フィルタ」ボタン(件数 Badge)。シート children に既存フィルタ UI を配線。モバイルで section① を非レンダリング化 |
-
-- テスト: モバイル幅で「フィルタ」ボタン→シート表示、チップタップで表示件数変化、バッジ件数、シート内リセットで件数クリア。**デスクトップの既存テスト(詳細設定パネル系)が無修正で通ること(不変の証明)**
-- 手動確認(375px): チップ⇔シート内 Select の同期、シート内 MultiSelectFilter(Popover)の表示、リセット/表示に適用、リロード後のフィルタ維持(uiState 永続化)
+### ステップ5: `feat: 編集シートに保存インジケータを表示`
+- `App.tsx`: `isLocalSavePending` + `sheetSaveStatus` 合成、InputTab へ prop 追加
+- `InputTab.tsx` / `InputProgressList.tsx`: prop 中継(デスクトップ分岐は未使用)
+- `InputCharacterEditSheet.tsx`: `SheetDescription` を動的表示(保存済み ✓ / 保存中... / 同期中... / 同期エラー、トーン色分け)
+- テスト: 文言検証(116行)を saveStatus 別表示に書き換え
 
 ### 共通の検証
-各ステップで `npm test` / `npm run typecheck`、最終で `npm run build`。PR に 375px スクリーンショット(ファーストビュー・メニューシート・フィルタシート)+768px 無変化確認を添付。関数コメントは日本語。
+各ステップで `npm test` / `npm run typecheck`、最終で `npm run build`。**InputProgressTable.test.tsx と InputTab.test.tsx のデスクトップ系テストは全ステップ無修正で通過させる。**
+
+### 手動確認(375×812)
+1. ☆: 6ボタンのタップ、star6 未実装の「6」disabled、☆6 で maxed 表示
+2. RANK: 「+」15連打で 0→15、タップ毎にサマリー・一覧行の「必要」即時更新、上下限 disabled
+3. 専用1: Lv.130→140(非連続区間)、370→SP→370 往復、SP 非実装キャラは 370 で + disabled、未実装キャラは「-」
+4. 数値: −/+ で**ソフトキーボードが起動しない**こと、直接入力との共存、ガチャ300上限
+5. 保存インジケータ: 編集直後「保存中...」→約0.4秒で「保存済み ✓」。未ログイン時に同期系文言が出ないこと
+6. 連打時のフレーム落ちがないか(シート裏の仮想化一覧)
+7. デスクトップ: テーブル内 Select・数値入力・Tooltip が完全に従来通り
 
 ## リスク
 
-1. **Sheet 上に SyncHeader の AlertDialog が重なるネスト**: Radix のポータルスタックで動く想定(編集シート内 Select で実績あり)だが focus trap・オーバーレイの重なりを手動確認。問題があれば「メニューを閉じてからダイアログを開く」方式(open を App 側へ引き上げ)に切替
-2. **forceMount 中(display:none)の useWindowVirtualizer**: 非表示中は offsetTop が 0 になるが、scrollMargin は state 管理+ResizeObserver 再計測(設計判断4)で復帰時に追従する設計。タブ往復での描画崩れがないか手動確認は必須
-3. **タブ切替時の window スクロール位置クランプ**(一覧の深い位置→短いタブ→復帰で先頭に戻る): フェーズ1では許容し PR に明記。必要ならフェーズ2で sessionStorage 退避
-4. **シート表示中の body スクロールロック**: Radix Dialog の仕様通りだが、iOS での背景スクロール貫通を手動確認
-5. **InputTab の JSX 分岐による検索ブロックの重複**: state・ハンドラは単一なので許容。乖離が気になる場合のみ検索ブロックを小さなローカルコンポーネントに括る(過剰抽象化はしない)
+1. **入力途中(未 blur)に +/− を押した場合の基準値**: `stepBy` は draft 文字列を基準にクランプ後歩進する設計で吸収。テストで明示的にカバー
+2. **連打時のレンダーコスト**: タップ毎に App 全体再レンダー(既存 Select と同経路、memo 済み)。実機で15連打のもたつきを確認、問題があれば SheetBody への props 安定化を追補
+3. **保存インジケータの初回表示**: マウント時の保存 effect で「保存中」が一瞬出ないよう ref スキップ。リセット/インポート直後の挙動も確認
+4. **InputProgressList.test.tsx の書き換え**: combobox 系4アサーション+文言1件。発火パッチの期待値は不変なので UI 操作部分のみの置換
 
 ## レビュー(2026-07-08 実装完了)
 
 ### 実施結果
 
-- [x] ステップ1: `cc3e800` スマホ向けコンパクトヘッダーとメニューシート(MobileHeader 新設、SyncHeader をシート内埋め込み、FileImportButton に className prop 追加)
-- [x] ステップ2: `311e947` モバイル一覧のページスクロール化+sticky 検索バー(useWindowVirtualizer、scrollMargin は state + ResizeObserver 管理)
-- [x] ステップ3: `809d61a` フィルタのボトムシート化+チップ(InputFilterSheet 新設、activeDetailFilterCount、チップ2個+件数バッジ)
+- [x] ステップ1: `b0c179c` ☆のセグメンテッドコントロール化(常時6ボタン、star6 未実装は disabled)
+- [x] ステップ2: `78923c8` RANK・専用装備のステッパー化(StepperShell+値リスト歩進、SP は最上段ステップ)
+- [x] ステップ3: `314717a` 数値入力に −/+ 併設(useClampedNumberInput.stepBy 追加、既存 API 不変)
+- [x] ステップ4: `3c6bea2` 必要数サマリーをヘッダー直下へ(2値コンパクト、内訳は現位置維持)
+- [x] ステップ5: `9a65e26` 保存インジケータ(isLocalSavePending + sheetSaveStatus 合成)
 
 ### 検証結果(375×812 実測)
 
-- `npm test` 250 テスト全通過(新規9件追加)、`npm run typecheck` / `npm run build` 通過。デスクトップの既存テストは無修正で全通過
-- 最初のキャラ行: フェーズ1前 y=585 → **y=246**。ファーストビューの表示行数 約3行 → **9行**
-- ページスクロール1本(22,268px、内部スクローラー0件)。深部 scrollY=12,000 で行ギャップ 0px、詳細設定展開による一覧位置移動(約1,200px)でも行ズレなし(scrollMargin 追従を確認)
-- 検索バーは深スクロール中も上部固定。チップ⇔シート内 Select の双方向同期、バッジ件数、シート内 10 セレクトの表示を確認
-- ⋯メニュー(ログイン/エクスポート/インポート/初期化/最終更新)動作、Sheet 上の AlertDialog ネスト正常
-- デスクトップ(961px): フルヘッダー・詳細設定パネル・テーブル内部スクロールすべて従来通り、モバイル要素の混入なし
+- `npm test` 266 テスト全通過、`npm run typecheck` / `npm run build` 通過
+- **InputProgressTable.test.tsx / InputTab.test.tsx は全ステップ無修正で通過**(デスクトップ不変の証明)。デスクトップ実表示も combobox 52個/ステッパー0個で従来通り
+- ☆ボタンは 51×44px(44px 基準クリア)、ステッパー12個、−/+ でソフトキーボード起動なし
+- RANK ステッパータップ → localStorage 即保存、保存インジケータ「保存中...」(150ms 時点)→「保存済み ✓」(800ms 時点)の遷移を実測確認
+- 必要メモピ/ピュアピの2値サマリーがシートを開いた直後のファーストビューに表示
+- 非連続区間(Lv.130→140)・SP 往復・上下限 disabled・draft 基準歩進はテストでカバー
 
-### 計画からの逸脱(いずれも軽微・報告済み)
+### 計画からの逸脱(軽微・報告済み)
 
-- FileImportButton に optional className prop を追加(メニュー項目スタイル埋め込みの最小手段、未指定時は従来と同一出力)
-- updatedAt はフォーマット済み文字列で MobileHeader に渡す(formatUpdatedAt が App プライベートのため)
-- SyncHeader のログイン系タップ時はメニューシートを閉じない(閉じるとアンマウントでダイアログが消えるため)
-- モバイル一覧の外側は overflow-x-hidden も撤去し描画クリップのみの overflow-hidden に(overflow-x だけ残すと overflow-y が auto に計算され内部スクローラーが復活するため)
+- ステッパー化した行は grid-cols-2 でなく全て1行占有(375px では 44px×2 ボタン+中央表示が2カラムに収まらないため)
+- 保存インジケータの初回マウントスキップは boolean ref でなく「直近予約 state の参照比較」方式(StrictMode の effect 二重実行で誤点灯するため)
+- InputProgressList.test.tsx の既存内訳アサーション1行を getAllByText 化(サマリー追加で同値が2箇所に現れるため)
+- App.test.tsx に保存インジケータの結合テストを追加(window.scrollTo スタブ+タイムアウト延長)
 
-### 既知の制約(PR に明記)
+### 残課題(今後)
 
-- タブ切替で window スクロール位置がクランプされ、育成入力へ戻ると先頭付近に戻ることがある(フェーズ2以降で必要なら sessionStorage 退避)
-
-### 残課題(今後のフェーズ)
-
-- フェーズ2: 入力の高速化(☆/RANK のステッパー化、数値 +/-、シート項目順の入れ替え、保存インジケータ)
-- フェーズ3: 磨き込み(チェックボックス拡大、行レイアウト、下部固定ナビ)
-- 別途: PWA 化、他タブのモバイル調整、hover 依存改善
+- フェーズ3: 磨き込み(一覧行のチェックボックス拡大・行レイアウト2行化・下部固定ナビ)
+- 別途: PWA 化、他タブのモバイル調整、hover 依存改善、タブ切替時のスクロール位置復元
 
 ---
 
-## 参考: 前フェーズ(完了済み)の記録
+## 参考: 完了済みフェーズの記録
 
-- 育成入力タブのモバイル一覧+編集シート: コミット 8861240 / c25e9f9 / f8a5552 / cc6b2fa / b817e9f。241 テスト通過、375px 実機確認済み
-- 残課題(本フェーズ以降): フェーズ2=入力の高速化(ステッパー化・シート項目順・保存インジケータ)、フェーズ3=磨き込み(チェックボックス拡大・行2行化・下部固定ナビ)、別途 PWA 化・他タブ調整・hover 依存改善
+- フェーズ0(育成入力のモバイル一覧+編集シート): 8861240 / c25e9f9 / f8a5552 / cc6b2fa / b817e9f
+- フェーズ1(骨格再設計): cc3e800(コンパクトヘッダー+⋯メニュー)/ 311e947(ページスクロール化+sticky 検索バー)/ 809d61a(フィルタシート+チップ)。ファーストビューの一覧 3行→9行
+- 既知の制約: タブ切替で window スクロール位置がクランプされ一覧先頭に戻ることがある
+- 残: フェーズ3(チェックボックス拡大・行レイアウト・下部固定ナビ)、PWA 化、他タブ調整、hover 依存改善
