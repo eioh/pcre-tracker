@@ -36,6 +36,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { PenLine, LayoutDashboard, Coins, Calculator, Download, Upload, RotateCcw, Swords } from "lucide-react";
 import { SyncHeader } from "./components/SyncHeader";
 import { MobileHeader } from "./components/MobileHeader";
+import { MobileBottomNav } from "./components/MobileBottomNav";
+import { cn } from "./lib/utils";
 import { PrivacyPolicyPage } from "./components/PrivacyPolicyPage";
 import { useSync } from "./hooks/useSync";
 import { useIsMobile } from "./hooks/useIsMobile";
@@ -343,7 +345,13 @@ export default function App() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-5 pb-9 pt-7">
+    <div
+      className={cn(
+        "mx-auto w-full max-w-[1400px] px-5 pt-7",
+        // モバイルは下部固定ナビ（h-14 + セーフエリア）にフッターが隠れないよう下余白を確保する。
+        isMobile ? "pb-[calc(3.5rem+env(safe-area-inset-bottom)+1rem)]" : "pb-9",
+      )}
+    >
       {/* 768px 未満はコンパクトヘッダー+メニューシート、それ以上は従来ヘッダー（無改変）を描画する。 */}
       {isMobile ? (
         <MobileHeader
@@ -417,6 +425,10 @@ export default function App() {
           setUiState((previous) => ({ ...previous, activeTab: value as ActiveTab }));
         }}
       >
+        {/* モバイルは下部固定ナビ、デスクトップは従来の上部タブリスト（無改変）を描画する。 */}
+        {isMobile ? (
+          <MobileBottomNav />
+        ) : (
         <TabsList className="mb-5" aria-label="画面切り替え">
           <TabsTrigger value="dashboard">
             <LayoutDashboard className="size-4" />
@@ -439,6 +451,7 @@ export default function App() {
             コネクトランク計算
           </TabsTrigger>
         </TabsList>
+        )}
 
         <TabsContent value="input" forceMount={hasOpenedInput ? true : undefined}>
           <Suspense fallback={<TabLoadingFallback />}>

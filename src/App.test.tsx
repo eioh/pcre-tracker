@@ -87,6 +87,48 @@ describe("App: プライバシーポリシーのルーティング", () => {
   });
 });
 
+describe("App: タブナビゲーション", () => {
+  // 遅延読み込みタブを2つ（育成入力→ダッシュボード）待つため、テスト全体のタイムアウトを延長する。
+  it("モバイルでは短縮ラベルの下部ナビを描画し、タブ切替後も育成入力が DOM に残る", { timeout: 20_000 }, async () => {
+    stubMobileMatchMedia();
+    // jsdom 未実装の window.scrollTo（仮想化リストが呼ぶ）をスタブし、エラーログを抑止する。
+    vi.stubGlobal("scrollTo", vi.fn());
+    render(<App />);
+
+    // 短縮ラベルのタブが存在する（フルラベルと文字列が変わる3件で検証する）。
+    expect(screen.getByRole("tab", { name: "集計" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "クラバト" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "ランク計算" })).toBeInTheDocument();
+    // デスクトップ用のフルラベルのタブは描画されない。
+    expect(screen.queryByRole("tab", { name: "ダッシュボード" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "クラバト編成" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "コネクトランク計算" })).not.toBeInTheDocument();
+
+    // 初期タブ（育成入力）のモバイル一覧が表示されるまで待つ。
+    await screen.findAllByRole("button", { name: /の編集シートを開く$/ }, { timeout: 10_000 });
+
+    // 「集計」タップでダッシュボードが表示される（遅延読み込みのため待機する）。
+    // Radix Tabs の Trigger は mousedown で選択されるため fireEvent.mouseDown を使う。
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "集計" }));
+    expect(await screen.findByRole("heading", { name: "進捗ダッシュボード" }, { timeout: 10_000 })).toBeInTheDocument();
+
+    // forceMount 維持: タブ切替後も育成入力のコンテンツが DOM に残る（再マウント回避）。
+    expect(screen.getAllByRole("button", { name: /の編集シートを開く$/ }).length).toBeGreaterThan(0);
+  });
+
+  it("デスクトップでは従来のフルラベルの上部タブを描画し、下部ナビは描画しない", () => {
+    render(<App />);
+
+    // 従来のフルラベルのタブが存在する。
+    expect(screen.getByRole("tab", { name: "ダッシュボード" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "クラバト編成" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "コネクトランク計算" })).toBeInTheDocument();
+    // モバイル用の短縮ラベルのタブは描画されない。
+    expect(screen.queryByRole("tab", { name: "集計" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "ランク計算" })).not.toBeInTheDocument();
+  });
+});
+
 describe("App: モバイル編集シートの保存インジケータ", () => {
   it("編集直後は保存中を表示し、debounce保存後に保存済みへ戻る", async () => {
     stubMobileMatchMedia();
