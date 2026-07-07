@@ -11,6 +11,9 @@ import { computeRowDerived } from "./rowDerived";
 import type { ProgressPatch, SaveStatus, VisibleRow } from "./types";
 import { TableCheckbox } from "../ui/table-checkbox";
 
+// モバイル一覧行の物理固定高（px）。ListRow の h-20 クラスと必ず一致させること（変更時は両方を更新する）。
+const LIST_ROW_HEIGHT_PX = 80;
+
 type InputProgressListProps = {
   visibleRows: VisibleRow[];
   purePieceByCharacterName: Record<string, number>;
@@ -40,7 +43,7 @@ type ListRowProps = {
   onOpenEditSheet: (name: string) => void;
 };
 
-// モバイル一覧の1行。64px の物理固定高に収め、行タップで編集シートを開く。
+// モバイル一覧の1行。80px の物理固定高に収め、行タップで編集シートを開く。
 const ListRow = memo(function ListRow({
   character,
   progress,
@@ -75,8 +78,9 @@ const ListRow = memo(function ListRow({
     <div
       style={style}
       className={cn(
-        // h-16 の物理固定高 + overflow-hidden で、仮想化の estimateSize(64) と実 DOM 高のズレを構造的に防ぐ。
-        "flex h-16 items-center gap-1 overflow-hidden border-b border-table-border px-2",
+        // h-20（=LIST_ROW_HEIGHT_PX の 80px）の物理固定高 + overflow-hidden で、
+        // 仮想化の estimateSize と実 DOM 高のズレを構造的に防ぐ（変更時は定数と両方を更新する）。
+        "flex h-20 items-center gap-1 overflow-hidden border-b border-table-border px-2",
         isEven ? "bg-row-even" : "bg-row-odd",
       )}
     >
@@ -99,7 +103,8 @@ const ListRow = memo(function ListRow({
         onClick={handleOpen}
         className="flex h-full min-w-0 flex-1 items-center justify-between gap-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
       >
-        <span className="grid min-w-0 gap-1">
+        {/* 左ブロックはタグ / 名前 / サマリーの3段スタック。 */}
+        <span className="grid min-w-0 flex-1 gap-1">
           <span className="truncate text-[0.72rem] font-semibold leading-none">
             <span className={character.limited ? "text-limited-text" : "text-normal-text"}>{character.limited ? "限定" : "恒常"}</span>
             <span className="text-tag-separator"> / </span>
@@ -108,13 +113,15 @@ const ListRow = memo(function ListRow({
             <span className={roleTextClassMap[character.role]}>{character.role}</span>
           </span>
           <span className="block max-w-full truncate font-bold">{character.name}</span>
+          {/* サマリー行。必要メモピは行内で最重要のため text-sm font-bold で強調する。 */}
+          <span className="flex items-center gap-2 whitespace-nowrap tabular-nums leading-none">
+            <span className="text-xs text-muted">☆{progress.star}</span>
+            <span className="text-xs text-muted">RANK {progress.connectRank}</span>
+            <span className="text-sm font-bold text-main">必要 {adjustedTotalRemainingMemoryPiece}</span>
+          </span>
         </span>
-        <span className="flex shrink-0 items-center gap-2 whitespace-nowrap text-xs tabular-nums text-muted">
-          <span>☆{progress.star}</span>
-          <span>RANK {progress.connectRank}</span>
-          <span className="font-bold text-main">必要 {adjustedTotalRemainingMemoryPiece}</span>
-          <ChevronRight aria-hidden="true" className="size-4 shrink-0" />
-        </span>
+        {/* 行タップのアフォーダンスとして右端に縦センターでシェブロンを置く。 */}
+        <ChevronRight aria-hidden="true" className="size-4 shrink-0 text-muted" />
       </button>
     </div>
   );
@@ -142,7 +149,8 @@ export const InputProgressList = memo(function InputProgressList({
   const [scrollMargin, setScrollMargin] = useState(0);
   const rowVirtualizer = useWindowVirtualizer({
     count: visibleRows.length,
-    estimateSize: () => 64,
+    // 行は物理固定高のため推定値=実高。ListRow の h-20 と一致させる（LIST_ROW_HEIGHT_PX の定義コメント参照）。
+    estimateSize: () => LIST_ROW_HEIGHT_PX,
     overscan: 8,
     scrollMargin,
   });
