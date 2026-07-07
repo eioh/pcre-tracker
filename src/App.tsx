@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { masterCharacters } from "./domain/master";
 
 // タブ表示時にのみ読み込むことで初期バンドルを軽量化する。
@@ -19,6 +19,7 @@ import { buildInitialState, loadStoredState, saveStoredState, toPurePieceCount }
 import type { CharacterProgress, ClanBattleState, StoredStateV1 } from "./domain/types";
 import { buildDefaultUiState, loadUiState, saveUiState, type ActiveTab, type InputViewSettings } from "./domain/uiStorage";
 import { buildDefaultConnectRankCalcState, saveConnectRankCalcState } from "./domain/connectRankCalcStorage";
+import type { SaveStatus } from "./components/input/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,8 +35,12 @@ import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { PenLine, LayoutDashboard, Coins, Calculator, Download, Upload, RotateCcw, Swords } from "lucide-react";
 import { SyncHeader } from "./components/SyncHeader";
+import { MobileHeader } from "./components/MobileHeader";
+import { MobileBottomNav } from "./components/MobileBottomNav";
+import { cn } from "./lib/utils";
 import { PrivacyPolicyPage } from "./components/PrivacyPolicyPage";
 import { useSync } from "./hooks/useSync";
+import { useIsMobile } from "./hooks/useIsMobile";
 import { clearSyncMeta } from "./domain/syncMeta";
 
 const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
@@ -88,6 +93,8 @@ export default function App() {
   const [hasOpenedInput, setHasOpenedInput] = useState(() => uiState.activeTab === "input");
   // 現在のパス名（SPA フォールバックでの簡易ルーティング用。設計判断 1）。
   const [pathname, setPathname] = useState(() => window.location.pathname);
+  // 768px 未満ではコンパクトヘッダー（MobileHeader）へ切り替える。
+  const isMobile = useIsMobile();
 
   // ブラウザの戻る/進む操作でパス名の state を追随させる。
   useEffect(() => {
@@ -119,9 +126,21 @@ export default function App() {
     clearSyncMeta();
   }, []);
 
+  // localStorage への debounce 保存が予約中かどうか（モバイル編集シートの保存インジケータ用）。
+  const [isLocalSavePending, setIsLocalSavePending] = useState(false);
+  // 直近に保存予約した state の参照。初回マウント（StrictMode の再実行を含む）では state が
+  // 変化していないため、「保存中」を表示しない判定基準に使う。
+  const lastScheduledSaveStateRef = useRef(state);
+
   useEffect(() => {
+    // state が実際に変化したときのみ「保存中」を立てる（初回マウント時の書き戻しでは表示しない）。
+    if (lastScheduledSaveStateRef.current !== state) {
+      lastScheduledSaveStateRef.current = state;
+      setIsLocalSavePending(true);
+    }
     const timerId = window.setTimeout(() => {
       saveStoredState(state);
+      setIsLocalSavePending(false);
     }, STORED_STATE_SAVE_DEBOUNCE_MS);
     return () => {
       window.clearTimeout(timerId);
@@ -148,6 +167,22 @@ export default function App() {
 
   // 同期層（セッション監視・起動時 GET・デバウンス PUT・競合ダイアログ）。
   const sync = useSync({ getState, masterCharacters, onServerDataAdopted: handleServerDataAdopted });
+
+  // モバイル編集シートへ渡す保存ステータス。ローカル保存中を最優先し、ログイン時のみ同期の
+  // 進行中/エラーを補助表示する。sync.status の idle は編集直後でも（PUT の 10 秒 debounce により）
+  // 最大10秒続くため、「同期済み」とは表示せずローカル保存完了＝保存済みとして扱う。
+  const sheetSaveStatus = useMemo<SaveStatus>(() => {
+    if (isLocalSavePending) {
+      return "saving";
+    }
+    if (sync.isLoggedIn && sync.status === "syncing") {
+      return "syncing";
+    }
+    if (sync.isLoggedIn && sync.status === "error") {
+      return "error";
+    }
+    return "saved";
+  }, [isLocalSavePending, sync.isLoggedIn, sync.status]);
 
   // 現在のlocalStorage内容をバックアップJSONとしてダウンロードする。
   const handleExportBackup = useCallback(() => {
@@ -215,6 +250,11 @@ export default function App() {
     // 初期化はユーザー操作による保存データ変更のため、同期カウンタを進めてサーバーへも反映させる。
     sync.notifyLocalChange();
   }, [sync]);
+
+  // 保存データ初期化の確認ダイアログを開く（MobileHeader のメニュー項目から呼ぶ）。
+  const handleRequestReset = useCallback(() => {
+    setIsResetDialogOpen(true);
+  }, []);
 
   // 結果メッセージを閉じ、必要なら画面を再読み込みする。
   const handleCloseMessageDialog = useCallback(() => {
@@ -305,7 +345,29 @@ export default function App() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-5 pb-9 pt-7">
+    <div
+      className={cn(
+        "mx-auto w-full max-w-[1400px] px-5 pt-7",
+        // モバイルは下部固定ナビ（h-14 + セーフエリア）にフッターが隠れないよう下余白を確保する。
+        isMobile ? "pb-[calc(3.5rem+env(safe-area-inset-bottom)+1rem)]" : "pb-9",
+      )}
+    >
+      {/* 768px 未満はコンパクトヘッダー+メニューシート、それ以上は従来ヘッダー（無改変）を描画する。 */}
+      {isMobile ? (
+        <MobileHeader
+          isLoggedIn={sync.isLoggedIn}
+          isSessionPending={sync.isSessionPending}
+          userLabel={sync.userLabel}
+          status={sync.status}
+          onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
+          onDeleteRequestStart={sync.stopSync}
+          onBeforeAccountDeleted={handleBeforeAccountDeleted}
+          updatedAt={state.updatedAt ? formatUpdatedAt(state.updatedAt) : "-"}
+          onExportBackup={handleExportBackup}
+          onSelectImportFile={handleSelectImportFile}
+          onRequestReset={handleRequestReset}
+        />
+      ) : (
       <header className="mb-5 flex flex-col items-start justify-between gap-6 lg:flex-row">
         <div>
           <p className="m-0 font-orbitron text-xs tracking-[0.12em] text-accent">Princess Connect! Re:Dive</p>
@@ -347,6 +409,7 @@ export default function App() {
           <p className="m-0 text-sm text-muted">最終更新: {state.updatedAt ? formatUpdatedAt(state.updatedAt) : "-"}</p>
         </div>
       </header>
+      )}
 
       <Tabs
         value={safeUiState.activeTab}
@@ -362,6 +425,10 @@ export default function App() {
           setUiState((previous) => ({ ...previous, activeTab: value as ActiveTab }));
         }}
       >
+        {/* モバイルは下部固定ナビ、デスクトップは従来の上部タブリスト（無改変）を描画する。 */}
+        {isMobile ? (
+          <MobileBottomNav />
+        ) : (
         <TabsList className="mb-5" aria-label="画面切り替え">
           <TabsTrigger value="dashboard">
             <LayoutDashboard className="size-4" />
@@ -384,6 +451,7 @@ export default function App() {
             コネクトランク計算
           </TabsTrigger>
         </TabsList>
+        )}
 
         <TabsContent value="input" forceMount={hasOpenedInput ? true : undefined}>
           <Suspense fallback={<TabLoadingFallback />}>
@@ -395,6 +463,7 @@ export default function App() {
               initialSettings={safeUiState.input}
               onSettingsChange={handleInputSettingsChange}
               settingsSyncToken={inputSettingsSyncToken}
+              saveStatus={sheetSaveStatus}
             />
           </Suspense>
         </TabsContent>

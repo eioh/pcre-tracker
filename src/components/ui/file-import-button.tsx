@@ -5,11 +5,13 @@ type FileImportButtonProps = {
   label: string;
   icon?: ReactNode;
   accept?: string;
+  // ボタンへ追加するクラス名（メニュー項目スタイルなどレイアウト調整用）。
+  className?: string;
   onSelectFile: (file: File) => void | Promise<void>;
 };
 
 // ボタン押下でファイル選択を開き、選択ファイルを親へ渡す。
-export function FileImportButton({ label, icon, accept, onSelectFile }: FileImportButtonProps) {
+export function FileImportButton({ label, icon, accept, className, onSelectFile }: FileImportButtonProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // 非表示inputを開いてファイル選択ダイアログを表示する。
@@ -32,7 +34,7 @@ export function FileImportButton({ label, icon, accept, onSelectFile }: FileImpo
 
   return (
     <>
-      <Button type="button" variant="outline" onClick={openFileDialog}>
+      <Button type="button" variant="outline" className={className} onClick={openFileDialog}>
         {icon}
         {label}
       </Button>

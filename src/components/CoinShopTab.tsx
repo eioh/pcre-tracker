@@ -28,7 +28,8 @@ export function CoinShopTab() {
           const names = (coinShopData as Record<string, string[]>)[coinType] ?? [];
           return (
             <TabsContent key={coinType} value={coinType}>
-              <div className="grid grid-cols-4 gap-2">
+              {/* モバイル(md 未満)では2列、デスクトップでは従来どおり4列で表示する */}
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
                 {names.map((name) => (
                   <div
                     key={name}

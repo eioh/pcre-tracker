@@ -5,12 +5,14 @@ import { cn } from "../../lib/utils";
 // NOTE: shadcn/ui カタログではラッパー div で overflow-auto を付与するが、
 // 本プロジェクトでは仮想スクロール（@tanstack/react-virtual）の scrollElement と
 // 競合するため、ラッパーを省略しテーブル要素のみ描画する。
+// NOTE: 最小幅（min-w-*）はレイアウト都合で呼び出し側ごとに異なるため、
+// 共有コンポーネントでは指定せず className で個別に付与する。
 const Table = React.forwardRef<HTMLTableElement, React.TableHTMLAttributes<HTMLTableElement>>(function Table(
   { className, ...props },
   ref,
 ) {
   return (
-    <table ref={ref} className={cn("w-full min-w-[1280px] border-separate border-spacing-0 caption-bottom text-sm", className)} {...props} />
+    <table ref={ref} className={cn("w-full border-separate border-spacing-0 caption-bottom text-sm", className)} {...props} />
   );
 });
 Table.displayName = "Table";

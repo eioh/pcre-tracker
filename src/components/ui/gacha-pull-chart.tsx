@@ -1,6 +1,7 @@
 import type { TooltipContentProps } from "recharts";
-import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
+import { useIsMobile } from "../../hooks/useIsMobile";
 import type { GachaPullChartItem } from "../../utils/dashboard";
 import { ChartContainer, ChartTooltip, type ChartConfig } from "./chart";
 
@@ -21,9 +22,8 @@ function formatDateForDisplay(value: string): string {
   return value.replace(/-/g, "/");
 }
 
-// 軸ラベル用にキャラ名を省略し、長い名前は末尾を ... に置き換える。
-function formatCharacterNameForAxis(value: string): string {
-  const maxLength = 7;
+// 軸ラベル用にキャラ名を省略し、長い名前は末尾を ... に置き換える(省略長は画面幅に応じて指定)。
+function formatCharacterNameForAxis(value: string, maxLength: number = 7): string {
   return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
 }
 
@@ -48,11 +48,65 @@ function GachaPullTooltipContent({ active, payload }: TooltipContentProps<ValueT
 
 // キャラ名を縦軸に並べ、ガチャ回数を横棒で表示する。
 export function GachaPullChart({ items, averagePullCount }: GachaPullChartProps) {
+  // フックは早期 return より前に必ず呼ぶ(Rules of Hooks 違反防止)。
+  const isMobile = useIsMobile();
+
   if (items.length === 0) {
     return <p className="m-0 text-sm text-muted">該当データがありません</p>;
   }
 
   const chartHeight = Math.max(320, items.length * 44);
+
+  // モバイル時は ResponsiveContainer で画面幅に収める。
+  // 縦スクロール箱(max-h-[520px])との相性対策として高さは items.length ベースの値を明示的に渡す。
+  if (isMobile) {
+    return (
+      <div className="max-h-[520px] overflow-y-auto pr-2">
+        <ChartContainer config={chartConfig} className="min-h-[320px]" style={{ height: `${chartHeight}px` }}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <BarChart
+              data={items}
+              layout="vertical"
+              margin={{ top: 16, right: 16, bottom: 8, left: 8 }}
+            >
+              <CartesianGrid horizontal={false} stroke="var(--color-chart-grid)" />
+              <XAxis
+                type="number"
+                allowDecimals={false}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: "var(--color-sub)", fontSize: 12 }}
+              />
+              <YAxis
+                type="category"
+                dataKey="name"
+                width={72}
+                tickFormatter={(value) => formatCharacterNameForAxis(String(value), 6)}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: "var(--color-sub)", fontSize: 11 }}
+              />
+              <ChartTooltip cursor={{ fill: "var(--color-chart-cursor)" }} content={GachaPullTooltipContent} />
+              <ReferenceLine
+                x={averagePullCount}
+                stroke="var(--color-chart-ref)"
+                strokeDasharray="6 4"
+                ifOverflow="extendDomain"
+                label={{
+                  value: `平均 ${averagePullCount.toFixed(1)}`,
+                  position: "insideTop",
+                  fill: "var(--color-sub)",
+                  fontSize: 11,
+                }}
+              />
+              <Bar dataKey="gachaPullCount" fill="var(--color-chart-bar)" radius={[0, 6, 6, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </div>
+    );
+  }
+
   return (
     <div className="max-h-[520px] overflow-y-auto pr-2">
       <ChartContainer config={chartConfig} className="min-h-[320px] min-w-[720px]" style={{ height: `${chartHeight}px` }}>
