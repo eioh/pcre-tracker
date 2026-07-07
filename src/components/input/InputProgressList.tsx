@@ -80,8 +80,18 @@ const ListRow = memo(function ListRow({
         isEven ? "bg-row-even" : "bg-row-odd",
       )}
     >
-      <label className="flex h-full shrink-0 items-center px-1.5" onClick={stopPropagation}>
-        <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onCheckedChange={handleOwnedChange} />
+      {/* min-w-11(44px)でタップ領域を確保し、縦罫線で「左=チェック / 右=行タップ」の境界を可視化する。 */}
+      <label
+        className="flex h-full min-w-11 shrink-0 items-center justify-center border-r border-white/10"
+        onClick={stopPropagation}
+      >
+        {/* size-6 で 24px に拡大（twMerge で TableCheckbox 既定の h-4 w-4 を上書き。Check アイコンも size-4 へ追従）。 */}
+        <TableCheckbox
+          className="size-6 [&_svg]:size-4"
+          checked={progress.owned}
+          aria-label={`${character.name}の所持状態`}
+          onCheckedChange={handleOwnedChange}
+        />
       </label>
       <button
         type="button"
