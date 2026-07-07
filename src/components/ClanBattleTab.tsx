@@ -388,10 +388,11 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                 >
                   {formatMonthGroupTitle(group.year, group.month)}
                 </button>
+                {/* max-md:min-h-11/min-w-11 はモバイル（768px未満）のみタップ領域を44pxへ広げるスタイル調整（スタイルのみの差は max-md: バリアントを使う規約）。 */}
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-danger hover:text-danger-strong"
+                  className="text-danger hover:text-danger-strong max-md:min-h-11 max-md:min-w-11"
                   aria-label={`${formatMonthGroupTitle(group.year, group.month)}を削除`}
                   onClick={() => handleDeleteMonthGroup(group.id)}
                 >
@@ -520,6 +521,7 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                   const isCurrentMonth = isCurrentClanBattleMonth(selectedGroup);
                   const diffs = isCurrentMonth ? getClanBattleMemberDiffs(member, state.progressByName[member.characterName]) : [];
                   const hasDiff = diffs.length > 0;
+                  // max-md:grid-cols-2 はモバイル（768px未満）のみSelect5個を2列に配置して縦の冗長さを抑えるスタイル調整（スタイルのみの差は max-md: バリアント、構造分岐は useIsMobile を使う規約）。
                   return (
                     <article
                       key={member.id}
@@ -527,12 +529,14 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                       onDragStart={() => setDraggingMemberId(member.id)}
                       onDragOver={(event) => event.preventDefault()}
                       onDrop={() => handleDropMember(member.id)}
-                      className={`grid gap-3 rounded-[8px] border p-3 transition lg:grid-cols-[minmax(160px,1.2fr)_repeat(5,minmax(88px,1fr))_auto] lg:items-center ${
+                      className={`grid gap-3 rounded-[8px] border p-3 transition max-md:grid-cols-2 lg:grid-cols-[minmax(160px,1.2fr)_repeat(5,minmax(88px,1fr))_auto] lg:items-center ${
                         hasDiff ? "border-accent/70 bg-black/20" : "border-white/15 bg-black/20"
                       }`}
                     >
-                      <div className="flex min-w-0 items-center gap-2">
-                        <GripVertical className="size-4 shrink-0 cursor-grab text-muted" aria-hidden="true" />
+                      {/* 名前ブロックはモバイルでは2列分を使い、キャラ名の折返しを防ぐ。 */}
+                      <div className="flex min-w-0 items-center gap-2 max-md:col-span-2">
+                        {/* ドラッグ操作はモバイルでは使えないため、つまみアイコンはモバイルで非表示にする。 */}
+                        <GripVertical className="size-4 shrink-0 cursor-grab text-muted max-md:hidden" aria-hidden="true" />
                         <div className="min-w-0">
                           <p className="m-0 truncate text-sm font-semibold">{member.characterName}</p>
                           <div className="mt-1 flex flex-wrap items-center gap-1.5">
@@ -651,10 +655,11 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                         </Select>
                       </label>
 
+                      {/* 削除ボタンはモバイルでは2列分の幅を使い、min-h-11/min-w-11 でタップ領域を44pxへ広げる。 */}
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-danger hover:text-danger-strong"
+                        className="text-danger hover:text-danger-strong max-md:col-span-2 max-md:min-h-11 max-md:min-w-11"
                         aria-label={`${member.characterName}を削除`}
                         onClick={() => handleDeleteMember(member.id)}
                       >
