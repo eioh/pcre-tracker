@@ -62,12 +62,6 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputProgressList>
   };
 }
 
-// コンボボックスを開いて項目ラベルを選択する。
-function selectOptionFromCombobox(combobox: HTMLElement, optionLabel: string): void {
-  fireEvent.click(combobox);
-  fireEvent.click(screen.getByRole("option", { name: optionLabel }));
-}
-
 // 行タップで編集シートを開き、シート本体（dialog）を返す。
 function openEditSheet(characterName: string): HTMLElement {
   fireEvent.click(screen.getByRole("button", { name: `${characterName}の編集シートを開く` }));
@@ -116,21 +110,130 @@ describe("InputProgressList", () => {
     expect(within(dialog).getByText("変更は即時保存されます")).toBeInTheDocument();
   });
 
-  it("シート内のセレクト変更でRANK・専用1・専用2を更新できる", () => {
+  it("シート内のステッパーでRANK・専用2を1段ずつ歩進できる", () => {
     const onUpdateProgress = vi.fn();
     const props = buildProps({ onUpdateProgress });
     render(<InputProgressList {...props} />);
 
     const dialog = openEditSheet("ヒヨリ");
-    const combos = within(dialog).getAllByRole("combobox");
 
-    selectOptionFromCombobox(combos[0] as HTMLElement, "10");
-    selectOptionFromCombobox(combos[1] as HTMLElement, "SP");
-    selectOptionFromCombobox(combos[2] as HTMLElement, "Lv.5");
+    // connectRank: 1 / ue2Level: 0 を起点に前後1段ずつ歩進する。
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリのコネクトRANKを上げる" }));
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { connectRank: 2 });
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリのコネクトRANKを下げる" }));
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { connectRank: 0 });
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリの専用2を上げる" }));
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue2Level: 1 });
+  });
 
-    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { connectRank: 10 });
+  it("RANKステッパーは下限0で−を、上限15で+を無効化する", () => {
+    const props = buildProps({
+      visibleRows: [{ character: buildCharacter(), progress: buildProgress({ connectRank: 0 }) }],
+    });
+    const { rerender } = render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    expect(within(dialog).getByRole("button", { name: "ヒヨリのコネクトRANKを下げる" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "ヒヨリのコネクトRANKを上げる" })).toBeEnabled();
+
+    rerender(
+      <InputProgressList {...props} visibleRows={[{ character: buildCharacter(), progress: buildProgress({ connectRank: 15 }) }]} />,
+    );
+    expect(within(dialog).getByRole("button", { name: "ヒヨリのコネクトRANKを上げる" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "ヒヨリのコネクトRANKを下げる" })).toBeEnabled();
+  });
+
+  it("専用1ステッパーは非連続なレベル区間を1段ずつ歩進する", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({
+      onUpdateProgress,
+      visibleRows: [{ character: buildCharacter(), progress: buildProgress({ ue1Level: 130 }) }],
+    });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+
+    // Lv.130 の次は +10 の Lv.140（+1 ではなく値リストの次段）へ進む。
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリの専用1を上げる" }));
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 140, ue1SpEquipped: false });
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリの専用1を下げる" }));
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 110, ue1SpEquipped: false });
+  });
+
+  it("専用1ステッパーはLv.370の+でSP装備になり、SPの−でSP解除する", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({
+      onUpdateProgress,
+      visibleRows: [{ character: buildCharacter(), progress: buildProgress({ ue1Level: 370 }) }],
+    });
+    const { rerender } = render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+
+    // SP実装キャラは Lv.370 の次のステップが SP 装備になる。
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリの専用1を上げる" }));
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 370, ue1SpEquipped: true });
-    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue2Level: 5 });
+
+    rerender(
+      <InputProgressList
+        {...props}
+        visibleRows={[{ character: buildCharacter(), progress: buildProgress({ ue1Level: 370, ue1SpEquipped: true }) }]}
+      />,
+    );
+
+    // SP装備中は最上段のため + は無効、− で SP を解除して Lv.370 へ戻る。
+    expect(within(dialog).getByRole("button", { name: "ヒヨリの専用1を上げる" })).toBeDisabled();
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリの専用1を下げる" }));
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 370, ue1SpEquipped: false });
+  });
+
+  it("SP未実装キャラはLv.370で専用1の+を無効化する", () => {
+    const row: VisibleRow = {
+      character: buildCharacter({
+        implemented: {
+          star6: true,
+          ue1: true,
+          ue1Sp: false,
+          ue2: true,
+        },
+      }),
+      progress: buildProgress({ ue1Level: 370 }),
+    };
+    const props = buildProps({ visibleRows: [row] });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+
+    expect(within(dialog).getByRole("button", { name: "ヒヨリの専用1を上げる" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "ヒヨリの専用1を下げる" })).toBeEnabled();
+  });
+
+  it("専用装備未実装キャラはステッパーを無効表示する", () => {
+    const row: VisibleRow = {
+      character: buildCharacter({
+        name: "ユイ",
+        implemented: {
+          star6: true,
+          ue1: false,
+          ue1Sp: false,
+          ue2: false,
+        },
+      }),
+      progress: buildProgress({ ue1Level: null, ue2Level: null }),
+    };
+    const props = buildProps({
+      visibleRows: [row],
+      purePieceByCharacterName: { ユイ: 0 },
+      purePieceByBaseNameFromCharacters: { ユイ: 0 },
+    });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ユイ");
+
+    expect(within(dialog).getByRole("button", { name: "ユイの専用1を上げる" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "ユイの専用1を下げる" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "ユイの専用2を上げる" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "ユイの専用2を下げる" })).toBeDisabled();
   });
 
   it("シート内の☆セグメントのタップで星を更新できる", () => {

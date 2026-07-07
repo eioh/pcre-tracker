@@ -4,15 +4,12 @@ import type { Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../../utils/starMemoryCost";
 import { attributeTextClassMap, memorySourceLabelMap, roleTextClassMap, sourceChipClassMap } from "./constants";
 import {
-  ConnectRankSelect,
   GachaPullCountInput,
   ObtainedDatePicker,
   OwnedMemoryPieceInput,
   OwnedPurePieceInput,
-  Ue1Select,
-  Ue2Select,
 } from "./progressFields";
-import { StarSegmentedControl } from "./mobileFields";
+import { ConnectRankStepper, StarSegmentedControl, Ue1Stepper, Ue2Stepper } from "./mobileFields";
 import { computeRowDerived } from "./rowDerived";
 import type { ProgressPatch, VisibleRow } from "./types";
 import { sectionLabelClass, tableSwitchClass } from "./uiStyles";
@@ -145,27 +142,27 @@ const SheetBody = memo(function SheetBody({
           <FieldRow label="☆">
             <StarSegmentedControl character={character} star={progress.star} isAtMax={isStarAtMax} onUpdateProgress={onUpdateProgress} />
           </FieldRow>
-          <div className="grid grid-cols-2 gap-3">
-            <FieldRow label="コネクトRANK">
-              <ConnectRankSelect
-                character={character}
-                connectRank={progress.connectRank}
-                isAtMax={isConnectRankAtMax}
-                onUpdateProgress={onUpdateProgress}
-              />
-            </FieldRow>
-          </div>
+          {/* ステッパーは −/値/+ の横並びのため1行を占有する */}
+          <FieldRow label="コネクトRANK">
+            <ConnectRankStepper
+              character={character}
+              connectRank={progress.connectRank}
+              isAtMax={isConnectRankAtMax}
+              onUpdateProgress={onUpdateProgress}
+            />
+          </FieldRow>
         </div>
       </section>
 
       <section>
         <h3 className={sectionLabelClass}>専用装備</h3>
-        <div className="grid grid-cols-2 gap-3">
+        {/* ステッパーの −/+ に 44px 幅を確保するため、2カラムでなく縦積みにする */}
+        <div className="grid gap-3">
           <FieldRow label="専用1">
-            <Ue1Select character={character} value={ue1CompositeValue} isAtMax={isUe1AtMax} onUpdateProgress={onUpdateProgress} />
+            <Ue1Stepper character={character} value={ue1CompositeValue} isAtMax={isUe1AtMax} onUpdateProgress={onUpdateProgress} />
           </FieldRow>
           <FieldRow label="専用2">
-            <Ue2Select character={character} value={ue2Value} isAtMax={isUe2AtMax} onUpdateProgress={onUpdateProgress} />
+            <Ue2Stepper character={character} value={ue2Value} isAtMax={isUe2AtMax} onUpdateProgress={onUpdateProgress} />
           </FieldRow>
         </div>
       </section>
