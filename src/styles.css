@@ -58,6 +58,8 @@
   --color-maxed-bg: #060607e8;
   --color-maxed-text: #f1f5f9;
   --color-maxed-dot: #67aaf2;
+  /* モバイル一覧サマリー: 最大強化済み(属性/ロール色と揃えたソフトグリーン) */
+  --color-maxed-green: #8bc8ab;
 
   /* テーブル */
   --color-table-border: #cbd5e124;

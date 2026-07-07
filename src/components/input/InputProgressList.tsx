@@ -11,6 +11,9 @@ import { computeRowDerived } from "./rowDerived";
 import type { ProgressPatch, SaveStatus, VisibleRow } from "./types";
 import { TableCheckbox } from "../ui/table-checkbox";
 
+// モバイル一覧行の物理固定高（px）。ListRow の h-20 クラスと必ず一致させること（変更時は両方を更新する）。
+const LIST_ROW_HEIGHT_PX = 80;
+
 type InputProgressListProps = {
   visibleRows: VisibleRow[];
   purePieceByCharacterName: Record<string, number>;
@@ -40,7 +43,7 @@ type ListRowProps = {
   onOpenEditSheet: (name: string) => void;
 };
 
-// モバイル一覧の1行。64px の物理固定高に収め、行タップで編集シートを開く。
+// モバイル一覧の1行。80px の物理固定高に収め、行タップで編集シートを開く。
 const ListRow = memo(function ListRow({
   character,
   progress,
@@ -54,12 +57,21 @@ const ListRow = memo(function ListRow({
   onUpdateProgress,
   onOpenEditSheet,
 }: ListRowProps) {
-  // サマリー表示用に必要メモピ合計を計算する（テーブル行と同一ロジック）。
-  const { adjustedTotalRemainingMemoryPiece } = computeRowDerived(character, progress, ownedPurePiece, ownedPurePieceByBase, {
-    includeSameBasePurePieceForUe2,
-    starMemoryCalcMode,
-    ue1MemoryCalcMode,
-  });
+  // サマリー表示用に育成状態の派生値を計算する（テーブル行と同一ロジック）。
+  const { isStarAtMax, isConnectRankAtMax, isUe1AtMax, isUe2AtMax, ue1CompositeValue, ue2Value } = computeRowDerived(
+    character,
+    progress,
+    ownedPurePiece,
+    ownedPurePieceByBase,
+    {
+      includeSameBasePurePieceForUe2,
+      starMemoryCalcMode,
+      ue1MemoryCalcMode,
+    },
+  );
+  // 専用装備の表示値。未実装は "-"、SP装備中は "SP"、それ以外はレベル数値をそのまま表示する。
+  const ue1Display = ue1CompositeValue === "null" ? "-" : ue1CompositeValue === "sp" ? "SP" : ue1CompositeValue;
+  const ue2Display = ue2Value === "null" ? "-" : ue2Value;
 
   const handleOwnedChange = useCallback(
     (checked: boolean | "indeterminate") => onUpdateProgress(character.name, { owned: checked === true }),
@@ -75,13 +87,24 @@ const ListRow = memo(function ListRow({
     <div
       style={style}
       className={cn(
-        // h-16 の物理固定高 + overflow-hidden で、仮想化の estimateSize(64) と実 DOM 高のズレを構造的に防ぐ。
-        "flex h-16 items-center gap-1 overflow-hidden border-b border-table-border px-2",
+        // h-20（=LIST_ROW_HEIGHT_PX の 80px）の物理固定高 + overflow-hidden で、
+        // 仮想化の estimateSize と実 DOM 高のズレを構造的に防ぐ（変更時は定数と両方を更新する）。
+        "flex h-20 items-center gap-1 overflow-hidden border-b border-table-border px-2",
         isEven ? "bg-row-even" : "bg-row-odd",
       )}
     >
-      <label className="flex h-full shrink-0 items-center px-1.5" onClick={stopPropagation}>
-        <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onCheckedChange={handleOwnedChange} />
+      {/* min-w-11(44px)でタップ領域を確保し、縦罫線で「左=チェック / 右=行タップ」の境界を可視化する。 */}
+      <label
+        className="flex h-full min-w-11 shrink-0 items-center justify-center border-r border-white/10"
+        onClick={stopPropagation}
+      >
+        {/* size-6 で 24px に拡大（twMerge で TableCheckbox 既定の h-4 w-4 を上書き。Check アイコンも size-4 へ追従）。 */}
+        <TableCheckbox
+          className="size-6 [&_svg]:size-4"
+          checked={progress.owned}
+          aria-label={`${character.name}の所持状態`}
+          onCheckedChange={handleOwnedChange}
+        />
       </label>
       <button
         type="button"
@@ -89,7 +112,8 @@ const ListRow = memo(function ListRow({
         onClick={handleOpen}
         className="flex h-full min-w-0 flex-1 items-center justify-between gap-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
       >
-        <span className="grid min-w-0 gap-1">
+        {/* 左ブロックはタグ / 名前 / サマリーの3段スタック。 */}
+        <span className="grid min-w-0 flex-1 gap-1">
           <span className="truncate text-[0.72rem] font-semibold leading-none">
             <span className={character.limited ? "text-limited-text" : "text-normal-text"}>{character.limited ? "限定" : "恒常"}</span>
             <span className="text-tag-separator"> / </span>
@@ -98,13 +122,16 @@ const ListRow = memo(function ListRow({
             <span className={roleTextClassMap[character.role]}>{character.role}</span>
           </span>
           <span className="block max-w-full truncate font-bold">{character.name}</span>
+          {/* サマリー行。育成状態4項目を横並びで表示し、実装段階の最大まで強化済みの項目は緑系の色で示す。 */}
+          <span className="flex min-w-0 items-center gap-2 truncate text-xs whitespace-nowrap tabular-nums leading-none">
+            <span className={isStarAtMax ? "text-maxed-green" : "text-muted"}>☆{progress.star}</span>
+            <span className={isConnectRankAtMax ? "text-maxed-green" : "text-muted"}>CR{progress.connectRank}</span>
+            <span className={isUe1AtMax ? "text-maxed-green" : "text-muted"}>専用1: {ue1Display}</span>
+            <span className={isUe2AtMax ? "text-maxed-green" : "text-muted"}>専用2: {ue2Display}</span>
+          </span>
         </span>
-        <span className="flex shrink-0 items-center gap-2 whitespace-nowrap text-xs tabular-nums text-muted">
-          <span>☆{progress.star}</span>
-          <span>RANK {progress.connectRank}</span>
-          <span className="font-bold text-main">必要 {adjustedTotalRemainingMemoryPiece}</span>
-          <ChevronRight aria-hidden="true" className="size-4 shrink-0" />
-        </span>
+        {/* 行タップのアフォーダンスとして右端に縦センターでシェブロンを置く。 */}
+        <ChevronRight aria-hidden="true" className="size-4 shrink-0 text-muted" />
       </button>
     </div>
   );
@@ -132,7 +159,8 @@ export const InputProgressList = memo(function InputProgressList({
   const [scrollMargin, setScrollMargin] = useState(0);
   const rowVirtualizer = useWindowVirtualizer({
     count: visibleRows.length,
-    estimateSize: () => 64,
+    // 行は物理固定高のため推定値=実高。ListRow の h-20 と一致させる（LIST_ROW_HEIGHT_PX の定義コメント参照）。
+    estimateSize: () => LIST_ROW_HEIGHT_PX,
     overscan: 8,
     scrollMargin,
   });
