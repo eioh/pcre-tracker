@@ -326,9 +326,9 @@ export function InputTab({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- onSettingsChange は親側で安定参照(useCallback)を前提に意図的に依存配列から除外する。
   }, [currentSettings]);
 
-  return (
-    <>
-      <section className={`${panelClass} mb-4`}>
+  // 詳細設定セクション。モバイル・デスクトップ共通で使う（ステップ3でモバイルはフィルタシートへ置換予定）。
+  const detailSettingsSection = (
+    <section className={`${panelClass} mb-4`}>
         <div className={`flex flex-wrap items-center gap-2 ${isDetailSettingsOpen ? "mb-3" : ""}`}>
           <button
             type="button"
@@ -396,6 +396,63 @@ export function InputTab({
           </div>
         ) : null}
       </section>
+  );
+
+  if (isMobile) {
+    // モバイル（768px 未満）: 検索バーを画面上部へ固定し、一覧は window スクロールに一本化する。
+    // パネル枠を使わないのは、sticky バーの上に padding の隙間から行が透けるのを防ぐため。
+    // sticky バーは詳細設定のアニメーション用ラッパー（overflow-hidden）の外に置くこと。
+    return (
+      <>
+        {detailSettingsSection}
+
+        <div className="sticky top-0 z-10 bg-bg-end py-2.5">
+          <div className="flex items-center gap-2">
+            <div className="relative w-full">
+              <Search
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
+              />
+              <Input
+                aria-label="キャラ検索"
+                value={searchText}
+                onChange={(event) => setSearchText(event.target.value)}
+                className="pl-9"
+                placeholder="例: ヒヨリ"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="shrink-0 border-danger/60 bg-danger-bg/40 text-danger hover:border-danger-strong hover:text-danger-strong"
+              onClick={handleSearchReset}
+            >
+              リセット
+            </Button>
+          </div>
+        </div>
+
+        <p className="mb-2.5 mt-1.5 text-sm text-muted">表示件数: {visibleRowsWithCurrentProgress.length}</p>
+
+        <InputProgressList
+          visibleRows={visibleRowsWithCurrentProgress}
+          purePieceByCharacterName={state.purePieceByCharacterName}
+          purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
+          onUpdateProgress={onUpdateProgress}
+          onUpdatePurePiece={onUpdateCharacterPurePiece}
+          includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
+          starMemoryCalcMode={starMemoryCalcMode}
+          ue1MemoryCalcMode={ue1MemoryCalcMode}
+        />
+      </>
+    );
+  }
+
+  // デスクトップ（768px 以上）: 従来のパネル+内部スクロールテーブル構成（見た目・挙動とも不変）。
+  return (
+    <>
+      {detailSettingsSection}
 
       <section className={panelClass}>
         <div className="mb-3 grid gap-1.5 text-sm text-muted">
@@ -429,29 +486,16 @@ export function InputTab({
 
         <p className="my-3.5 text-sm text-muted">表示件数: {visibleRowsWithCurrentProgress.length}</p>
 
-        {isMobile ? (
-          <InputProgressList
-            visibleRows={visibleRowsWithCurrentProgress}
-            purePieceByCharacterName={state.purePieceByCharacterName}
-            purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
-            onUpdateProgress={onUpdateProgress}
-            onUpdatePurePiece={onUpdateCharacterPurePiece}
-            includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
-            starMemoryCalcMode={starMemoryCalcMode}
-            ue1MemoryCalcMode={ue1MemoryCalcMode}
-          />
-        ) : (
-          <InputProgressTable
-            visibleRows={visibleRowsWithCurrentProgress}
-            purePieceByCharacterName={state.purePieceByCharacterName}
-            purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
-            onUpdateProgress={onUpdateProgress}
-            onUpdatePurePiece={onUpdateCharacterPurePiece}
-            includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
-            starMemoryCalcMode={starMemoryCalcMode}
-            ue1MemoryCalcMode={ue1MemoryCalcMode}
-          />
-        )}
+        <InputProgressTable
+          visibleRows={visibleRowsWithCurrentProgress}
+          purePieceByCharacterName={state.purePieceByCharacterName}
+          purePieceByBaseNameFromCharacters={purePieceByBaseNameFromCharacters}
+          onUpdateProgress={onUpdateProgress}
+          onUpdatePurePiece={onUpdateCharacterPurePiece}
+          includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
+          starMemoryCalcMode={starMemoryCalcMode}
+          ue1MemoryCalcMode={ue1MemoryCalcMode}
+        />
       </section>
     </>
   );

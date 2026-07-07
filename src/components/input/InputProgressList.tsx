@@ -1,5 +1,5 @@
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { memo, useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
+import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { ChevronRight } from "lucide-react";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
@@ -119,16 +119,51 @@ export const InputProgressList = memo(function InputProgressList({
   starMemoryCalcMode,
   ue1MemoryCalcMode,
 }: InputProgressListProps) {
-  const scrollParentRef = useRef<HTMLDivElement | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
   // 選択キャラは name で保持し、レンダリング毎に visibleRows から最新 row を引く
   // （progress オブジェクトは編集の度に再生成されるため、参照保持だと古い値を表示してしまう）。
   const [selectedCharacterName, setSelectedCharacterName] = useState<string | null>(null);
-  const rowVirtualizer = useVirtualizer({
+  // ページ先頭から一覧先頭までのオフセット。ref 直参照は再レンダーを起こさず、
+  // ヘッダー高の変化・sticky バーの変化・タブ再表示（forceMount の display:none 解除）・回転に
+  // 追従できないため、state で管理して変化を仮想化計算へ確実に反映する。
+  const [scrollMargin, setScrollMargin] = useState(0);
+  const rowVirtualizer = useWindowVirtualizer({
     count: visibleRows.length,
-    getScrollElement: () => scrollParentRef.current,
     estimateSize: () => 64,
     overscan: 8,
+    scrollMargin,
   });
+
+  useLayoutEffect(() => {
+    const listElement = listRef.current;
+    if (!listElement) {
+      return;
+    }
+    // 一覧先頭のページ内オフセットを再計測し、変化があれば state を更新する（同値なら再レンダーなし）。
+    const measureScrollMargin = () => {
+      setScrollMargin(listElement.getBoundingClientRect().top + window.scrollY);
+    };
+    measureScrollMargin();
+    // 画面回転やビューポート変化で一覧の開始位置がずれた場合に追従する。
+    window.addEventListener("resize", measureScrollMargin);
+    // 一覧自身と body を監視し、上部要素（ヘッダー・詳細設定など）の高さ変化やタブ再表示に追従する。
+    // jsdom には ResizeObserver が無いため存在チェックを挟む（テストでは初回計測のみで足りる）。
+    let resizeObserver: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(measureScrollMargin);
+      resizeObserver.observe(listElement);
+      resizeObserver.observe(document.body);
+    }
+    return () => {
+      window.removeEventListener("resize", measureScrollMargin);
+      resizeObserver?.disconnect();
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    // scrollMargin の変化時は仮想化の位置計算を再実行し、行の重なり・空白を防ぐ。
+    rowVirtualizer.measure();
+  }, [scrollMargin, rowVirtualizer]);
   const virtualRows = rowVirtualizer.getVirtualItems();
   const visibleVirtualRows = useMemo(() => {
     const resolvedRows = virtualRows
@@ -174,10 +209,11 @@ export const InputProgressList = memo(function InputProgressList({
 
   return (
     <>
-      {/* 70dvh: モバイルブラウザの動的ツールバーによる高さ変動へ追従する */}
+      {/* 自然高で window スクロールに一本化する（内部スクローラーは持たない）。
+          overflow-hidden はスクロールを生まず、角丸からの行のはみ出しを防ぐ描画クリップのみ。 */}
       <div
-        ref={scrollParentRef}
-        className="h-[70dvh] overflow-y-auto overflow-x-hidden rounded-[8px] border border-table-wrap-border bg-table-wrap-bg"
+        ref={listRef}
+        className="overflow-hidden rounded-[8px] border border-table-wrap-border bg-table-wrap-bg"
       >
         {visibleRows.length === 0 ? (
           <p className="px-3 py-[18px] text-center text-sm text-muted">条件に一致するキャラがいません</p>
@@ -196,7 +232,14 @@ export const InputProgressList = memo(function InputProgressList({
                 isEven={(virtualRow?.index ?? 0) % 2 === 0}
                 style={
                   virtualRow
-                    ? { position: "absolute", top: 0, left: 0, width: "100%", transform: `translateY(${virtualRow.start}px)` }
+                    ? {
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        // start はページ先頭基準のため、一覧コンテナ基準へ scrollMargin 分を差し引いて配置する。
+                        transform: `translateY(${virtualRow.start - scrollMargin}px)`,
+                      }
                     : undefined
                 }
                 onUpdateProgress={onUpdateProgress}
