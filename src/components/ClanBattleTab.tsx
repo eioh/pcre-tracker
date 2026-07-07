@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, GripVertical, Maximize2, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, ChevronDown, ChevronUp, GripVertical, Maximize2, Plus, Trash2 } from "lucide-react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type {
   CharacterProgress,
@@ -111,6 +111,25 @@ function reorderMembers(members: ClanBattleMember[], sourceId: string, targetId:
     return members;
   }
   nextMembers.splice(targetIndex, 0, moved);
+  return nextMembers;
+}
+
+// 指定メンバーを上下方向へ1つ移動したメンバー配列を返す（モバイルの▲▼ボタン用）。端で動かせない場合は元の配列をそのまま返す。
+export function moveMemberByDirection(
+  members: ClanBattleMember[],
+  memberId: string,
+  direction: "up" | "down",
+): ClanBattleMember[] {
+  const index = members.findIndex((member) => member.id === memberId);
+  if (index < 0) {
+    return members;
+  }
+  const targetIndex = direction === "up" ? index - 1 : index + 1;
+  if (targetIndex < 0 || targetIndex >= members.length) {
+    return members;
+  }
+  const nextMembers = [...members];
+  [nextMembers[index], nextMembers[targetIndex]] = [nextMembers[targetIndex]!, nextMembers[index]!];
   return nextMembers;
 }
 
@@ -333,6 +352,14 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
     setDraggingMemberId(null);
   };
 
+  // モバイルの▲▼ボタンで指定メンバーを上下へ1つ移動する。
+  const handleMoveMember = (memberId: string, direction: "up" | "down"): void => {
+    if (!selectedFormation) {
+      return;
+    }
+    updateSelectedFormation({ members: moveMemberByDirection(selectedFormation.members, memberId, direction) });
+  };
+
   return (
     <section className="grid gap-4 xl:grid-cols-[340px_minmax(0,1fr)]">
       <aside className={`${panelClass} grid content-start gap-4`}>
@@ -474,7 +501,11 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
               <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                   <h3 className="m-0 text-sm font-semibold text-sub">編成キャラ</h3>
-                  <p className="m-0 mt-1 text-xs text-muted">ドラッグで並び替えできます。サポートは最大1人です。</p>
+                  <p className="m-0 mt-1 text-xs text-muted">
+                    {/* モバイルはD&Dが使えないため▲▼ボタンを案内し、デスクトップは従来のドラッグ案内を表示する（md:hidden / max-md:hidden で出し分け）。 */}
+                    <span className="md:hidden">▲▼で並び替えできます。サポートは最大1人です。</span>
+                    <span className="max-md:hidden">ドラッグで並び替えできます。サポートは最大1人です。</span>
+                  </p>
                 </div>
                 <div className="grid gap-2 sm:min-w-[320px]">
                   <div className="relative">
@@ -516,7 +547,7 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                     キャラを追加してください。
                   </p>
                 ) : null}
-                {selectedFormation.members.map((member) => {
+                {selectedFormation.members.map((member, memberIndex) => {
                   const character = characterByName.get(member.characterName);
                   const isCurrentMonth = isCurrentClanBattleMonth(selectedGroup);
                   const diffs = isCurrentMonth ? getClanBattleMemberDiffs(member, state.progressByName[member.characterName]) : [];
@@ -545,6 +576,29 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                               サポート
                             </label>
                           </div>
+                        </div>
+                        {/* モバイル用の並び替え▲▼ボタン（min-h-11/min-w-11 で44pxのタップ領域を確保）。デスクトップはD&Dで並び替えるため md 以上では非表示。 */}
+                        <div className="ml-auto flex shrink-0 items-center md:hidden">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="min-h-11 min-w-11"
+                            disabled={memberIndex === 0}
+                            aria-label={`${member.characterName}を上に移動`}
+                            onClick={() => handleMoveMember(member.id, "up")}
+                          >
+                            <ChevronUp className="size-4" aria-hidden="true" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="min-h-11 min-w-11"
+                            disabled={memberIndex === selectedFormation.members.length - 1}
+                            aria-label={`${member.characterName}を下に移動`}
+                            onClick={() => handleMoveMember(member.id, "down")}
+                          >
+                            <ChevronDown className="size-4" aria-hidden="true" />
+                          </Button>
                         </div>
                       </div>
 
