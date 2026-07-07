@@ -124,6 +124,23 @@ const SheetBody = memo(function SheetBody({
         <SheetDescription>変更は即時保存されます</SheetDescription>
       </SheetHeader>
 
+      {/* 最重要情報「あと何個必要か」をファーストビューで確認できるよう、ヘッダー直下へコンパクトに表示する。
+          詳細な内訳はシート下部の各セクションで従来どおり確認できる。 */}
+      <section
+        aria-label="必要数サマリー"
+        className="grid grid-cols-2 divide-x divide-white/20 rounded-[10px] border border-white/20 bg-input-bg px-3 py-2.5"
+      >
+        <div className="grid gap-0.5 pr-3">
+          <span className="text-xs font-semibold text-muted">必要メモピ</span>
+          <span className="text-lg font-bold leading-tight tabular-nums">{adjustedTotalRemainingMemoryPiece}</span>
+        </div>
+        <div className="grid gap-0.5 pl-3">
+          <span className="text-xs font-semibold text-muted">必要ピュアピ</span>
+          {/* ピュアピが意味を持たない（☆6・専用2とも未実装）キャラは値の代わりに「-」を表示する */}
+          <span className="text-lg font-bold leading-tight tabular-nums">{isPurePieceImplemented ? totalPurePieceNeeded : "-"}</span>
+        </div>
+      </section>
+
       <section>
         <h3 className={sectionLabelClass}>基本</h3>
         <div className="grid gap-3">

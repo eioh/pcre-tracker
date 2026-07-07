@@ -388,6 +388,69 @@ describe("InputProgressList", () => {
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { obtainedDate: "2026-02-28" });
   });
 
+  it("シートのヘッダー直下に必要メモピ・必要ピュアピのサマリーを表示する", () => {
+    const props = buildProps({
+      visibleRows: [{ character: buildCharacter(), progress: buildProgress({ star: 1 }) }],
+    });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    const summary = within(dialog).getByRole("region", { name: "必要数サマリー" });
+
+    // 必要メモピは内訳の合計と同じ 1210、必要ピュアピは☆6の50+専用2の150=200。
+    expect(within(summary).getByText("必要メモピ")).toBeInTheDocument();
+    expect(within(summary).getByText("1210")).toBeInTheDocument();
+    expect(within(summary).getByText("必要ピュアピ")).toBeInTheDocument();
+    expect(within(summary).getByText("200")).toBeInTheDocument();
+  });
+
+  it("編集で進捗が変わるとサマリー値が更新される", () => {
+    const props = buildProps({
+      visibleRows: [{ character: buildCharacter(), progress: buildProgress({ star: 1 }) }],
+    });
+    const { rerender } = render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    expect(within(within(dialog).getByRole("region", { name: "必要数サマリー" })).getByText("1210")).toBeInTheDocument();
+
+    // 所持メモピを10へ編集した後の再レンダリングで、必要メモピが 1210 → 1200 へ即時更新される。
+    rerender(
+      <InputProgressList
+        {...props}
+        visibleRows={[{ character: buildCharacter(), progress: buildProgress({ star: 1, ownedMemoryPiece: 10 }) }]}
+      />,
+    );
+
+    const summary = within(screen.getByRole("dialog")).getByRole("region", { name: "必要数サマリー" });
+    expect(within(summary).getByText("1200")).toBeInTheDocument();
+  });
+
+  it("ピュアピ未実装キャラはサマリーの必要ピュアピを「-」表示する", () => {
+    const row: VisibleRow = {
+      character: buildCharacter({
+        name: "ユイ",
+        implemented: {
+          star6: false,
+          ue1: false,
+          ue1Sp: false,
+          ue2: false,
+        },
+      }),
+      progress: buildProgress({ ue1Level: null, ue2Level: null }),
+    };
+    const props = buildProps({
+      visibleRows: [row],
+      purePieceByCharacterName: { ユイ: 0 },
+      purePieceByBaseNameFromCharacters: { ユイ: 0 },
+    });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ユイ");
+    const summary = within(dialog).getByRole("region", { name: "必要数サマリー" });
+
+    expect(within(summary).getByText("-")).toBeInTheDocument();
+  });
+
   it("シートに必要メモピ合計の内訳をインライン表示する", () => {
     const row: VisibleRow = {
       character: buildCharacter(),
@@ -403,7 +466,8 @@ describe("InputProgressList", () => {
     expect(within(dialog).getByText("+620")).toBeInTheDocument();
     expect(within(dialog).getByText("+120")).toBeInTheDocument();
     expect(within(dialog).getByText("+20")).toBeInTheDocument();
-    expect(within(dialog).getByText("1210")).toBeInTheDocument();
+    // 合計 1210 はヘッダー直下のサマリーと内訳セクションの2箇所に表示される。
+    expect(within(dialog).getAllByText("1210").length).toBe(2);
   });
 
   it("シートに必要ピュアピ合計の内訳と同名別衣装の充当分を表示する", () => {
