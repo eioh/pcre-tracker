@@ -9,10 +9,10 @@ import {
   ObtainedDatePicker,
   OwnedMemoryPieceInput,
   OwnedPurePieceInput,
-  StarSelect,
   Ue1Select,
   Ue2Select,
 } from "./progressFields";
+import { StarSegmentedControl } from "./mobileFields";
 import { computeRowDerived } from "./rowDerived";
 import type { ProgressPatch, VisibleRow } from "./types";
 import { sectionLabelClass, tableSwitchClass } from "./uiStyles";
@@ -141,10 +141,11 @@ const SheetBody = memo(function SheetBody({
               <span>限界突破</span>
             </label>
           </div>
+          {/* ☆はセグメンテッドコントロール（6ボタン）のため1行を占有する */}
+          <FieldRow label="☆">
+            <StarSegmentedControl character={character} star={progress.star} isAtMax={isStarAtMax} onUpdateProgress={onUpdateProgress} />
+          </FieldRow>
           <div className="grid grid-cols-2 gap-3">
-            <FieldRow label="☆">
-              <StarSelect character={character} star={progress.star} isAtMax={isStarAtMax} onUpdateProgress={onUpdateProgress} />
-            </FieldRow>
             <FieldRow label="コネクトRANK">
               <ConnectRankSelect
                 character={character}

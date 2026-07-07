@@ -116,7 +116,7 @@ describe("InputProgressList", () => {
     expect(within(dialog).getByText("変更は即時保存されます")).toBeInTheDocument();
   });
 
-  it("シート内のセレクト変更で星・専用1・専用2を更新できる", () => {
+  it("シート内のセレクト変更でRANK・専用1・専用2を更新できる", () => {
     const onUpdateProgress = vi.fn();
     const props = buildProps({ onUpdateProgress });
     render(<InputProgressList {...props} />);
@@ -124,15 +124,45 @@ describe("InputProgressList", () => {
     const dialog = openEditSheet("ヒヨリ");
     const combos = within(dialog).getAllByRole("combobox");
 
-    selectOptionFromCombobox(combos[0] as HTMLElement, "6");
-    selectOptionFromCombobox(combos[1] as HTMLElement, "10");
-    selectOptionFromCombobox(combos[2] as HTMLElement, "SP");
-    selectOptionFromCombobox(combos[3] as HTMLElement, "Lv.5");
+    selectOptionFromCombobox(combos[0] as HTMLElement, "10");
+    selectOptionFromCombobox(combos[1] as HTMLElement, "SP");
+    selectOptionFromCombobox(combos[2] as HTMLElement, "Lv.5");
 
-    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { star: 6 });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { connectRank: 10 });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue1Level: 370, ue1SpEquipped: true });
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue2Level: 5 });
+  });
+
+  it("シート内の☆セグメントのタップで星を更新できる", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({ onUpdateProgress });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    fireEvent.click(within(dialog).getByRole("button", { name: "6" }));
+
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { star: 6 });
+  });
+
+  it("☆6未実装キャラは☆セグメントの「6」を無効化する", () => {
+    const row: VisibleRow = {
+      character: buildCharacter({
+        implemented: {
+          star6: false,
+          ue1: true,
+          ue1Sp: false,
+          ue2: false,
+        },
+      }),
+      progress: buildProgress({ ue2Level: null }),
+    };
+    const props = buildProps({ visibleRows: [row] });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+
+    expect(within(dialog).getByRole("button", { name: "6" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "5" })).toBeEnabled();
   });
 
   it("シート内の所持チェックと限界突破チェックで進捗更新を通知する", () => {
