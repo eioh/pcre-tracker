@@ -122,12 +122,12 @@ const ListRow = memo(function ListRow({
             <span className={roleTextClassMap[character.role]}>{character.role}</span>
           </span>
           <span className="block max-w-full truncate font-bold">{character.name}</span>
-          {/* サマリー行。育成状態4項目を横並びで表示し、実装段階の最大まで強化済みの項目は maxed 色で示す。 */}
+          {/* サマリー行。育成状態4項目を横並びで表示し、実装段階の最大まで強化済みの項目は緑系の色で示す。 */}
           <span className="flex min-w-0 items-center gap-2 truncate text-xs whitespace-nowrap tabular-nums leading-none">
-            <span className={isStarAtMax ? "text-maxed-text" : "text-muted"}>☆{progress.star}</span>
-            <span className={isConnectRankAtMax ? "text-maxed-text" : "text-muted"}>CR{progress.connectRank}</span>
-            <span className={isUe1AtMax ? "text-maxed-text" : "text-muted"}>専用1: {ue1Display}</span>
-            <span className={isUe2AtMax ? "text-maxed-text" : "text-muted"}>専用2: {ue2Display}</span>
+            <span className={isStarAtMax ? "text-emerald-400" : "text-muted"}>☆{progress.star}</span>
+            <span className={isConnectRankAtMax ? "text-emerald-400" : "text-muted"}>CR{progress.connectRank}</span>
+            <span className={isUe1AtMax ? "text-emerald-400" : "text-muted"}>専用1: {ue1Display}</span>
+            <span className={isUe2AtMax ? "text-emerald-400" : "text-muted"}>専用2: {ue2Display}</span>
           </span>
         </span>
         {/* 行タップのアフォーダンスとして右端に縦センターでシェブロンを置く。 */}

@@ -128,9 +128,9 @@ describe("InputProgressList", () => {
     expect(ue2).toBeInTheDocument();
     // 未実装項目は maxed 色にせず text-muted のまま表示する。
     expect(ue1.className).toContain("text-muted");
-    expect(ue1.className).not.toContain("text-maxed-text");
+    expect(ue1.className).not.toContain("text-emerald-400");
     expect(ue2.className).toContain("text-muted");
-    expect(ue2.className).not.toContain("text-maxed-text");
+    expect(ue2.className).not.toContain("text-emerald-400");
   });
 
   it("SP装備中のキャラはサマリーの専用1を「SP」で表示する", () => {
@@ -154,10 +154,10 @@ describe("InputProgressList", () => {
     });
     render(<InputProgressList {...props} />);
 
-    expect(screen.getByText("☆6").className).toContain("text-maxed-text");
-    expect(screen.getByText("CR15").className).toContain("text-maxed-text");
-    expect(screen.getByText("専用1: SP").className).toContain("text-maxed-text");
-    expect(screen.getByText("専用2: 5").className).toContain("text-maxed-text");
+    expect(screen.getByText("☆6").className).toContain("text-emerald-400");
+    expect(screen.getByText("CR15").className).toContain("text-emerald-400");
+    expect(screen.getByText("専用1: SP").className).toContain("text-emerald-400");
+    expect(screen.getByText("専用2: 5").className).toContain("text-emerald-400");
   });
 
   it("☆6未実装キャラは☆5でサマリーの☆をmaxed色で表示する", () => {
@@ -175,7 +175,7 @@ describe("InputProgressList", () => {
     const props = buildProps({ visibleRows: [row] });
     render(<InputProgressList {...props} />);
 
-    expect(screen.getByText("☆5").className).toContain("text-maxed-text");
+    expect(screen.getByText("☆5").className).toContain("text-emerald-400");
   });
 
   it("最大未達の項目はサマリーをtext-mutedのまま表示する", () => {
@@ -190,7 +190,7 @@ describe("InputProgressList", () => {
       screen.getByText("専用2: 0"),
     ]) {
       expect(element.className).toContain("text-muted");
-      expect(element.className).not.toContain("text-maxed-text");
+      expect(element.className).not.toContain("text-emerald-400");
     }
   });
 
