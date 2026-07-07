@@ -1,17 +1,20 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import * as Popover from "@radix-ui/react-popover";
-import { format, isValid, parseISO } from "date-fns";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
-import { toGachaPullCount, toPurePieceCount } from "../../domain/storage";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
-import { getConnectRankRemainingMemoryPieceCount } from "../../utils/connectRankMemoryCost";
-import { getLimitBreakRemainingMemoryPieceCount } from "../../utils/limitBreakMemoryCost";
-import { getUe1RemainingMemoryPieceCount, type Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
-import { getStarRemainingMemoryPieceCount, type StarMemoryCalcMode } from "../../utils/starMemoryCost";
+import type { Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
+import type { StarMemoryCalcMode } from "../../utils/starMemoryCost";
 import { attributeTextClassMap, memorySourceLabelMap, roleTextClassMap, sourceChipClassMap } from "./constants";
-import { formatObtainedDate, formatUeLevel } from "./formatters";
+import {
+  ConnectRankSelect,
+  GachaPullCountInput,
+  ObtainedDatePicker,
+  OwnedMemoryPieceInput,
+  OwnedPurePieceInput,
+  StarSelect,
+  Ue1Select,
+  Ue2Select,
+} from "./progressFields";
+import { computeRowDerived } from "./rowDerived";
 import type { ProgressPatch, VisibleRow } from "./types";
 import {
   characterNameCellLayoutClass,
@@ -20,20 +23,9 @@ import {
   tableWrapClass,
 } from "./uiStyles";
 import { TableCheckbox } from "../ui/table-checkbox";
-import { TableNumberInput } from "../ui/table-number-input";
-import { SelectItem } from "../ui/select";
-import { TableSelect } from "../ui/table-select";
-import { Calendar } from "../ui/calendar";
-import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow as UiTableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
-import { useClampedNumberInput } from "./useClampedNumberInput";
-
-// 所持メモピのクランプ: 0 以上の整数（上限なし）。
-const clampOwnedMemoryPiece = (v: number) => Math.max(0, Math.floor(v));
-// toPurePieceCount は unknown を受け取るが、hook では number のみ渡すためラップする。
-const clampPurePiece = (v: number) => toPurePieceCount(v);
 
 type InputProgressTableProps = {
   visibleRows: VisibleRow[];
@@ -45,20 +37,6 @@ type InputProgressTableProps = {
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
 };
-
-// 保存用の日付文字列をDateへ変換し、不正値なら undefined を返す。
-function parseStoredDate(value: string | null): Date | undefined {
-  if (!value) {
-    return undefined;
-  }
-  const parsed = parseISO(value);
-  return isValid(parsed) ? parsed : undefined;
-}
-
-// Date型を保存用の YYYY-MM-DD 文字列へ変換する。
-function toStoredDateString(value: Date): string {
-  return format(value, "yyyy-MM-dd");
-}
 
 type TableRowProps = {
   character: MasterCharacter;
@@ -84,50 +62,31 @@ const TableRow = memo(function TableRow({
   starMemoryCalcMode,
   ue1MemoryCalcMode,
 }: TableRowProps) {
-  const ue1Value = character.implemented.ue1 ? String(progress.ue1Level ?? 0) : "null";
-  const ue2Value = character.implemented.ue2 ? String(progress.ue2Level ?? 0) : "null";
-  const isPurePieceImplemented = character.implemented.star6 || character.implemented.ue2;
-  const starMax = character.implemented.star6 ? 6 : 5;
-  const ue1MaxLevel = UE1_LEVEL_VALUES[UE1_LEVEL_VALUES.length - 1];
-  const ue2MaxLevel = UE2_LEVEL_VALUES[UE2_LEVEL_VALUES.length - 1];
-  const connectRankMax = 15;
-  const isStarAtMax = progress.star === starMax;
-  const isConnectRankAtMax = progress.connectRank === connectRankMax;
-  const isUe1AtMax =
-    character.implemented.ue1 &&
-    (character.implemented.ue1Sp ? progress.ue1SpEquipped : progress.ue1Level === ue1MaxLevel);
-  const isUe2AtMax = character.implemented.ue2 && progress.ue2Level === ue2MaxLevel;
-  const ue1CompositeValue =
-    character.implemented.ue1 && character.implemented.ue1Sp && progress.ue1SpEquipped ? "sp" : ue1Value;
-  const starRemainingMemoryPiece = getStarRemainingMemoryPieceCount(character, progress, starMemoryCalcMode);
-  const connectRankRemainingMemoryPiece = getConnectRankRemainingMemoryPieceCount(progress);
-  const ue1RemainingMemoryPiece = getUe1RemainingMemoryPieceCount(character, progress, ue1MemoryCalcMode);
-  const limitBreakRemainingMemoryPiece = getLimitBreakRemainingMemoryPieceCount(character, progress);
-  const totalRemainingMemoryPiece =
-    starRemainingMemoryPiece + connectRankRemainingMemoryPiece + ue1RemainingMemoryPiece + limitBreakRemainingMemoryPiece;
-  const adjustedTotalRemainingMemoryPiece = Math.max(0, totalRemainingMemoryPiece - progress.ownedMemoryPiece);
-  const star6PurePieceNeed = character.implemented.star6 && progress.star < 6 ? 50 : 0;
-  const ue2PurePieceNeed = character.implemented.ue2 && progress.ue2Level !== ue2MaxLevel ? 150 : 0;
-  const sameBasePurePieceUsed =
-    includeSameBasePurePieceForUe2 && character.implemented.ue2 ? Math.max(0, ownedPurePieceByBase - ownedPurePiece) : 0;
-  const star6PurePieceSubtotal = Math.max(0, star6PurePieceNeed - ownedPurePiece);
-  const ue2PurePieceSubtotal = Math.max(0, ue2PurePieceNeed - (ownedPurePiece + sameBasePurePieceUsed));
-  const totalPurePieceNeeded = star6PurePieceSubtotal + ue2PurePieceSubtotal;
-  const commitOwnedMemoryPiece = useCallback(
-    (v: number) => onUpdateProgress(character.name, { ownedMemoryPiece: v }),
-    [onUpdateProgress, character.name],
-  );
-  const commitOwnedPurePiece = useCallback(
-    (v: number) => onUpdatePurePiece(character.name, v),
-    [onUpdatePurePiece, character.name],
-  );
-  const commitGachaPullCount = useCallback(
-    (v: number) => onUpdateProgress(character.name, { gachaPullCount: v }),
-    [onUpdateProgress, character.name],
-  );
-  const ownedMemoryPieceField = useClampedNumberInput(progress.ownedMemoryPiece, clampOwnedMemoryPiece, commitOwnedMemoryPiece);
-  const ownedPurePieceField = useClampedNumberInput(ownedPurePiece, clampPurePiece, commitOwnedPurePiece);
-  const gachaPullCountField = useClampedNumberInput(progress.gachaPullCount, toGachaPullCount, commitGachaPullCount);
+  // 必要メモピ・ピュアピの内訳や最大強化判定などの派生値を一括計算する。
+  const {
+    isPurePieceImplemented,
+    isStarAtMax,
+    isConnectRankAtMax,
+    isUe1AtMax,
+    isUe2AtMax,
+    ue1CompositeValue,
+    ue2Value,
+    starRemainingMemoryPiece,
+    connectRankRemainingMemoryPiece,
+    ue1RemainingMemoryPiece,
+    limitBreakRemainingMemoryPiece,
+    adjustedTotalRemainingMemoryPiece,
+    star6PurePieceNeed,
+    sameBasePurePieceUsed,
+    star6PurePieceSubtotal,
+    ue2PurePieceNeed,
+    ue2PurePieceSubtotal,
+    totalPurePieceNeeded,
+  } = computeRowDerived(character, progress, ownedPurePiece, ownedPurePieceByBase, {
+    includeSameBasePurePieceForUe2,
+    starMemoryCalcMode,
+    ue1MemoryCalcMode,
+  });
 
   const handleOwnedChange = useCallback(
     (checked: boolean | "indeterminate") => onUpdateProgress(character.name, { owned: checked === true }),
@@ -141,54 +100,6 @@ const TableRow = memo(function TableRow({
     (checked: boolean | "indeterminate") => onUpdateProgress(character.name, { adventureMemoryPieceTarget: checked === true }),
     [onUpdateProgress, character.name],
   );
-  const handleStarChange = useCallback(
-    (value: string) => onUpdateProgress(character.name, { star: Number(value) as CharacterProgress["star"] }),
-    [onUpdateProgress, character.name],
-  );
-  const handleUe1Change = useCallback(
-    (value: string) => {
-      if (value === "sp") {
-        onUpdateProgress(character.name, { ue1Level: 370, ue1SpEquipped: true });
-        return;
-      }
-      const nextValue = (value === "null" ? null : Number(value)) as CharacterProgress["ue1Level"];
-      onUpdateProgress(character.name, { ue1Level: nextValue, ue1SpEquipped: false });
-    },
-    [onUpdateProgress, character.name],
-  );
-  const handleConnectRankChange = useCallback(
-    (value: string) => onUpdateProgress(character.name, { connectRank: Number(value) as CharacterProgress["connectRank"] }),
-    [onUpdateProgress, character.name],
-  );
-  const handleUe2Change = useCallback(
-    (value: string) => {
-      const nextValue = (value === "null" ? null : Number(value)) as CharacterProgress["ue2Level"];
-      onUpdateProgress(character.name, { ue2Level: nextValue });
-    },
-    [onUpdateProgress, character.name],
-  );
-  const selectedObtainedDate = useMemo(() => parseStoredDate(progress.obtainedDate), [progress.obtainedDate]);
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const handleObtainedDateChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const nextValue = event.target.value.trim();
-      onUpdateProgress(character.name, { obtainedDate: nextValue ? nextValue : null });
-    },
-    [onUpdateProgress, character.name],
-  );
-  const handleObtainedDateSelect = useCallback(
-    (value: Date | undefined) => {
-      if (!value) {
-        return;
-      }
-      onUpdateProgress(character.name, { obtainedDate: toStoredDateString(value) });
-      setIsDatePickerOpen(false);
-    },
-    [onUpdateProgress, character.name],
-  );
-  const handleObtainedDateClear = useCallback(() => {
-    onUpdateProgress(character.name, { obtainedDate: null });
-  }, [onUpdateProgress, character.name]);
 
   return (
     <UiTableRow className="odd:[&>td]:bg-row-odd even:[&>td]:bg-row-even hover:[&>td]:bg-row-hover hover:[&>td]:border-row-hover-border">
@@ -215,58 +126,21 @@ const TableRow = memo(function TableRow({
         </label>
       </TableCell>
       <TableCell>
-        <TableSelect value={String(progress.star)} appearance={isStarAtMax ? "maxed" : "default"} onValueChange={handleStarChange}>
-          {Array.from({ length: starMax }, (_, index) => index + 1).map((star) => (
-            <SelectItem key={star} value={String(star)}>
-              {star}
-            </SelectItem>
-          ))}
-        </TableSelect>
+        <StarSelect character={character} star={progress.star} isAtMax={isStarAtMax} onUpdateProgress={onUpdateProgress} />
       </TableCell>
       <TableCell>
-        <TableSelect
-          value={String(progress.connectRank)}
-          appearance={isConnectRankAtMax ? "maxed" : "default"}
-          onValueChange={handleConnectRankChange}
-        >
-          <SelectItem value="0">未開放</SelectItem>
-          {Array.from({ length: 15 }, (_, index) => index + 1).map((rank) => (
-            <SelectItem key={rank} value={String(rank)}>
-              {rank}
-            </SelectItem>
-          ))}
-        </TableSelect>
+        <ConnectRankSelect
+          character={character}
+          connectRank={progress.connectRank}
+          isAtMax={isConnectRankAtMax}
+          onUpdateProgress={onUpdateProgress}
+        />
       </TableCell>
       <TableCell>
-        {character.implemented.ue1 ? (
-          <TableSelect value={ue1CompositeValue} appearance={isUe1AtMax ? "maxed" : "default"} onValueChange={handleUe1Change}>
-            {UE1_LEVEL_VALUES.map((level) => (
-              <SelectItem key={level} value={String(level)}>
-                {formatUeLevel(level)}
-              </SelectItem>
-            ))}
-            {character.implemented.ue1Sp ? <SelectItem value="sp">SP</SelectItem> : null}
-          </TableSelect>
-        ) : (
-          <TableSelect value="null" appearance="disabled" disabled>
-            <SelectItem value="null">-</SelectItem>
-          </TableSelect>
-        )}
+        <Ue1Select character={character} value={ue1CompositeValue} isAtMax={isUe1AtMax} onUpdateProgress={onUpdateProgress} />
       </TableCell>
       <TableCell>
-        {character.implemented.ue2 ? (
-          <TableSelect value={ue2Value} appearance={isUe2AtMax ? "maxed" : "default"} onValueChange={handleUe2Change}>
-            {UE2_LEVEL_VALUES.map((level) => (
-              <SelectItem key={level} value={String(level)}>
-                {formatUeLevel(level)}
-              </SelectItem>
-            ))}
-          </TableSelect>
-        ) : (
-          <TableSelect value="null" appearance="disabled" disabled>
-            <SelectItem value="null">-</SelectItem>
-          </TableSelect>
-        )}
+        <Ue2Select character={character} value={ue2Value} isAtMax={isUe2AtMax} onUpdateProgress={onUpdateProgress} />
       </TableCell>
       <TableCell className="text-center">
         <label className={`${tableSwitchClass} w-full justify-center`}>
@@ -278,92 +152,21 @@ const TableRow = memo(function TableRow({
         </label>
       </TableCell>
       <TableCell>
-        <TableNumberInput
-          type="number"
-          inputMode="numeric"
-          min={0}
-          step={1}
-          value={ownedMemoryPieceField.value}
-          aria-label={`${character.name}の所持メモピ数`}
-          onChange={ownedMemoryPieceField.onChange}
-          onBlur={ownedMemoryPieceField.onBlur}
-          onKeyDown={ownedMemoryPieceField.onKeyDown}
-        />
+        <OwnedMemoryPieceInput character={character} ownedMemoryPiece={progress.ownedMemoryPiece} onUpdateProgress={onUpdateProgress} />
       </TableCell>
       <TableCell>
-        {isPurePieceImplemented ? (
-          <TableNumberInput
-            type="number"
-            inputMode="numeric"
-            min={0}
-            max={99999}
-            step={1}
-            value={ownedPurePieceField.value}
-            aria-label={`${character.name}の所持ピュアピ数`}
-            onChange={ownedPurePieceField.onChange}
-            onBlur={ownedPurePieceField.onBlur}
-            onKeyDown={ownedPurePieceField.onKeyDown}
-          />
-        ) : (
-          <TableNumberInput
-            type="text"
-            value="-"
-            disabled
-            aria-label={`${character.name}の所持ピュアピ数（未実装）`}
-            className="text-left text-muted"
-          />
-        )}
+        <OwnedPurePieceInput
+          character={character}
+          ownedPurePiece={ownedPurePiece}
+          isImplemented={isPurePieceImplemented}
+          onUpdatePurePiece={onUpdatePurePiece}
+        />
       </TableCell>
       <TableCell className="text-center">
-        <Popover.Root open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-          <Popover.Trigger asChild>
-            <button
-              type="button"
-              aria-label={`${character.name}の入手日セル`}
-              className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-input-bg px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-            >
-              <span className="tabular-nums">{formatObtainedDate(progress.obtainedDate)}</span>
-              <span className="inline-flex items-center text-muted">
-                <CalendarIcon className="size-4" />
-              </span>
-            </button>
-          </Popover.Trigger>
-          <Popover.Portal>
-            <Popover.Content
-              side="bottom"
-              align="center"
-              className="z-50 rounded-[12px] border border-white/20 bg-popover-bg p-2 shadow-panel"
-            >
-              <Calendar mode="single" selected={selectedObtainedDate} onSelect={handleObtainedDateSelect} />
-              <div className="mt-1.5 flex justify-end">
-                <Button variant="ghost" size="sm" aria-label={`${character.name}の入手日クリア`} onClick={handleObtainedDateClear}>
-                  クリア
-                </Button>
-              </div>
-            </Popover.Content>
-          </Popover.Portal>
-        </Popover.Root>
-        <input
-          type="date"
-          value={progress.obtainedDate ?? ""}
-          aria-label={`${character.name}の入手日`}
-          className="sr-only"
-          onChange={handleObtainedDateChange}
-        />
+        <ObtainedDatePicker character={character} obtainedDate={progress.obtainedDate} onUpdateProgress={onUpdateProgress} />
       </TableCell>
       <TableCell className="border-r border-table-border">
-        <TableNumberInput
-          type="number"
-          inputMode="numeric"
-          min={0}
-          max={300}
-          step={1}
-          value={gachaPullCountField.value}
-          aria-label={`${character.name}のガチャ回数`}
-          onChange={gachaPullCountField.onChange}
-          onBlur={gachaPullCountField.onBlur}
-          onKeyDown={gachaPullCountField.onKeyDown}
-        />
+        <GachaPullCountInput character={character} gachaPullCount={progress.gachaPullCount} onUpdateProgress={onUpdateProgress} />
       </TableCell>
       <TableCell>
         <TooltipProvider>
@@ -586,7 +389,7 @@ export const InputProgressTable = memo(function InputProgressTable({
         style={{ left: stickyShadowLeft }}
       />
       <div ref={scrollParentRef} className={tableWrapClass}>
-        <Table className="table-fixed">
+        <Table className="min-w-[1280px] table-fixed">
         <colgroup>
           <col className="w-20" />
           <col className="w-[200px]" />
