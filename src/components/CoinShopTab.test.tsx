@@ -29,13 +29,14 @@ describe("CoinShopTab", () => {
     expect(dungeonTab).toHaveAttribute("data-state", "active");
   });
 
-  it("キャラ名が4列グリッドで配置される", () => {
+  it("キャラ名がモバイル2列・デスクトップ4列のグリッドで配置される", () => {
     render(<CoinShopTab />);
 
     const firstCharCell = screen.getByText(coinShopData.dungeon_coin[0]);
     const grid = firstCharCell.parentElement;
     expect(grid).not.toBeNull();
-    expect((grid as HTMLElement).className).toContain("grid-cols-4");
+    expect((grid as HTMLElement).className).toContain("grid-cols-2");
+    expect((grid as HTMLElement).className).toContain("md:grid-cols-4");
   });
 
   it("表示中のタブパネル内にキャラ名セルが正しい数だけ存在する", () => {
