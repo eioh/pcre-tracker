@@ -34,8 +34,10 @@ import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { PenLine, LayoutDashboard, Coins, Calculator, Download, Upload, RotateCcw, Swords } from "lucide-react";
 import { SyncHeader } from "./components/SyncHeader";
+import { MobileHeader } from "./components/MobileHeader";
 import { PrivacyPolicyPage } from "./components/PrivacyPolicyPage";
 import { useSync } from "./hooks/useSync";
+import { useIsMobile } from "./hooks/useIsMobile";
 import { clearSyncMeta } from "./domain/syncMeta";
 
 const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
@@ -88,6 +90,8 @@ export default function App() {
   const [hasOpenedInput, setHasOpenedInput] = useState(() => uiState.activeTab === "input");
   // 現在のパス名（SPA フォールバックでの簡易ルーティング用。設計判断 1）。
   const [pathname, setPathname] = useState(() => window.location.pathname);
+  // 768px 未満ではコンパクトヘッダー（MobileHeader）へ切り替える。
+  const isMobile = useIsMobile();
 
   // ブラウザの戻る/進む操作でパス名の state を追随させる。
   useEffect(() => {
@@ -216,6 +220,11 @@ export default function App() {
     sync.notifyLocalChange();
   }, [sync]);
 
+  // 保存データ初期化の確認ダイアログを開く（MobileHeader のメニュー項目から呼ぶ）。
+  const handleRequestReset = useCallback(() => {
+    setIsResetDialogOpen(true);
+  }, []);
+
   // 結果メッセージを閉じ、必要なら画面を再読み込みする。
   const handleCloseMessageDialog = useCallback(() => {
     const shouldReload = messageDialog?.reloadOnClose ?? false;
@@ -306,6 +315,22 @@ export default function App() {
 
   return (
     <div className="mx-auto w-full max-w-[1400px] px-5 pb-9 pt-7">
+      {/* 768px 未満はコンパクトヘッダー+メニューシート、それ以上は従来ヘッダー（無改変）を描画する。 */}
+      {isMobile ? (
+        <MobileHeader
+          isLoggedIn={sync.isLoggedIn}
+          isSessionPending={sync.isSessionPending}
+          userLabel={sync.userLabel}
+          status={sync.status}
+          onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
+          onDeleteRequestStart={sync.stopSync}
+          onBeforeAccountDeleted={handleBeforeAccountDeleted}
+          updatedAt={state.updatedAt ? formatUpdatedAt(state.updatedAt) : "-"}
+          onExportBackup={handleExportBackup}
+          onSelectImportFile={handleSelectImportFile}
+          onRequestReset={handleRequestReset}
+        />
+      ) : (
       <header className="mb-5 flex flex-col items-start justify-between gap-6 lg:flex-row">
         <div>
           <p className="m-0 font-orbitron text-xs tracking-[0.12em] text-accent">Princess Connect! Re:Dive</p>
@@ -347,6 +372,7 @@ export default function App() {
           <p className="m-0 text-sm text-muted">最終更新: {state.updatedAt ? formatUpdatedAt(state.updatedAt) : "-"}</p>
         </div>
       </header>
+      )}
 
       <Tabs
         value={safeUiState.activeTab}

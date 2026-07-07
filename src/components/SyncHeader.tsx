@@ -36,7 +36,7 @@ type Props = {
 type DeleteResult = "success" | "session_expired" | "error";
 
 // 同期ステータスを日本語テキストへ変換する。
-function formatSyncStatus(status: SyncStatus): { text: string; tone: "muted" | "accent" | "danger" } {
+export function formatSyncStatus(status: SyncStatus): { text: string; tone: "muted" | "accent" | "danger" } {
   switch (status) {
     case "loading":
       return { text: "確認中...", tone: "muted" };
