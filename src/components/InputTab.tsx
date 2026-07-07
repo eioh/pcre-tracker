@@ -1,4 +1,4 @@
-import { ChevronDown, Search } from "lucide-react";
+import { ChevronDown, Search, SlidersHorizontal } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type { CharacterProgress, MasterCharacter, StoredStateV1 } from "../domain/types";
 import type {
@@ -19,6 +19,8 @@ import type { Ue1HeartFragmentCalcMode } from "../utils/ue1HeartFragmentCost";
 import type { Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../utils/starMemoryCost";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { cn } from "../lib/utils";
+import { InputFilterSheet } from "./input/InputFilterSheet";
 import { InputFilters } from "./input/InputFilters";
 import { InputMemoryCalcSettings } from "./input/InputMemoryCalcSettings";
 import { InputProgressList } from "./input/InputProgressList";
@@ -83,6 +85,32 @@ function buildAppliedDisplaySettings(settings: InputViewSettings): AppliedDispla
   };
 }
 
+type QuickFilterChipProps = {
+  // チップに表示するラベル。
+  label: string;
+  // 選択中かどうか（選択中は強調表示する）。
+  selected: boolean;
+  // タップ時のトグル処理。
+  onClick: () => void;
+};
+
+// モバイルの sticky バーに並べるクイックフィルタチップ。タップでフィルタをトグルする。
+function QuickFilterChip({ label, selected, onClick }: QuickFilterChipProps) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      className={cn(
+        "shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+        selected ? "border-accent/60 bg-accent/15 text-accent" : "border-white/20 bg-white/5 text-muted",
+      )}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  );
+}
+
 // 育成入力画面の状態管理と各 UI コンポーネントの合成を行う。
 export function InputTab({
   masterCharacters,
@@ -128,6 +156,8 @@ export function InputTab({
   const [appliedProgressByName, setAppliedProgressByName] = useState<Record<string, CharacterProgress>>(() => ({
     ...state.progressByName,
   }));
+  // モバイルのフィルタシートの開閉状態（永続化しないローカル state）。
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
   useEffect(() => {
     // 検索入力の連続更新中は反映を遅らせ、全件フィルタ計算の頻度を抑える。
@@ -266,20 +296,22 @@ export function InputTab({
     return nextTotals;
   }, [masterCharacters, state.purePieceByCharacterName]);
 
-  // 詳細設定を閉じた状態でも絞り込み中だと分かるよう、表示件数に影響する詳細フィルタだけを判定する。
-  const hasActiveDetailFilter = useMemo(
-    () =>
-      appliedDisplaySettings.ownedFilter !== "all" ||
-      appliedDisplaySettings.limitedFilter !== "all" ||
-      appliedDisplaySettings.limitBreakFilter !== "all" ||
-      appliedDisplaySettings.adventureMemoryPieceFilter !== "all" ||
-      appliedDisplaySettings.purePieceAvailabilityFilter !== "all" ||
-      appliedDisplaySettings.starFilters.length > 0 ||
-      appliedDisplaySettings.ue1Filters.length > 0 ||
-      appliedDisplaySettings.ue2Filters.length > 0 ||
+  // 詳細設定を閉じた状態でも絞り込み中だと分かるよう、表示件数に影響する詳細フィルタの適用数を数える。
+  // デスクトップは「count > 0」でバッジ表示（従来の boolean 判定と等価）、モバイルはフィルタボタンに件数を表示する。
+  const activeDetailFilterCount = useMemo(() => {
+    const activeFlags = [
+      appliedDisplaySettings.ownedFilter !== "all",
+      appliedDisplaySettings.limitedFilter !== "all",
+      appliedDisplaySettings.limitBreakFilter !== "all",
+      appliedDisplaySettings.adventureMemoryPieceFilter !== "all",
+      appliedDisplaySettings.purePieceAvailabilityFilter !== "all",
+      appliedDisplaySettings.starFilters.length > 0,
+      appliedDisplaySettings.ue1Filters.length > 0,
+      appliedDisplaySettings.ue2Filters.length > 0,
       appliedDisplaySettings.memorySourceFilters.length > 0,
-    [appliedDisplaySettings],
-  );
+    ];
+    return activeFlags.filter(Boolean).length;
+  }, [appliedDisplaySettings]);
 
   useEffect(() => {
     // 親からの明示同期トリガー時のみ、入力画面のローカル設定を外部値へ合わせる。
@@ -326,7 +358,52 @@ export function InputTab({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- onSettingsChange は親側で安定参照(useCallback)を前提に意図的に依存配列から除外する。
   }, [currentSettings]);
 
-  // 詳細設定セクション。モバイル・デスクトップ共通で使う（ステップ3でモバイルはフィルタシートへ置換予定）。
+  // フィルタ・ソート・計算モードの設定 UI（配線済み）。
+  // デスクトップは詳細設定パネル、モバイルはフィルタシートへ同じものを埋め込む（どちらか一方のみレンダリング）。
+  const filterSettingsContent = (
+    <>
+      <InputFilters
+        ownedFilter={ownedFilter}
+        onOwnedFilterChange={setOwnedFilter}
+        limitedFilter={limitedFilter}
+        onLimitedFilterChange={setLimitedFilter}
+        limitBreakFilter={limitBreakFilter}
+        onLimitBreakFilterChange={setLimitBreakFilter}
+        adventureMemoryPieceFilter={adventureMemoryPieceFilter}
+        onAdventureMemoryPieceFilterChange={setAdventureMemoryPieceFilter}
+        purePieceAvailabilityFilter={purePieceAvailabilityFilter}
+        onPurePieceAvailabilityFilterChange={setPurePieceAvailabilityFilter}
+        starFilters={starFilters}
+        setStarFilters={setStarFilters}
+        ue1Filters={ue1Filters}
+        setUe1Filters={setUe1Filters}
+        ue2Filters={ue2Filters}
+        setUe2Filters={setUe2Filters}
+        memorySourceFilters={memorySourceFilters}
+        setMemorySourceFilters={setMemorySourceFilters}
+        sortKey={sortKey}
+        onSortKeyChange={handleSortKeyChange}
+        sortDirection={sortDirection}
+        onSortDirectionChange={setSortDirection}
+        onApplyDisplaySettings={handleApplyDisplaySettings}
+      />
+
+      <Separator className="mt-4" label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
+
+      <InputMemoryCalcSettings
+        starMemoryCalcMode={starMemoryCalcMode}
+        onStarMemoryCalcModeChange={setStarMemoryCalcMode}
+        ue1MemoryCalcMode={ue1MemoryCalcMode}
+        onUe1MemoryCalcModeChange={setUe1MemoryCalcMode}
+        ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
+        onUe1HeartFragmentCalcModeChange={setUe1HeartFragmentCalcMode}
+        includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
+        onIncludeSameBasePurePieceForUe2Change={setIncludeSameBasePurePieceForUe2}
+      />
+    </>
+  );
+
+  // 詳細設定セクション（デスクトップ専用。モバイルではフィルタシートに置き換えるためレンダリングしない）。
   const detailSettingsSection = (
     <section className={`${panelClass} mb-4`}>
         <div className={`flex flex-wrap items-center gap-2 ${isDetailSettingsOpen ? "mb-3" : ""}`}>
@@ -340,7 +417,7 @@ export function InputTab({
             <span>詳細設定</span>
             <ChevronDown className={`size-4 shrink-0 transition-transform ${isDetailSettingsOpen ? "rotate-180" : ""}`} />
           </button>
-          {!isDetailSettingsOpen && hasActiveDetailFilter ? (
+          {!isDetailSettingsOpen && activeDetailFilterCount > 0 ? (
             <Badge className="border-accent/40 bg-accent/10 text-accent">フィルタ適用中</Badge>
           ) : null}
         </div>
@@ -353,59 +430,18 @@ export function InputTab({
               isDetailSettingsVisible ? "max-h-[1200px] opacity-100" : "max-h-0 opacity-0"
             }`}
           >
-            <div className="pt-1">
-              <InputFilters
-                ownedFilter={ownedFilter}
-                onOwnedFilterChange={setOwnedFilter}
-                limitedFilter={limitedFilter}
-                onLimitedFilterChange={setLimitedFilter}
-                limitBreakFilter={limitBreakFilter}
-                onLimitBreakFilterChange={setLimitBreakFilter}
-                adventureMemoryPieceFilter={adventureMemoryPieceFilter}
-                onAdventureMemoryPieceFilterChange={setAdventureMemoryPieceFilter}
-                purePieceAvailabilityFilter={purePieceAvailabilityFilter}
-                onPurePieceAvailabilityFilterChange={setPurePieceAvailabilityFilter}
-                starFilters={starFilters}
-                setStarFilters={setStarFilters}
-                ue1Filters={ue1Filters}
-                setUe1Filters={setUe1Filters}
-                ue2Filters={ue2Filters}
-                setUe2Filters={setUe2Filters}
-                memorySourceFilters={memorySourceFilters}
-                setMemorySourceFilters={setMemorySourceFilters}
-                sortKey={sortKey}
-                onSortKeyChange={handleSortKeyChange}
-                sortDirection={sortDirection}
-                onSortDirectionChange={setSortDirection}
-                onApplyDisplaySettings={handleApplyDisplaySettings}
-              />
-
-              <Separator className="mt-4" label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
-
-              <InputMemoryCalcSettings
-                starMemoryCalcMode={starMemoryCalcMode}
-                onStarMemoryCalcModeChange={setStarMemoryCalcMode}
-                ue1MemoryCalcMode={ue1MemoryCalcMode}
-                onUe1MemoryCalcModeChange={setUe1MemoryCalcMode}
-                ue1HeartFragmentCalcMode={ue1HeartFragmentCalcMode}
-                onUe1HeartFragmentCalcModeChange={setUe1HeartFragmentCalcMode}
-                includeSameBasePurePieceForUe2={includeSameBasePurePieceForUe2}
-                onIncludeSameBasePurePieceForUe2Change={setIncludeSameBasePurePieceForUe2}
-              />
-            </div>
+            <div className="pt-1">{filterSettingsContent}</div>
           </div>
         ) : null}
       </section>
   );
 
   if (isMobile) {
-    // モバイル（768px 未満）: 検索バーを画面上部へ固定し、一覧は window スクロールに一本化する。
+    // モバイル（768px 未満）: 検索バー+クイックフィルタチップを画面上部へ固定し、一覧は window スクロールに一本化する。
+    // 詳細なフィルタ・表示設定は詳細設定パネルの代わりにボトムシート（InputFilterSheet）へ集約する。
     // パネル枠を使わないのは、sticky バーの上に padding の隙間から行が透けるのを防ぐため。
-    // sticky バーは詳細設定のアニメーション用ラッパー（overflow-hidden）の外に置くこと。
     return (
       <>
-        {detailSettingsSection}
-
         <div className="sticky top-0 z-10 bg-bg-end py-2.5">
           <div className="flex items-center gap-2">
             <div className="relative w-full">
@@ -431,9 +467,43 @@ export function InputTab({
               リセット
             </Button>
           </div>
+
+          <div className="mt-2 flex items-center gap-2">
+            {/* チップ行は将来の項目追加に備えて横スクロール可能にする（表示件数とフィルタボタンは右端に固定） */}
+            <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
+              <QuickFilterChip
+                label="所持のみ"
+                selected={ownedFilter === "owned"}
+                onClick={() => setOwnedFilter((previous) => (previous === "owned" ? "all" : "owned"))}
+              />
+              <QuickFilterChip
+                label="未所持のみ"
+                selected={ownedFilter === "unowned"}
+                onClick={() => setOwnedFilter((previous) => (previous === "unowned" ? "all" : "unowned"))}
+              />
+            </div>
+            <span className="shrink-0 text-xs whitespace-nowrap text-muted">
+              表示件数: {visibleRowsWithCurrentProgress.length}
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="shrink-0"
+              onClick={() => setIsFilterSheetOpen(true)}
+            >
+              <SlidersHorizontal className="size-4" aria-hidden="true" />
+              フィルタ
+              {activeDetailFilterCount > 0 ? (
+                <Badge className="border-accent/40 bg-accent/10 px-1.5 text-accent">{activeDetailFilterCount}</Badge>
+              ) : null}
+            </Button>
+          </div>
         </div>
 
-        <p className="mb-2.5 mt-1.5 text-sm text-muted">表示件数: {visibleRowsWithCurrentProgress.length}</p>
+        <InputFilterSheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
+          {filterSettingsContent}
+        </InputFilterSheet>
 
         <InputProgressList
           visibleRows={visibleRowsWithCurrentProgress}

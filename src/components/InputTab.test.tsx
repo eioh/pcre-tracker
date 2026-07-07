@@ -283,4 +283,120 @@ describe("InputTab", () => {
       vi.unstubAllGlobals();
     }
   });
+
+  it("モバイル幅ではフィルタボタンのタップでフィルタシートが開き詳細設定パネルは出さない", () => {
+    stubMobileMatchMedia();
+    try {
+      const props = buildProps();
+      render(<InputTab {...props} />);
+
+      // モバイルでは詳細設定パネル（開閉ボタン）をレンダリングしない。
+      expect(screen.queryByRole("button", { name: "詳細設定" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("button", { name: "フィルタ" }));
+
+      expect(screen.getByRole("dialog", { name: "絞り込みと表示設定" })).toBeInTheDocument();
+      // シート内にフィルタと計算モードの両設定が表示される。
+      expect(screen.getByText("必要メモピ/ハートの欠片計算")).toBeInTheDocument();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("モバイル幅では所持のみチップのタップで絞り込みと再タップ解除ができる", () => {
+    stubMobileMatchMedia();
+    try {
+      const props = buildProps();
+      const [ownedCharacter] = props.masterCharacters;
+      expect(ownedCharacter).toBeDefined();
+      const ownedByName = Object.fromEntries(props.masterCharacters.map((character) => [character.name, false]));
+      const state = buildStateWithOwnedFlags(props.state, { ...ownedByName, [ownedCharacter?.name ?? ""]: true });
+      render(<InputTab {...props} state={state} />);
+
+      expect(screen.getByText("表示件数: 5")).toBeInTheDocument();
+
+      const ownedChip = screen.getByRole("button", { name: "所持のみ" });
+      fireEvent.click(ownedChip);
+
+      expect(ownedChip).toHaveAttribute("aria-pressed", "true");
+      expect(screen.getByText("表示件数: 1")).toBeInTheDocument();
+
+      fireEvent.click(ownedChip);
+
+      expect(ownedChip).toHaveAttribute("aria-pressed", "false");
+      expect(screen.getByText("表示件数: 5")).toBeInTheDocument();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("モバイル幅では所持のみと未所持のみチップが相互排他で切り替わる", () => {
+    stubMobileMatchMedia();
+    try {
+      const props = buildProps();
+      const [ownedCharacter] = props.masterCharacters;
+      expect(ownedCharacter).toBeDefined();
+      const ownedByName = Object.fromEntries(props.masterCharacters.map((character) => [character.name, false]));
+      const state = buildStateWithOwnedFlags(props.state, { ...ownedByName, [ownedCharacter?.name ?? ""]: true });
+      render(<InputTab {...props} state={state} />);
+
+      const ownedChip = screen.getByRole("button", { name: "所持のみ" });
+      const unownedChip = screen.getByRole("button", { name: "未所持のみ" });
+
+      fireEvent.click(ownedChip);
+      expect(ownedChip).toHaveAttribute("aria-pressed", "true");
+
+      fireEvent.click(unownedChip);
+
+      expect(unownedChip).toHaveAttribute("aria-pressed", "true");
+      expect(ownedChip).toHaveAttribute("aria-pressed", "false");
+      expect(screen.getByText("表示件数: 4")).toBeInTheDocument();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("モバイル幅ではフィルタ適用数がフィルタボタンのバッジへ表示される", () => {
+    stubMobileMatchMedia();
+    try {
+      const props = buildProps();
+      const initialSettings = {
+        ...props.initialSettings,
+        ownedFilter: "owned" as const,
+        limitedFilter: "limited" as const,
+      };
+      render(<InputTab {...props} initialSettings={initialSettings} />);
+
+      const filterButton = screen.getByRole("button", { name: /フィルタ/ });
+      expect(within(filterButton).getByText("2")).toBeInTheDocument();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("モバイル幅ではシート内リセットでフィルタ適用バッジが消える", () => {
+    stubMobileMatchMedia();
+    try {
+      const props = buildProps();
+      const initialSettings = { ...props.initialSettings, ownedFilter: "owned" as const };
+      render(<InputTab {...props} initialSettings={initialSettings} />);
+
+      const filterButton = screen.getByRole("button", { name: /フィルタ/ });
+      const ownedChip = screen.getByRole("button", { name: "所持のみ" });
+      expect(within(filterButton).getByText("1")).toBeInTheDocument();
+      // チップとシート内 Select は同一 state のため、初期設定の所持フィルタがチップにも反映される。
+      expect(ownedChip).toHaveAttribute("aria-pressed", "true");
+
+      fireEvent.click(filterButton);
+      const dialog = screen.getByRole("dialog", { name: "絞り込みと表示設定" });
+      fireEvent.click(within(dialog).getByRole("button", { name: "リセット" }));
+
+      // シート表示中は外側が aria-hidden になるため、保持済みの要素参照で属性を検証する。
+      expect(within(filterButton).queryByText("1")).not.toBeInTheDocument();
+      expect(ownedChip).toHaveAttribute("aria-pressed", "false");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });
