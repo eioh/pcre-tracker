@@ -15,6 +15,7 @@ import {
   type ConnectRankMaterialCost,
 } from "../utils/connectRankMaterialCost";
 import { isCharacterNameMatched } from "../utils/nameSearch";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
@@ -33,6 +34,8 @@ type Props = {
 
 // コネクトランク計算タブのメインコンポーネント。
 export function ConnectRankCalcTab({ masterCharacters, state, resetToken, onStateSaved }: Props) {
+  // モバイル判定。テーブルとカードリストで DOM 構造が変わるため useIsMobile で分岐する（構造分岐の規約）。
+  const isMobile = useIsMobile();
   const [calcState, setCalcState] = useState<ConnectRankCalcStateV1>(() => loadConnectRankCalcState());
 
   // ユーザー操作による保存とマウント直後の初回保存を区別するため、初回実行済みフラグを保持する。
@@ -145,10 +148,28 @@ export function ConnectRankCalcTab({ masterCharacters, state, resetToken, onStat
       {/* キャラ追加エリア */}
       <CharacterCombobox candidates={availableCharacters} onSelect={handleAddCharacter} resetToken={resetToken} />
 
-      {/* テーブル or 空状態 */}
+      {/* テーブル（デスクトップ）/ カードリスト（モバイル）/ 空状態 */}
       {calcState.entries.length === 0 ? (
         <div className="flex min-h-[120px] items-center justify-center">
           <p className="text-sm text-muted">キャラクターを追加して素材を計算できます</p>
+        </div>
+      ) : isMobile ? (
+        <div className="grid gap-2">
+          {/* 合計素材カード。テーブルの集計行（TableFooter）と同じ合計値を先頭に常時表示する。 */}
+          <TotalCostCard totalCost={totalCost} />
+          {calcState.entries.map((entry, index) => (
+            <CalcCard
+              key={entry.characterName}
+              entry={entry}
+              index={index}
+              entryCount={calcState.entries.length}
+              progress={state.progressByName[entry.characterName]}
+              cost={rowCosts[entry.characterName] ?? createEmptyCost()}
+              onTargetRankChange={handleTargetRankChange}
+              onMove={handleMove}
+              onRemove={handleRemove}
+            />
+          ))}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-[8px] border border-table-wrap-border bg-table-wrap-bg">
@@ -465,5 +486,160 @@ function CalcRow({
         </Button>
       </TableCell>
     </TableRow>
+  );
+}
+
+// モバイルカードの素材チップの表示順とラベル。テーブルの列順（アーツ〜ゴールド）と一致させる。
+const MATERIAL_FIELDS: { key: keyof ConnectRankMaterialCost; label: string }[] = [
+  { key: "arts", label: "アーツ" },
+  { key: "soul", label: "ソウル" },
+  { key: "guard", label: "ガード" },
+  { key: "bronzeRegalia", label: "ブロンズ" },
+  { key: "silverRegalia", label: "シルバー" },
+  { key: "goldRegalia", label: "ゴールド" },
+];
+
+// 素材6種を3列×2行のラベル付きチップで表示する。
+function MaterialChipGrid({ cost }: { cost: ConnectRankMaterialCost }) {
+  return (
+    <div className="grid grid-cols-3 gap-1.5">
+      {MATERIAL_FIELDS.map(({ key, label }) => (
+        <div
+          key={key}
+          className={cn(
+            "flex min-w-0 items-center justify-between gap-1 rounded-md bg-white/5 px-2 py-1.5 text-xs",
+            // 0個の素材は薄く表示して情報密度を調整する。
+            cost[key] === 0 && "opacity-50",
+          )}
+        >
+          <span className="truncate text-muted">{label}</span>
+          <span className="font-semibold tabular-nums text-main">{cost[key]}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// モバイル用の合計素材カード。テーブルの集計行（TableFooter）に相当する合計値を表示する。
+function TotalCostCard({ totalCost }: { totalCost: ConnectRankMaterialCost }) {
+  return (
+    <article className="grid gap-2 rounded-[8px] border border-table-wrap-border bg-table-wrap-bg p-3">
+      <p className="m-0 text-sm font-semibold text-main">集計</p>
+      <MaterialChipGrid cost={totalCost} />
+    </article>
+  );
+}
+
+// モバイル用のキャラカード。テーブル1行（CalcRow）と同じ表示値・操作を1枚のカードにまとめる。
+function CalcCard({
+  entry,
+  index,
+  entryCount,
+  progress,
+  cost,
+  onTargetRankChange,
+  onMove,
+  onRemove,
+}: {
+  entry: ConnectRankCalcEntry;
+  index: number;
+  entryCount: number;
+  progress: CharacterProgress | undefined;
+  cost: ConnectRankMaterialCost;
+  onTargetRankChange: (name: string, targetRank: number) => void;
+  onMove: (name: string, direction: "up" | "down") => void;
+  onRemove: (name: string) => void;
+}) {
+  const currentRank = progress?.connectRank ?? 0;
+  const isOverTarget = currentRank >= entry.targetRank;
+
+  // 目標ランクの選択肢を生成する（CalcRow と同一ロジック）。
+  const targetRankOptions = useMemo(() => {
+    const options: number[] = [];
+    for (let rank = currentRank + 1; rank <= CONNECT_RANK_MAX; rank++) {
+      options.push(rank);
+    }
+    return options;
+  }, [currentRank]);
+
+  return (
+    <article className="grid gap-2 rounded-[8px] border border-table-wrap-border bg-table-wrap-bg p-3">
+      {/* 1段目: キャラ名 + 差分警告アイコン + 削除ボタン */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <span className="truncate text-sm font-semibold text-main">{entry.characterName}</span>
+          {isOverTarget && (
+            <AlertTriangle className="size-4 shrink-0 text-yellow-400" aria-label="現在ランクが目標以上です" />
+          )}
+        </div>
+        {/* min-h-11 / min-w-11（44px）でタップ領域を確保する。 */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="min-h-11 min-w-11 shrink-0"
+          onClick={() => onRemove(entry.characterName)}
+          aria-label={`${entry.characterName}を削除`}
+        >
+          <Trash2 className="size-4" aria-hidden="true" />
+        </Button>
+      </div>
+
+      {/* 2段目: 現在ランク → 目標ランク Select */}
+      <div className="flex items-center gap-2 text-sm text-main">
+        <span>現在 {currentRank}</span>
+        <span className="text-muted" aria-hidden="true">
+          →
+        </span>
+        <span>目標</span>
+        {currentRank >= CONNECT_RANK_MAX ? (
+          <span className="text-muted">{CONNECT_RANK_MAX}</span>
+        ) : (
+          <Select
+            value={String(entry.targetRank)}
+            onValueChange={(value) => onTargetRankChange(entry.characterName, Number(value))}
+          >
+            <SelectTrigger className="w-[80px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {targetRankOptions.map((rank) => (
+                <SelectItem key={rank} value={String(rank)}>
+                  {rank}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+
+      {/* 3段目: 素材チップ（3列×2行）+ ▲▼移動ボタン */}
+      <div className="flex items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <MaterialChipGrid cost={cost} />
+        </div>
+        <div className="flex shrink-0 flex-col">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="min-h-11 min-w-11"
+            disabled={index === 0}
+            onClick={() => onMove(entry.characterName, "up")}
+            aria-label={`${entry.characterName}を上に移動`}
+          >
+            <ChevronUp className="size-4" aria-hidden="true" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="min-h-11 min-w-11"
+            disabled={index === entryCount - 1}
+            onClick={() => onMove(entry.characterName, "down")}
+            aria-label={`${entry.characterName}を下に移動`}
+          >
+            <ChevronDown className="size-4" aria-hidden="true" />
+          </Button>
+        </div>
+      </div>
+    </article>
   );
 }

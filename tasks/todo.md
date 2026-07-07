@@ -1,112 +1,119 @@
-# スマホ UI フェーズ3: 磨き込み 実装計画
+# スマホ UI フェーズ4: 他タブのモバイル調整 実装計画
 
-フェーズ0〜2(モバイル一覧+編集シート、骨格再設計、入力高速化)は PR #4 で develop にマージ済み。作業ブランチ: `feature/mobile-polish`(develop 最新から分岐)。
+フェーズ0〜3(育成入力のスマホ対応、PR #4/#5)は develop にマージ済み。作業ブランチ: `feature/mobile-other-tabs`。
 
 ## 背景・ゴール
 
-残る磨き込み3点(いずれも 768px 未満のみ。デスクトップ不変):
-1. 所持チェックボックスが 16px+実効ヒット幅約28px で WCAG 推奨(44px)未満。行タップ(シートを開く)との境界も視覚的に不明
-2. 一覧行(64px 1行)の右側に「☆・RANK・必要メモピ・シェブロン」が text-muted で密集し読みづらい
-3. タブが上部の横スクロールで、モバイルの定石(下部固定ナビ、親指到達圏)から外れる
+残る4タブ(集計/クラバト編成/ショップ/ランク計算)の 375px での問題を解消する。方針: 「375px で壊れない・主要操作ができる」を優先し、過剰な再設計はしない。デスクトップ(768px 以上)は一切不変。
 
-## 前提(コード調査で確認済みの事実)
+## 問題一覧(コード裏取り+375px 実測の両方で確認済み)
 
-- 一覧行の固定高前提は `InputProgressList.tsx` の `h-16`(L79)と `estimateSize: () => 64`(L135)の2箇所のみ(measureElement 不使用)。行高変更はこの2値の同時変更で完結
-- `TableCheckbox` は `cn("h-4 w-4", className)` の薄いラッパーで、twMerge により呼び出し側 `size-6` が後勝ちで確実に上書き可能。デスクトップテーブル・編集シートは className を渡していないため 16px のまま
-- `activeTab` は `uiState.activeTab` として uiStorage で永続化済み(スキーマ変更不要)。Tabs は controlled で、`onValueChange` 内の `hasOpenedInput`(forceMount 制御)は Trigger が Radix である限り無変更で済む
-- `TabsList`(ui/tabs.tsx)は **CoinShopTab 内のコインタブでも使用** → ui/tabs.tsx のデフォルトスタイル変更は不可(巻き添え)
-- シート類は全て z-50、sticky 検索バーは z-10
-- **index.html の viewport meta に `viewport-fit=cover` が無い**ため、iOS では `env(safe-area-inset-*)` が常に 0(既存シートの pb は実質無効だった)。下部固定ナビには cover 追加が本命
-- テスト: 一覧行系テストは role/テキスト参照のみでレイアウト変更に不感。App.test.tsx にモバイル matchMedia スタブのパターン確立済み
+| タブ | 問題 | 場所 | 深刻度 |
+|---|---|---|---|
+| 集計 | ガチャ回数チャートが `min-w-[720px]` + `<BarChart width={720}>` の**固定 px**(CSS だけでは直らない)。縦スクロール箱(`max-h-[520px] overflow-y-auto`)の中に約2.4画面分の横スクロールが入れ子。実測: 720px/コンテナ301px | gacha-pull-chart.tsx:57-60 | 高 |
+| 集計 | YAxis のキャラ名幅 96px が 375px では 1/4 超を占有 | 同 :74-82 | 中(同時解決) |
+| クラバト | **メンバー並び替えが HTML5 `draggable` のみ → iOS Safari / Android Chrome では drag イベントが発火せずタッチで並び替え不能**(確定)。案内文「ドラッグで並び替えできます」も不正確に | ClanBattleTab.tsx:526-529, 535, 476 | 高 |
+| クラバト | メンバーカードが lg 未満で1列スタック、1人約400px×5人で縦に冗長 | 同 :530-663 | 中 |
+| クラバト | ゴミ箱系ボタンが ghost/sm(実効約28px)でタップターゲット不足 | 同 :391-399, 654-662 | 中 |
+| ショップ | キャラグリッドが全幅 `grid-cols-4`。375px では1セル約75px=全角3文字/行で長名が4段折返し | CoinShopTab.tsx:31 | 高(修正は1行) |
+| ランク計算 | 11列テーブルが `min-w-[900px]`。主目的の素材列・集計行がスクロールしないと見えない。実測: 900px/コンテナ333px | ConnectRankCalcTab.tsx:154-201 | 高 |
+| ランク計算 | 行の上下移動・削除ボタンが約28px | 同 :442-465 | 中(カード化で同時解決) |
+
+問題なしを確認: StatCard グリッド・分布チャート(ResponsiveContainer)・年 Select、クラバトのサイドバー/TimelineModal/TL textarea、ショップのコインタブ(横スクロールで操作成立)、ランク計算のコンボボックス(320px は 375px に収まる)。**Radix Tooltip はこの4タブでは未使用**(hover 依存調査はクローズ。チャートの recharts ツールチップはタップで出る想定、要実機確認)。
 
 ## 設計判断(確定)
 
-1. **チェックボックス拡大は呼び出し側 className 上書き**(`<TableCheckbox className="size-6 [&_svg]:size-4" />`)。ui/ 無改変=デスクトップ構造的に不変。ヒット領域はラベル側で確保: `min-w-11`(44px)+ `justify-center` + **`border-r border-white/10` の縦罫線で「左=チェック / 右=行タップ」の境界を可視化**
-2. **行レイアウトは3段スタック**(タグ行 0.72rem / 名前 font-bold / サマリー行)。サマリー行は左寄せで `☆n`・`RANK n` は text-xs text-muted、`必要 n` は **text-sm font-bold text-main に格上げ**。シェブロンは右端縦センター維持。行高は **80px**(`h-20` + `LIST_ROW_HEIGHT_PX = 80` 定数化、両側に相互参照コメント)。タグ+名前を1行に連結する案は長名キャラで truncate 頻発のため不採用。ファーストビュー9行→約7行のトレードオフは可読性優先で許容(窮屈なら 72px へ微調整の余地)
-3. **下部ナビは Tabs Root 内にモバイル専用の `TabsPrimitive.List` を条件レンダリング**(`src/components/MobileBottomNav.tsx` 新設、ui/ でなく components/ 直下)。Radix の value/onValueChange・forceMount・hasOpenedInput の経路は完全無変更、tablist/tab の a11y も自動。CSS レスポンシブ化(TabsList の max-md:fixed)はコインタブ巻き添えのため不可、Radix と独立した BottomNav は状態配線の二重化のため不可
-   - スタイル: `fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-white/15 bg-bg-end pb-[env(safe-area-inset-bottom)]`。各 Trigger は `h-14 flex-col`(56px≥44px)+アイコン size-5+ラベル text-[10px]。アクティブは **色+font-bold のみ**(インジケータバーなし)
-   - **z-index 設計**: ナビ z-40 < シート/オーバーレイ z-50 → シート表示中はシートが最前面(要件)
-   - コンテンツ下部 padding: App ルート div を `isMobile` 時 `pb-[calc(3.5rem+env(safe-area-inset-bottom)+1rem)]` に(フッターのポリシーリンクがナビに隠れない)
-   - `index.html` に `viewport-fit=cover` 追加(env() が実値を返すようになる)
-4. **モバイルでは上部 TabsList を非レンダリング**(何も残さない)。現在タブは下部ナビのハイライトで自明。`mb-5` 分ファーストビューがさらに広がる
-5. **タブラベルの短縮(モバイルナビのみ、デスクトップ不変)**: 集計(ダッシュボード)/ 育成入力 / クラバト(クラバト編成)/ ショップ / ランク計算(コネクトランク計算)。1タブ 75px(375px÷5)に対し最長5文字=約50px で収まる。「ホーム」はデフォルトタブが育成入力のため誤解を招き不採用
-6. hide-on-scroll(スクロール時のナビ自動非表示)は不採用(シンプル第一)
+1. **ガチャチャート: gacha-pull-chart.tsx 内で `useIsMobile` 分岐**。モバイルは `ResponsiveContainer width="100%"` + min-w なし + `YAxis width={72}`・軸名省略6文字・margin 縮小。**デスクトップ分岐(width=720 固定)は文字通り無改変**。distribution-chart.tsx:81 に ResponsiveContainer の実績パターンあり。**注意: GachaPullChart は `items.length === 0` の早期 return を持つため、`useIsMobile()` は必ずコンポーネント冒頭(早期 return より前)で呼ぶ**(Rules of Hooks 違反防止)
+2. **ランク計算: `isMobile ? カードリスト : 既存テーブル(無改変)` 分岐**(InputTab で確立したパターンの踏襲)。行数はユーザー追加式で少数のため仮想化不要。カード構成: 1段目=キャラ名+警告+削除(44px)、2段目=「現在 n → 目標 [Select]」、3段目=素材6種の3列チップ、▲▼移動(44px)。**合計素材カードを先頭に常時表示**。既存の handleMove / rowCosts / totalCost / 永続化をそのまま使う(ロジック追加ゼロ)
+3. **クラバト並び替え: モバイルは ▲▼ボタン**(md:hidden で表示)。方向指定の純関数を追加し、既存 `reorderMembers` と同型で実装。「タップ選択→タップ配置」方式は選択状態管理が増える割に編成は最大5人で ▲▼ の連打コストが低いため不採用。`draggable` はデスクトップ用に残し、`GripVertical` は `max-md:hidden`、案内文はブレークポイントで出し分け
+4. **クラバトのカード: `max-md:grid-cols-2`** で Select 5個を2列配置(約400px→約250px/人)。シート再設計は過剰につき不採用
+5. **ショップ: `grid-cols-2 md:grid-cols-4`** の1行修正
+6. **タップターゲット: ゴミ箱系に `max-md:min-h-11 max-md:min-w-11`**
+7. **規約: スタイルのみの差は `max-md:` バリアント、構造分岐は `useIsMobile`**。`max-md:` はコードベース初出のため使用箇所にコメントを付ける
+8. スコープ外: コインタブ TabsList の横スクロール改善、`window.confirm` のダイアログ化、タブ切替時スクロール位置復元、recharts ツールチップがタップで出ない場合の対応(その場合は降格して据え置き)
 
-## 実装ステップ(コミット単位)
+## 実装ステップ(コミット単位、工数対効果順)
 
-### ステップ1: `feat: モバイル一覧行の所持チェックのタップ領域を拡大`
-- `InputProgressList.tsx` のみ: TableCheckbox に `size-6 [&_svg]:size-4`、label を `flex h-full min-w-11 shrink-0 items-center justify-center border-r border-white/10` へ
-- テスト: 既存「所持チェックのタップはシートを開かない」が無修正通過(role/aria-label 不変)。スタイルのみのため追加不要
-- 検証: `npm test` / `npm run typecheck`(InputProgressTable.test.tsx 無修正通過=デスクトップ16px不変の証明)
+### ステップ1: `feat: ショップのキャラ一覧をモバイル2列グリッドに変更`(極小)
+- CoinShopTab.tsx:31 を `grid-cols-2 md:grid-cols-4` へ
+- テスト: CoinShopTab.test.tsx の grid-cols-4 アサートを「`grid-cols-2` と `md:grid-cols-4` の両方を含む」に更新(意図の明確化。**デスクトップ不変証明の意図的例外として PR に明記**)
+- 検証: `npm test` / `npm run typecheck`
 
-### ステップ2: `feat: モバイル一覧行を2行レイアウト化し行高を80pxへ拡大`
-- `InputProgressList.tsx` のみ: `LIST_ROW_HEIGHT_PX = 80` 定数+`estimateSize` 変更、`h-16`→`h-20`(相互参照コメント)、左ブロックをタグ/名前/サマリーの3段グリッドへ再構成
-- **テキストノード(`☆3` / `RANK 1` / `必要 N`)は現行と同一文字列を維持**(テスト無修正通過のため)
-- 検証: `npm test` / `npm run typecheck` + 375px でスクロール(重なり・空白なし)
+### ステップ2: `feat: ガチャ回数チャートをモバイルで画面幅に収める`(小〜中)
+- gacha-pull-chart.tsx に useIsMobile 分岐(設計判断1)
+- テスト: DashboardTab.test.tsx 無修正通過。追加はモバイル時に `min-w-[720px]` クラスが付かないスモーク程度(recharts は jsdom で実描画されないため)
+- 検証: `npm test` / `npm run typecheck` + 375px で横スクロール消滅、ツールチップのタップ表示、ResponsiveContainer と縦スクロール箱の相性(ちらつき)確認
 
-### ステップ3: `feat: モバイルのタブ切替を下部固定ナビへ移動`
-- 新規 `src/components/MobileBottomNav.tsx`: TabsPrimitive.List/Trigger 直使用、5タブ(アイコンは App.tsx と同じ lucide を流用、ラベルは短縮版)、`aria-label="画面切り替え"`
-- `src/App.tsx`: `{isMobile ? <MobileBottomNav /> : (既存 TabsList 無改変)}`、ルート div の pb を isMobile 分岐
-- `index.html`: viewport meta に `viewport-fit=cover` 追加
-- テスト(App.test.tsx 追加): ※「育成入力」「ショップ」は短縮版とフルラベルが同一文字列のため、検証は**ラベルが変わる3件に絞る**
-  - モバイル: 「集計」「クラバト」「ランク計算」の tab が存在し、「ダッシュボード」「クラバト編成」「コネクトランク計算」の tab が不在/「集計」タップでダッシュボード表示+育成入力が DOM 残留(forceMount 維持)
-  - デスクトップ: 「ダッシュボード」「クラバト編成」「コネクトランク計算」の tab が従来通り存在し、「集計」「ランク計算」の tab が不在
-- 検証: `npm test` / `npm run typecheck` / `npm run build`
+### ステップ3: `feat: ランク計算をモバイルでカードリスト表示に変更`(中)
+- ConnectRankCalcTab.tsx に useIsMobile 分岐(設計判断2)
+- テスト(新規): モバイルスタブで「キャラ追加→カードに現在/目標/素材合計が表示」「▲▼で並び順入替」「削除」。デスクトップ側は `min-w-[900px]` テーブル描画のスモーク1件追加
+- 検証: `npm test` / `npm run typecheck`
+
+### ステップ4: `feat: クラバト編成カードをモバイル2列レイアウトに調整`(小〜中)
+- ClanBattleTab.tsx: article へ `max-md:grid-cols-2` +名前/削除の col-span 調整、ゴミ箱系へ 44px 確保、GripVertical を `max-md:hidden`
+- スタイルのみ(DOM 構造・ハンドラ不変)
+- 検証: `npm test` / `npm run typecheck` + 375px 目視
+
+### ステップ5: `feat: クラバト編成のメンバー並び替えにモバイル用の上下ボタンを追加`(中)
+- 方向指定の並び替え純関数 `moveMemberByDirection` +各カードに `md:hidden` の ▲▼(aria-label 付き、44px)。案内文を出し分け
+- テスト(新規): 純関数のユニットテスト+モバイルレンダリングで ▲▼ により並び替え済み members が onChange に渡ること
+- 検証: `npm test` / `npm run typecheck` / `npm run build`(最終)
 
 ### 共通の検証
-**InputProgressTable.test.tsx / InputTab.test.tsx / CoinShopTab 系テストは全ステップ無修正通過**(デスクトップ不変の証明)。関数コメントは日本語。
+- デスクトップ系テスト(InputProgressTable / InputTab / DashboardTab / App / CoinShopTab※ステップ1で意図的更新)通過=768px 以上不変の証明。デスクトップ分岐コードは diff 上も無改変を保つ
+- 関数コメントは日本語
 
 ### 手動確認(375×812)
-1. チェック: 24px 表示・44px ヒット領域でトグル、シートが開かない、縦罫線で境界視認
-2. 行: 80px で名前・サマリーが読める。高速スクロールで重なり/空白なし。フィルタ切替後も末尾までスクロール可
-3. 下部ナビ: 5タブが収まる(折返しなし)、切替動作、リロード後の activeTab 復元(uiStorage)
-4. **シート/メニューを開くとナビがオーバーレイの下に隠れシートが最前面**
-5. フッターのプライバシーポリシーリンクがナビに隠れない
-6. ソフトキーボード表示中のナビ挙動が許容範囲か
-7. デスクトップ: 上部タブ・テーブル・16px チェック・ショップ内コインタブすべて従来通り
+1. 集計: 横スクロールなしで全カード・4分布・ガチャチャート表示、棒タップでツールチップ、年 Select 操作
+2. ショップ: 2列グリッドで長名2行以内、5コインタブ切替
+3. ランク計算: キャラ追加→カード表示、目標 Select・▲▼・削除タップ操作、合計常時表示
+4. クラバト: 年月追加・編成追加・キャラ検索・Select 変更・▲▼並び替え・削除・TL 編集が全てタップで完結
+5. デスクトップ(1280px): 4タブ従来と同一(ガチャチャート720px、ランク計算テーブル、D&D、ショップ4列)
+6. 下部ナビ(z-40)と各タブ内ポップオーバー/モーダルの重なり正常
 
 ## リスク
 
-1. **`viewport-fit=cover` のグローバル影響**: ページ背景がノッチ/ホームバー下まで伸びる。背景はグラデ一色+px-5 で視覚破綻の可能性は低いが、iOS 実機(横向き含む)で要確認。問題時の代替: cover を見送りナビを pb-2 固定
-2. **行高80px でファーストビュー 9行→約7行**: 可読性優先の意図的判断。実機で窮屈なら 72px へ微調整
-3. **ナビ(bg-bg-end 単色)とグラデ背景の継ぎ目**: 最下部はほぼ bg-end で馴染む想定。要視認確認(必要なら半透明+backdrop-blur)
-4. **タブ切替時のスクロール位置クランプ(既知の制約)**: 下部ナビで切替頻度が上がり顕在化しやすい。本フェーズではスコープ外を維持
-5. Android でソフトキーボードの上にナビが乗る場合がある(許容範囲か手動確認)
+1. recharts v3 のタッチツールチップ挙動が未検証 → タップで出なければ「棒の長さ+軸で読める」ためスコープ外へ降格可
+2. ResponsiveContainer と縦スクロール箱(max-h-[520px])の相性 → モバイル分岐では明示 height(items.length ベース)を渡して回避見込み。実装時にちらつき確認
+3. ClanBattleTab はテスト不在 → ステップ5の並び替えテストで最低限の網を張る(統合的にするか純関数に留めるかは工数次第で実装時判断)
+4. `max-md:` 初導入による記法混在 → 使用箇所にコメント、設計判断7の規約に従う
+5. ランク計算カードの情報密度(素材6種を335pxに収める) → 実装時に微調整。表示値は現テーブルと同一値を出す
 
-## レビュー(2026-07-08 実装完了)
+## レビュー
 
-### 実施結果
+### ステップ1〜2(実装済み)
 
-- [x] ステップ1: `90f742d` 所持チェックのタップ領域拡大(24px 表示+44px ヒット領域+縦罫線で境界可視化)
-- [x] ステップ2: `b88e950` 一覧行の2行(3段)レイアウト化+行高80px(LIST_ROW_HEIGHT_PX 定数化)
-- [x] ステップ3: `5ccac7f` 下部固定ナビ(MobileBottomNav、TabsPrimitive 直使用、viewport-fit=cover 追加)
+- ステップ1: `5061623` feat: ショップのキャラ一覧をモバイル2列グリッドに変更
+- ステップ2: `1a54b8a` feat: ガチャ回数チャートをモバイルで画面幅に収める
 
-### 検証結果(375×812 実測)
+### ステップ3〜5(実装済み)
 
-- `npm test` 268 テスト全通過(新規2件)、`npm run typecheck` / `npm run build` 通過
-- **InputProgressTable.test.tsx / InputTab.test.tsx / CoinShopTab 系テストは全ステップ無修正通過**(デスクトップ不変の証明)。デスクトップ実表示も上部タブ・16px チェック・コインタブ従来通り
-- チェックラベル実測 44px 幅・チェック 24px、行高 80px、仮想化 translateY が 80px 刻みで整合
-- 下部ナビ: 375px を 75px×5 に等分(折返しなし)、高さ56px、画面最下部に密着。アクティブは accent 色+太字
-- z-index: シート/メニュー(z-50)がナビ(z-40)より前面に出ることを確認
-- フッターのプライバシーポリシーリンクはナビに隠れない(bottom 740px < ナビ top 755px)
-- タブ切替・リロード後の activeTab 復元(uiStorage)も確認
+- ステップ3: `02dbae7` feat: ランク計算をモバイルでカードリスト表示に変更
+  - ConnectRankCalcTab に useIsMobile 分岐。モバイルはカードリスト(合計カード先頭常時表示+キャラカード)、デスクトップは既存テーブル無改変
+  - 新規テスト4件(モバイル: 追加/合計・▲▼・削除、デスクトップ: min-w-[900px] スモーク)
+- ステップ4: `930a68e` feat: クラバト編成カードをモバイル2列レイアウトに調整
+  - スタイルのみ: article へ max-md:grid-cols-2、名前ブロック/削除ボタンへ max-md:col-span-2、ゴミ箱系へ max-md:min-h-11/min-w-11、GripVertical を max-md:hidden。max-md: 初出箇所に規約コメント付与
+- ステップ5: `01fe40b` feat: クラバト編成のメンバー並び替えにモバイル用の上下ボタンを追加
+  - 純関数 moveMemberByDirection(端は no-op)+ md:hidden の▲▼(44px、端 disabled)+案内文出し分け。draggable は無改変で温存
+  - 新規テスト7件(純関数4+モバイルレンダリング3)
 
-### 計画からの逸脱
+### 検証結果
 
-- なし(Radix Tabs Trigger は mousedown で選択されるため、テストは fireEvent.mouseDown を使用 — 実装への影響なし)
+- `npm test`: 36 files / 287 tests 全通過(デスクトップ系テスト無修正通過)
+- `npm run typecheck` / `npm run build`: 通過
+- 375px 実測: ランク計算=追加→カード表示(合計と行の素材値が Select 変更へ即時追従)・▲▼・削除・横スクロールなし・タップターゲット44px実測。クラバト=年月追加→編成追加→キャラ追加→☆Select 変更・▲▼並び替え(localStorage 反映確認)・削除・TL 編集が全てタップで完結。0個素材チップは opacity 0.5 で減光
+- 1280px 実測: ランク計算=900px テーブル+集計行(モバイルと同一値)、カードなし。クラバト=7カラムグリッド・draggable/Grip 温存・▲▼非表示・従来案内文表示
+- 検証データはすべて削除済み(clanBattle.groups=0 / calcEntries=0 / progress 無変更)
 
-### 残課題(今後)
+### 備考(実装時判断)
 
-- iOS 実機での safe-area 確認(viewport-fit=cover の実挙動、横向き回転)— エミュレータでは env() が 0 のため実機必須
-- PWA 化(manifest / apple-touch-icon / theme-color / Service Worker)
-- 他タブ(集計/クラバト/ショップ/ランク計算)のモバイル微調整(ガチャチャート min-w-[720px] 等)
-- hover 依存 UI のタッチフィードバック改善
-- タブ切替時の window スクロール位置復元(下部ナビで切替頻度が上がるため優先度上昇の可能性)
+- moveMemberByDirection はテストから参照するため export(reorderMembers は非公開のまま無改変)
+- 375px のキャラカードでは▲▼列の分だけ素材チップが狭まり「ブロンズ/シルバー/ゴールド」ラベルが truncate される(値は常時全表示、合計カードは全文表示)。リスク5の範囲内として許容
 
 ---
 
 ## 参考: 完了済みフェーズの記録
 
-- フェーズ0(モバイル一覧+編集シート)/ フェーズ1(骨格再設計)/ フェーズ2(入力の高速化): PR #4(bb65877 で develop へマージ済み)。266 テスト、詳細は PR #4 本文
+- フェーズ0〜2: PR #4 / フェーズ3+サマリー刷新: PR #5(いずれも develop へマージ済み)
 - 既知の制約: タブ切替で window スクロール位置がクランプされ一覧先頭に戻ることがある
-- 残(フェーズ3後): PWA 化、他タブのモバイル調整、hover 依存改善
+- 残(フェーズ4後): PWA 化、hover 依存改善(Radix Tooltip はデスクトップテーブルのみと判明)、iOS 実機での safe-area 確認
