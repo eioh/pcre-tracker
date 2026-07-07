@@ -17,10 +17,10 @@ import { useClampedNumberInput } from "./useClampedNumberInput";
 // 進捗更新コールバックの共通型。App 側の handleUpdateProgress をそのまま受け取る。
 type UpdateProgressHandler = (name: string, patch: ProgressPatch) => void;
 
-// 所持メモピのクランプ: 0 以上の整数（上限なし）。
-const clampOwnedMemoryPiece = (v: number) => Math.max(0, Math.floor(v));
-// toPurePieceCount は unknown を受け取るが、hook では number のみ渡すためラップする。
-const clampPurePiece = (v: number) => toPurePieceCount(v);
+// 所持メモピのクランプ: 0 以上の整数（上限なし）。モバイルのステッパーからも共用する。
+export const clampOwnedMemoryPiece = (v: number) => Math.max(0, Math.floor(v));
+// toPurePieceCount は unknown を受け取るが、hook では number のみ渡すためラップする。モバイルのステッパーからも共用する。
+export const clampPurePiece = (v: number) => toPurePieceCount(v);
 
 // 保存用の日付文字列をDateへ変換し、不正値なら undefined を返す。
 function parseStoredDate(value: string | null): Date | undefined {

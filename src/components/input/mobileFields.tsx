@@ -1,9 +1,13 @@
 import { useCallback, useMemo } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
+import { toGachaPullCount } from "../../domain/storage";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import { cn } from "../../lib/utils";
+import { Input } from "../ui/input";
 import { formatUeLevel } from "./formatters";
+import { clampOwnedMemoryPiece, clampPurePiece } from "./progressFields";
 import type { ProgressPatch } from "./types";
+import { useClampedNumberInput } from "./useClampedNumberInput";
 
 // 進捗更新コールバックの共通型。progressFields と同じく App 側の handleUpdateProgress を受け取る。
 type UpdateProgressHandler = (name: string, patch: ProgressPatch) => void;
@@ -263,5 +267,158 @@ export function Ue2Stepper({ character, value, isAtMax, onUpdateProgress }: Ue2S
     >
       <StepperValue value={formatUeLevel(Number(value))} isAtMax={isAtMax} />
     </StepperShell>
+  );
+}
+
+type NumberInputStepperProps = {
+  /** 保存済みの外部値。draft の初期値と同期に使う */
+  externalValue: number;
+  /** 値のクランプ関数（既存の数値入力と同一のものを渡す） */
+  clamp: (value: number) => number;
+  /** クランプ済みの確定値を通知する */
+  onCommit: (value: number) => void;
+  /** 中央 input の aria-label（既存の数値入力と完全に同一にする） */
+  inputAriaLabel: string;
+  decrementLabel: string;
+  incrementLabel: string;
+  /** input の max 属性（既存の数値入力と同一にする。上限なしの場合は未指定） */
+  max?: number;
+};
+
+// 数値入力ステッパーの共通実装。[−][number input][+] の構成で、
+// +/− は draft 文字列基準の stepBy で即コミット、直接入力は従来通り blur/Enter で確定する。
+function NumberInputStepper({
+  externalValue,
+  clamp,
+  onCommit,
+  inputAriaLabel,
+  decrementLabel,
+  incrementLabel,
+  max,
+}: NumberInputStepperProps) {
+  const field = useClampedNumberInput(externalValue, clamp, onCommit);
+  // 上下限判定も stepBy と同じく draft 文字列基準に揃える（入力途中でも一貫した挙動にする）。
+  const current = clamp(Number(field.value) || 0);
+  return (
+    <StepperShell
+      decrementLabel={decrementLabel}
+      incrementLabel={incrementLabel}
+      canDecrement={clamp(current - 1) < current}
+      canIncrement={clamp(current + 1) > current}
+      onDecrement={() => field.stepBy(-1)}
+      onIncrement={() => field.stepBy(1)}
+    >
+      <Input
+        type="number"
+        inputMode="numeric"
+        min={0}
+        max={max}
+        step={1}
+        value={field.value}
+        aria-label={inputAriaLabel}
+        className="min-h-11 text-center"
+        onChange={field.onChange}
+        onBlur={field.onBlur}
+        onKeyDown={field.onKeyDown}
+      />
+    </StepperShell>
+  );
+}
+
+type OwnedMemoryPieceStepperProps = {
+  character: MasterCharacter;
+  ownedMemoryPiece: number;
+  onUpdateProgress: UpdateProgressHandler;
+};
+
+// 所持メモピ数ステッパー。0 以上の整数（上限なし）で、パッチは既存 OwnedMemoryPieceInput と同一。
+export function OwnedMemoryPieceStepper({ character, ownedMemoryPiece, onUpdateProgress }: OwnedMemoryPieceStepperProps) {
+  const commit = useCallback(
+    (v: number) => onUpdateProgress(character.name, { ownedMemoryPiece: v }),
+    [onUpdateProgress, character.name],
+  );
+  return (
+    <NumberInputStepper
+      externalValue={ownedMemoryPiece}
+      clamp={clampOwnedMemoryPiece}
+      onCommit={commit}
+      inputAriaLabel={`${character.name}の所持メモピ数`}
+      decrementLabel={`${character.name}の所持メモピ数を減らす`}
+      incrementLabel={`${character.name}の所持メモピ数を増やす`}
+    />
+  );
+}
+
+type OwnedPurePieceStepperProps = {
+  character: MasterCharacter;
+  ownedPurePiece: number;
+  /** rowDerived の isPurePieceImplemented。false なら無効表示にする */
+  isImplemented: boolean;
+  onUpdatePurePiece: (name: string, value: number) => void;
+};
+
+// 所持ピュアピ数ステッパー。ピュアピ未実装キャラは既存同様「-」の無効表示にする。
+export function OwnedPurePieceStepper({ character, ownedPurePiece, isImplemented, onUpdatePurePiece }: OwnedPurePieceStepperProps) {
+  const commit = useCallback(
+    (v: number) => onUpdatePurePiece(character.name, v),
+    [onUpdatePurePiece, character.name],
+  );
+  const decrementLabel = `${character.name}の所持ピュアピ数を減らす`;
+  const incrementLabel = `${character.name}の所持ピュアピ数を増やす`;
+  if (!isImplemented) {
+    return (
+      <StepperShell
+        decrementLabel={decrementLabel}
+        incrementLabel={incrementLabel}
+        canDecrement={false}
+        canIncrement={false}
+        onDecrement={() => {}}
+        onIncrement={() => {}}
+      >
+        <Input
+          type="text"
+          value="-"
+          disabled
+          aria-label={`${character.name}の所持ピュアピ数（未実装）`}
+          className="min-h-11 text-center text-muted"
+        />
+      </StepperShell>
+    );
+  }
+  return (
+    <NumberInputStepper
+      externalValue={ownedPurePiece}
+      clamp={clampPurePiece}
+      onCommit={commit}
+      inputAriaLabel={`${character.name}の所持ピュアピ数`}
+      decrementLabel={decrementLabel}
+      incrementLabel={incrementLabel}
+      max={99999}
+    />
+  );
+}
+
+type GachaPullCountStepperProps = {
+  character: MasterCharacter;
+  gachaPullCount: number;
+  onUpdateProgress: UpdateProgressHandler;
+};
+
+// ガチャ回数ステッパー。0〜300 の範囲で、パッチは既存 GachaPullCountInput と同一。
+export function GachaPullCountStepper({ character, gachaPullCount, onUpdateProgress }: GachaPullCountStepperProps) {
+  const commit = useCallback(
+    (v: number) => onUpdateProgress(character.name, { gachaPullCount: v }),
+    [onUpdateProgress, character.name],
+  );
+  return (
+    <NumberInputStepper
+      externalValue={gachaPullCount}
+      clamp={toGachaPullCount}
+      onCommit={commit}
+      inputAriaLabel={`${character.name}のガチャ回数`}
+      decrementLabel={`${character.name}のガチャ回数を減らす`}
+      incrementLabel={`${character.name}のガチャ回数を増やす`}
+      max={300}
+    />
   );
 }

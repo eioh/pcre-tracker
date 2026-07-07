@@ -311,6 +311,72 @@ describe("InputProgressList", () => {
     expect(onUpdatePurePiece).toHaveBeenCalledWith("ヒヨリ", 77);
   });
 
+  it("シート内の数値ステッパーの+は即コミットする", () => {
+    const onUpdateProgress = vi.fn();
+    const onUpdatePurePiece = vi.fn();
+    const props = buildProps({ onUpdateProgress, onUpdatePurePiece });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+
+    // blur を挟まず、タップの時点で確定値が通知される。
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリの所持メモピ数を増やす" }));
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ownedMemoryPiece: 1 });
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリの所持ピュアピ数を増やす" }));
+    expect(onUpdatePurePiece).toHaveBeenCalledWith("ヒヨリ", 1);
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリのガチャ回数を増やす" }));
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { gachaPullCount: 1 });
+  });
+
+  it("シート内の数値ステッパーの−は即コミットする", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({
+      onUpdateProgress,
+      visibleRows: [{ character: buildCharacter(), progress: buildProgress({ ownedMemoryPiece: 5 }) }],
+    });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリの所持メモピ数を減らす" }));
+
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ownedMemoryPiece: 4 });
+  });
+
+  it("入力途中（未blur）に+を押すとdraft文字列を基準に歩進してコミットする", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({
+      onUpdateProgress,
+      visibleRows: [{ character: buildCharacter(), progress: buildProgress({ ownedMemoryPiece: 5 }) }],
+    });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    const input = within(dialog).getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" });
+
+    // "12" と打ち込んだだけ（未 blur）の状態で + を押すと、保存値5でなく draft の12を基準に歩進する。
+    fireEvent.change(input, { target: { value: "12" } });
+    expect(onUpdateProgress).not.toHaveBeenCalled();
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリの所持メモピ数を増やす" }));
+
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ownedMemoryPiece: 13 });
+    expect(input).toHaveValue(13);
+  });
+
+  it("数値ステッパーは下限0で−を、ガチャ回数の上限300で+を無効化する", () => {
+    const props = buildProps({
+      visibleRows: [{ character: buildCharacter(), progress: buildProgress({ gachaPullCount: 300 }) }],
+    });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+
+    expect(within(dialog).getByRole("button", { name: "ヒヨリの所持メモピ数を減らす" })).toBeDisabled();
+    // 所持メモピは上限なしのため + は常に押せる。
+    expect(within(dialog).getByRole("button", { name: "ヒヨリの所持メモピ数を増やす" })).toBeEnabled();
+    expect(within(dialog).getByRole("button", { name: "ヒヨリのガチャ回数を増やす" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "ヒヨリのガチャ回数を減らす" })).toBeEnabled();
+  });
+
   it("シート内の入手日入力で進捗更新を通知する", () => {
     const onUpdateProgress = vi.fn();
     const props = buildProps({ onUpdateProgress });
@@ -429,5 +495,8 @@ describe("InputProgressList", () => {
 
     expect(within(dialog).getByRole("textbox", { name: "ユイの所持ピュアピ数（未実装）" })).toBeDisabled();
     expect(within(dialog).queryByRole("spinbutton", { name: "ユイの所持ピュアピ数" })).toBeNull();
+    // ステッパーの +/− も操作不能にする。
+    expect(within(dialog).getByRole("button", { name: "ユイの所持ピュアピ数を増やす" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "ユイの所持ピュアピ数を減らす" })).toBeDisabled();
   });
 });

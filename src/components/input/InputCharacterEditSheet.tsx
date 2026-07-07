@@ -3,13 +3,16 @@ import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../../utils/starMemoryCost";
 import { attributeTextClassMap, memorySourceLabelMap, roleTextClassMap, sourceChipClassMap } from "./constants";
+import { ObtainedDatePicker } from "./progressFields";
 import {
-  GachaPullCountInput,
-  ObtainedDatePicker,
-  OwnedMemoryPieceInput,
-  OwnedPurePieceInput,
-} from "./progressFields";
-import { ConnectRankStepper, StarSegmentedControl, Ue1Stepper, Ue2Stepper } from "./mobileFields";
+  ConnectRankStepper,
+  GachaPullCountStepper,
+  OwnedMemoryPieceStepper,
+  OwnedPurePieceStepper,
+  StarSegmentedControl,
+  Ue1Stepper,
+  Ue2Stepper,
+} from "./mobileFields";
 import { computeRowDerived } from "./rowDerived";
 import type { ProgressPatch, VisibleRow } from "./types";
 import { sectionLabelClass, tableSwitchClass } from "./uiStyles";
@@ -169,12 +172,13 @@ const SheetBody = memo(function SheetBody({
 
       <section>
         <h3 className={sectionLabelClass}>ピース所持数</h3>
-        <div className="grid grid-cols-2 gap-3">
+        {/* 数値ステッパーは −/入力/+ の横並びのため、2カラムでなく縦積みにする */}
+        <div className="grid gap-3">
           <FieldRow label="所持メモピ">
-            <OwnedMemoryPieceInput character={character} ownedMemoryPiece={progress.ownedMemoryPiece} onUpdateProgress={onUpdateProgress} />
+            <OwnedMemoryPieceStepper character={character} ownedMemoryPiece={progress.ownedMemoryPiece} onUpdateProgress={onUpdateProgress} />
           </FieldRow>
           <FieldRow label="所持ピュアピ">
-            <OwnedPurePieceInput
+            <OwnedPurePieceStepper
               character={character}
               ownedPurePiece={ownedPurePiece}
               isImplemented={isPurePieceImplemented}
@@ -195,14 +199,12 @@ const SheetBody = memo(function SheetBody({
             />
             <span>アドベンチャーメモピ枠</span>
           </label>
-          <div className="grid grid-cols-2 gap-3">
-            <FieldRow label="入手日">
-              <ObtainedDatePicker character={character} obtainedDate={progress.obtainedDate} onUpdateProgress={onUpdateProgress} />
-            </FieldRow>
-            <FieldRow label="ガチャ回数">
-              <GachaPullCountInput character={character} gachaPullCount={progress.gachaPullCount} onUpdateProgress={onUpdateProgress} />
-            </FieldRow>
-          </div>
+          <FieldRow label="入手日">
+            <ObtainedDatePicker character={character} obtainedDate={progress.obtainedDate} onUpdateProgress={onUpdateProgress} />
+          </FieldRow>
+          <FieldRow label="ガチャ回数">
+            <GachaPullCountStepper character={character} gachaPullCount={progress.gachaPullCount} onUpdateProgress={onUpdateProgress} />
+          </FieldRow>
         </div>
       </section>
 
