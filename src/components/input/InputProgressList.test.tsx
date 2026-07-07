@@ -85,8 +85,113 @@ describe("InputProgressList", () => {
     expect(screen.getByText("火")).toBeInTheDocument();
     expect(screen.getByText("アタッカー")).toBeInTheDocument();
     expect(screen.getByText("☆3")).toBeInTheDocument();
-    expect(screen.getByText("RANK 1")).toBeInTheDocument();
-    expect(screen.getByText(/^必要 \d+$/)).toBeInTheDocument();
+    expect(screen.getByText("CR1")).toBeInTheDocument();
+    expect(screen.getByText("専用1: 0")).toBeInTheDocument();
+    expect(screen.getByText("専用2: 0")).toBeInTheDocument();
+    // 必要メモピ合計は編集シート側のサマリーへ移したため一覧行には表示しない。
+    expect(screen.queryByText(/^必要 \d+$/)).not.toBeInTheDocument();
+  });
+
+  it("サマリーの専用1・専用2にレベル数値を表示する", () => {
+    const props = buildProps({
+      visibleRows: [{ character: buildCharacter(), progress: buildProgress({ ue1Level: 140, ue2Level: 3 }) }],
+    });
+    render(<InputProgressList {...props} />);
+
+    expect(screen.getByText("専用1: 140")).toBeInTheDocument();
+    expect(screen.getByText("専用2: 3")).toBeInTheDocument();
+  });
+
+  it("専用装備未実装キャラはサマリーの専用1・専用2を「-」で表示しmaxed扱いにしない", () => {
+    const row: VisibleRow = {
+      character: buildCharacter({
+        name: "ユイ",
+        implemented: {
+          star6: true,
+          ue1: false,
+          ue1Sp: false,
+          ue2: false,
+        },
+      }),
+      progress: buildProgress({ ue1Level: null, ue2Level: null }),
+    };
+    const props = buildProps({
+      visibleRows: [row],
+      purePieceByCharacterName: { ユイ: 0 },
+      purePieceByBaseNameFromCharacters: { ユイ: 0 },
+    });
+    render(<InputProgressList {...props} />);
+
+    const ue1 = screen.getByText("専用1: -");
+    const ue2 = screen.getByText("専用2: -");
+    expect(ue1).toBeInTheDocument();
+    expect(ue2).toBeInTheDocument();
+    // 未実装項目は maxed 色にせず text-muted のまま表示する。
+    expect(ue1.className).toContain("text-muted");
+    expect(ue1.className).not.toContain("text-maxed-text");
+    expect(ue2.className).toContain("text-muted");
+    expect(ue2.className).not.toContain("text-maxed-text");
+  });
+
+  it("SP装備中のキャラはサマリーの専用1を「SP」で表示する", () => {
+    const props = buildProps({
+      visibleRows: [{ character: buildCharacter(), progress: buildProgress({ ue1Level: 370, ue1SpEquipped: true }) }],
+    });
+    render(<InputProgressList {...props} />);
+
+    expect(screen.getByText("専用1: SP")).toBeInTheDocument();
+  });
+
+  it("実装段階の最大まで強化済みの項目はサマリーをmaxed色で表示する", () => {
+    // ☆6 / CR15 / 専用1 SP / 専用2 Lv.5 の全項目が実装段階の最大に到達しているキャラ。
+    const props = buildProps({
+      visibleRows: [
+        {
+          character: buildCharacter(),
+          progress: buildProgress({ star: 6, connectRank: 15, ue1Level: 370, ue1SpEquipped: true, ue2Level: 5 }),
+        },
+      ],
+    });
+    render(<InputProgressList {...props} />);
+
+    expect(screen.getByText("☆6").className).toContain("text-maxed-text");
+    expect(screen.getByText("CR15").className).toContain("text-maxed-text");
+    expect(screen.getByText("専用1: SP").className).toContain("text-maxed-text");
+    expect(screen.getByText("専用2: 5").className).toContain("text-maxed-text");
+  });
+
+  it("☆6未実装キャラは☆5でサマリーの☆をmaxed色で表示する", () => {
+    const row: VisibleRow = {
+      character: buildCharacter({
+        implemented: {
+          star6: false,
+          ue1: true,
+          ue1Sp: true,
+          ue2: true,
+        },
+      }),
+      progress: buildProgress({ star: 5 }),
+    };
+    const props = buildProps({ visibleRows: [row] });
+    render(<InputProgressList {...props} />);
+
+    expect(screen.getByText("☆5").className).toContain("text-maxed-text");
+  });
+
+  it("最大未達の項目はサマリーをtext-mutedのまま表示する", () => {
+    const props = buildProps();
+    render(<InputProgressList {...props} />);
+
+    // star: 3 / connectRank: 1 / ue1Level: 0 / ue2Level: 0 はいずれも最大未達。
+    for (const element of [
+      screen.getByText("☆3"),
+      screen.getByText("CR1"),
+      screen.getByText("専用1: 0"),
+      screen.getByText("専用2: 0"),
+    ]) {
+      expect(element.className).toContain("text-muted");
+      expect(element.className).not.toContain("text-maxed-text");
+    }
   });
 
   it("所持チェックのタップは編集シートを開かず所持状態を直接トグルする", () => {

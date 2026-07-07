@@ -57,12 +57,21 @@ const ListRow = memo(function ListRow({
   onUpdateProgress,
   onOpenEditSheet,
 }: ListRowProps) {
-  // サマリー表示用に必要メモピ合計を計算する（テーブル行と同一ロジック）。
-  const { adjustedTotalRemainingMemoryPiece } = computeRowDerived(character, progress, ownedPurePiece, ownedPurePieceByBase, {
-    includeSameBasePurePieceForUe2,
-    starMemoryCalcMode,
-    ue1MemoryCalcMode,
-  });
+  // サマリー表示用に育成状態の派生値を計算する（テーブル行と同一ロジック）。
+  const { isStarAtMax, isConnectRankAtMax, isUe1AtMax, isUe2AtMax, ue1CompositeValue, ue2Value } = computeRowDerived(
+    character,
+    progress,
+    ownedPurePiece,
+    ownedPurePieceByBase,
+    {
+      includeSameBasePurePieceForUe2,
+      starMemoryCalcMode,
+      ue1MemoryCalcMode,
+    },
+  );
+  // 専用装備の表示値。未実装は "-"、SP装備中は "SP"、それ以外はレベル数値をそのまま表示する。
+  const ue1Display = ue1CompositeValue === "null" ? "-" : ue1CompositeValue === "sp" ? "SP" : ue1CompositeValue;
+  const ue2Display = ue2Value === "null" ? "-" : ue2Value;
 
   const handleOwnedChange = useCallback(
     (checked: boolean | "indeterminate") => onUpdateProgress(character.name, { owned: checked === true }),
@@ -113,11 +122,12 @@ const ListRow = memo(function ListRow({
             <span className={roleTextClassMap[character.role]}>{character.role}</span>
           </span>
           <span className="block max-w-full truncate font-bold">{character.name}</span>
-          {/* サマリー行。必要メモピは行内で最重要のため text-sm font-bold で強調する。 */}
-          <span className="flex items-center gap-2 whitespace-nowrap tabular-nums leading-none">
-            <span className="text-xs text-muted">☆{progress.star}</span>
-            <span className="text-xs text-muted">RANK {progress.connectRank}</span>
-            <span className="text-sm font-bold text-main">必要 {adjustedTotalRemainingMemoryPiece}</span>
+          {/* サマリー行。育成状態4項目を横並びで表示し、実装段階の最大まで強化済みの項目は maxed 色で示す。 */}
+          <span className="flex min-w-0 items-center gap-2 truncate text-xs whitespace-nowrap tabular-nums leading-none">
+            <span className={isStarAtMax ? "text-maxed-text" : "text-muted"}>☆{progress.star}</span>
+            <span className={isConnectRankAtMax ? "text-maxed-text" : "text-muted"}>CR{progress.connectRank}</span>
+            <span className={isUe1AtMax ? "text-maxed-text" : "text-muted"}>専用1: {ue1Display}</span>
+            <span className={isUe2AtMax ? "text-maxed-text" : "text-muted"}>専用2: {ue2Display}</span>
           </span>
         </span>
         {/* 行タップのアフォーダンスとして右端に縦センターでシェブロンを置く。 */}
