@@ -11,6 +11,7 @@ const masterCharacters: MasterCharacter[] = [
     role: "アタッカー",
     implemented: { star6: true, ue1: true, ue1Sp: true, ue2: true },
     memoryPieceSources: ["hard_quest"],
+    formationOrder: 0,
   },
   {
     name: "ユイ",
@@ -20,6 +21,7 @@ const masterCharacters: MasterCharacter[] = [
     role: "ヒーラー",
     implemented: { star6: true, ue1: false, ue1Sp: false, ue2: false },
     memoryPieceSources: ["side_story"],
+    formationOrder: 1,
   },
 ];
 

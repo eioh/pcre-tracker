@@ -30,6 +30,7 @@ export type MasterCharacter = {
   name: string;
   baseName: string;
   searchTokens?: string[];
+  formationOrder: number;
   limited: boolean;
   attribute: Attribute;
   role: Role;
