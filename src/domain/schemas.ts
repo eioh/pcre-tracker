@@ -13,6 +13,7 @@ export const masterCharacterSchema = z.object({
   name: z.string().min(1),
   baseName: z.string().min(1),
   searchTokens: z.array(z.string().min(1)).optional(),
+  formationOrder: z.number().int().min(0),
   limited: z.boolean(),
   attribute: attributeSchema,
   role: roleSchema,

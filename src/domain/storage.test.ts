@@ -11,6 +11,7 @@ const masterCharacters: MasterCharacter[] = [
     role: "アタッカー",
     implemented: { star6: true, ue1: true, ue1Sp: true, ue2: false },
     memoryPieceSources: [],
+    formationOrder: 0,
   },
 ];
 
