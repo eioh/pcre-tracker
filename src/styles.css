@@ -6,42 +6,45 @@
   --font-inter: "Inter", sans-serif;
   --font-orbitron: "Orbitron", sans-serif;
 
-  --color-bg-start: #010101;
-  --color-bg-end: #050505;
-  --color-main: #f1f5f9;
-  --color-muted: #a8b0ba;
-  --color-accent: #4f8dff;
+  --color-bg-start: #0d1117;
+  --color-bg-end: #0d1117;
+  --color-main: #e6edf3;
+  --color-muted: #8d99a8;
+  --color-accent: #5c95ff;
   --color-accent-strong: #45e6ff;
-  --color-accent-text: #04111f;
+  --color-accent-text: #06101f;
   --color-danger: #ff6b6b;
   --color-danger-strong: #ff8a8a;
   --color-danger-bg: #3a0d0dcc;
 
-  --color-input-bg: #060607e8;
-  --color-popover-bg: #040405f7;
-  --color-selected: #10243f;
-  --color-checked-bg: #0b335f;
+  --color-input-bg: #0f141b;
+  --color-popover-bg: #1c232d;
+  --color-selected: #16304e;
+  --color-checked-bg: #123a63;
 
-  --shadow-panel: 0 20px 48px rgba(0, 0, 0, 0.45);
+  --shadow-panel: 0 16px 40px rgba(0, 0, 0, 0.38);
 
   /* パネル/カード共通 */
-  --color-panel-border: #aeb7c62e;
-  --color-panel-from: #090a0bef;
-  --color-panel-to: #040405e8;
+  --color-panel-border: rgba(180, 200, 225, 0.16);
+  --color-panel-from: #161c24;
+  --color-panel-to: #161c24;
 
   /* セクション（DashboardTab の外枠） */
-  --color-section-from: #070708e8;
-  --color-section-to: #030303f5;
+  --color-section-from: #161c24;
+  --color-section-to: #161c24;
 
   /* テキスト補助色 */
-  --color-sub: #cbd5e1;
+  --color-sub: #b9c4d0;
 
   /* チャート配色 */
   --color-chart-bar: #4f8dff;
   --color-chart-ref: #9ac0ff;
   --color-chart-accent: #45e6ff;
-  --color-chart-grid: rgba(203, 213, 225, 0.12);
+  --color-chart-grid: rgba(180, 200, 225, 0.12);
   --color-chart-cursor: rgba(69, 230, 255, 0.08);
+
+  /* ☆ランクの金色（新規トークン。適用は後続対応） */
+  --color-star: #e8c56a;
 
   /* バッジ: normal */
   --color-badge-normal-border: #67b8ffa6;
@@ -55,32 +58,32 @@
 
   /* テーブルセレクト: maxed */
   --color-maxed-border: #4b5563;
-  --color-maxed-bg: #060607e8;
-  --color-maxed-text: #f1f5f9;
+  --color-maxed-bg: #0f141b;
+  --color-maxed-text: #e6edf3;
   --color-maxed-dot: #67aaf2;
   /* モバイル一覧サマリー: 最大強化済み(属性/ロール色と揃えたソフトグリーン) */
   --color-maxed-green: #8bc8ab;
 
   /* テーブル */
-  --color-table-border: #cbd5e124;
-  --color-table-header-bg: #090a0bf5;
+  --color-table-border: rgba(180, 200, 225, 0.12);
+  --color-table-header-bg: #1c232d;
 
   /* テーブルセレクト: disabled */
   --color-disabled-border: #788aad38;
-  --color-disabled-bg: #070b12bf;
-  --color-disabled-text: #9fb0cf;
+  --color-disabled-bg: #12171f;
+  --color-disabled-text: #8d99a8;
 
   /* 入力フィルタ */
-  --color-filter-separator: #cbd5e124;
+  --color-filter-separator: rgba(180, 200, 225, 0.1);
 
   /* 入力テーブルラッパー */
-  --color-table-wrap-border: #cbd5e124;
-  --color-table-wrap-bg: #030303e0;
+  --color-table-wrap-border: rgba(180, 200, 225, 0.14);
+  --color-table-wrap-bg: #161c24;
   --color-sort-hover: #9ac0ff;
-  --color-row-odd: #050505;
-  --color-row-even: #0d0e0f;
-  --color-row-hover: #25282c;
-  --color-row-hover-border: #cbd5e124;
+  --color-row-odd: #161c24;
+  --color-row-even: #1c222a;
+  --color-row-hover: #222b37;
+  --color-row-hover-border: rgba(180, 200, 225, 0.12);
 
   /* 入力テーブルのキャラタグ */
   --color-limited-text: #d8aeb3;
@@ -129,30 +132,39 @@
 }
 
 :root {
-  --background: 0 0% 1%;
-  --foreground: 0 0% 96%;
-  --card: 0 0% 5%;
-  --card-foreground: 0 0% 96%;
-  --popover: 0 0% 4%;
-  --popover-foreground: 0 0% 96%;
-  --primary: 218 100% 66%;
-  --primary-foreground: 209 79% 7%;
-  --secondary: 0 0% 11%;
-  --secondary-foreground: 0 0% 96%;
-  --muted: 0 0% 12%;
-  --muted-foreground: 0 0% 72%;
-  --accent: 218 100% 66%;
-  --accent-foreground: 209 79% 7%;
-  --border: 0 0% 58%;
-  --input: 0 0% 10%;
-  --ring: 218 100% 66%;
+  --background: 216 28% 7%;
+  --foreground: 208 35% 93%;
+  --card: 214 24% 11%;
+  --card-foreground: 208 35% 93%;
+  --popover: 215 23% 14%;
+  --popover-foreground: 208 35% 93%;
+  --primary: 219 100% 68%;
+  --primary-foreground: 216 68% 7%;
+  --secondary: 215 23% 14%;
+  --secondary-foreground: 208 35% 93%;
+  --muted: 215 23% 14%;
+  --muted-foreground: 213 13% 61%;
+  --accent: 219 100% 68%;
+  --accent-foreground: 216 68% 7%;
+  --border: 212 17% 22%;
+  --input: 215 28% 8%;
+  --ring: 219 100% 68%;
+}
+
+/* Tailwind v4 ブリッジ: shadcn の :root HSL 変数から実際に使用されている
+   ユーティリティ（bg-card / text-card-foreground / text-muted-foreground）のみ生成する。
+   --muted はプロジェクトの文字色トークン --color-muted と名前が衝突するためブリッジ禁止。 */
+@theme inline {
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-muted-foreground: hsl(var(--muted-foreground));
 }
 
 @layer base {
   * {
     box-sizing: border-box;
     scrollbar-width: thin;
-    scrollbar-color: #68717c #050505;
+    scrollbar-color: #3a434f #0d1117;
   }
 
   *::-webkit-scrollbar {
@@ -161,22 +173,22 @@
   }
 
   *::-webkit-scrollbar-track {
-    background: linear-gradient(180deg, #050505, #020202);
-    border: 1px solid rgba(203, 213, 225, 0.18);
+    background: #0d1117;
+    border: 1px solid rgba(180, 200, 225, 0.16);
   }
 
   *::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #4d5661, #343a42);
-    border: 2px solid #050505;
+    background: #2b333d;
+    border: 2px solid #0d1117;
     border-radius: 9999px;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #68717c, #454c55);
+    background: #3a434f;
   }
 
   *::-webkit-scrollbar-corner {
-    background: #020202;
+    background: #0d1117;
   }
 
   body {
