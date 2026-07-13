@@ -143,6 +143,18 @@ export function normalizeClanBattleMemberWithMaster(
   };
 }
 
+// formationOrder 昇順(=隊列の先頭がリスト上)にメンバーを並べ替える。マスター未登録キャラは末尾へ。
+export function sortClanBattleMembers(
+  members: ClanBattleMember[],
+  characterByName: Map<string, MasterCharacter>,
+): ClanBattleMember[] {
+  return [...members].sort((a, b) => {
+    const orderA = characterByName.get(a.characterName)?.formationOrder ?? Number.MAX_SAFE_INTEGER;
+    const orderB = characterByName.get(b.characterName)?.formationOrder ?? Number.MAX_SAFE_INTEGER;
+    return orderA - orderB;
+  });
+}
+
 // クラバト保存データ全体を現在のマスターに合わせて正規化する。
 export function normalizeClanBattleState(state: ClanBattleState, masterCharacters: MasterCharacter[]): ClanBattleState {
   const characterByName = new Map(masterCharacters.map((character) => [character.name, character]));
@@ -158,9 +170,12 @@ export function normalizeClanBattleState(state: ClanBattleState, masterCharacter
           damage: toClanBattleDamage(formation.damage),
           timeline: formation.timeline,
           members: normalizeSupportMemberCount(
-            formation.members
-              .slice(0, CLAN_BATTLE_MAX_MEMBERS)
-              .map((member) => normalizeClanBattleMemberWithMaster(member, characterByName.get(member.characterName))),
+            sortClanBattleMembers(
+              formation.members
+                .slice(0, CLAN_BATTLE_MAX_MEMBERS)
+                .map((member) => normalizeClanBattleMemberWithMaster(member, characterByName.get(member.characterName))),
+              characterByName,
+            ),
           ),
         })),
       }))
