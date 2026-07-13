@@ -3,9 +3,10 @@ import {
   formatClanBattleDamage,
   getClanBattleMemberDiffs,
   normalizeClanBattleState,
+  sortClanBattleMembers,
   toClanBattleDamage,
 } from "./clanBattle";
-import type { CharacterProgress, ClanBattleState, MasterCharacter } from "./types";
+import type { CharacterProgress, ClanBattleMember, ClanBattleState, MasterCharacter } from "./types";
 
 const progress: CharacterProgress = {
   owned: true,
@@ -32,7 +33,32 @@ const masterCharacters: MasterCharacter[] = [
     memoryPieceSources: [],
     formationOrder: 0,
   },
+  {
+    name: "ペコリーヌ",
+    baseName: "ペコリーヌ",
+    limited: false,
+    attribute: "光",
+    role: "アタッカー",
+    implemented: { star6: true, ue1: true, ue1Sp: false, ue2: false },
+    memoryPieceSources: [],
+    formationOrder: 1,
+  },
 ];
+
+// ソート系テスト用の最小限のクラバトメンバーを生成する（並び替えに関与しない値は固定でよい）。
+function buildMember(id: string, characterName: string): ClanBattleMember {
+  return {
+    id,
+    characterName,
+    support: false,
+    limitBreak: false,
+    star: 3,
+    connectRank: 1,
+    ue1Level: 0,
+    ue1SpEquipped: false,
+    ue2Level: 0,
+  };
+}
 
 describe("clanBattle", () => {
   it("与ダメージを整数へ正規化し、日本語の大きい単位表示へ変換する", () => {
@@ -84,5 +110,74 @@ describe("clanBattle", () => {
 
     const normalized = normalizeClanBattleState(state, masterCharacters);
     expect(normalized.groups[0]?.formations[0]?.members.map((member) => member.support)).toEqual([true, false]);
+  });
+
+  describe("sortClanBattleMembers", () => {
+    it("formationOrder昇順に並べ替える", () => {
+      const characterByName = new Map(masterCharacters.map((character) => [character.name, character]));
+      const members = [buildMember("a", "ペコリーヌ"), buildMember("b", "ヒヨリ")];
+
+      const sorted = sortClanBattleMembers(members, characterByName);
+
+      expect(sorted.map((member) => member.characterName)).toEqual(["ヒヨリ", "ペコリーヌ"]);
+    });
+
+    it("マスター未登録キャラは末尾へ送る", () => {
+      const characterByName = new Map(masterCharacters.map((character) => [character.name, character]));
+      const members = [buildMember("a", "未登録キャラ"), buildMember("b", "ヒヨリ")];
+
+      const sorted = sortClanBattleMembers(members, characterByName);
+
+      expect(sorted.map((member) => member.characterName)).toEqual(["ヒヨリ", "未登録キャラ"]);
+    });
+
+    it("未登録キャラ同士は元の順序を維持する（安定ソート）", () => {
+      const characterByName = new Map(masterCharacters.map((character) => [character.name, character]));
+      const members = [buildMember("a", "未登録A"), buildMember("b", "未登録B")];
+
+      const sorted = sortClanBattleMembers(members, characterByName);
+
+      expect(sorted.map((member) => member.id)).toEqual(["a", "b"]);
+    });
+
+    it("元配列を破壊しない", () => {
+      const characterByName = new Map(masterCharacters.map((character) => [character.name, character]));
+      const members = [buildMember("a", "ペコリーヌ"), buildMember("b", "ヒヨリ")];
+
+      sortClanBattleMembers(members, characterByName);
+
+      expect(members.map((member) => member.characterName)).toEqual(["ペコリーヌ", "ヒヨリ"]);
+    });
+  });
+
+  it("normalizeClanBattleStateは逆順で保存されたmembersをformationOrder順に是正する", () => {
+    const state: ClanBattleState = {
+      groups: [
+        {
+          id: "group-1",
+          year: 2026,
+          month: 6,
+          formations: [
+            {
+              id: "formation-1",
+              name: "1ボス",
+              damage: 0,
+              timeline: "",
+              members: [
+                { id: "a", characterName: "ペコリーヌ", support: false, ...progress },
+                { id: "b", characterName: "ヒヨリ", support: false, ...progress },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    const normalized = normalizeClanBattleState(state, masterCharacters);
+
+    expect(normalized.groups[0]?.formations[0]?.members.map((member) => member.characterName)).toEqual([
+      "ヒヨリ",
+      "ペコリーヌ",
+    ]);
   });
 });
