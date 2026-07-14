@@ -227,7 +227,13 @@ export function SyncHeader({
               <LogOut className="size-4" aria-hidden="true" />
               ログアウト
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
+            {/* 破壊的操作のため危険色にする（dropdown 変形の danger メニュー項目と整合）。 */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-danger hover:border-danger"
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
               <Trash2 className="size-4" aria-hidden="true" />
               アカウント削除
             </Button>
