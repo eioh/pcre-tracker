@@ -1,44 +1,64 @@
-# クラバト編成: formationOrder 自動ソート化
-
-計画: `C:\Users\user\.claude\plans\polymorphic-exploring-ocean.md`
+# ヘッダーUI刷新: 右上ボタン群をドロップダウンメニューに集約（案A）
 
 ## 背景
 
-クラバト編成タブのメンバー並び順は現在、手動並び替え（モバイル▲▼ボタン + デスクトップのドラッグ&ドロップ）で管理している。PR #8 でキャラマスタに `formationOrder`（隊列順、小さいほど先頭）が追加されたため、これを使って並び順を自動決定し、手動並び替えUI・処理を全廃する。
+デスクトップヘッダー右上に「ログイン / エクスポート / インポート / 保存データを初期化」の4ボタン + 最終更新日時が横並びで、ログイン後はさらに「同期ステータス + ユーザー名 + ログアウト + アカウント削除」に膨らむ。項目増加に耐えられるよう、役割別の2ドロップダウンに集約する。
 
-作業ブランチ: `feature/clan-battle-formation-order`（origin/main = 813862d から作成）。
+- **データメニュー**（常時表示、トリガー「データ」）: エクスポート / インポート / ─区切り─ / 保存データを初期化（危険色）/ ─区切り─ / フッターに「最終更新: …」
+- **アカウントメニュー**: 未ログイン時は従来どおり「ログイン」ボタン（既存ログインダイアログを開く）。ログイン後はユーザー名チップ → メニュー（ヘッダー部: 表示名 + 同期ステータス / ─区切り─ / ログアウト / アカウント削除（危険色））
+
+モバイル（768px未満、`MobileHeader` のボトムシート）は既に集約済みのため**今回は変更しない**。
+
+作業ブランチ: `feature/header-dropdown-menu`（`git fetch` 後、**origin/develop** から作成。リポジトリ規約は feature → develop → main のため PR 先は **develop**）
+
+## 対象ファイルと現状
+
+- `src/App.tsx` 371-411行: デスクトップヘッダー（4ボタン横並び + 最終更新）。各ハンドラ（`handleExportBackup` / `handleSelectImportFile` / リセットダイアログ open）は App が保持
+- `src/components/SyncHeader.tsx`: ログインUI本体。未ログイン=ログインボタン+ダイアログ、ログイン後=ステータス文字列+表示名+ログアウト+アカウント削除ボタン+各種ダイアログ。**デスクトップとモバイル(`MobileHeader` のシート内)の両方から使用される**
+- `src/components/FileImportButton.tsx`: hidden file input + ボタン
+- `src/components/ui/`: DropdownMenu は未導入。`@radix-ui/react-popover` は導入済み
+
+## 設計方針
+
+1. **DropdownMenu コンポーネント新規追加**: AGENTS.md の規約どおり `npx shadcn@latest add dropdown-menu` で雛形取得（`@radix-ui/react-dropdown-menu` が依存に追加される）→ DESIGN.md（スレートナイト）のトークン（`bg-popover-bg` 等の CSS 変数）に合わせてカスタマイズ。compound component（`DropdownMenuTrigger` / `DropdownMenuContent` / `DropdownMenuItem` / `DropdownMenuSeparator` / `DropdownMenuLabel`）をそのまま公開
+2. **データメニュー**: 新規コンポーネント `src/components/HeaderDataMenu.tsx`。props でハンドラを受け取る（`onExport` / `onSelectImportFile` / `onRequestReset` / `updatedAtLabel`）
+   - インポート: **hidden file input はメニューコンテンツの外**（HeaderDataMenu のルート直下）に置き、メニュー項目の `onSelect` から ref 経由で `click()` する。メニュー閉鎖でコンテンツがアンマウントされても input が消えないようにするため。`FileImportButton` は流用できない場合、input 部分のロジック（accept="application/json"、選択後 value リセット）を踏襲する
+   - 初期化: `onSelect` → App の `setIsResetDialogOpen(true)`。確認ダイアログは App 直下にあるためメニュー閉鎖の影響なし（既存のまま）
+   - エクスポート: `onSelect` → `handleExportBackup` 直接呼び出し（既存挙動どおり確認なし）
+   - フッター: `DropdownMenuLabel`（非インタラクティブ）で「最終更新: …」を表示。App.tsx 409行の表示は撤去
+3. **SyncHeader にレイアウト変形を追加**: `variant: "inline" | "dropdown"`（デフォルト `"inline"` で現行挙動維持 = モバイル無変更）
+   - `dropdown` 時のログイン後: ユーザー名チップ（表示名 or「ログイン中」+ chevron）をトリガーに DropdownMenu を表示。中身は Label（表示名 + 同期ステータス文字列。`formatSyncStatus` を流用）/ Separator / ログアウト / アカウント削除（危険色）
+   - `dropdown` 時の未ログイン: 現行と同じ「ログイン」ボタン（変更なし）
+   - **ログインダイアログ・削除確認/結果ダイアログは SyncHeader ルート直下のまま**（メニューコンテンツの子にしない）。メニューが閉じてもダイアログは維持される
+   - 同期ステータスの常時表示が失われる代償として、同期エラー時のみチップに警告インジケータ（例: 危険色のドット）を出す
+4. **App.tsx デスクトップヘッダー**: `<SyncHeader variant="dropdown" …>` + `<HeaderDataMenu …>` の2要素に置き換え。エクスポート/インポート/初期化ボタンと最終更新表示を撤去。`FileImportButton` はデスクトップから撤去されるがモバイルで使用継続のため削除しない
+5. **日本語コメント**: 全関数に付与（リポジトリ規約）
 
 ## 実装ステップ
 
-- [x] `git fetch origin && git switch -c feature/clan-battle-formation-order origin/main`
-- [x] ドメイン層: `src/domain/clanBattle.ts` に `sortClanBattleMembers` を新設（export、マスター未登録キャラは末尾）
-- [x] ドメイン層: `normalizeClanBattleState` にソートを組み込む（ソート→`normalizeSupportMemberCount` の順）
-- [x] ドメインテスト: `src/domain/clanBattle.test.ts` に `sortClanBattleMembers`（昇順/未登録末尾/未登録同士は元順維持/非破壊）と `normalizeClanBattleState`（逆順保存データの是正）のテストを追加
-- [x] `npm test` で domain 側が緑であることを確認
-- [x] UI層: `src/components/ClanBattleTab.tsx` の `handleAddMember` をソート追加に変更（既存 `characterByName` useMemo を再利用）
-- [x] UI層: 並び替え関連の削除（`reorderMembers` / `moveMemberByDirection` / `draggingMemberId` state / `handleDropMember` / `handleMoveMember` / draggable系属性 / `GripVertical` / ▲▼ボタンブロック / 不要 import）
-- [x] UI層: 案内文を「編成順（隊列の並び）で自動的に並びます。サポートは最大1人です。」の単一文言へ差し替え
-- [x] UI層: `members.map` の未使用 `memberIndex` を削除
-- [x] UIテスト: `src/components/ClanBattleTab.test.tsx` から並び替え関連テスト（`moveMemberByDirection` describe、▲▼操作、disabled、案内文出し分け、`buildMember`、不要なら `stubMobileMatchMedia`）を削除
-- [x] UIテスト: 追加時の挿入位置（order 最小・最大の2体入り編成に中間キャラを追加 → `onChange` の members が昇順3体）のテストを新設
-- [x] UIテスト: 新案内文の表示（旧2文言の不在）のテストを新設
-- [x] 検証: `npm run typecheck`
-- [x] 検証: `npm test`
-- [x] 検証: `npm run build`
+- [x] `git fetch origin && git switch -c feature/header-dropdown-menu origin/develop`
+- [x] `npx shadcn@latest add dropdown-menu` → `src/components/ui/dropdown-menu.tsx` をスレートナイトのトークンへカスタマイズ（既存 `select.tsx` / `sheet.tsx` のスタイルを参考）
+- [x] `HeaderDataMenu.tsx` 新設（エクスポート / インポート(hidden input はコンテンツ外) / 初期化(危険色) / 最終更新フッター）
+- [x] `SyncHeader.tsx` に `variant` prop 追加。`dropdown` 時のログイン後 UI をユーザー名チップ + メニューに変更。ダイアログ群はルート直下のまま維持
+- [x] `App.tsx` デスクトップヘッダーを 2 要素構成へ置き換え
+- [x] テスト更新・追加:
+  - 既存テストで旧ヘッダーボタン参照があれば追随
+  - HeaderDataMenu: メニュー展開で3項目+最終更新が出る / エクスポート項目クリックで onExport 発火 / 初期化項目クリックで onRequestReset 発火 / ファイル選択で onSelectImportFile 発火
+  - SyncHeader(dropdown): ログイン後にチップ→メニュー展開でログアウト/アカウント削除が出る / ログアウトクリックで signOut / inline(モバイル) が現行どおり
+- [x] `npm run typecheck` / `npm test` / `npm run build`（typecheck 緑 / front+worker 全 38 ファイル 301 テスト緑 / build 緑）
+- [ ] dev サーバーで実画面確認（未ログイン・メニュー展開・インポートのファイル選択・初期化ダイアログ・モバイル幅で無変更）+ スクリーンショット
+  - 実画面確認は実施済み（未ログインヘッダー2要素化・データメニュー展開で3項目+最終更新・初期化ダイアログ表示・モバイル幅は無変更を確認）。スクリーンショットはブラウザペインのキャプチャがタイムアウトするため未取得
+- [ ] codex + Claude 系サブエージェントの2系統レビュー → 致命的指摘ゼロまで修正ループ
+- [ ] Conventional Commits でコミット → push → **develop 向け** PR 作成（目的 / 変更概要 / 確認結果 / スクリーンショット）
 
-## スコープ外（計画どおり対象外）
+## スコープ外
 
-- スキーマ・マイグレーション（不要）
-- `updateMember` / `updateSelectedFormation` のソート再実行
-- コネクトランク計算タブの▲▼並び替え（別機能）
+- MobileHeader / ボトムシートの変更（既に集約済み）
+- デスクトップとモバイルのメニュー項目定義の共通化（将来課題）
+- ログインダイアログ自体・認証フローの変更
+- 「マイページ」「設定」等の新項目追加
 
-## レビュー
+## リスク・注意点
 
-計画どおりに実装完了。
-
-- `src/domain/clanBattle.ts`: `sortClanBattleMembers` を新設し、`normalizeClanBattleState` に「ソート→`normalizeSupportMemberCount`」の順で組み込み。
-- `src/components/ClanBattleTab.tsx`: `handleAddMember` をソート込みに変更。`reorderMembers`/`moveMemberByDirection`/`draggingMemberId`/`handleDropMember`/`handleMoveMember`/draggable属性/`GripVertical`/▲▼ボタン/未使用`memberIndex`/不要import(`ChevronDown`,`ChevronUp`,`GripVertical`)を削除。案内文を単一文言に差し替え。
-- テスト: `src/domain/clanBattle.test.ts` に `sortClanBattleMembers`（昇順/未登録末尾/未登録同士は元順維持/非破壊）と `normalizeClanBattleState`（逆順是正）を追加。`src/components/ClanBattleTab.test.tsx` から並び替え関連テストを削除し、「追加時の挿入位置（昇順3体）」「新案内文表示・旧文言の不在」を追加。
-- 検証: `npm run typecheck`（緑）/ `npm test`（37 files / 289 tests 全PASS）/ `npm run build`（front + client 両方成功）。
-- 計画からの逸脱: なし。
-- 気づいた懸念点: 実画面での動作確認（dev サーバーでの逆順追加・localStorage 逆順データのロード是正）は未実施（typecheck/test/build の自動検証のみ実施）。コミットは未実施（監督者のレビュー待ち）。
+- `MobileHeader` はシートを閉じると SyncHeader ごとアンマウントされる制約（MobileHeader.tsx 111-116 コメント）があるが、今回はモバイル無変更なので影響なし。デスクトップ側では同種の罠（ダイアログをメニュー内に置くとメニュー閉鎖で消える）を上記設計で回避する
+- Radix DropdownMenu の `onSelect` はデフォルトでメニューを閉じる。ファイル選択ダイアログはユーザージェスチャ内で `input.click()` を同期呼び出しすれば開く想定。挙動が不安定なら `onSelect` 内で `event.preventDefault()` → 手動クローズ順序を制御する

@@ -10,6 +10,7 @@ vi.mock("../lib/authClient", () => ({
 }));
 
 import { SyncHeader } from "./SyncHeader";
+import { signOut } from "../lib/authClient";
 
 // window.location.reload をスパイに差し替えるためのユーティリティ。
 const reloadSpy = vi.fn();
@@ -118,6 +119,74 @@ describe("SyncHeader: アカウント削除フロー", () => {
     expect(mockDeleteUser).not.toHaveBeenCalled();
     expect(onDeleteRequestStart).not.toHaveBeenCalled();
     expect(onBeforeAccountDeleted).not.toHaveBeenCalled();
+  });
+});
+
+describe("SyncHeader: dropdown 変形（デスクトップヘッダー）", () => {
+  // ユーザー名チップからメニューを展開する。
+  // jsdom は PointerEvent 未実装で pointerdown 経由では開けないため、キーボード操作（Enter）で開く。
+  function openAccountMenu(chipName: string | RegExp) {
+    fireEvent.keyDown(screen.getByRole("button", { name: chipName }), { key: "Enter" });
+  }
+
+  it("ログイン後はユーザー名チップが表示され、メニューにステータス・ログアウト・アカウント削除が出る", () => {
+    renderLoggedIn({ variant: "dropdown", userLabel: "テスト表示名", status: "idle" });
+
+    // inline のボタン群は出ず、チップだけが出る。
+    expect(screen.queryByRole("button", { name: /ログアウト/ })).not.toBeInTheDocument();
+    openAccountMenu(/テスト表示名/);
+
+    // ヘッダーラベルに表示名と同期ステータスが出る。
+    expect(screen.getByText("同期済み")).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: "ログアウト" })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: "アカウント削除" })).toBeInTheDocument();
+  });
+
+  it("ログアウト項目の選択で signOut が呼ばれる", () => {
+    renderLoggedIn({ variant: "dropdown" });
+
+    openAccountMenu(/テスト表示名/);
+    fireEvent.click(screen.getByRole("menuitem", { name: "ログアウト" }));
+
+    expect(vi.mocked(signOut)).toHaveBeenCalledTimes(1);
+  });
+
+  it("アカウント削除項目の選択でメニューが閉じても確認ダイアログが表示される", () => {
+    renderLoggedIn({ variant: "dropdown" });
+
+    openAccountMenu(/テスト表示名/);
+    fireEvent.click(screen.getByRole("menuitem", { name: "アカウント削除" }));
+
+    // ダイアログは SyncHeader ルート直下にあるため、メニュー閉鎖後も表示される。
+    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+    expect(within(screen.getByRole("alertdialog")).getByText(/取り消せません/)).toBeInTheDocument();
+  });
+
+  it("同期エラー時はチップに危険色ドットのインジケータが出る", () => {
+    renderLoggedIn({ variant: "dropdown", status: "error" });
+    // role="status" の名前は内容から算出されないため、ライブリージョンの読み上げ内容（sr-only テキスト）を検証する。
+    expect(screen.getByRole("status")).toHaveTextContent("同期エラー");
+  });
+
+  it("同期エラーでなければチップにインジケータが出ない", () => {
+    renderLoggedIn({ variant: "dropdown", status: "idle" });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("未ログイン時は dropdown でも従来どおりログインボタンが出る", () => {
+    render(
+      <SyncHeader
+        isLoggedIn={false}
+        isSessionPending={false}
+        userLabel={null}
+        status="logged_out"
+        onOpenPrivacyPolicy={vi.fn()}
+        onDeleteRequestStart={vi.fn()}
+        onBeforeAccountDeleted={vi.fn()}
+        variant="dropdown"
+      />,
+    );
+    expect(screen.getByRole("button", { name: /ログイン/ })).toBeInTheDocument();
   });
 });
 

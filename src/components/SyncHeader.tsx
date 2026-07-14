@@ -13,7 +13,15 @@ import {
   AlertDialogTitle,
 } from "./ui/alert-dialog";
 import { Button } from "./ui/button";
-import { LogIn, LogOut, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { ChevronDown, LogIn, LogOut, Trash2, UserRound } from "lucide-react";
 
 type Props = {
   // ログイン中か。
@@ -30,6 +38,9 @@ type Props = {
   onDeleteRequestStart: () => void;
   // アカウント削除成功の直前に呼ぶ。同期メタ破棄など App 側の後処理を委譲する（設計判断 3）。
   onBeforeAccountDeleted: () => void;
+  // レイアウト変形。"inline"（既定）は従来の横並び表示（モバイルのシート内で使用）、
+  // "dropdown" はログイン後 UI をユーザー名チップ + ドロップダウンメニューに集約する（デスクトップヘッダー用）。
+  variant?: "inline" | "dropdown";
 };
 
 // アカウント削除処理の結果種別（UI 分岐用）。
@@ -61,6 +72,7 @@ export function SyncHeader({
   onOpenPrivacyPolicy,
   onDeleteRequestStart,
   onBeforeAccountDeleted,
+  variant = "inline",
 }: Props) {
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -141,35 +153,86 @@ export function SyncHeader({
   const statusInfo = formatSyncStatus(status);
 
   if (isLoggedIn) {
+    // 表示名（未設定時は汎用表記。email は PII 方針によりフォールバックに使わない）。
+    const displayLabel = userLabel ?? "ログイン中";
     return (
       <>
-        <div className="flex items-center gap-2.5">
-          {statusInfo.text ? (
-            <span
-              className={cn(
-                "text-xs",
-                statusInfo.tone === "accent" && "text-accent",
-                statusInfo.tone === "danger" && "text-danger",
-                statusInfo.tone === "muted" && "text-muted",
-              )}
-            >
-              {statusInfo.text}
-            </span>
-          ) : null}
-          {userLabel ? (
-            <span className="max-w-[160px] truncate text-xs text-muted">{userLabel}</span>
-          ) : (
-            <span className="text-xs text-muted">ログイン中</span>
-          )}
-          <Button variant="outline" size="sm" onClick={handleSignOut}>
-            <LogOut className="size-4" aria-hidden="true" />
-            ログアウト
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
-            <Trash2 className="size-4" aria-hidden="true" />
-            アカウント削除
-          </Button>
-        </div>
+        {variant === "dropdown" ? (
+          // dropdown 変形: ユーザー名チップをトリガーに、ログアウト / アカウント削除をメニューへ集約する。
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              {/* 「データ」メニューのトリガー（既定サイズ）と高さ・文字サイズを揃えるため size は既定にする。 */}
+              <Button variant="outline" className="relative">
+                <UserRound className="size-4" aria-hidden="true" />
+                <span className="max-w-[160px] truncate">{displayLabel}</span>
+                <ChevronDown className="size-4 opacity-70" aria-hidden="true" />
+                {/* 同期ステータスの常時表示が無い代償として、同期エラー時のみ危険色ドットで知らせる。 */}
+                {statusInfo.tone === "danger" ? (
+                  <span className="absolute right-1 top-1 size-2 rounded-full bg-danger" role="status">
+                    {/* スクリーンリーダー向けの読み上げテキスト（空要素の aria-label は読まれない場合があるため）。 */}
+                    <span className="sr-only">同期エラー</span>
+                  </span>
+                ) : null}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {/* ヘッダー部: 表示名 + 同期ステータス（非インタラクティブ）。 */}
+              <DropdownMenuLabel>
+                <span className="block max-w-[220px] truncate text-sm text-main">{displayLabel}</span>
+                {statusInfo.text ? (
+                  <span
+                    className={cn(
+                      "mt-0.5 block text-xs",
+                      statusInfo.tone === "accent" && "text-accent",
+                      statusInfo.tone === "danger" && "text-danger",
+                      statusInfo.tone === "muted" && "text-muted",
+                    )}
+                  >
+                    {statusInfo.text}
+                  </span>
+                ) : null}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={handleSignOut}>
+                <LogOut className="size-4" aria-hidden="true" />
+                ログアウト
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="danger" onSelect={() => setIsDeleteDialogOpen(true)}>
+                <Trash2 className="size-4" aria-hidden="true" />
+                アカウント削除
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          // inline 変形（既定）: 従来の横並び表示（モバイルのシート内はこのまま）。
+          <div className="flex items-center gap-2.5">
+            {statusInfo.text ? (
+              <span
+                className={cn(
+                  "text-xs",
+                  statusInfo.tone === "accent" && "text-accent",
+                  statusInfo.tone === "danger" && "text-danger",
+                  statusInfo.tone === "muted" && "text-muted",
+                )}
+              >
+                {statusInfo.text}
+              </span>
+            ) : null}
+            {userLabel ? (
+              <span className="max-w-[160px] truncate text-xs text-muted">{userLabel}</span>
+            ) : (
+              <span className="text-xs text-muted">ログイン中</span>
+            )}
+            <Button variant="outline" size="sm" onClick={handleSignOut}>
+              <LogOut className="size-4" aria-hidden="true" />
+              ログアウト
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
+              <Trash2 className="size-4" aria-hidden="true" />
+              アカウント削除
+            </Button>
+          </div>
+        )}
 
         {/* 破壊的操作の確認ダイアログ。削除内容を明示する（設計判断 3）。 */}
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={(open) => !isDeleting && setIsDeleteDialogOpen(open)}>
@@ -228,7 +291,8 @@ export function SyncHeader({
 
   return (
     <>
-      <Button variant="outline" size="sm" onClick={() => setIsLoginDialogOpen(true)}>
+      {/* dropdown 変形（デスクトップヘッダー）では「データ」メニューのトリガーとサイズを揃えるため既定サイズにする。 */}
+      <Button variant="outline" size={variant === "dropdown" ? "default" : "sm"} onClick={() => setIsLoginDialogOpen(true)}>
         <LogIn className="size-4" aria-hidden="true" />
         ログイン
       </Button>
