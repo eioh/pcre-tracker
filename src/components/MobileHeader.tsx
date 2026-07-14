@@ -112,9 +112,12 @@ export function MobileHeader({
               ログイン導線（未ログイン時）またはステータス・ログアウト・アカウント削除（ログイン時）。
               ダイアログ群は SyncHeader が保持しているため、これらの操作ではシートを閉じない
               （閉じると SyncHeader ごとアンマウントされダイアログが消えるため）。
-              子ボタンをメニュー項目スタイルへ寄せるためのセレクタを併用する（SyncHeader 本体は無改変）。
+              子ボタンをメニュー項目スタイルへ寄せるためのセレクタを併用する（SyncHeader 本体はレイアウト無改変）。
+              角丸はシート内の他メニュー項目（rounded-[10px]）と揃える。ログイン後のログアウト/アカウント削除は
+              div 内にネストされるため、角丸のみ子孫セレクタ（[&_button]）で全ボタンに適用する
+              （ダイアログ群はポータルで body 直下に描画されるため影響しない）。
             */}
-            <div className="[&>button]:w-full [&>button]:justify-start [&>button]:px-4 [&>button]:py-3 [&>button]:text-sm [&>div]:flex-wrap">
+            <div className="[&_button]:rounded-[10px] [&>button]:w-full [&>button]:justify-start [&>button]:px-4 [&>button]:py-3 [&>button]:text-sm [&>div]:flex-wrap">
               <SyncHeader
                 isLoggedIn={isLoggedIn}
                 isSessionPending={isSessionPending}
@@ -139,7 +142,12 @@ export function MobileHeader({
               onSelectFile={handleSelectImportFile}
             />
 
-            <Button variant="outline" className={menuItemClass} onClick={runAfterClose(onRequestReset)}>
+            {/* 破壊的操作のため危険色にする（デスクトップのデータメニューの danger 項目と整合）。 */}
+            <Button
+              variant="outline"
+              className={cn(menuItemClass, "text-danger hover:border-danger")}
+              onClick={runAfterClose(onRequestReset)}
+            >
               <RotateCcw className="size-4" aria-hidden="true" />
               保存データを初期化
             </Button>
