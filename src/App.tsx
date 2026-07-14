@@ -30,10 +30,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "./components/ui/alert-dialog";
-import { Button } from "./components/ui/button";
-import { FileImportButton } from "./components/ui/file-import-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { PenLine, LayoutDashboard, Coins, Calculator, Download, Upload, RotateCcw, Swords } from "lucide-react";
+import { PenLine, LayoutDashboard, Coins, Calculator, Swords } from "lucide-react";
+import { HeaderDataMenu } from "./components/HeaderDataMenu";
 import { SyncHeader } from "./components/SyncHeader";
 import { MobileHeader } from "./components/MobileHeader";
 import { MobileBottomNav } from "./components/MobileBottomNav";
@@ -352,7 +351,7 @@ export default function App() {
         isMobile ? "pb-[calc(3.5rem+env(safe-area-inset-bottom)+1rem)]" : "pb-9",
       )}
     >
-      {/* 768px 未満はコンパクトヘッダー+メニューシート、それ以上は従来ヘッダー（無改変）を描画する。 */}
+      {/* 768px 未満はコンパクトヘッダー+メニューシート、それ以上はドロップダウン集約ヘッダーを描画する。 */}
       {isMobile ? (
         <MobileHeader
           isLoggedIn={sync.isLoggedIn}
@@ -375,38 +374,24 @@ export default function App() {
           <p className="m-0 text-sm text-muted md:text-base">育成状況を管理</p>
         </div>
 
-        <div className="flex w-full flex-col items-start gap-2.5 lg:w-auto lg:items-end">
-          <div className="flex flex-wrap items-center gap-2">
-            <SyncHeader
-              isLoggedIn={sync.isLoggedIn}
-              isSessionPending={sync.isSessionPending}
-              userLabel={sync.userLabel}
-              status={sync.status}
-              onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
-              onDeleteRequestStart={sync.stopSync}
-              onBeforeAccountDeleted={handleBeforeAccountDeleted}
-            />
-            <Button variant="outline" onClick={handleExportBackup}>
-              <Download className="size-4" aria-hidden="true" />
-              エクスポート
-            </Button>
-            <FileImportButton
-              label="インポート"
-              icon={<Upload className="size-4" aria-hidden="true" />}
-              accept="application/json,.json"
-              onSelectFile={handleSelectImportFile}
-            />
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsResetDialogOpen(true);
-              }}
-            >
-              <RotateCcw className="size-4" aria-hidden="true" />
-              保存データを初期化
-            </Button>
-          </div>
-          <p className="m-0 text-sm text-muted">最終更新: {state.updatedAt ? formatUpdatedAt(state.updatedAt) : "-"}</p>
+        <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto lg:justify-end">
+          {/* アカウント関連はユーザー名チップのメニュー、データ操作は「データ」メニューへ集約する。 */}
+          <SyncHeader
+            variant="dropdown"
+            isLoggedIn={sync.isLoggedIn}
+            isSessionPending={sync.isSessionPending}
+            userLabel={sync.userLabel}
+            status={sync.status}
+            onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
+            onDeleteRequestStart={sync.stopSync}
+            onBeforeAccountDeleted={handleBeforeAccountDeleted}
+          />
+          <HeaderDataMenu
+            onExport={handleExportBackup}
+            onSelectImportFile={handleSelectImportFile}
+            onRequestReset={handleRequestReset}
+            updatedAtLabel={state.updatedAt ? formatUpdatedAt(state.updatedAt) : "-"}
+          />
         </div>
       </header>
       )}
