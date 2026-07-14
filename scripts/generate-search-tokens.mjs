@@ -6,6 +6,7 @@ const sourceMasterPath = resolve(process.cwd(), "src/data/characterMaster.json")
 const coinShopPath = resolve(process.cwd(), "src/data/coinShopMemoryPiece.json");
 const hardQuestPath = resolve(process.cwd(), "src/data/hardQuestMemoryPiece.json");
 const sideStoryPath = resolve(process.cwd(), "src/data/sideStoryMemoryPiece.json");
+const formationOrderPath = resolve(process.cwd(), "src/data/formationOrder.json");
 const generatedMasterPath = resolve(process.cwd(), "src/data/characterMaster.generated.json");
 
 // 検索用の比較で使う正規化文字列を作る。
@@ -60,6 +61,34 @@ function buildSideStoryCharacterSet() {
   return set;
 }
 
+// 編成順リスト(formationOrder.json)を検証し、キャラ名→編成順(0始まり)のMapを構築する。
+function buildFormationOrderMap(masterNames) {
+  const rawText = readFileSync(formationOrderPath, "utf8");
+  const orderedNames = JSON.parse(rawText);
+  if (!Array.isArray(orderedNames)) {
+    throw new Error("formationOrder.json の形式が不正です(キャラ名の配列である必要があります)");
+  }
+  /** @type {Map<string, number>} */
+  const map = new Map();
+  for (const name of orderedNames) {
+    if (typeof name !== "string") {
+      throw new Error(`formationOrder.json に文字列でない要素があります: ${JSON.stringify(name)}`);
+    }
+    if (map.has(name)) {
+      throw new Error(`formationOrder.json に重複したキャラクター名があります: ${name}`);
+    }
+    if (!masterNames.has(name)) {
+      throw new Error(`formationOrder.json にマスターデータに存在しない名前があります: ${name}`);
+    }
+    map.set(name, map.size);
+  }
+  const missing = [...masterNames].filter((name) => !map.has(name));
+  if (missing.length > 0) {
+    throw new Error(`formationOrder.json に載っていないキャラクターがあります: ${missing.join(", ")}`);
+  }
+  return map;
+}
+
 // マスターデータへ検索トークンとコインショップ・ハードクエスト・サイドストーリー情報を統合して保存する。
 function generateSearchTokens() {
   const rawText = readFileSync(sourceMasterPath, "utf8");
@@ -72,6 +101,10 @@ function generateSearchTokens() {
   const coinSourceMap = buildCoinSourceMap();
   const hardQuestCharacters = buildHardQuestCharacterSet();
   const sideStoryCharacters = buildSideStoryCharacterSet();
+  const masterNames = new Set(
+    characters.filter((character) => character && typeof character.name === "string").map((character) => character.name),
+  );
+  const formationOrderMap = buildFormationOrderMap(masterNames);
 
   const enriched = characters.map((character) => {
     if (!character || typeof character !== "object" || typeof character.name !== "string") {
@@ -84,6 +117,7 @@ function generateSearchTokens() {
       ...character,
       memoryPieceSources: [...coinSources, ...hardQuestSources, ...sideStorySources, ...(character.memoryPieceSources ?? [])],
       searchTokens: buildNameSearchTokens(character.name),
+      formationOrder: formationOrderMap.get(character.name),
     };
   });
 

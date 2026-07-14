@@ -11,6 +11,7 @@ function createCharacter(implemented: MasterCharacter["implemented"]): MasterCha
     role: "アタッカー",
     implemented,
     memoryPieceSources: [],
+    formationOrder: 0,
   };
 }
 

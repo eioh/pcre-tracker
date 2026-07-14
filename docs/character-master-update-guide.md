@@ -7,6 +7,7 @@
 ## 1. 更新対象
 
 - マスターデータ（手編集元）: `src/data/characterMaster.json`
+- 編成順リスト（手編集元）: `src/data/formationOrder.json`
 - マスターデータ（生成・アプリ参照）: `src/data/characterMaster.generated.json`
 - 検索トークン生成スクリプト: `scripts/generate-search-tokens.mjs`
 - 運用手順書: `docs/character-master-update-guide.md`
@@ -38,13 +39,19 @@
   - 情報が確定するまで空配列 `[]` を許容する
   - ショップ追加などで確定後に更新する
 - `searchTokens` は手編集しない（`npm run generate` で生成ファイルへ再生成）
+- `formationOrder`（編成順）:
+  - 正本は `src/data/formationOrder.json`（編成順=隊列の前衛側が先頭になるよう並べたキャラ名の配列）
+  - 新キャラ追加時は、隊列表等で編成順の位置を確認し、`formationOrder.json` の該当位置に名前を1行挿入する
+  - 番号は `npm run generate` が配列の並びから自動採番するため、手で番号を管理しない
+  - `characterMaster.json` と `formationOrder.json` のキャラ集合が一致しないと `npm run generate` がエラーになる（入れ忘れ検出）
 
 ## 4. 作業手順
 
 1. 追加対象キャラの確認元URL（公式 + 補完）を確定する。
 2. `src/data/characterMaster.json` にキャラを追加/更新する（`attribute`/`role` は確認済み値のみ入力）。
-3. `npm run generate` を実行して `src/data/characterMaster.generated.json` を再生成する。
-4. 差分を確認して不要変更がないことを確認する（元データは上書きされない）。
+3. `src/data/formationOrder.json` の編成順の正しい位置に追加キャラの名前を挿入する。
+4. `npm run generate` を実行して `src/data/characterMaster.generated.json` を再生成する。
+5. 差分を確認して不要変更がないことを確認する（元データは上書きされない）。
 
 ## 5. 検証コマンド
 
@@ -55,6 +62,7 @@
 ## 6. コミット前チェックリスト
 
 - 追加キャラの `name` が重複していない
+- 追加キャラが `formationOrder.json` の正しい位置に挿入されている
 - 追加キャラの `attribute` と `role` が確認元URLの記載と一致している
 - 追加キャラの確認元URL（公式 + 補完）をPR本文またはコミットメモに残している
 - `implemented` が実装状況と一致している

@@ -11,6 +11,7 @@ function createCharacter(limited: boolean): MasterCharacter {
     role: "アタッカー",
     implemented: { star6: true, ue1: true, ue1Sp: true, ue2: true },
     memoryPieceSources: [],
+    formationOrder: 0,
   };
 }
 

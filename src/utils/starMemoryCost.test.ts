@@ -14,6 +14,7 @@ function createCharacter(params: {
     role: "アタッカー",
     implemented: params.implemented,
     memoryPieceSources: [],
+    formationOrder: 0,
   };
 }
 
