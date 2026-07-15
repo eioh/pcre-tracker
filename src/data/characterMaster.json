@@ -1803,7 +1803,7 @@
       "star6": false,
       "ue1": true,
       "ue1Sp": false,
-      "ue2": false
+      "ue2": true
     }
   },
   {
@@ -1816,7 +1816,7 @@
       "star6": false,
       "ue1": true,
       "ue1Sp": false,
-      "ue2": false
+      "ue2": true
     }
   },
   {
@@ -4434,6 +4434,20 @@
     "limited": true,
     "attribute": "闇",
     "role": "アタッカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "クレジッタ（サマー）",
+    "baseName": "クレジッタ",
+    "limited": true,
+    "attribute": "火",
+    "role": "バッファー",
     "implemented": {
       "star6": false,
       "ue1": false,

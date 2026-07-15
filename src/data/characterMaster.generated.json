@@ -43,7 +43,7 @@
       "ゆい",
       "yui"
     ],
-    "formationOrder": 326
+    "formationOrder": 327
   },
   {
     "name": "レイ",
@@ -180,7 +180,7 @@
       "ゆき",
       "yuki"
     ],
-    "formationOrder": 330
+    "formationOrder": 331
   },
   {
     "name": "アンナ",
@@ -226,7 +226,7 @@
       "まほ",
       "maho"
     ],
-    "formationOrder": 324
+    "formationOrder": 325
   },
   {
     "name": "リノ",
@@ -272,7 +272,7 @@
       "はつね",
       "hatsune"
     ],
-    "formationOrder": 301
+    "formationOrder": 302
   },
   {
     "name": "ナナカ",
@@ -295,7 +295,7 @@
       "ななか",
       "nanaka"
     ],
-    "formationOrder": 284
+    "formationOrder": 285
   },
   {
     "name": "カスミ",
@@ -341,7 +341,7 @@
       "みさと",
       "misato"
     ],
-    "formationOrder": 281
+    "formationOrder": 282
   },
   {
     "name": "スズナ",
@@ -754,7 +754,7 @@
       "きょうか",
       "kyouka"
     ],
-    "formationOrder": 333
+    "formationOrder": 334
   },
   {
     "name": "トモ",
@@ -823,7 +823,7 @@
       "あおい",
       "aoi"
     ],
-    "formationOrder": 318
+    "formationOrder": 319
   },
   {
     "name": "チカ",
@@ -846,7 +846,7 @@
       "ちか",
       "chika"
     ],
-    "formationOrder": 321
+    "formationOrder": 322
   },
   {
     "name": "マコト",
@@ -1030,7 +1030,7 @@
       "みさき",
       "misaki"
     ],
-    "formationOrder": 304
+    "formationOrder": 305
   },
   {
     "name": "ミツキ",
@@ -1261,7 +1261,7 @@
       "きゃる",
       "kyaru"
     ],
-    "formationOrder": 294
+    "formationOrder": 295
   },
   {
     "name": "ムイミ",
@@ -1554,7 +1554,7 @@
       "スズメ(サマア)",
       "suzume(samaa)"
     ],
-    "formationOrder": 313
+    "formationOrder": 314
   },
   {
     "name": "キャル（サマー）",
@@ -1577,7 +1577,7 @@
       "キャル(サマア)",
       "kyaru(samaa)"
     ],
-    "formationOrder": 316
+    "formationOrder": 317
   },
   {
     "name": "タマキ（サマー）",
@@ -1689,7 +1689,7 @@
       "みさき(はろうぃん)",
       "misaki(harouin)"
     ],
-    "formationOrder": 335
+    "formationOrder": 336
   },
   {
     "name": "チカ（クリスマス）",
@@ -1711,7 +1711,7 @@
       "ちか(くりすます)",
       "chika(kurisumasu)"
     ],
-    "formationOrder": 309
+    "formationOrder": 310
   },
   {
     "name": "クルミ（クリスマス）",
@@ -1801,7 +1801,7 @@
       "ユイ(ニュウイヤア)",
       "yui(nyuuiyaa)"
     ],
-    "formationOrder": 289
+    "formationOrder": 290
   },
   {
     "name": "レイ（ニューイヤー）",
@@ -2183,7 +2183,7 @@
       "マホ(サマア)",
       "maho(samaa)"
     ],
-    "formationOrder": 322
+    "formationOrder": 323
   },
   {
     "name": "アオイ（編入生）",
@@ -2274,7 +2274,7 @@
       "ゆに",
       "yuni"
     ],
-    "formationOrder": 331
+    "formationOrder": 332
   },
   {
     "name": "キョウカ（ハロウィン）",
@@ -2296,7 +2296,7 @@
       "きょうか(はろうぃん)",
       "kyouka(harouin)"
     ],
-    "formationOrder": 337
+    "formationOrder": 338
   },
   {
     "name": "ミソギ（ハロウィン）",
@@ -2362,7 +2362,7 @@
       "るな",
       "runa"
     ],
-    "formationOrder": 307
+    "formationOrder": 308
   },
   {
     "name": "クリスティーナ（クリスマス）",
@@ -3138,7 +3138,7 @@
       "star6": false,
       "ue1": true,
       "ue1Sp": false,
-      "ue2": false
+      "ue2": true
     },
     "memoryPieceSources": [
       "master_coin"
@@ -3160,7 +3160,7 @@
       "star6": false,
       "ue1": true,
       "ue1Sp": false,
-      "ue2": false
+      "ue2": true
     },
     "memoryPieceSources": [
       "side_story"
@@ -3193,7 +3193,7 @@
       "カスミ(サマア)",
       "kasumi(samaa)"
     ],
-    "formationOrder": 282
+    "formationOrder": 283
   },
   {
     "name": "リマ（シンデレラ）",
@@ -3325,7 +3325,7 @@
       "ゆに(聖学祭)",
       "yuni(聖学祭)"
     ],
-    "formationOrder": 332
+    "formationOrder": 333
   },
   {
     "name": "イノリ（タイムトラベル）",
@@ -3596,7 +3596,7 @@
       "ユキ(オウエド)",
       "yuki(ooedo)"
     ],
-    "formationOrder": 325
+    "formationOrder": 326
   },
   {
     "name": "カオリ（ハロウィン）",
@@ -3662,7 +3662,7 @@
       "すずな(はろうぃん)",
       "suzuna(harouin)"
     ],
-    "formationOrder": 305
+    "formationOrder": 306
   },
   {
     "name": "クレジッタ",
@@ -3684,7 +3684,7 @@
       "くれじった",
       "kurejitta"
     ],
-    "formationOrder": 297
+    "formationOrder": 298
   },
   {
     "name": "ランファ",
@@ -3706,7 +3706,7 @@
       "らんふぁ",
       "ranfua"
     ],
-    "formationOrder": 317
+    "formationOrder": 318
   },
   {
     "name": "ミソラ",
@@ -3750,7 +3750,7 @@
       "かりん",
       "karin"
     ],
-    "formationOrder": 320
+    "formationOrder": 321
   },
   {
     "name": "ネビア",
@@ -3772,7 +3772,7 @@
       "ねびあ",
       "nebia"
     ],
-    "formationOrder": 339
+    "formationOrder": 340
   },
   {
     "name": "イオ（ノワール）",
@@ -3862,7 +3862,7 @@
       "りの(くりすます)",
       "rino(kurisumasu)"
     ],
-    "formationOrder": 306
+    "formationOrder": 307
   },
   {
     "name": "ミヤコ（クリスマス）",
@@ -4068,7 +4068,7 @@
       "クルミ(ステエジ)",
       "kurumi(suteeji)"
     ],
-    "formationOrder": 276
+    "formationOrder": 277
   },
   {
     "name": "ミサキ（ステージ）",
@@ -4091,7 +4091,7 @@
       "ミサキ(ステエジ)",
       "misaki(suteeji)"
     ],
-    "formationOrder": 287
+    "formationOrder": 288
   },
   {
     "name": "アユミ（怪盗）",
@@ -4203,7 +4203,7 @@
       "あおい(きゃんぷ)",
       "aoi(kyanpu)"
     ],
-    "formationOrder": 277
+    "formationOrder": 278
   },
   {
     "name": "ユカリ（キャンプ）",
@@ -4339,7 +4339,7 @@
       "キョウカ(サマア)",
       "kyouka(samaa)"
     ],
-    "formationOrder": 334
+    "formationOrder": 335
   },
   {
     "name": "ミソギ（サマー）",
@@ -4407,7 +4407,7 @@
       "あめす",
       "amesu"
     ],
-    "formationOrder": 290
+    "formationOrder": 291
   },
   {
     "name": "マホ（エクスプローラー）",
@@ -4430,7 +4430,7 @@
       "マホ(エクスプロウラア)",
       "maho(ekusupurooraa)"
     ],
-    "formationOrder": 323
+    "formationOrder": 324
   },
   {
     "name": "アヤネ（エクスプローラー）",
@@ -4541,7 +4541,7 @@
       "ななか(はろうぃん)",
       "nanaka(harouin)"
     ],
-    "formationOrder": 286
+    "formationOrder": 287
   },
   {
     "name": "クリスティーナ（ワイルド）",
@@ -4812,7 +4812,7 @@
       "たまき(かふぇ)",
       "tamaki(kafye)"
     ],
-    "formationOrder": 338
+    "formationOrder": 339
   },
   {
     "name": "モニカ（カフェ）",
@@ -4857,7 +4857,7 @@
       "コッコロ(レンジャア)",
       "kokkoro(renjaa)"
     ],
-    "formationOrder": 298
+    "formationOrder": 299
   },
   {
     "name": "シオリ（レンジャー）",
@@ -5101,7 +5101,7 @@
       "らいらえる",
       "rairaeru"
     ],
-    "formationOrder": 285
+    "formationOrder": 286
   },
   {
     "name": "ネネカ（サマー）",
@@ -5261,7 +5261,7 @@
       "きゃる(編入生)",
       "kyaru(編入生)"
     ],
-    "formationOrder": 329
+    "formationOrder": 330
   },
   {
     "name": "スズナ（編入生）",
@@ -5275,13 +5275,15 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "hard_quest"
+    ],
     "searchTokens": [
       "スズナ(編入生)",
       "すずな(編入生)",
       "suzuna(編入生)"
     ],
-    "formationOrder": 295
+    "formationOrder": 296
   },
   {
     "name": "サレン（サラサリア）",
@@ -5452,7 +5454,7 @@
       "ハツネ(ニュウイヤア)",
       "hatsune(nyuuiyaa)"
     ],
-    "formationOrder": 328
+    "formationOrder": 329
   },
   {
     "name": "カスミ（ニューイヤー）",
@@ -5475,7 +5477,7 @@
       "カスミ(ニュウイヤア)",
       "kasumi(nyuuiyaa)"
     ],
-    "formationOrder": 283
+    "formationOrder": 284
   },
   {
     "name": "ヒヨリ（アストラル）",
@@ -5541,7 +5543,7 @@
       "ゆい(あすとらる)",
       "yui(asutoraru)"
     ],
-    "formationOrder": 311
+    "formationOrder": 312
   },
   {
     "name": "エリス",
@@ -5563,7 +5565,7 @@
       "えりす",
       "erisu"
     ],
-    "formationOrder": 327
+    "formationOrder": 328
   },
   {
     "name": "ユニ（ウィンター）",
@@ -5913,7 +5915,7 @@
       "ミソラ(サマア)",
       "misora(samaa)"
     ],
-    "formationOrder": 299
+    "formationOrder": 300
   },
   {
     "name": "リリ（サマー）",
@@ -5959,7 +5961,7 @@
       "アメス(サマア)",
       "amesu(samaa)"
     ],
-    "formationOrder": 288
+    "formationOrder": 289
   },
   {
     "name": "ホマレ（サマー）",
@@ -6024,7 +6026,7 @@
       "エキドナ(サマア)",
       "ekidona(samaa)"
     ],
-    "formationOrder": 314
+    "formationOrder": 315
   },
   {
     "name": "レム（サマー）",
@@ -6092,7 +6094,7 @@
       "ルイズマリイ",
       "ruizumarii"
     ],
-    "formationOrder": 300
+    "formationOrder": 301
   },
   {
     "name": "ルイズマリー（サマー）",
@@ -6113,7 +6115,7 @@
       "ルイズマリイ(サマア)",
       "ruizumarii(samaa)"
     ],
-    "formationOrder": 302
+    "formationOrder": 303
   },
   {
     "name": "イロハ",
@@ -6175,7 +6177,7 @@
       "らいらえる(くりすます)",
       "rairaeru(kurisumasu)"
     ],
-    "formationOrder": 296
+    "formationOrder": 297
   },
   {
     "name": "イオ（クリスマス）",
@@ -6195,7 +6197,7 @@
       "いお(くりすます)",
       "io(kurisumasu)"
     ],
-    "formationOrder": 293
+    "formationOrder": 294
   },
   {
     "name": "グレイス",
@@ -6350,7 +6352,7 @@
       "ねねか(あるふぁ)",
       "neneka(arufua)"
     ],
-    "formationOrder": 303
+    "formationOrder": 304
   },
   {
     "name": "クリスティーナ（アルファ）",
@@ -6395,7 +6397,7 @@
       "ふぃお",
       "fyio"
     ],
-    "formationOrder": 291
+    "formationOrder": 292
   },
   {
     "name": "ランファ（儀装束）",
@@ -6417,7 +6419,7 @@
       "らんふぁ(儀装束)",
       "ranfua(儀装束)"
     ],
-    "formationOrder": 315
+    "formationOrder": 316
   },
   {
     "name": "チカ（儀装束）",
@@ -6437,7 +6439,7 @@
       "ちか(儀装束)",
       "chika(儀装束)"
     ],
-    "formationOrder": 312
+    "formationOrder": 313
   },
   {
     "name": "クローチェ（エアリアル）",
@@ -6569,7 +6571,7 @@
       "エリス(サマア)",
       "erisu(samaa)"
     ],
-    "formationOrder": 319
+    "formationOrder": 320
   },
   {
     "name": "シェフィ（サマー）",
@@ -6737,7 +6739,7 @@
       "ゆきの",
       "yukino"
     ],
-    "formationOrder": 340
+    "formationOrder": 341
   },
   {
     "name": "サツキ",
@@ -6779,7 +6781,7 @@
       "あらくね",
       "arakune"
     ],
-    "formationOrder": 278
+    "formationOrder": 279
   },
   {
     "name": "サクラ",
@@ -6945,7 +6947,7 @@
       "こっころ(嚮導幼君)",
       "kokkoro(嚮導幼君)"
     ],
-    "formationOrder": 280
+    "formationOrder": 281
   },
   {
     "name": "リノ（ニューイヤー）",
@@ -7070,7 +7072,7 @@
       "ゆい(ぷりんせす)",
       "yui(purinsesu)"
     ],
-    "formationOrder": 308
+    "formationOrder": 309
   },
   {
     "name": "レイ（プリンセス）",
@@ -7159,7 +7161,7 @@
       "きゃる(ぷりんせす)",
       "kyaru(purinsesu)"
     ],
-    "formationOrder": 292
+    "formationOrder": 293
   },
   {
     "name": "ハツネ＆シオリ",
@@ -7181,7 +7183,7 @@
       "はつね&しおり",
       "hatsune&shiori"
     ],
-    "formationOrder": 279
+    "formationOrder": 280
   },
   {
     "name": "ミソギ＆ミミ＆キョウカ",
@@ -7397,7 +7399,7 @@
       "きょうか(ごしっく)",
       "kyouka(goshikku)"
     ],
-    "formationOrder": 336
+    "formationOrder": 337
   },
   {
     "name": "キャル（覇瞳天星）",
@@ -7419,7 +7421,7 @@
       "きゃる(覇瞳天星)",
       "kyaru(覇瞳天星)"
     ],
-    "formationOrder": 310
+    "formationOrder": 311
   },
   {
     "name": "ミホ（ガルパン）",
@@ -7581,5 +7583,26 @@
       "shefyi(vuaadorahhe)"
     ],
     "formationOrder": 132
+  },
+  {
+    "name": "クレジッタ（サマー）",
+    "baseName": "クレジッタ",
+    "limited": true,
+    "attribute": "火",
+    "role": "バッファー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "クレジッタ(サマー)",
+      "くれじった(さまあ)",
+      "クレジッタ(サマア)",
+      "kurejitta(samaa)"
+    ],
+    "formationOrder": 276
   }
 ]
