@@ -6564,7 +6564,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "エリス(サマー)",
       "えりす(さまあ)",
@@ -6585,7 +6587,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "シェフィ(サマー)",
       "しぇふぃ(さまあ)",
@@ -6606,7 +6610,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "プレシア(サマー)",
       "ぷれしあ(さまあ)",
@@ -7575,7 +7581,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "シェフィ(ヴァードラッヘ)",
       "しぇふぃ(ゔぁあどらっへ)",
