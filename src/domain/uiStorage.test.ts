@@ -26,6 +26,7 @@ describe("uiStorage", () => {
         isDetailSettingsOpen: true,
         ownedFilter: "owned",
         limitedFilter: "limited",
+        ue1SpImplementedFilter: "implemented",
         limitBreakFilter: "on",
         adventureMemoryPieceFilter: "on",
         purePieceAvailabilityFilter: "available",
@@ -56,6 +57,7 @@ describe("uiStorage", () => {
           searchText: 123,
           isDetailSettingsOpen: "broken",
           ownedFilter: "foo",
+          ue1SpImplementedFilter: "broken",
           adventureMemoryPieceFilter: "broken",
           purePieceAvailabilityFilter: "broken",
           starFilters: [1, 99, 1, "x"],
@@ -74,6 +76,7 @@ describe("uiStorage", () => {
     expect(loaded.input.ownedFilter).toBe("all");
     expect(loaded.input.purePieceAvailabilityFilter).toBe("all");
     expect(loaded.input.limitedFilter).toBe("all");
+    expect(loaded.input.ue1SpImplementedFilter).toBe("all");
     expect(loaded.input.limitBreakFilter).toBe("all");
     expect(loaded.input.adventureMemoryPieceFilter).toBe("all");
     expect(loaded.input.starMemoryCalcMode).toBe("implemented_max");
