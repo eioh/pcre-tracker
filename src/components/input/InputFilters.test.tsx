@@ -10,6 +10,7 @@ import type {
   SortKey,
   StarFilter,
   Ue1Filter,
+  Ue1SpImplementedFilter,
   Ue2Filter,
   AdventureMemoryPieceFilter,
 } from "../../domain/uiStorage";
@@ -23,6 +24,8 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputFilters>>): C
     onOwnedFilterChange: vi.fn<(value: OwnedFilter) => void>(),
     limitedFilter: "all",
     onLimitedFilterChange: vi.fn<(value: LimitedFilter) => void>(),
+    ue1SpImplementedFilter: "all",
+    onUe1SpImplementedFilterChange: vi.fn<(value: Ue1SpImplementedFilter) => void>(),
     limitBreakFilter: "all",
     onLimitBreakFilterChange: vi.fn<(value: LimitBreakFilter) => void>(),
     adventureMemoryPieceFilter: "all",
@@ -70,6 +73,7 @@ describe("InputFilters", () => {
     const props = buildProps({
       ownedFilter: "owned",
       limitedFilter: "limited",
+      ue1SpImplementedFilter: "implemented",
       limitBreakFilter: "on",
       adventureMemoryPieceFilter: "on",
       starFilters: [6],
@@ -83,6 +87,7 @@ describe("InputFilters", () => {
 
     expect(props.onOwnedFilterChange).toHaveBeenCalledWith("all");
     expect(props.onLimitedFilterChange).toHaveBeenCalledWith("all");
+    expect(props.onUe1SpImplementedFilterChange).toHaveBeenCalledWith("all");
     expect(props.onLimitBreakFilterChange).toHaveBeenCalledWith("all");
     expect(props.onAdventureMemoryPieceFilterChange).toHaveBeenCalledWith("all");
     expect(props.onPurePieceAvailabilityFilterChange).toHaveBeenCalledWith("all");
@@ -131,15 +136,30 @@ describe("InputFilters", () => {
 
     selectComboboxOption("所持", "所持のみ");
     selectComboboxOption("限定", "限定のみ");
+    selectComboboxOption("専用1SP", "実装済みのみ");
     selectComboboxOption("限界突破", "限界突破済み");
     selectComboboxOption("アドベンチャー", "メモピ枠のみ");
     selectComboboxOption("ピュアピ", "入手可能のみ");
 
     expect(props.onOwnedFilterChange).toHaveBeenCalledWith("owned");
     expect(props.onLimitedFilterChange).toHaveBeenCalledWith("limited");
+    expect(props.onUe1SpImplementedFilterChange).toHaveBeenCalledWith("implemented");
     expect(props.onLimitBreakFilterChange).toHaveBeenCalledWith("on");
     expect(props.onAdventureMemoryPieceFilterChange).toHaveBeenCalledWith("on");
     expect(props.onPurePieceAvailabilityFilterChange).toHaveBeenCalledWith("available");
+  });
+
+  it("専用1SPフィルタは現在値を表示し未実装のみへの変更も通知する", () => {
+    const props = buildProps({ ue1SpImplementedFilter: "implemented" });
+    render(<InputFilters {...props} />);
+
+    const field = screen.getByText("専用1SP").closest("div");
+    expect(field).not.toBeNull();
+    expect(within(field as HTMLElement).getByText("実装済みのみ")).toBeInTheDocument();
+
+    selectComboboxOption("専用1SP", "未実装のみ");
+
+    expect(props.onUe1SpImplementedFilterChange).toHaveBeenCalledWith("unimplemented");
   });
 
   it("ソート列とソート順の変更を通知する", () => {

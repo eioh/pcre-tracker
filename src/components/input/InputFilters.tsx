@@ -12,6 +12,7 @@ import type {
   SortKey,
   StarFilter,
   Ue1Filter,
+  Ue1SpImplementedFilter,
   Ue2Filter,
 } from "../../domain/uiStorage";
 import { Button } from "../ui/button";
@@ -27,6 +28,8 @@ type InputFiltersProps = {
   onOwnedFilterChange: (value: OwnedFilter) => void;
   limitedFilter: LimitedFilter;
   onLimitedFilterChange: (value: LimitedFilter) => void;
+  ue1SpImplementedFilter: Ue1SpImplementedFilter;
+  onUe1SpImplementedFilterChange: (value: Ue1SpImplementedFilter) => void;
   limitBreakFilter: LimitBreakFilter;
   onLimitBreakFilterChange: (value: LimitBreakFilter) => void;
   adventureMemoryPieceFilter: AdventureMemoryPieceFilter;
@@ -75,6 +78,8 @@ export const InputFilters = memo(function InputFilters({
   onOwnedFilterChange,
   limitedFilter,
   onLimitedFilterChange,
+  ue1SpImplementedFilter,
+  onUe1SpImplementedFilterChange,
   limitBreakFilter,
   onLimitBreakFilterChange,
   adventureMemoryPieceFilter,
@@ -115,6 +120,7 @@ export const InputFilters = memo(function InputFilters({
   function resetFilters(): void {
     onOwnedFilterChange("all");
     onLimitedFilterChange("all");
+    onUe1SpImplementedFilterChange("all");
     onLimitBreakFilterChange("all");
     onAdventureMemoryPieceFilterChange("all");
     onPurePieceAvailabilityFilterChange("all");
@@ -274,6 +280,23 @@ export const InputFilters = memo(function InputFilters({
           summary={selectedUe1Labels}
           onToggle={(value) => toggleFilter(value, setUe1Filters)}
         />
+
+        <div className="grid gap-1.5 text-sm text-muted">
+          <Label>専用1SP</Label>
+          <Select
+            value={ue1SpImplementedFilter}
+            onValueChange={(value) => onUe1SpImplementedFilterChange(value as Ue1SpImplementedFilter)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">すべて</SelectItem>
+              <SelectItem value="implemented">実装済みのみ</SelectItem>
+              <SelectItem value="unimplemented">未実装のみ</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         <MultiSelectFilter
           title="専用2"

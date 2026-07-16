@@ -11,6 +11,7 @@ export const CURRENT_UI_SCHEMA_VERSION = 1 as const;
 export type ActiveTab = "input" | "dashboard" | "coin_shop" | "connect_rank_calc" | "clan_battle";
 export type OwnedFilter = "all" | "owned" | "unowned";
 export type LimitedFilter = "all" | "limited" | "normal";
+export type Ue1SpImplementedFilter = "all" | "implemented" | "unimplemented";
 export type LimitBreakFilter = "all" | "on" | "off";
 export type AdventureMemoryPieceFilter = "all" | "on" | "off";
 export type PurePieceAvailabilityFilter = "all" | "available" | "unavailable";
@@ -39,6 +40,7 @@ export type InputViewSettings = {
   isDetailSettingsOpen: boolean;
   ownedFilter: OwnedFilter;
   limitedFilter: LimitedFilter;
+  ue1SpImplementedFilter: Ue1SpImplementedFilter;
   limitBreakFilter: LimitBreakFilter;
   adventureMemoryPieceFilter: AdventureMemoryPieceFilter;
   purePieceAvailabilityFilter: PurePieceAvailabilityFilter;
@@ -63,6 +65,7 @@ export type UiStateV1 = {
 const ACTIVE_TAB_VALUES: ActiveTab[] = ["input", "dashboard", "coin_shop", "connect_rank_calc", "clan_battle"];
 const OWNED_FILTER_VALUES: OwnedFilter[] = ["all", "owned", "unowned"];
 const LIMITED_FILTER_VALUES: LimitedFilter[] = ["all", "limited", "normal"];
+const UE1_SP_IMPLEMENTED_FILTER_VALUES: Ue1SpImplementedFilter[] = ["all", "implemented", "unimplemented"];
 const LIMIT_BREAK_FILTER_VALUES: LimitBreakFilter[] = ["all", "on", "off"];
 const ADVENTURE_MEMORY_PIECE_FILTER_VALUES: AdventureMemoryPieceFilter[] = ["all", "on", "off"];
 const PURE_PIECE_AVAILABILITY_FILTER_VALUES: PurePieceAvailabilityFilter[] = ["all", "available", "unavailable"];
@@ -96,6 +99,7 @@ const defaultInputViewSettings: InputViewSettings = {
   isDetailSettingsOpen: false,
   ownedFilter: "all",
   limitedFilter: "all",
+  ue1SpImplementedFilter: "all",
   limitBreakFilter: "all",
   adventureMemoryPieceFilter: "all",
   purePieceAvailabilityFilter: "all",
@@ -117,6 +121,7 @@ const looseInputSettingsSchema = z
     isDetailSettingsOpen: z.unknown().optional(),
     ownedFilter: z.unknown().optional(),
     limitedFilter: z.unknown().optional(),
+    ue1SpImplementedFilter: z.unknown().optional(),
     limitBreakFilter: z.unknown().optional(),
     adventureMemoryPieceFilter: z.unknown().optional(),
     purePieceAvailabilityFilter: z.unknown().optional(),
@@ -197,6 +202,11 @@ function normalizeInputSettings(rawInput: unknown): InputViewSettings {
         : defaultInputViewSettings.isDetailSettingsOpen,
     ownedFilter: normalizeEnumValue(raw.ownedFilter, OWNED_FILTER_VALUES, defaultInputViewSettings.ownedFilter),
     limitedFilter: normalizeEnumValue(raw.limitedFilter, LIMITED_FILTER_VALUES, defaultInputViewSettings.limitedFilter),
+    ue1SpImplementedFilter: normalizeEnumValue(
+      raw.ue1SpImplementedFilter,
+      UE1_SP_IMPLEMENTED_FILTER_VALUES,
+      defaultInputViewSettings.ue1SpImplementedFilter,
+    ),
     limitBreakFilter: normalizeEnumValue(
       raw.limitBreakFilter,
       LIMIT_BREAK_FILTER_VALUES,

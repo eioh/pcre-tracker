@@ -11,6 +11,7 @@ import type {
   SortKey,
   StarFilter,
   Ue1Filter,
+  Ue1SpImplementedFilter,
   Ue2Filter,
 } from "../../domain/uiStorage";
 import { getLimitBreakRemainingMemoryPieceCount } from "../../utils/limitBreakMemoryCost";
@@ -30,6 +31,7 @@ type UseVisibleRowsParams = {
   searchText: string;
   ownedFilter: OwnedFilter;
   limitedFilter: LimitedFilter;
+  ue1SpImplementedFilter: Ue1SpImplementedFilter;
   limitBreakFilter: LimitBreakFilter;
   adventureMemoryPieceFilter: AdventureMemoryPieceFilter;
   purePieceAvailabilityFilter: PurePieceAvailabilityFilter;
@@ -121,6 +123,7 @@ export function useVisibleRows({
   searchText,
   ownedFilter,
   limitedFilter,
+  ue1SpImplementedFilter,
   limitBreakFilter,
   adventureMemoryPieceFilter,
   purePieceAvailabilityFilter,
@@ -173,6 +176,12 @@ export function useVisibleRows({
         continue;
       }
       if (limitedFilter === "normal" && character.limited) {
+        continue;
+      }
+      if (
+        ue1SpImplementedFilter !== "all" &&
+        character.implemented.ue1Sp !== (ue1SpImplementedFilter === "implemented")
+      ) {
         continue;
       }
       if (limitBreakFilter === "on" && !progress.limitBreak) {
@@ -336,5 +345,6 @@ export function useVisibleRows({
     starMemoryCalcMode,
     ue1HeartFragmentCalcMode,
     ue1MemoryCalcMode,
+    ue1SpImplementedFilter,
   ]);
 }

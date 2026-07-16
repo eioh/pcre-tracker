@@ -229,6 +229,18 @@ describe("InputTab", () => {
     });
   });
 
+  it("settingsSyncToken更新時は専用1SP実装有無フィルタも再同期する", () => {
+    const props = buildProps();
+    const { rerender } = render(<InputTab {...props} />);
+
+    expect(screen.getByText("表示件数: 5")).toBeInTheDocument();
+
+    const nextSettings = { ...props.initialSettings, ue1SpImplementedFilter: "implemented" as const };
+    rerender(<InputTab {...props} initialSettings={nextSettings} settingsSyncToken={1} />);
+
+    expect(screen.getByText("表示件数: 2")).toBeInTheDocument();
+  });
+
   it("テーブル値が変わっても手動適用までは現在のソート順を維持する", () => {
     const props = buildProps();
     const characterNames = props.masterCharacters.slice(0, 2).map((character) => character.name);

@@ -13,6 +13,7 @@ import type {
   SortKey,
   StarFilter,
   Ue1Filter,
+  Ue1SpImplementedFilter,
   Ue2Filter,
 } from "../domain/uiStorage";
 import type { Ue1HeartFragmentCalcMode } from "../utils/ue1HeartFragmentCost";
@@ -53,6 +54,7 @@ type AppliedDisplaySettings = Pick<
   InputViewSettings,
   | "ownedFilter"
   | "limitedFilter"
+  | "ue1SpImplementedFilter"
   | "limitBreakFilter"
   | "adventureMemoryPieceFilter"
   | "purePieceAvailabilityFilter"
@@ -72,6 +74,7 @@ function buildAppliedDisplaySettings(settings: InputViewSettings): AppliedDispla
   return {
     ownedFilter: settings.ownedFilter,
     limitedFilter: settings.limitedFilter,
+    ue1SpImplementedFilter: settings.ue1SpImplementedFilter,
     limitBreakFilter: settings.limitBreakFilter,
     adventureMemoryPieceFilter: settings.adventureMemoryPieceFilter,
     purePieceAvailabilityFilter: settings.purePieceAvailabilityFilter,
@@ -135,6 +138,9 @@ export function InputTab({
   const [isDetailSettingsVisible, setIsDetailSettingsVisible] = useState(initialSettings.isDetailSettingsOpen);
   const [ownedFilter, setOwnedFilter] = useState<OwnedFilter>(initialSettings.ownedFilter);
   const [limitedFilter, setLimitedFilter] = useState<LimitedFilter>(initialSettings.limitedFilter);
+  const [ue1SpImplementedFilter, setUe1SpImplementedFilter] = useState<Ue1SpImplementedFilter>(
+    initialSettings.ue1SpImplementedFilter,
+  );
   const [limitBreakFilter, setLimitBreakFilter] = useState<LimitBreakFilter>(initialSettings.limitBreakFilter);
   const [adventureMemoryPieceFilter, setAdventureMemoryPieceFilter] = useState<AdventureMemoryPieceFilter>(
     initialSettings.adventureMemoryPieceFilter,
@@ -221,6 +227,7 @@ export function InputTab({
       isDetailSettingsOpen,
       ownedFilter,
       limitedFilter,
+      ue1SpImplementedFilter,
       limitBreakFilter,
       adventureMemoryPieceFilter,
       purePieceAvailabilityFilter,
@@ -240,6 +247,7 @@ export function InputTab({
       isDetailSettingsOpen,
       ownedFilter,
       limitedFilter,
+      ue1SpImplementedFilter,
       limitBreakFilter,
       adventureMemoryPieceFilter,
       purePieceAvailabilityFilter,
@@ -268,6 +276,7 @@ export function InputTab({
     searchText: deferredSearchText,
     ownedFilter: appliedDisplaySettings.ownedFilter,
     limitedFilter: appliedDisplaySettings.limitedFilter,
+    ue1SpImplementedFilter: appliedDisplaySettings.ue1SpImplementedFilter,
     limitBreakFilter: appliedDisplaySettings.limitBreakFilter,
     adventureMemoryPieceFilter: appliedDisplaySettings.adventureMemoryPieceFilter,
     purePieceAvailabilityFilter: appliedDisplaySettings.purePieceAvailabilityFilter,
@@ -305,6 +314,7 @@ export function InputTab({
     const activeFlags = [
       appliedDisplaySettings.ownedFilter !== "all",
       appliedDisplaySettings.limitedFilter !== "all",
+      appliedDisplaySettings.ue1SpImplementedFilter !== "all",
       appliedDisplaySettings.limitBreakFilter !== "all",
       appliedDisplaySettings.adventureMemoryPieceFilter !== "all",
       appliedDisplaySettings.purePieceAvailabilityFilter !== "all",
@@ -326,6 +336,7 @@ export function InputTab({
     setIsDetailSettingsVisible(initialSettings.isDetailSettingsOpen);
     setOwnedFilter(initialSettings.ownedFilter);
     setLimitedFilter(initialSettings.limitedFilter);
+    setUe1SpImplementedFilter(initialSettings.ue1SpImplementedFilter);
     setLimitBreakFilter(initialSettings.limitBreakFilter);
     setAdventureMemoryPieceFilter(initialSettings.adventureMemoryPieceFilter);
     setPurePieceAvailabilityFilter(initialSettings.purePieceAvailabilityFilter);
@@ -370,6 +381,8 @@ export function InputTab({
         onOwnedFilterChange={setOwnedFilter}
         limitedFilter={limitedFilter}
         onLimitedFilterChange={setLimitedFilter}
+        ue1SpImplementedFilter={ue1SpImplementedFilter}
+        onUe1SpImplementedFilterChange={setUe1SpImplementedFilter}
         limitBreakFilter={limitBreakFilter}
         onLimitBreakFilterChange={setLimitBreakFilter}
         adventureMemoryPieceFilter={adventureMemoryPieceFilter}
