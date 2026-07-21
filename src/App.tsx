@@ -36,6 +36,7 @@ import { HeaderDataMenu } from "./components/HeaderDataMenu";
 import { SyncHeader } from "./components/SyncHeader";
 import { MobileHeader } from "./components/MobileHeader";
 import { MobileBottomNav } from "./components/MobileBottomNav";
+import { PwaUpdatePrompt } from "./components/PwaUpdatePrompt";
 import { cn } from "./lib/utils";
 import { PrivacyPolicyPage } from "./components/PrivacyPolicyPage";
 import { useSync } from "./hooks/useSync";
@@ -130,17 +131,26 @@ export default function App() {
   // 直近に保存予約した state の参照。初回マウント（StrictMode の再実行を含む）では state が
   // 変化していないため、「保存中」を表示しない判定基準に使う。
   const lastScheduledSaveStateRef = useRef(state);
+  // ユーザー編集による debounce 保存が「保留中（未実行）」かどうかの ref。flushPendingSave のゲートに使う。
+  // pagehide 等のイベントリスナー内から最新値を参照するため、state ではなく ref で追跡する（stale closure 回避）。
+  const pendingSaveRef = useRef(false);
+  // 予約中の debounce 保存タイマーの ID。cancelPendingSave から明示的に解除するため ref で保持する。
+  const saveTimerRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     // state が実際に変化したときのみ「保存中」を立てる（初回マウント時の書き戻しでは表示しない）。
     if (lastScheduledSaveStateRef.current !== state) {
       lastScheduledSaveStateRef.current = state;
       setIsLocalSavePending(true);
+      // ユーザー編集分の保存が保留になったことを記録する（保存実行時に下ろす）。
+      pendingSaveRef.current = true;
     }
     const timerId = window.setTimeout(() => {
       saveStoredState(state);
+      pendingSaveRef.current = false;
       setIsLocalSavePending(false);
     }, STORED_STATE_SAVE_DEBOUNCE_MS);
+    saveTimerRef.current = timerId;
     return () => {
       window.clearTimeout(timerId);
     };
@@ -155,14 +165,55 @@ export default function App() {
   stateRef.current = state;
   const getState = useCallback(() => stateRef.current, []);
 
+  // debounce 保存が保留中のときだけ、編集内容を localStorage へ同期 flush する
+  // （PWA 更新の即時リロード前や pagehide での防御に使う。stateRef は常に最新 state を指す）。
+  // 保留中でなければ何もしてはならない: インポートやサーバーデータ採用は localStorage を
+  // 直接更新し、React state は旧データのままリロードする設計のため、無条件に flush すると
+  // リロード時の pagehide で旧 in-memory state が採用済みデータを上書きしてしまう（データ損失）。
+  const flushPendingSave = useCallback(() => {
+    if (!pendingSaveRef.current) {
+      return;
+    }
+    saveStoredState(stateRef.current);
+    pendingSaveRef.current = false;
+  }, []);
+
+  // デバウンス保存の 400ms 窓を塞ぐ防御: タブを閉じる・別タブ起点の SW 更新リロード・
+  // モバイル OS による PWA の退避（eviction）など、「更新」ボタン以外の経路でページが
+  // 破棄される場合にも保留中の編集を失わないよう、pagehide で同期 flush する。
+  // flush 自体が保留中ゲート付きのため、インポート/採用フローのリロードでは何も書き込まない。
+  useEffect(() => {
+    window.addEventListener("pagehide", flushPendingSave);
+    return () => {
+      window.removeEventListener("pagehide", flushPendingSave);
+    };
+  }, [flushPendingSave]);
+
+  // インポートやサーバーデータ採用など「localStorage を直接書き換えてリロードする」フローの
+  // 開始時に必ず呼ぶ。直接書き換え後に保留中の debounce 保存が実行されると（400ms タイマーの
+  // 発火・pagehide の flush のどちらの経路でも）旧 in-memory state が採用済みデータを上書き
+  // してしまうため、予約中のタイマーを解除して保留フラグを下ろす。
+  const cancelPendingSave = useCallback(() => {
+    if (saveTimerRef.current !== undefined) {
+      window.clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = undefined;
+    }
+    pendingSaveRef.current = false;
+    setIsLocalSavePending(false);
+  }, []);
+
   // サーバーデータ採用時: 既存インポート復元と同じ「ダイアログ表示 → リロード」パターンで反映する（設計判断 6）。
+  // useSync（adoptServerPayload）は localStorage を直接書き換えた直後にこのコールバックを同期的に
+  // 呼ぶため、ここで保留中の debounce 保存をキャンセルし、採用データの上書き経路を塞ぐ
+  // （起動時採用と競合解決「サーバーのデータを使う」の両方がこの経路を通る）。
   const handleServerDataAdopted = useCallback(() => {
+    cancelPendingSave();
     setMessageDialog({
       title: "サーバーのデータを反映しました",
       description: "サーバー側の育成データを取り込みました。閉じると画面を再読み込みします。",
       reloadOnClose: true,
     });
-  }, []);
+  }, [cancelPendingSave]);
 
   // 同期層（セッション監視・起動時 GET・デバウンス PUT・競合ダイアログ）。
   const sync = useSync({ getState, masterCharacters, onServerDataAdopted: handleServerDataAdopted });
@@ -213,6 +264,12 @@ export default function App() {
       const text = await pendingImportFile.text();
       const payload = parseBackupPayload(text);
       applyBackupPayloadToLocalStorage(payload);
+      // 適用の正常終了直後に保留中の debounce 保存をキャンセルする（同一同期ブロック内のため、
+      // 適用とキャンセルの間にタイマーが割り込む余地はない。残したまま発火すると旧 in-memory
+      // state がインポート結果を上書きするため必ずここで解除する）。適用「前」にキャンセルしては
+      // ならない: 適用が失敗すると localStorage はロールバックされるが、キャンセル済みの保留保存は
+      // 復活せず、画面に残った未保存編集がページ破棄で消失するため、失敗パスではキャンセルしない。
+      cancelPendingSave();
       // インポートはユーザーが自分のデータを持ち込む操作のため、安全側として touched を立てる（設計判断 8）。
       // これによりログイン後の引き継ぎ判定で「実データあり」と確定し、サーバーデータでの無断上書きを防ぐ。
       // ログイン中の場合はさらに同期メタの localChangeSeq を進めて永続 dirty 化する（PUT 予約はしない）。
@@ -235,7 +292,7 @@ export default function App() {
       setIsImporting(false);
       setPendingImportFile(null);
     }
-  }, [pendingImportFile, sync]);
+  }, [pendingImportFile, sync, cancelPendingSave]);
 
   // 保存データを初期化し、UI設定も既定値へ戻す。
   const handleConfirmReset = useCallback(() => {
@@ -573,6 +630,9 @@ export default function App() {
           プライバシーポリシー
         </button>
       </footer>
+
+      {/* PWA 新バージョン検出時の更新バナー（本番のみ配線・下部固定でナビと非重複）。 */}
+      <PwaUpdatePrompt flushPendingSave={flushPendingSave} />
     </div>
   );
 }

@@ -1,10 +1,16 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // useSync をモックし、セッションや同期ロジックに依存せず App のルーティングを検証する。
 const mockUseSync = vi.fn();
+// App が useSync へ渡した options の捕捉先。テストから onServerDataAdopted（サーバーデータ採用
+// コールバック）を直接呼び、「localStorage 直接書き換え → 採用通知」のフローを再現するために使う。
+let capturedUseSyncOptions: { onServerDataAdopted: () => void } | null = null;
 vi.mock("./hooks/useSync", () => ({
-  useSync: () => mockUseSync(),
+  useSync: (options: { onServerDataAdopted: () => void }) => {
+    capturedUseSyncOptions = options;
+    return mockUseSync();
+  },
 }));
 
 // authClient はログイン UI が参照するためスタブ化する（実 API を呼ばせない）。
@@ -14,7 +20,23 @@ vi.mock("./lib/authClient", () => ({
   signOut: vi.fn(),
 }));
 
+// バックアップ適用の失敗を注入できるようにするための差し替え口。既定では実実装へ委譲し、
+// 「インポート適用失敗時に保留中の編集が失われないこと」のテストでのみ throw に差し替える。
+const { mockApplyBackupPayloadToLocalStorage } = vi.hoisted(() => ({
+  mockApplyBackupPayloadToLocalStorage: vi.fn<(payload: unknown) => void>(),
+}));
+vi.mock("./domain/backup", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./domain/backup")>();
+  mockApplyBackupPayloadToLocalStorage.mockImplementation(actual.applyBackupPayloadToLocalStorage);
+  return {
+    ...actual,
+    applyBackupPayloadToLocalStorage: mockApplyBackupPayloadToLocalStorage,
+  };
+});
+
 import App from "./App";
+import { STORAGE_KEY } from "./domain/storage";
+import { UI_STORAGE_KEY } from "./domain/uiStorage";
 
 // useSync の戻り値を未ログイン・同期なしの静的値に固定する。
 function stubSync() {
@@ -58,6 +80,7 @@ function stubMobileMatchMedia() {
 beforeEach(() => {
   window.localStorage.clear();
   mockUseSync.mockReset();
+  capturedUseSyncOptions = null;
   stubSync();
 });
 
@@ -153,5 +176,153 @@ describe("App: モバイル編集シートの保存インジケータ", () => {
     expect(await within(dialog).findByText("保存済み ✓")).toBeInTheDocument();
     expect(within(dialog).queryByText("同期中...")).toBeNull();
     expect(within(dialog).queryByText("同期エラー")).toBeNull();
+  });
+});
+
+describe("App: pagehide での防御的 flush", () => {
+  // 遅延読み込みタブの表示待ちがあるため、テスト全体のタイムアウトを延長する。
+  it("保留中の編集がある状態で pagehide が発火すると最新 state を localStorage へ保存する", { timeout: 20_000 }, async () => {
+    stubMobileMatchMedia();
+    // jsdom 未実装の window.scrollTo（仮想化リストが呼ぶ）をスタブし、エラーログを抑止する。
+    vi.stubGlobal("scrollTo", vi.fn());
+    render(<App />);
+
+    // 遅延読み込みの育成入力タブ（モバイル一覧）が表示されるまで待ち、先頭行の編集シートを開く。
+    const openRowButtons = await screen.findAllByRole("button", { name: /の編集シートを開く$/ }, { timeout: 10_000 });
+    fireEvent.click(openRowButtons[0]!);
+    const dialog = screen.getByRole("dialog");
+
+    // 編集直後（400ms debounce の完了前）に pagehide を発火させる。
+    fireEvent.click(within(dialog).getByRole("button", { name: /の所持メモピ数を増やす$/ }));
+    fireEvent(window, new Event("pagehide"));
+
+    // 保留中の編集（メモピ 0 → 1）を含む最新 state が同期 flush で保存されている。
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    expect(raw).not.toBeNull();
+    const saved = JSON.parse(raw!) as { progressByName: Record<string, { ownedMemoryPiece: number }> };
+    expect(Object.values(saved.progressByName).some((progress) => progress.ownedMemoryPiece === 1)).toBe(true);
+  });
+
+  it("保留中の編集がなければ pagehide で localStorage を上書きしない（インポート採用データの保護）", async () => {
+    // jsdom 未実装の window.scrollTo（仮想化リストが呼ぶ）をスタブし、エラーログを抑止する。
+    vi.stubGlobal("scrollTo", vi.fn());
+    render(<App />);
+
+    // 初回マウントの書き戻し保存（400ms debounce）が完了し、保留なしの安定状態になるまで待つ。
+    await waitFor(() => expect(window.localStorage.getItem(STORAGE_KEY)).not.toBeNull(), { timeout: 3_000 });
+
+    // インポート/サーバーデータ採用相当: localStorage を直接更新する（in-memory state は旧データのまま）。
+    const adoptedPayload = JSON.stringify({ marker: "imported" });
+    window.localStorage.setItem(STORAGE_KEY, adoptedPayload);
+
+    // リロード時に発火する pagehide でも、保留中の編集がなければ flush されず採用データが残る。
+    fireEvent(window, new Event("pagehide"));
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe(adoptedPayload);
+  });
+});
+
+describe("App: localStorage 直接書き換えフローでの保留保存キャンセル", () => {
+  // モバイル編集シートで1件編集し、debounce 保存（400ms）が保留中の状態を作る共通セットアップ。
+  async function renderAndMakePendingEdit() {
+    stubMobileMatchMedia();
+    // jsdom 未実装の window.scrollTo（仮想化リストが呼ぶ）をスタブし、エラーログを抑止する。
+    vi.stubGlobal("scrollTo", vi.fn());
+    render(<App />);
+    const openRowButtons = await screen.findAllByRole("button", { name: /の編集シートを開く$/ }, { timeout: 10_000 });
+    fireEvent.click(openRowButtons[0]!);
+    const dialog = screen.getByRole("dialog");
+    // 編集して debounce 保存を保留中（400ms 窓内）にする。
+    fireEvent.click(within(dialog).getByRole("button", { name: /の所持メモピ数を増やす$/ }));
+  }
+
+  // サーバーデータ採用フローを再現する: useSync（adoptServerPayload）が localStorage を直接
+  // 書き換えた直後に onServerDataAdopted を同期的に呼ぶ実装と同じ順序で実行する。
+  function adoptServerData(adoptedPayload: string) {
+    window.localStorage.setItem(STORAGE_KEY, adoptedPayload);
+    expect(capturedUseSyncOptions).not.toBeNull();
+    act(() => {
+      capturedUseSyncOptions!.onServerDataAdopted();
+    });
+  }
+
+  it("保留中の編集があっても、採用後の pagehide は採用データを上書きしない", { timeout: 20_000 }, async () => {
+    await renderAndMakePendingEdit();
+
+    const adoptedPayload = JSON.stringify({ marker: "server-adopted" });
+    adoptServerData(adoptedPayload);
+
+    // 採用完了ダイアログが表示される（採用フローが実際に走った証跡）。
+    expect(screen.getByText("サーバーのデータを反映しました")).toBeInTheDocument();
+
+    // 採用時に保留保存がキャンセルされているため、リロード時の pagehide でも上書きされない。
+    fireEvent(window, new Event("pagehide"));
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe(adoptedPayload);
+  });
+
+  it("保留中の編集があっても、採用後に debounce タイマーが満了する時間が経過しても採用データを上書きしない", { timeout: 20_000 }, async () => {
+    await renderAndMakePendingEdit();
+
+    const adoptedPayload = JSON.stringify({ marker: "server-adopted" });
+    adoptServerData(adoptedPayload);
+
+    // 採用時にタイマー自体がキャンセルされているため、400ms の debounce 満了時刻を過ぎても
+    // 旧 in-memory state の保存は実行されない（キャンセルが無ければここで上書きされる）。
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe(adoptedPayload);
+  });
+
+  it("インポート適用が失敗した場合、保留中の編集は引き続き保存される", { timeout: 20_000 }, async () => {
+    stubMobileMatchMedia();
+    // jsdom 未実装の window.scrollTo（仮想化リストが呼ぶ）をスタブし、エラーログを抑止する。
+    vi.stubGlobal("scrollTo", vi.fn());
+    render(<App />);
+    await screen.findAllByRole("button", { name: /の編集シートを開く$/ }, { timeout: 10_000 });
+
+    // 適用処理の失敗を注入する（実実装は失敗時に localStorage をロールバックして throw する）。
+    mockApplyBackupPayloadToLocalStorage.mockImplementationOnce(() => {
+      throw new Error("apply failed");
+    });
+
+    // モバイルメニューを開き、スキーマ的に妥当なバックアップファイルを選択して確認ダイアログを出す。
+    fireEvent.click(screen.getByRole("button", { name: "メニューを開く" }));
+    const backupJson = JSON.stringify({
+      formatVersion: 1,
+      exportedAt: new Date().toISOString(),
+      storage: { [STORAGE_KEY]: null, [UI_STORAGE_KEY]: null },
+    });
+    const backupFile = new File([backupJson], "backup.json", { type: "application/json" });
+    // jsdom の File は text() 未実装のため、実ブラウザ相当の挙動をインスタンスに補う
+    // （これが無いと handleConfirmImport が text() の TypeError で早期 catch され、
+    // 検証対象の「適用失敗」パスに到達しない）。
+    Object.defineProperty(backupFile, "text", { value: () => Promise.resolve(backupJson) });
+    // メニューシートは Radix のポータルで body 直下に描画されるため、document 全体から探す。
+    const fileInput = document.querySelector('input[type="file"]');
+    expect(fileInput).not.toBeNull();
+    fireEvent.change(fileInput!, { target: { files: [backupFile] } });
+
+    // 確認ダイアログ（モーダル）が最前面のうちに、実行ボタンの参照を確保しておく。
+    const confirmDialog = screen.getByRole("alertdialog");
+    const importButton = within(confirmDialog).getByRole("button", { name: "インポート" });
+
+    // 確認ダイアログが開いた状態で編集し、debounce 保存を保留中（400ms 窓内）にする
+    // （編集をインポート実行の直前に置くことで、保留状態のまま適用失敗パスへ入ることを保証する）。
+    // モーダルの背後は aria-hidden になるため hidden: true で検索する（fireEvent は直接発火できる）。
+    const openRowButtons = screen.getAllByRole("button", { name: /の編集シートを開く$/, hidden: true });
+    fireEvent.click(openRowButtons[0]!);
+    fireEvent.click(screen.getByRole("button", { name: /の所持メモピ数を増やす$/, hidden: true }));
+
+    // インポートを実行すると適用が失敗し、失敗ダイアログが表示される。
+    fireEvent.click(importButton);
+    await screen.findByText("インポート失敗");
+    // 失敗の注入点が適用処理であること（text()/parse での早期 catch でないこと）を保証する。
+    expect(mockApplyBackupPayloadToLocalStorage).toHaveBeenCalledTimes(1);
+
+    // 適用失敗パスではキャンセルが走らないため、保留中の編集（メモピ 0 → 1）は
+    // pagehide の flush（または debounce タイマー満了）で引き続き保存される。
+    fireEvent(window, new Event("pagehide"));
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    expect(raw).not.toBeNull();
+    const saved = JSON.parse(raw!) as { progressByName: Record<string, { ownedMemoryPiece: number }> };
+    expect(Object.values(saved.progressByName).some((progress) => progress.ownedMemoryPiece === 1)).toBe(true);
   });
 });
