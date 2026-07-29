@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Maximize2, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, Copy, Maximize2, Plus, Trash2 } from "lucide-react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type {
   CharacterProgress,
@@ -14,6 +14,7 @@ import {
   createClanBattleFormation,
   createClanBattleMember,
   createClanBattleMonthGroup,
+  duplicateClanBattleFormation,
   formatClanBattleDamage,
   getClanBattleMemberDiffs,
   isCurrentClanBattleMonth,
@@ -237,6 +238,24 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
     setFormationNameInput("");
   };
 
+  // 指定編成を同じ年月グループの末尾に複製し、複製先を選択状態にする。
+  const handleCopyFormation = (groupId: string, formationId: string): void => {
+    const group = state.clanBattle.groups.find((item) => item.id === groupId);
+    const formation = group?.formations.find((item) => item.id === formationId);
+    if (!formation) {
+      return;
+    }
+    const duplicated = duplicateClanBattleFormation(formation);
+    updateClanBattle(
+      (previous) => ({
+        groups: previous.groups.map((item) =>
+          item.id === groupId ? { ...item, formations: [...item.formations, duplicated] } : item,
+        ),
+      }),
+      duplicated.id,
+    );
+  };
+
   // 編成削除前に確認し、選択中なら次の候補へ選択を移す。
   const handleDeleteFormation = (groupId: string, formationId: string): void => {
     if (!window.confirm("この編成を削除しますか？")) {
@@ -380,18 +399,33 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
               </div>
               <div className="grid gap-1.5">
                 {group.formations.map((formation) => (
-                  <button
+                  <div
                     key={formation.id}
-                    type="button"
-                    className={`rounded-[8px] border px-3 py-2 text-left text-sm transition ${
+                    className={`group flex items-center rounded-[8px] border transition ${
                       selectedFormation?.id === formation.id
                         ? "border-accent bg-selected text-main"
                         : "border-white/10 bg-black/20 text-muted hover:border-accent/60 hover:text-main"
                     }`}
-                    onClick={() => setSelectedFormationId(formation.id)}
                   >
-                    <span className="block truncate font-semibold">{formation.name}</span>
-                  </button>
+                    <button
+                      type="button"
+                      className="min-w-0 flex-1 px-3 py-2 text-left text-sm"
+                      onClick={() => setSelectedFormationId(formation.id)}
+                    >
+                      <span className="block truncate font-semibold">{formation.name}</span>
+                    </button>
+                    {/* ホバー時のみ表示（タッチ端末は常時表示）。Tailwind v4ではgroup-hover自体が@media(hover:hover)でラップされるため、
+                        非表示化のみ明示的に[@media(hover:hover)]:opacity-0で指定する。フォーカス時も表示してキーボード操作に対応する。 */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mr-1 shrink-0 max-md:min-h-11 max-md:min-w-11 [@media(hover:hover)]:opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+                      aria-label={`${formation.name}をコピー`}
+                      onClick={() => handleCopyFormation(group.id, formation.id)}
+                    >
+                      <Copy className="size-4" />
+                    </Button>
+                  </div>
                 ))}
               </div>
               <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
