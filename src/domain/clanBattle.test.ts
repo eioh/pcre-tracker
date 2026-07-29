@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  duplicateClanBattleFormation,
   formatClanBattleDamage,
   getClanBattleMemberDiffs,
   normalizeClanBattleState,
   sortClanBattleMembers,
   toClanBattleDamage,
 } from "./clanBattle";
-import type { CharacterProgress, ClanBattleMember, ClanBattleState, MasterCharacter } from "./types";
+import type { CharacterProgress, ClanBattleFormation, ClanBattleMember, ClanBattleState, MasterCharacter } from "./types";
 
 const progress: CharacterProgress = {
   owned: true,
@@ -179,5 +180,58 @@ describe("clanBattle", () => {
       "ヒヨリ",
       "ペコリーヌ",
     ]);
+  });
+
+  describe("duplicateClanBattleFormation", () => {
+    // 複製対象の元編成（TL・ダメージ・メンバー2名を持つ）を生成する。
+    function buildFormation(): ClanBattleFormation {
+      return {
+        id: "formation-1",
+        name: "1ボス",
+        damage: 123456789,
+        timeline: "1:30　○×○×○　オートON",
+        members: [
+          { id: "a", characterName: "ヒヨリ", support: true, ...progress },
+          { id: "b", characterName: "ペコリーヌ", support: false, ...progress },
+        ],
+      };
+    }
+
+    it("編成IDと全メンバーIDを新規採番する", () => {
+      const original = buildFormation();
+      const duplicated = duplicateClanBattleFormation(original);
+
+      expect(duplicated.id).not.toBe(original.id);
+      duplicated.members.forEach((member, index) => {
+        expect(member.id).not.toBe(original.members[index]!.id);
+      });
+    });
+
+    it("編成名に「 (コピー)」を付加する", () => {
+      const original = buildFormation();
+      const duplicated = duplicateClanBattleFormation(original);
+
+      expect(duplicated.name).toBe("1ボス (コピー)");
+    });
+
+    it("timeline・damage・メンバー内容（ID以外）を元編成と一致させる", () => {
+      const original = buildFormation();
+      const duplicated = duplicateClanBattleFormation(original);
+
+      expect(duplicated.timeline).toBe(original.timeline);
+      expect(duplicated.damage).toBe(original.damage);
+      expect(duplicated.members.map(({ id: _id, ...rest }) => rest)).toEqual(
+        original.members.map(({ id: _id, ...rest }) => rest),
+      );
+    });
+
+    it("元の編成オブジェクトを変異させない", () => {
+      const original = buildFormation();
+      const originalSnapshot = JSON.parse(JSON.stringify(original)) as ClanBattleFormation;
+
+      duplicateClanBattleFormation(original);
+
+      expect(original).toEqual(originalSnapshot);
+    });
   });
 });

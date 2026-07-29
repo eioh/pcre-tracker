@@ -53,6 +53,16 @@ export function createClanBattleFormation(name: string): ClanBattleFormation {
   };
 }
 
+// 既存編成の完全な複製を新規IDで作成する（TL・ダメージ・メンバー含む）。
+export function duplicateClanBattleFormation(formation: ClanBattleFormation): ClanBattleFormation {
+  return {
+    ...formation,
+    id: createClanBattleId("cbf"),
+    name: `${formation.name} (コピー)`,
+    members: formation.members.map((member) => ({ ...member, id: createClanBattleId("cbp") })),
+  };
+}
+
 // キャラ名と育成入力の現在値から、編成内で独立保存するキャラ行を作成する。
 export function createClanBattleMember(characterName: string, progress: CharacterProgress): ClanBattleMember {
   return {
