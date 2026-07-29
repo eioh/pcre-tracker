@@ -374,10 +374,10 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
           </div>
         </div>
 
-        <div className="grid gap-3">
+        <div className="min-w-0 grid gap-3">
           {sortedGroups.length === 0 ? <p className="m-0 text-sm text-muted">年月グループを追加してください。</p> : null}
           {sortedGroups.map((group) => (
-            <section key={group.id} className="rounded-[8px] border border-white/15 bg-white/[0.03] p-3">
+            <section key={group.id} className="min-w-0 rounded-[8px] border border-white/15 bg-white/[0.03] p-3">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <button
                   type="button"
@@ -401,7 +401,7 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                 {group.formations.map((formation) => (
                   <div
                     key={formation.id}
-                    className={`group flex items-center rounded-[8px] border transition ${
+                    className={`group flex min-w-0 items-center rounded-[8px] border transition ${
                       selectedFormation?.id === formation.id
                         ? "border-accent bg-selected text-main"
                         : "border-white/10 bg-black/20 text-muted hover:border-accent/60 hover:text-main"
