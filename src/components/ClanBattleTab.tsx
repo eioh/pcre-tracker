@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Copy, Maximize2, Plus, Trash2 } from "lucide-react";
+import { DndContext, MouseSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
+import type { DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type {
   CharacterProgress,
@@ -18,6 +22,7 @@ import {
   formatClanBattleDamage,
   getClanBattleMemberDiffs,
   isCurrentClanBattleMonth,
+  reorderClanBattleFormations,
   sortClanBattleMembers,
   toClanBattleDamage,
 } from "../domain/clanBattle";
@@ -169,6 +174,54 @@ function TimelineModal({
   );
 }
 
+// ドラッグ可能な編成行。長押し起動のセンサーと組み合わせ、行全体をドラッグ対象にしつつ選択ボタン・コピーボタンのクリックは従来どおり動かす。
+function SortableFormationRow({
+  formation,
+  isSelected,
+  onSelect,
+  onCopy,
+}: {
+  formation: ClanBattleFormation;
+  isSelected: boolean;
+  onSelect: () => void;
+  onCopy: () => void;
+}) {
+  const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: formation.id });
+
+  return (
+    // dnd-kitのattributes（role="button"/tabIndex/aria-roledescription等）は展開しない。キーボード並び替えはスコープ外でKeyboardSensor未登録のため、
+    // attributesを付けると子の選択・コピーボタンがARIAのPresentational Children規則で読み上げ不能になり、かつ動作しないEnter/Spaceの案内だけが残る。
+    // マウス・タッチのドラッグはlistenersのみで完結する。
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      {...listeners}
+      className={`group flex min-w-0 touch-manipulation select-none items-center rounded-[8px] border transition ${
+        isDragging ? "z-10 opacity-60" : ""
+      } ${
+        isSelected
+          ? "border-accent bg-selected text-main"
+          : "border-white/10 bg-black/20 text-muted hover:border-accent/60 hover:text-main"
+      }`}
+    >
+      <button type="button" className="min-w-0 flex-1 px-3 py-2 text-left text-sm" onClick={onSelect}>
+        <span className="block truncate font-semibold">{formation.name}</span>
+      </button>
+      {/* ホバー時のみ表示（タッチ端末は常時表示）。Tailwind v4ではgroup-hover自体が@media(hover:hover)でラップされるため、
+          非表示化のみ明示的に[@media(hover:hover)]:opacity-0で指定する。フォーカス時も表示してキーボード操作に対応する。 */}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="mr-1 shrink-0 max-md:min-h-11 max-md:min-w-11 [@media(hover:hover)]:opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+        aria-label={`${formation.name}をコピー`}
+        onClick={onCopy}
+      >
+        <Copy className="size-4" />
+      </Button>
+    </div>
+  );
+}
+
 // クラバト編成の年月、編成、キャラ、TLを1画面で管理する。
 export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleTabProps) {
   const [yearInput, setYearInput] = useState(getDefaultYear());
@@ -187,6 +240,12 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
     [characterSearchText, masterCharacters],
   );
   const yearOptions = useMemo(() => buildYearOptions(getDefaultYear()), []);
+  // 編成の並び替えは250ms長押しで起動する（PC・タッチとも統一）。PointerSensorはtouchmoveを止められずスクロールに奪われうるため、
+  // touch-manipulationと両立するMouseSensor + TouchSensorの併用とする。
+  const formationDragSensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+  );
 
   // clanBattle全体を受け取る更新関数で、親の保存状態と選択IDを同期する。
   const updateClanBattle = (updater: (previous: ClanBattleState) => ClanBattleState, nextSelectedFormationId?: string | null): void => {
@@ -254,6 +313,25 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
       }),
       duplicated.id,
     );
+  };
+
+  // ドラッグ終了時に同一グループ内で編成を並び替えて保存する。選択IDは渡さず、選択状態はidベースで自然に維持させる。
+  const handleReorderFormations = (groupId: string, event: DragEndEvent): void => {
+    const { active, over } = event;
+    if (!over) {
+      return;
+    }
+    const group = state.clanBattle.groups.find((item) => item.id === groupId);
+    if (!group) {
+      return;
+    }
+    const reordered = reorderClanBattleFormations(group.formations, String(active.id), String(over.id));
+    if (reordered === group.formations) {
+      return;
+    }
+    updateClanBattle((previous) => ({
+      groups: previous.groups.map((item) => (item.id === groupId ? { ...item, formations: reordered } : item)),
+    }));
   };
 
   // 編成削除前に確認し、選択中なら次の候補へ選択を移す。
@@ -397,37 +475,26 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                   <Trash2 className="size-4" />
                 </Button>
               </div>
-              <div className="grid gap-1.5">
-                {group.formations.map((formation) => (
-                  <div
-                    key={formation.id}
-                    className={`group flex min-w-0 items-center rounded-[8px] border transition ${
-                      selectedFormation?.id === formation.id
-                        ? "border-accent bg-selected text-main"
-                        : "border-white/10 bg-black/20 text-muted hover:border-accent/60 hover:text-main"
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      className="min-w-0 flex-1 px-3 py-2 text-left text-sm"
-                      onClick={() => setSelectedFormationId(formation.id)}
-                    >
-                      <span className="block truncate font-semibold">{formation.name}</span>
-                    </button>
-                    {/* ホバー時のみ表示（タッチ端末は常時表示）。Tailwind v4ではgroup-hover自体が@media(hover:hover)でラップされるため、
-                        非表示化のみ明示的に[@media(hover:hover)]:opacity-0で指定する。フォーカス時も表示してキーボード操作に対応する。 */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="mr-1 shrink-0 max-md:min-h-11 max-md:min-w-11 [@media(hover:hover)]:opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-                      aria-label={`${formation.name}をコピー`}
-                      onClick={() => handleCopyFormation(group.id, formation.id)}
-                    >
-                      <Copy className="size-4" />
-                    </Button>
+              {/* 月グループごとにDndContextを独立させ、グループをまたぐ並び替えを構造的に不可能にする。 */}
+              <DndContext
+                sensors={formationDragSensors}
+                collisionDetection={closestCenter}
+                onDragEnd={(event) => handleReorderFormations(group.id, event)}
+              >
+                <SortableContext items={group.formations.map((formation) => formation.id)} strategy={verticalListSortingStrategy}>
+                  <div className="grid gap-1.5">
+                    {group.formations.map((formation) => (
+                      <SortableFormationRow
+                        key={formation.id}
+                        formation={formation}
+                        isSelected={selectedFormation?.id === formation.id}
+                        onSelect={() => setSelectedFormationId(formation.id)}
+                        onCopy={() => handleCopyFormation(group.id, formation.id)}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
               <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
                 <Input
                   value={formationNameInput}
