@@ -63,6 +63,26 @@ export function duplicateClanBattleFormation(formation: ClanBattleFormation): Cl
   };
 }
 
+// 編成配列内でactiveIdの編成をoverIdの位置へ移動した新しい配列を返す。移動が不要・不可能な場合は元の配列をそのまま返す。
+export function reorderClanBattleFormations(
+  formations: ClanBattleFormation[],
+  activeId: string,
+  overId: string,
+): ClanBattleFormation[] {
+  if (activeId === overId) {
+    return formations;
+  }
+  const fromIndex = formations.findIndex((formation) => formation.id === activeId);
+  const toIndex = formations.findIndex((formation) => formation.id === overId);
+  if (fromIndex === -1 || toIndex === -1) {
+    return formations;
+  }
+  const next = [...formations];
+  const [moved] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, moved!);
+  return next;
+}
+
 // キャラ名と育成入力の現在値から、編成内で独立保存するキャラ行を作成する。
 export function createClanBattleMember(characterName: string, progress: CharacterProgress): ClanBattleMember {
   return {

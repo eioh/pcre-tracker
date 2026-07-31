@@ -131,3 +131,22 @@ describe("ClanBattleTab（編成コピー）", () => {
     expect(nextGroupB.formations[1]!.name).toBe("編成B (コピー)");
   });
 });
+
+describe("ClanBattleTab（編成行の表示順）", () => {
+  it("編成行はformations配列の並び順（並び替え結果）でレンダリングされる", () => {
+    // jsdomはPointerEvent未実装でD&D操作そのものはテストできないため、
+    // 配列順が表示順に正しく反映される（＝並び替え結果を表示できる）ことだけを検証する。
+    const baseState = buildInitialState(testCharacters);
+    const formations = ["Zebra編成", "Apple編成", "Mango編成"].map((name) => createClanBattleFormation(name));
+    const group = { ...createClanBattleMonthGroup(2020, 1), formations };
+    const state: StoredStateV1 = { ...baseState, clanBattle: { groups: [group] } };
+    render(<ClanBattleTab masterCharacters={testCharacters} state={state} onChange={vi.fn()} />);
+
+    const copyButtons = screen.getAllByRole("button", { name: /をコピー$/ });
+    expect(copyButtons.map((button) => button.getAttribute("aria-label"))).toEqual([
+      "Zebra編成をコピー",
+      "Apple編成をコピー",
+      "Mango編成をコピー",
+    ]);
+  });
+});
