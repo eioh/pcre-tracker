@@ -163,6 +163,15 @@ export function resolveDropTarget(active: Active, over: Over | null): DropTarget
   return { groupId, index: activeCenter > overCenter ? sortable.index + 1 : sortable.index };
 }
 
+// ドロップ確定位置を決める。表示中のインジケータ（=onDragMoveの最新結果）があればそれをそのまま採用する。
+// mouseupではポインタが動かないためインジケータは最後の計算結果と一致しており、ユーザーに見えている位置＝確定位置になる。
+// DragEnd時のactive.rect.current.translatedはDragOverlayの後始末で巻き戻る・nullになることがあり、
+// そこから再計算すると前後判定が反転して「見えていたラインと違う位置に入る」ため、再計算はインジケータが無いとき（=onDragMoveが
+// 一度も走らずにドロップされたエッジケース）だけに限定する。
+export function resolveCommitTarget(dropIndicator: DropTarget | null, active: Active, over: Over | null): DropTarget | null {
+  return dropIndicator ?? resolveDropTarget(active, over);
+}
+
 // ドロップ先が同じかを判定し、ドラッグ中の無駄な再描画を避ける。
 function isSameDropTarget(a: DropTarget | null, b: DropTarget | null): boolean {
   if (a === null || b === null) {
@@ -598,9 +607,9 @@ export function ClanBattleSidebar({
     setDropIndicator((previous) => (isSameDropTarget(previous, nextTarget) ? previous : nextTarget));
   };
 
-  // 確定位置はstale になりうるdropIndicatorではなく、最終イベントからresolveDropTargetを再実行して求める。
+  // 確定位置は表示中のインジケータ（onDragMoveで毎回更新される）を正とする。理由はresolveCommitTargetのコメント参照。
   const handleDragEnd = (event: DragEndEvent): void => {
-    const target = resolveDropTarget(event.active, event.over);
+    const target = resolveCommitTarget(dropIndicator, event.active, event.over);
     setActiveFormation(null);
     setDropIndicator(null);
     if (!target) {

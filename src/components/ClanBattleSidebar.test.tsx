@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import type { Active, CollisionDetection, Over } from "@dnd-kit/core";
 import type { ClanBattleMonthGroup } from "../domain/types";
-import { ClanBattleSidebar, resolveDropTarget, treeCollisionDetection } from "./ClanBattleSidebar";
+import { ClanBattleSidebar, resolveCommitTarget, resolveDropTarget, treeCollisionDetection } from "./ClanBattleSidebar";
 
 // jsdom には ResizeObserver が無く、Radix Popover の位置計算が失敗するためスタブを補完する。
 beforeAll(() => {
@@ -104,6 +104,26 @@ describe("resolveDropTarget", () => {
     const active = { id: "drag", data: { current: undefined }, rect: { current: { initial: null, translated: null } } } as unknown as Active;
 
     expect(resolveDropTarget(active, buildOverRow("row", "g1", 2, 100))).toEqual({ groupId: "g1", index: 2 });
+  });
+});
+
+describe("resolveCommitTarget", () => {
+  it("表示中のインジケータがあれば、最終イベントの再計算結果が違ってもインジケータを採用する", () => {
+    // DragEnd時のactive矩形はDragOverlayの後始末で巻き戻り、再計算するとafter(index 1)になってしまうケース。
+    const staleActive = buildActive("drag", 110);
+    const over = buildOverRow("row", "g1", 0, 100);
+    expect(resolveDropTarget(staleActive, over)).toEqual({ groupId: "g1", index: 1 });
+
+    // 直前のonDragMoveでbefore(index 0)を表示していたなら、見えていたその位置で確定する。
+    expect(resolveCommitTarget({ groupId: "g1", index: 0 }, staleActive, over)).toEqual({ groupId: "g1", index: 0 });
+  });
+
+  it("インジケータが無い場合だけ最終イベントから計算する", () => {
+    expect(resolveCommitTarget(null, buildActive("drag", 110), buildOverRow("row", "g1", 2, 100))).toEqual({
+      groupId: "g1",
+      index: 3,
+    });
+    expect(resolveCommitTarget(null, buildActive("drag", 0), null)).toBeNull();
   });
 });
 
