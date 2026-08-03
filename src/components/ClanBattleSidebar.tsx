@@ -267,7 +267,7 @@ function InlineFormationInput({
       value={value}
       aria-label="編成名"
       placeholder="編成名"
-      className="h-9 max-md:min-h-11"
+      className="h-9 min-w-0 max-md:min-h-11"
       onChange={(event) => onChange(event.target.value)}
       onKeyDown={(event) => {
         // IME変換中のEnter・Escapeは変換の確定/取り消し操作なので、編成の作成・入力欄のキャンセルには使わない。
@@ -464,11 +464,13 @@ function MonthFolder({
 
       {/* 折りたたみ時は本文を描画しない（max-hトランジションで隠すだけだと、隠れたsortable/droppableがdnd-kitの測定対象に残り誤ドロップの温床になるため）。 */}
       {isCollapsed ? null : (
-        <div id={bodyId} ref={isEmpty ? undefined : setMonthBodyDroppableRef} className="mt-1 grid gap-1.5 pl-4">
+        <div id={bodyId} ref={isEmpty ? undefined : setMonthBodyDroppableRef} className="mt-1 grid min-w-0 gap-1.5 pl-4">
           <SortableContext id={group.id} items={group.formations.map((formation) => formation.id)} strategy={noopSortingStrategy}>
-            <div className="grid gap-1.5">
+            <div className="grid min-w-0 gap-1.5">
               {group.formations.map((formation, index) => (
-                <div key={formation.id} className="relative">
+                // min-w-0 は必須。gridアイテムのmin-width:autoが効くと、行内のtruncate用nowrapテキストのmin-content（=編成名の全文幅）まで
+                // トラックが広がり、長い編成名でサイドバーからはみ出す。行のmin-w-0+truncateのチェーンをここで断ち切らない。
+                <div key={formation.id} className="relative min-w-0">
                   {indicatorIndex === index ? <DropIndicatorLine position="before" /> : null}
                   <SortableFormationRow
                     formation={formation}
@@ -627,7 +629,8 @@ export function ClanBattleSidebar({
   };
 
   return (
-    <aside className={`${panelClass} grid content-start gap-4`}>
+    // aside自身も右ペインとの2カラムgridのアイテムなので、min-w-0でトラック幅を超えて広がらないようにする。
+    <aside className={`${panelClass} grid min-w-0 content-start gap-4`}>
       <div className="flex items-center justify-between gap-2">
         <h2 className="m-0 text-sm font-semibold tracking-[0.08em] text-sub">クラバト編成</h2>
         <AddMonthPopover onAddMonthGroup={handleAddMonthGroup} />

@@ -189,6 +189,18 @@ describe("ClanBattleSidebar（月フォルダの折りたたみ）", () => {
     expect(screen.queryByRole("button", { name: "編成Cをコピー" })).not.toBeInTheDocument();
   });
 
+  it("編成行のラッパーとリストにmin-w-0が付き、長い編成名でもはみ出さない", () => {
+    // jsdomではレイアウト計測ができないため、min-width:auto を断ち切るクラスが付いていることで代用検証する。
+    const props = { ...buildProps(), groups: [buildGroup("g1", 2020, 3, ["とても長い編成名がここに入る想定のテスト用編成名"])] };
+    props.selectedFormationId = "g1_とても長い編成名がここに入る想定のテスト用編成名";
+    render(<ClanBattleSidebar {...props} />);
+
+    const rowWrapper = screen.getByRole("button", { name: /をコピー$/ }).closest("div.relative");
+    expect(rowWrapper).not.toBeNull();
+    expect(rowWrapper).toHaveClass("min-w-0");
+    expect(rowWrapper?.parentElement).toHaveClass("min-w-0");
+  });
+
   it("月見出しを押すたびに展開と折りたたみが切り替わる", () => {
     render(<ClanBattleSidebar {...buildProps()} />);
 
