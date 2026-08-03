@@ -3,12 +3,20 @@ import {
   duplicateClanBattleFormation,
   formatClanBattleDamage,
   getClanBattleMemberDiffs,
+  moveClanBattleFormation,
   normalizeClanBattleState,
   reorderClanBattleFormations,
   sortClanBattleMembers,
   toClanBattleDamage,
 } from "./clanBattle";
-import type { CharacterProgress, ClanBattleFormation, ClanBattleMember, ClanBattleState, MasterCharacter } from "./types";
+import type {
+  CharacterProgress,
+  ClanBattleFormation,
+  ClanBattleMember,
+  ClanBattleMonthGroup,
+  ClanBattleState,
+  MasterCharacter,
+} from "./types";
 
 const progress: CharacterProgress = {
   owned: true,
@@ -278,6 +286,168 @@ describe("clanBattle", () => {
       reorderClanBattleFormations(formations, "a", "c");
 
       expect(formations.map((formation) => formation.id)).toEqual(["a", "b", "c"]);
+    });
+  });
+
+  describe("moveClanBattleFormation", () => {
+    // ID以外の内容を問わない移動テスト用の最小限の編成を生成する。
+    function buildFormationList(ids: string[]): ClanBattleFormation[] {
+      return ids.map((id) => ({ id, name: id, damage: 0, timeline: "", members: [] }));
+    }
+
+    // groupId・formation構成を指定してクラバトstateを組み立てる。
+    function buildState(groups: Array<{ id: string; formationIds: string[] }>): ClanBattleState {
+      return {
+        groups: groups.map(
+          (group, index): ClanBattleMonthGroup => ({
+            id: group.id,
+            year: 2026,
+            month: index + 1,
+            formations: buildFormationList(group.formationIds),
+          }),
+        ),
+      };
+    }
+
+    // 各グループのformation ID配列だけを取り出して比較しやすくする。
+    function idsOf(state: ClanBattleState): string[][] {
+      return state.groups.map((group) => group.formations.map((formation) => formation.id));
+    }
+
+    it("月をまたいで先頭へ移動する", () => {
+      const state = buildState([
+        { id: "g1", formationIds: ["a", "b"] },
+        { id: "g2", formationIds: ["x", "y"] },
+      ]);
+
+      const next = moveClanBattleFormation(state, "b", "g2", 0);
+
+      expect(idsOf(next)).toEqual([["a"], ["b", "x", "y"]]);
+    });
+
+    it("月をまたいで中間へ移動する", () => {
+      const state = buildState([
+        { id: "g1", formationIds: ["a", "b"] },
+        { id: "g2", formationIds: ["x", "y"] },
+      ]);
+
+      const next = moveClanBattleFormation(state, "b", "g2", 1);
+
+      expect(idsOf(next)).toEqual([["a"], ["x", "b", "y"]]);
+    });
+
+    it("月をまたいで末尾へ移動する", () => {
+      const state = buildState([
+        { id: "g1", formationIds: ["a", "b"] },
+        { id: "g2", formationIds: ["x", "y"] },
+      ]);
+
+      const next = moveClanBattleFormation(state, "b", "g2", 2);
+
+      expect(idsOf(next)).toEqual([["a"], ["x", "y", "b"]]);
+    });
+
+    it("月をまたいで空グループへ移動する", () => {
+      const state = buildState([
+        { id: "g1", formationIds: ["a", "b"] },
+        { id: "g2", formationIds: [] },
+      ]);
+
+      const next = moveClanBattleFormation(state, "a", "g2", 0);
+
+      expect(idsOf(next)).toEqual([["b"], ["a"]]);
+    });
+
+    it("同一グループ内で前から後ろへ移動するとtoIndexが1つ補正される", () => {
+      const state = buildState([{ id: "g1", formationIds: ["a", "b", "c", "d"] }]);
+
+      // 表示上「dの直後（挿入位置4）」を指定してaを移動する。
+      const next = moveClanBattleFormation(state, "a", "g1", 4);
+
+      expect(idsOf(next)).toEqual([["b", "c", "d", "a"]]);
+    });
+
+    it("同一グループ内で後ろから前へ移動する", () => {
+      const state = buildState([{ id: "g1", formationIds: ["a", "b", "c", "d"] }]);
+
+      const next = moveClanBattleFormation(state, "d", "g1", 0);
+
+      expect(idsOf(next)).toEqual([["d", "a", "b", "c"]]);
+    });
+
+    it("toIndexが負の値でも0にクランプする", () => {
+      const state = buildState([
+        { id: "g1", formationIds: ["a", "b"] },
+        { id: "g2", formationIds: ["x", "y"] },
+      ]);
+
+      const next = moveClanBattleFormation(state, "b", "g2", -5);
+
+      expect(idsOf(next)).toEqual([["a"], ["b", "x", "y"]]);
+    });
+
+    it("toIndexが配列長を超えても末尾にクランプする", () => {
+      const state = buildState([
+        { id: "g1", formationIds: ["a", "b"] },
+        { id: "g2", formationIds: ["x", "y"] },
+      ]);
+
+      const next = moveClanBattleFormation(state, "b", "g2", 999);
+
+      expect(idsOf(next)).toEqual([["a"], ["x", "y", "b"]]);
+    });
+
+    it("同一グループ内でtoIndexが範囲外でもクランプする", () => {
+      const state = buildState([{ id: "g1", formationIds: ["a", "b", "c"] }]);
+
+      expect(idsOf(moveClanBattleFormation(state, "a", "g1", -10))).toEqual([["a", "b", "c"]]);
+      expect(idsOf(moveClanBattleFormation(state, "a", "g1", 999))).toEqual([["b", "c", "a"]]);
+    });
+
+    it("実質no-op（元の位置に戻る移動）の場合は同一参照を返す", () => {
+      const state = buildState([{ id: "g1", formationIds: ["a", "b", "c"] }]);
+
+      // bの現在位置(1)へ挿入 = 変化なし
+      expect(moveClanBattleFormation(state, "b", "g1", 1)).toBe(state);
+      // bの直後(2)へ挿入 = 補正後1で変化なし
+      expect(moveClanBattleFormation(state, "b", "g1", 2)).toBe(state);
+    });
+
+    it("formationIdが見つからない場合は同一参照を返す", () => {
+      const state = buildState([{ id: "g1", formationIds: ["a", "b"] }]);
+
+      expect(moveClanBattleFormation(state, "missing", "g1", 0)).toBe(state);
+    });
+
+    it("toGroupIdが見つからない場合は同一参照を返す", () => {
+      const state = buildState([{ id: "g1", formationIds: ["a", "b"] }]);
+
+      expect(moveClanBattleFormation(state, "a", "missing", 0)).toBe(state);
+    });
+
+    it("移動対象以外のグループは同一参照を維持する（イミュータビリティ）", () => {
+      const state = buildState([
+        { id: "g1", formationIds: ["a", "b"] },
+        { id: "g2", formationIds: ["x", "y"] },
+        { id: "g3", formationIds: ["p", "q"] },
+      ]);
+
+      const next = moveClanBattleFormation(state, "a", "g2", 0);
+
+      expect(next.groups[0]).not.toBe(state.groups[0]);
+      expect(next.groups[1]).not.toBe(state.groups[1]);
+      expect(next.groups[2]).toBe(state.groups[2]);
+    });
+
+    it("元のstateを変異させない", () => {
+      const state = buildState([
+        { id: "g1", formationIds: ["a", "b"] },
+        { id: "g2", formationIds: ["x", "y"] },
+      ]);
+
+      moveClanBattleFormation(state, "a", "g2", 0);
+
+      expect(idsOf(state)).toEqual([["a", "b"], ["x", "y"]]);
     });
   });
 });
