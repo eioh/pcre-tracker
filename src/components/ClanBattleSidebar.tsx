@@ -1,9 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { ChevronDown, Copy, Plus, Trash2 } from "lucide-react";
-import { DndContext, MouseSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
-import type { DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  DragOverlay,
+  MouseSensor,
+  TouchSensor,
+  pointerWithin,
+  rectIntersection,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import type { Active, CollisionDetection, DragEndEvent, DragMoveEvent, DragStartEvent, Over } from "@dnd-kit/core";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import type { SortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { ClanBattleFormation, ClanBattleMonthGroup } from "../domain/types";
 import { panelClass } from "./input/uiStyles";
@@ -20,10 +31,33 @@ type ClanBattleSidebarProps = {
   onDeleteMonthGroup: (groupId: string) => void;
   onAddFormation: (groupId: string, name: string) => void;
   onCopyFormation: (groupId: string, formationId: string) => void;
-  onReorderFormations: (groupId: string, activeId: string, overId: string) => void;
+  onMoveFormation: (formationId: string, toGroupId: string, toIndex: number) => void;
+};
+
+// ドロップ先（挿入先の月グループと、その月の配列における挿入位置）。
+type DropTarget = {
+  groupId: string;
+  index: number;
+};
+
+// 月コンテナ（空の月・折りたたみ見出し）のdroppableに持たせるデータ。
+type MonthDroppableData = {
+  groupId: string;
+  formationCount: number;
 };
 
 const MONTH_OPTIONS = Array.from({ length: 12 }, (_, index) => index + 1);
+
+// 並び替えプレビュー（行スライド）を無効化する。ドラッグ中に配列を動かさない設計では同月・他月で挙動が非対称になるため、
+// インジケータライン＋DragOverlayの統一UXにする。
+const noopSortingStrategy: SortingStrategy = () => null;
+
+// pointerWithin優先・当たりが無ければrectIntersectionへフォールバックする。
+// closestCenter単独だと縦長のツリーでポインタから遠い月へ吸い寄せられるため使わない。
+const treeCollisionDetection: CollisionDetection = (args) => {
+  const pointerCollisions = pointerWithin(args);
+  return pointerCollisions.length > 0 ? pointerCollisions : rectIntersection(args);
+};
 
 // クラバト編成画面の初期年を現在年から作る。
 function getDefaultYear(): number {
@@ -58,6 +92,71 @@ function findGroupIdByFormationId(groups: ClanBattleMonthGroup[], formationId: s
   return groups.find((group) => group.formations.some((formation) => formation.id === formationId))?.id ?? null;
 }
 
+// 月コンテナのdroppableに載せたデータを取り出す。
+function toMonthDroppableData(over: Over): MonthDroppableData | null {
+  const data = over.data.current as Partial<MonthDroppableData> | undefined;
+  if (!data || typeof data.groupId !== "string" || typeof data.formationCount !== "number") {
+    return null;
+  }
+  return { groupId: data.groupId, formationCount: data.formationCount };
+}
+
+// ドラッグ中のポインタ位置から挿入先を求める純ヘルパー。onDragMoveとonDragEndの両方から同じ計算で呼ぶ。
+export function resolveDropTarget(active: Active, over: Over | null): DropTarget | null {
+  if (!over) {
+    return null;
+  }
+  // 空の月コンテナ・折りたたみ見出しへのドロップはその月の末尾へ入れる。
+  const monthDroppable = toMonthDroppableData(over);
+  if (monthDroppable) {
+    return { groupId: monthDroppable.groupId, index: monthDroppable.formationCount };
+  }
+  // 編成行の上なら、SortableContextのid（=月ID）と行indexがover側のsortable情報から得られる。
+  const sortable = (over.data.current as { sortable?: { containerId: string | number; index: number } } | undefined)?.sortable;
+  if (!sortable) {
+    return null;
+  }
+  if (over.id === active.id) {
+    return null;
+  }
+  const groupId = String(sortable.containerId);
+  const activeRect = active.rect.current.translated;
+  if (!activeRect) {
+    return { groupId, index: sortable.index };
+  }
+  // ドラッグ中の行の縦中心がover行の中心より下なら後ろへ、上なら前へ挿入する。
+  const activeCenter = activeRect.top + activeRect.height / 2;
+  const overCenter = over.rect.top + over.rect.height / 2;
+  return { groupId, index: activeCenter > overCenter ? sortable.index + 1 : sortable.index };
+}
+
+// ドロップ先が同じかを判定し、ドラッグ中の無駄な再描画を避ける。
+function isSameDropTarget(a: DropTarget | null, b: DropTarget | null): boolean {
+  if (a === null || b === null) {
+    return a === b;
+  }
+  return a.groupId === b.groupId && a.index === b.index;
+}
+
+// 行の間に挿入位置を示す2pxのライン。レイアウトを動かさないよう絶対配置で重ねる（行がずれると当たり判定が揺れるため）。
+function DropIndicatorLine({ position }: { position: "before" | "after" }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute inset-x-0 h-0.5 rounded-full bg-accent ${position === "before" ? "-top-1" : "-bottom-1"}`}
+    />
+  );
+}
+
+// DragOverlayでポインタに追従させる編成行のコピー（表示専用）。
+function FormationRowPreview({ formation }: { formation: ClanBattleFormation }) {
+  return (
+    <div className="pointer-events-none flex min-w-0 items-center rounded-[8px] border border-accent bg-selected px-3 py-2 text-sm text-main shadow-panel">
+      <span className="block truncate font-semibold">{formation.name}</span>
+    </div>
+  );
+}
+
 // ドラッグ可能な編成行。長押し起動のセンサーと組み合わせ、行全体をドラッグ対象にしつつ選択ボタン・コピーボタンのクリックは従来どおり動かす。
 function SortableFormationRow({
   formation,
@@ -81,7 +180,7 @@ function SortableFormationRow({
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...listeners}
       className={`group flex min-w-0 touch-manipulation select-none items-center rounded-[8px] border transition ${
-        isDragging ? "z-10 opacity-60" : ""
+        isDragging ? "opacity-40" : ""
       } ${
         isSelected
           ? "border-accent bg-selected text-main"
@@ -220,7 +319,7 @@ function MonthFolder({
   selectedFormationId,
   isAddingFormation,
   addingName,
-  dragSensors,
+  dropIndicator,
   onToggleCollapsed,
   onSelectFormation,
   onStartAddFormation,
@@ -229,7 +328,6 @@ function MonthFolder({
   onCancelAddFormation,
   onCopyFormation,
   onDeleteMonthGroup,
-  onReorderFormations,
 }: {
   group: ClanBattleMonthGroup;
   isCollapsed: boolean;
@@ -237,7 +335,7 @@ function MonthFolder({
   selectedFormationId: string | null;
   isAddingFormation: boolean;
   addingName: string;
-  dragSensors: ReturnType<typeof useSensors>;
+  dropIndicator: DropTarget | null;
   onToggleCollapsed: (groupId: string) => void;
   onSelectFormation: (formationId: string) => void;
   onStartAddFormation: (groupId: string) => void;
@@ -246,31 +344,30 @@ function MonthFolder({
   onCancelAddFormation: () => void;
   onCopyFormation: (groupId: string, formationId: string) => void;
   onDeleteMonthGroup: (groupId: string) => void;
-  onReorderFormations: (groupId: string, activeId: string, overId: string) => void;
 }) {
   const title = formatMonthGroupTitle(group.year, group.month);
   const bodyId = `clan-battle-month-${group.id}`;
-
-  // ドラッグ終了時に同一グループ内の並び替えを依頼する。
-  const handleDragEnd = (event: DragEndEvent): void => {
-    const { active, over } = event;
-    if (!over) {
-      return;
-    }
-    onReorderFormations(group.id, String(active.id), String(over.id));
-  };
+  // 折りたたみ見出し（末尾へ追加）と空の月の受け皿を1つのdroppableで兼ねる。展開かつ編成ありのときは行のsortableに任せてrefを付けない。
+  const monthDroppableData: MonthDroppableData = { groupId: group.id, formationCount: group.formations.length };
+  const { setNodeRef: setMonthDroppableRef, isOver: isMonthDroppableOver } = useDroppable({
+    id: `droppable-${group.id}`,
+    data: monthDroppableData,
+  });
+  const isEmpty = group.formations.length === 0;
+  const indicatorIndex = dropIndicator?.groupId === group.id ? dropIndicator.index : null;
 
   return (
     <section className="min-w-0">
       <div className="group flex min-w-0 items-center gap-1">
         <button
           type="button"
+          ref={isCollapsed ? setMonthDroppableRef : undefined}
           aria-expanded={!isCollapsed}
           aria-controls={bodyId}
           // 畳んだ月に選択中編成がある場合は見出しを選択色にして、選択が迷子に見えないようにする。
           className={`inline-flex min-w-0 flex-1 items-center gap-1.5 rounded-[8px] px-1.5 py-1.5 text-left text-sm font-semibold transition max-md:min-h-11 ${
-            isCollapsed && hasSelectedFormation ? "bg-selected text-main" : "text-main hover:text-accent"
-          }`}
+            isCollapsed && isMonthDroppableOver ? "ring-2 ring-accent" : ""
+          } ${isCollapsed && hasSelectedFormation ? "bg-selected text-main" : "text-main hover:text-accent"}`}
           onClick={() => onToggleCollapsed(group.id)}
         >
           <ChevronDown className={`size-4 shrink-0 transition-transform ${isCollapsed ? "" : "rotate-180"}`} aria-hidden="true" />
@@ -301,21 +398,24 @@ function MonthFolder({
       {/* 折りたたみ時は本文を描画しない（max-hトランジションで隠すだけだと、隠れたsortable/droppableがdnd-kitの測定対象に残り誤ドロップの温床になるため）。 */}
       {isCollapsed ? null : (
         <div id={bodyId} className="mt-1 grid gap-1.5 pl-4">
-          <DndContext sensors={dragSensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={group.formations.map((formation) => formation.id)} strategy={verticalListSortingStrategy}>
-              <div className="grid gap-1.5">
-                {group.formations.map((formation) => (
+          <SortableContext id={group.id} items={group.formations.map((formation) => formation.id)} strategy={noopSortingStrategy}>
+            <div className="grid gap-1.5">
+              {group.formations.map((formation, index) => (
+                <div key={formation.id} className="relative">
+                  {indicatorIndex === index ? <DropIndicatorLine position="before" /> : null}
                   <SortableFormationRow
-                    key={formation.id}
                     formation={formation}
                     isSelected={selectedFormationId === formation.id}
                     onSelect={() => onSelectFormation(formation.id)}
                     onCopy={() => onCopyFormation(group.id, formation.id)}
                   />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+                  {index === group.formations.length - 1 && indicatorIndex === group.formations.length ? (
+                    <DropIndicatorLine position="after" />
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </SortableContext>
           {isAddingFormation ? (
             <InlineFormationInput
               value={addingName}
@@ -324,8 +424,15 @@ function MonthFolder({
               onCancel={onCancelAddFormation}
             />
           ) : null}
-          {group.formations.length === 0 && !isAddingFormation ? (
-            <p className="m-0 px-1.5 py-1 text-xs text-muted">編成がありません。</p>
+          {isEmpty && !isAddingFormation ? (
+            <p
+              ref={setMonthDroppableRef}
+              className={`m-0 rounded-[8px] border border-dashed px-1.5 py-2 text-xs text-muted transition ${
+                isMonthDroppableOver ? "border-accent text-main" : "border-white/20"
+              }`}
+            >
+              編成がありません。
+            </p>
           ) : null}
         </div>
       )}
@@ -333,7 +440,7 @@ function MonthFolder({
   );
 }
 
-// クラバト編成タブの左サイドバー。月フォルダのツリーとして年月グループと編成の一覧・追加・削除・並び替えを担当する。
+// クラバト編成タブの左サイドバー。月フォルダのツリーとして年月グループと編成の一覧・追加・削除・月またぎ移動を担当する。
 export function ClanBattleSidebar({
   groups,
   selectedFormationId,
@@ -342,7 +449,7 @@ export function ClanBattleSidebar({
   onDeleteMonthGroup,
   onAddFormation,
   onCopyFormation,
-  onReorderFormations,
+  onMoveFormation,
 }: ClanBattleSidebarProps) {
   const sortedGroups = useMemo(() => sortMonthGroups(groups), [groups]);
   const selectedGroupId = useMemo(() => findGroupIdByFormationId(groups, selectedFormationId), [groups, selectedFormationId]);
@@ -352,6 +459,10 @@ export function ClanBattleSidebar({
   );
   const [addingInGroupId, setAddingInGroupId] = useState<string | null>(null);
   const [addingName, setAddingName] = useState("");
+  // ドラッグ中はclanBattle stateを動かさない（onChangeが保存パイプライン直結のため）。
+  // 挿入位置は描画専用のdropIndicatorとDragOverlayだけで表現し、確定はonDragEndの1回に集約する。
+  const [activeFormation, setActiveFormation] = useState<ClanBattleFormation | null>(null);
+  const [dropIndicator, setDropIndicator] = useState<DropTarget | null>(null);
   // 編成の並び替えは250ms長押しで起動する（PC・タッチとも統一）。PointerSensorはtouchmoveを止められずスクロールに奪われうるため、
   // touch-manipulationと両立するMouseSensor + TouchSensorの併用とする。
   const formationDragSensors = useSensors(
@@ -365,14 +476,7 @@ export function ClanBattleSidebar({
     if (!selectedGroupId) {
       return;
     }
-    setCollapsedGroupIds((previous) => {
-      if (!previous.has(selectedGroupId)) {
-        return previous;
-      }
-      const next = new Set(previous);
-      next.delete(selectedGroupId);
-      return next;
-    });
+    setCollapsedGroupIds((previous) => expandGroup(previous, selectedGroupId));
   }, [selectedGroupId]);
 
   // 月フォルダの開閉を切り替える。
@@ -390,14 +494,7 @@ export function ClanBattleSidebar({
 
   // ＋押下で対象月を強制展開し、その月の末尾にインライン入力欄を出す。
   const handleStartAddFormation = (groupId: string): void => {
-    setCollapsedGroupIds((previous) => {
-      if (!previous.has(groupId)) {
-        return previous;
-      }
-      const next = new Set(previous);
-      next.delete(groupId);
-      return next;
-    });
+    setCollapsedGroupIds((previous) => expandGroup(previous, groupId));
     setAddingName("");
     setAddingInGroupId(groupId);
   };
@@ -415,6 +512,39 @@ export function ClanBattleSidebar({
     setAddingInGroupId(null);
   };
 
+  // ドラッグ開始時にオーバーレイ表示用の編成を保持する。
+  const handleDragStart = (event: DragStartEvent): void => {
+    const formationId = String(event.active.id);
+    const formation = groups.flatMap((group) => group.formations).find((item) => item.id === formationId) ?? null;
+    setActiveFormation(formation);
+    setDropIndicator(null);
+  };
+
+  // 挿入位置はonDragOverではなくonDragMoveで追従する（onDragOverはoverが変わった時しか発火せず、同じ行の上半分→下半分の移動を拾えないため）。
+  const handleDragMove = (event: DragMoveEvent): void => {
+    const nextTarget = resolveDropTarget(event.active, event.over);
+    setDropIndicator((previous) => (isSameDropTarget(previous, nextTarget) ? previous : nextTarget));
+  };
+
+  // 確定位置はstale になりうるdropIndicatorではなく、最終イベントからresolveDropTargetを再実行して求める。
+  const handleDragEnd = (event: DragEndEvent): void => {
+    const target = resolveDropTarget(event.active, event.over);
+    setActiveFormation(null);
+    setDropIndicator(null);
+    if (!target) {
+      return;
+    }
+    // 折りたたんだ月へ落とした場合は結果が見えるよう展開する。
+    setCollapsedGroupIds((previous) => expandGroup(previous, target.groupId));
+    onMoveFormation(String(event.active.id), target.groupId, target.index);
+  };
+
+  // ドラッグ中断時はオーバーレイとインジケータだけを片付ける。
+  const handleDragCancel = (): void => {
+    setActiveFormation(null);
+    setDropIndicator(null);
+  };
+
   return (
     <aside className={`${panelClass} grid content-start gap-4`}>
       <div className="flex items-center justify-between gap-2">
@@ -422,30 +552,50 @@ export function ClanBattleSidebar({
         <AddMonthPopover onAddMonthGroup={onAddMonthGroup} />
       </div>
 
-      <div className="min-w-0 grid gap-1.5">
-        {sortedGroups.length === 0 ? <p className="m-0 text-sm text-muted">年月グループを追加してください。</p> : null}
-        {sortedGroups.map((group) => (
-          <MonthFolder
-            key={group.id}
-            group={group}
-            isCollapsed={collapsedGroupIds.has(group.id)}
-            hasSelectedFormation={selectedGroupId === group.id}
-            selectedFormationId={selectedFormationId}
-            isAddingFormation={addingInGroupId === group.id}
-            addingName={addingName}
-            dragSensors={formationDragSensors}
-            onToggleCollapsed={handleToggleCollapsed}
-            onSelectFormation={onSelectFormation}
-            onStartAddFormation={handleStartAddFormation}
-            onChangeAddingName={setAddingName}
-            onCommitAddFormation={handleCommitAddFormation}
-            onCancelAddFormation={handleCancelAddFormation}
-            onCopyFormation={onCopyFormation}
-            onDeleteMonthGroup={onDeleteMonthGroup}
-            onReorderFormations={onReorderFormations}
-          />
-        ))}
-      </div>
+      {/* DndContextはサイドバー全体で1つにして、月をまたぐ移動を可能にする。 */}
+      <DndContext
+        sensors={formationDragSensors}
+        collisionDetection={treeCollisionDetection}
+        onDragStart={handleDragStart}
+        onDragMove={handleDragMove}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        <div className="min-w-0 grid gap-1.5">
+          {sortedGroups.length === 0 ? <p className="m-0 text-sm text-muted">年月グループを追加してください。</p> : null}
+          {sortedGroups.map((group) => (
+            <MonthFolder
+              key={group.id}
+              group={group}
+              isCollapsed={collapsedGroupIds.has(group.id)}
+              hasSelectedFormation={selectedGroupId === group.id}
+              selectedFormationId={selectedFormationId}
+              isAddingFormation={addingInGroupId === group.id}
+              addingName={addingName}
+              dropIndicator={dropIndicator}
+              onToggleCollapsed={handleToggleCollapsed}
+              onSelectFormation={onSelectFormation}
+              onStartAddFormation={handleStartAddFormation}
+              onChangeAddingName={setAddingName}
+              onCommitAddFormation={handleCommitAddFormation}
+              onCancelAddFormation={handleCancelAddFormation}
+              onCopyFormation={onCopyFormation}
+              onDeleteMonthGroup={onDeleteMonthGroup}
+            />
+          ))}
+        </div>
+        <DragOverlay>{activeFormation ? <FormationRowPreview formation={activeFormation} /> : null}</DragOverlay>
+      </DndContext>
     </aside>
   );
+}
+
+// 折りたたみ集合から対象月を外して展開する（変化が無ければ同じSetを返す）。
+function expandGroup(collapsedGroupIds: Set<string>, groupId: string): Set<string> {
+  if (!collapsedGroupIds.has(groupId)) {
+    return collapsedGroupIds;
+  }
+  const next = new Set(collapsedGroupIds);
+  next.delete(groupId);
+  return next;
 }

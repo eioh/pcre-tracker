@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
+import type { Active, Over } from "@dnd-kit/core";
 import type { ClanBattleMonthGroup } from "../domain/types";
-import { ClanBattleSidebar } from "./ClanBattleSidebar";
+import { ClanBattleSidebar, resolveDropTarget } from "./ClanBattleSidebar";
 
 // jsdom には ResizeObserver が無く、Radix Popover の位置計算が失敗するためスタブを補完する。
 beforeAll(() => {
@@ -34,9 +35,77 @@ function buildProps() {
     onDeleteMonthGroup: vi.fn<(groupId: string) => void>(),
     onAddFormation: vi.fn<(groupId: string, name: string) => void>(),
     onCopyFormation: vi.fn<(groupId: string, formationId: string) => void>(),
-    onReorderFormations: vi.fn<(groupId: string, activeId: string, overId: string) => void>(),
+    onMoveFormation: vi.fn<(formationId: string, toGroupId: string, toIndex: number) => void>(),
   };
 }
+
+// 矩形（ClientRect）をtop/heightから組み立てる。
+function buildRect(top: number, height: number) {
+  return { top, left: 0, width: 200, height, bottom: top + height, right: 200 };
+}
+
+// ドラッグ中の編成行（active）を、translated矩形付きで組み立てる。
+function buildActive(id: string, top: number, height = 40): Active {
+  return {
+    id,
+    data: { current: undefined },
+    rect: { current: { initial: null, translated: buildRect(top, height) } },
+  } as unknown as Active;
+}
+
+// ドロップ先の編成行（over）を、所属月と行indexを持たせて組み立てる。
+function buildOverRow(id: string, containerId: string, index: number, top: number, height = 40): Over {
+  return {
+    id,
+    data: { current: { sortable: { containerId, index, items: [] } } },
+    rect: buildRect(top, height),
+    disabled: false,
+  } as unknown as Over;
+}
+
+// ドロップ先の月コンテナ（空の月・折りたたみ見出し）を組み立てる。
+function buildOverMonth(groupId: string, formationCount: number): Over {
+  return {
+    id: `droppable-${groupId}`,
+    data: { current: { groupId, formationCount } },
+    rect: buildRect(0, 40),
+    disabled: false,
+  } as unknown as Over;
+}
+
+describe("resolveDropTarget", () => {
+  it("over行の中心より下にいるときはその行の後ろへ挿入する", () => {
+    // over行は top=100/height=40（中心120）、ドラッグ行の中心は130。
+    expect(resolveDropTarget(buildActive("drag", 110), buildOverRow("row", "g1", 2, 100))).toEqual({
+      groupId: "g1",
+      index: 3,
+    });
+  });
+
+  it("over行の中心より上にいるときはその行の前へ挿入する", () => {
+    // ドラッグ行の中心は110でover行の中心120より上。
+    expect(resolveDropTarget(buildActive("drag", 90), buildOverRow("row", "g1", 2, 100))).toEqual({
+      groupId: "g1",
+      index: 2,
+    });
+  });
+
+  it("月コンテナ（空の月・折りたたみ見出し）へのドロップはその月の末尾になる", () => {
+    expect(resolveDropTarget(buildActive("drag", 0), buildOverMonth("g2", 3))).toEqual({ groupId: "g2", index: 3 });
+  });
+
+  it("overが無い・自分自身の上・sortable情報が無い場合はnullを返す", () => {
+    expect(resolveDropTarget(buildActive("drag", 0), null)).toBeNull();
+    expect(resolveDropTarget(buildActive("drag", 0), buildOverRow("drag", "g1", 1, 100))).toBeNull();
+    expect(resolveDropTarget(buildActive("drag", 0), { id: "x", data: { current: {} }, rect: buildRect(0, 40) } as unknown as Over)).toBeNull();
+  });
+
+  it("ドラッグ中の矩形が未計測のときはover行の位置をそのまま使う", () => {
+    const active = { id: "drag", data: { current: undefined }, rect: { current: { initial: null, translated: null } } } as unknown as Active;
+
+    expect(resolveDropTarget(active, buildOverRow("row", "g1", 2, 100))).toEqual({ groupId: "g1", index: 2 });
+  });
+});
 
 describe("ClanBattleSidebar（月フォルダの折りたたみ）", () => {
   it("選択中編成のある月だけ展開し、畳んだ月は編成数バッジを出して中身を描画しない", () => {

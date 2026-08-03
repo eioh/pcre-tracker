@@ -18,7 +18,7 @@ import {
   formatClanBattleDamage,
   getClanBattleMemberDiffs,
   isCurrentClanBattleMonth,
-  reorderClanBattleFormations,
+  moveClanBattleFormation,
   sortClanBattleMembers,
   toClanBattleDamage,
 } from "../domain/clanBattle";
@@ -222,19 +222,13 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
     );
   };
 
-  // ドラッグ終了時に同一グループ内で編成を並び替えて保存する。選択IDは渡さず、選択状態はidベースで自然に維持させる。
-  const handleReorderFormations = (groupId: string, activeId: string, overId: string): void => {
-    const group = state.clanBattle.groups.find((item) => item.id === groupId);
-    if (!group) {
+  // ドラッグ終了時に編成を月またぎで移動して保存する。選択IDは渡さず、選択状態はidベースで自然に維持させる。
+  const handleMoveFormation = (formationId: string, toGroupId: string, toIndex: number): void => {
+    const moved = moveClanBattleFormation(state.clanBattle, formationId, toGroupId, toIndex);
+    if (moved === state.clanBattle) {
       return;
     }
-    const reordered = reorderClanBattleFormations(group.formations, activeId, overId);
-    if (reordered === group.formations) {
-      return;
-    }
-    updateClanBattle((previous) => ({
-      groups: previous.groups.map((item) => (item.id === groupId ? { ...item, formations: reordered } : item)),
-    }));
+    updateClanBattle(() => moved);
   };
 
   // 編成削除前に確認し、選択中なら次の候補へ選択を移す。
@@ -322,7 +316,7 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
         onDeleteMonthGroup={handleDeleteMonthGroup}
         onAddFormation={handleAddFormation}
         onCopyFormation={handleCopyFormation}
-        onReorderFormations={handleReorderFormations}
+        onMoveFormation={handleMoveFormation}
       />
 
       <section className={`${panelClass} min-w-0`}>

@@ -5,7 +5,6 @@ import {
   getClanBattleMemberDiffs,
   moveClanBattleFormation,
   normalizeClanBattleState,
-  reorderClanBattleFormations,
   sortClanBattleMembers,
   toClanBattleDamage,
 } from "./clanBattle";
@@ -241,51 +240,6 @@ describe("clanBattle", () => {
       duplicateClanBattleFormation(original);
 
       expect(original).toEqual(originalSnapshot);
-    });
-  });
-
-  describe("reorderClanBattleFormations", () => {
-    // ID以外の内容を問わない並び替えテスト用の最小限の編成を生成する。
-    function buildFormationList(ids: string[]): ClanBattleFormation[] {
-      return ids.map((id) => ({ id, name: id, damage: 0, timeline: "", members: [] }));
-    }
-
-    it("前から後ろへ、後ろから前へ、それぞれ移動すると期待順になる", () => {
-      const formations = buildFormationList(["a", "b", "c"]);
-
-      expect(reorderClanBattleFormations(formations, "a", "c").map((formation) => formation.id)).toEqual([
-        "b",
-        "c",
-        "a",
-      ]);
-      expect(reorderClanBattleFormations(formations, "c", "a").map((formation) => formation.id)).toEqual([
-        "c",
-        "a",
-        "b",
-      ]);
-    });
-
-    it("activeIdとoverIdが同じ場合は同一参照を返す", () => {
-      const formations = buildFormationList(["a", "b", "c"]);
-
-      const reordered = reorderClanBattleFormations(formations, "b", "b");
-
-      expect(reordered).toBe(formations);
-    });
-
-    it("存在しないidを渡すと同一参照を返す", () => {
-      const formations = buildFormationList(["a", "b", "c"]);
-
-      expect(reorderClanBattleFormations(formations, "missing", "a")).toBe(formations);
-      expect(reorderClanBattleFormations(formations, "a", "missing")).toBe(formations);
-    });
-
-    it("元配列を変異させない", () => {
-      const formations = buildFormationList(["a", "b", "c"]);
-
-      reorderClanBattleFormations(formations, "a", "c");
-
-      expect(formations.map((formation) => formation.id)).toEqual(["a", "b", "c"]);
     });
   });
 
