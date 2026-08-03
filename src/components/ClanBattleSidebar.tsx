@@ -12,7 +12,15 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import type { Active, CollisionDetection, DragEndEvent, DragMoveEvent, DragStartEvent, Over } from "@dnd-kit/core";
+import type {
+  Active,
+  CollisionDetection,
+  DragEndEvent,
+  DragMoveEvent,
+  DragStartEvent,
+  Over,
+  UniqueIdentifier,
+} from "@dnd-kit/core";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import type { SortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -40,7 +48,7 @@ type DropTarget = {
   index: number;
 };
 
-// 月コンテナ（空の月・折りたたみ見出し）のdroppableに持たせるデータ。
+// 月コンテナ（折りたたみ見出し・空の月・展開中の月ボディ）のdroppableに持たせるデータ。
 type MonthDroppableData = {
   groupId: string;
   formationCount: number;
@@ -48,15 +56,40 @@ type MonthDroppableData = {
 
 const MONTH_OPTIONS = Array.from({ length: 12 }, (_, index) => index + 1);
 
+// 月末尾へのドロップを明示的に受ける枠（折りたたみ見出し・空の月のプレースホルダ）のID接頭辞。
+const MONTH_END_DROPPABLE_ID_PREFIX = "clan-battle-month-end-";
+// 展開中の月ボディ全体を覆う受け皿のID接頭辞。行の隙間やリスト下端の余白を拾うためだけの弱い受け皿。
+const MONTH_BODY_DROPPABLE_ID_PREFIX = "clan-battle-month-body-";
+
 // 並び替えプレビュー（行スライド）を無効化する。ドラッグ中に配列を動かさない設計では同月・他月で挙動が非対称になるため、
 // インジケータライン＋DragOverlayの統一UXにする。
 const noopSortingStrategy: SortingStrategy = () => null;
 
+// 月ボディの受け皿かを判定する。
+function isMonthBodyDroppableId(id: UniqueIdentifier): boolean {
+  return String(id).startsWith(MONTH_BODY_DROPPABLE_ID_PREFIX);
+}
+
+// 月コンテナ（末尾枠・月ボディ）のいずれかかを判定する。
+function isMonthDroppableId(id: UniqueIdentifier): boolean {
+  return isMonthBodyDroppableId(id) || String(id).startsWith(MONTH_END_DROPPABLE_ID_PREFIX);
+}
+
 // pointerWithin優先・当たりが無ければrectIntersectionへフォールバックする。
 // closestCenter単独だと縦長のツリーでポインタから遠い月へ吸い寄せられるため使わない。
-const treeCollisionDetection: CollisionDetection = (args) => {
+export const treeCollisionDetection: CollisionDetection = (args) => {
   const pointerCollisions = pointerWithin(args);
-  return pointerCollisions.length > 0 ? pointerCollisions : rectIntersection(args);
+  // 行・折りたたみ見出し・空月プレースホルダはポインタが乗っていれば明示的な指定として扱う。
+  const explicitCollisions = pointerCollisions.filter((collision) => !isMonthBodyDroppableId(collision.id));
+  if (explicitCollisions.length > 0) {
+    return explicitCollisions;
+  }
+  if (pointerCollisions.length > 0) {
+    // 月ボディの上（行の隙間・リスト下端の余白）にいるときは、矩形が重なる行を拾えればそれを優先する。
+    const intersectingRows = rectIntersection(args).filter((collision) => !isMonthDroppableId(collision.id));
+    return intersectingRows.length > 0 ? intersectingRows : pointerCollisions;
+  }
+  return rectIntersection(args);
 };
 
 // クラバト編成画面の初期年を現在年から作る。
@@ -106,7 +139,7 @@ export function resolveDropTarget(active: Active, over: Over | null): DropTarget
   if (!over) {
     return null;
   }
-  // 空の月コンテナ・折りたたみ見出しへのドロップはその月の末尾へ入れる。
+  // 月コンテナ（折りたたみ見出し・空の月・展開中の月ボディの余白）へのドロップはその月の末尾へ入れる。
   const monthDroppable = toMonthDroppableData(over);
   if (monthDroppable) {
     return { groupId: monthDroppable.groupId, index: monthDroppable.formationCount };
@@ -149,9 +182,11 @@ function DropIndicatorLine({ position }: { position: "before" | "after" }) {
 }
 
 // DragOverlayでポインタに追従させる編成行のコピー（表示専用）。
+// max-md:min-h-11 は実際の行（コピーボタンで44pxへ広がる）と高さを揃えるために必須。
+// オーバーレイの矩形がactive.rectになるため、高さがずれると挿入位置の前後判定もずれる。
 function FormationRowPreview({ formation }: { formation: ClanBattleFormation }) {
   return (
-    <div className="pointer-events-none flex min-w-0 items-center rounded-[8px] border border-accent bg-selected px-3 py-2 text-sm text-main shadow-panel">
+    <div className="pointer-events-none flex min-w-0 items-center rounded-[8px] border border-accent bg-selected px-3 py-2 text-sm text-main shadow-panel max-md:min-h-11">
       <span className="block truncate font-semibold">{formation.name}</span>
     </div>
   );
@@ -226,6 +261,10 @@ function InlineFormationInput({
       className="h-9 max-md:min-h-11"
       onChange={(event) => onChange(event.target.value)}
       onKeyDown={(event) => {
+        // IME変換中のEnter・Escapeは変換の確定/取り消し操作なので、編成の作成・入力欄のキャンセルには使わない。
+        if (event.nativeEvent.isComposing) {
+          return;
+        }
         if (event.key === "Enter") {
           event.preventDefault();
           onCommit();
@@ -236,7 +275,13 @@ function InlineFormationInput({
           onCancel();
         }
       }}
-      onBlur={onCancel}
+      onBlur={() => {
+        // 別タブ・別アプリへ切り替えたときのblurでは入力内容を捨てない（ウィンドウ復帰後もそのまま続けられるようにする）。
+        if (!document.hasFocus()) {
+          return;
+        }
+        onCancel();
+      }}
     />
   );
 }
@@ -347,10 +392,15 @@ function MonthFolder({
 }) {
   const title = formatMonthGroupTitle(group.year, group.month);
   const bodyId = `clan-battle-month-${group.id}`;
-  // 折りたたみ見出し（末尾へ追加）と空の月の受け皿を1つのdroppableで兼ねる。展開かつ編成ありのときは行のsortableに任せてrefを付けない。
   const monthDroppableData: MonthDroppableData = { groupId: group.id, formationCount: group.formations.length };
-  const { setNodeRef: setMonthDroppableRef, isOver: isMonthDroppableOver } = useDroppable({
-    id: `droppable-${group.id}`,
+  // 末尾枠は「折りたたみ見出し」と「空の月のプレースホルダ」で兼用する（両者は同時に描画されない）。
+  const { setNodeRef: setMonthEndDroppableRef, isOver: isMonthEndDroppableOver } = useDroppable({
+    id: `${MONTH_END_DROPPABLE_ID_PREFIX}${group.id}`,
+    data: monthDroppableData,
+  });
+  // 展開中の月ボディ全体の受け皿。行の隙間やリスト下端の余白でドロップ先を見失わないようにする（行が重なる場合は行が優先される）。
+  const { setNodeRef: setMonthBodyDroppableRef } = useDroppable({
+    id: `${MONTH_BODY_DROPPABLE_ID_PREFIX}${group.id}`,
     data: monthDroppableData,
   });
   const isEmpty = group.formations.length === 0;
@@ -361,12 +411,12 @@ function MonthFolder({
       <div className="group flex min-w-0 items-center gap-1">
         <button
           type="button"
-          ref={isCollapsed ? setMonthDroppableRef : undefined}
+          ref={isCollapsed ? setMonthEndDroppableRef : undefined}
           aria-expanded={!isCollapsed}
           aria-controls={bodyId}
           // 畳んだ月に選択中編成がある場合は見出しを選択色にして、選択が迷子に見えないようにする。
           className={`inline-flex min-w-0 flex-1 items-center gap-1.5 rounded-[8px] px-1.5 py-1.5 text-left text-sm font-semibold transition max-md:min-h-11 ${
-            isCollapsed && isMonthDroppableOver ? "ring-2 ring-accent" : ""
+            isCollapsed && isMonthEndDroppableOver ? "ring-2 ring-accent" : ""
           } ${isCollapsed && hasSelectedFormation ? "bg-selected text-main" : "text-main hover:text-accent"}`}
           onClick={() => onToggleCollapsed(group.id)}
         >
@@ -379,12 +429,14 @@ function MonthFolder({
             </Badge>
           ) : null}
         </button>
-        {/* ホバー時のみ表示（タッチ端末は常時表示）。max-md:min-h-11/min-w-11 はモバイル（768px未満）のみタップ領域を44pxへ広げるスタイル調整。 */}
+        {/* ホバー時のみ表示（タッチ端末は常時表示）。max-md:min-h-11/min-w-11 はモバイル（768px未満）のみタップ領域を44pxへ広げるスタイル調整。
+            onPointerDownのpreventDefaultはインライン入力欄からフォーカスを奪わないため（奪うとblurキャンセルが走り、入力中の文字が消える）。 */}
         <Button
           variant="ghost"
           size="sm"
           className="shrink-0 max-md:min-h-11 max-md:min-w-11 [@media(hover:hover)]:opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
           aria-label={`${title}に編成を追加`}
+          onPointerDown={(event) => event.preventDefault()}
           onClick={() => onStartAddFormation(group.id)}
         >
           <Plus className="size-4" />
@@ -394,6 +446,7 @@ function MonthFolder({
           size="sm"
           className="shrink-0 text-danger hover:text-danger-strong max-md:min-h-11 max-md:min-w-11 [@media(hover:hover)]:opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
           aria-label={`${title}を削除`}
+          onPointerDown={(event) => event.preventDefault()}
           onClick={() => onDeleteMonthGroup(group.id)}
         >
           <Trash2 className="size-4" />
@@ -402,7 +455,7 @@ function MonthFolder({
 
       {/* 折りたたみ時は本文を描画しない（max-hトランジションで隠すだけだと、隠れたsortable/droppableがdnd-kitの測定対象に残り誤ドロップの温床になるため）。 */}
       {isCollapsed ? null : (
-        <div id={bodyId} className="mt-1 grid gap-1.5 pl-4">
+        <div id={bodyId} ref={isEmpty ? undefined : setMonthBodyDroppableRef} className="mt-1 grid gap-1.5 pl-4">
           <SortableContext id={group.id} items={group.formations.map((formation) => formation.id)} strategy={noopSortingStrategy}>
             <div className="grid gap-1.5">
               {group.formations.map((formation, index) => (
@@ -431,9 +484,9 @@ function MonthFolder({
           ) : null}
           {isEmpty && !isAddingFormation ? (
             <p
-              ref={setMonthDroppableRef}
+              ref={setMonthEndDroppableRef}
               className={`m-0 rounded-[8px] border border-dashed px-1.5 py-2 text-xs text-muted transition ${
-                isMonthDroppableOver ? "border-accent text-main" : "border-white/20"
+                isMonthEndDroppableOver ? "border-accent text-main" : "border-white/20"
               }`}
             >
               編成がありません。
@@ -497,9 +550,23 @@ export function ClanBattleSidebar({
     });
   };
 
+  // 同じ年月が既にある場合は保存を発火させず、その月を展開するだけにする。
+  const handleAddMonthGroup = (year: number, month: number): void => {
+    const existingGroup = groups.find((group) => group.year === year && group.month === month);
+    if (existingGroup) {
+      setCollapsedGroupIds((previous) => expandGroup(previous, existingGroup.id));
+      return;
+    }
+    onAddMonthGroup(year, month);
+  };
+
   // ＋押下で対象月を強制展開し、その月の末尾にインライン入力欄を出す。
   const handleStartAddFormation = (groupId: string): void => {
     setCollapsedGroupIds((previous) => expandGroup(previous, groupId));
+    if (addingInGroupId === groupId) {
+      // 同じ月の＋を押し直しただけのときは入力中の文字を消さない。
+      return;
+    }
     setAddingName("");
     setAddingInGroupId(groupId);
   };
@@ -554,7 +621,7 @@ export function ClanBattleSidebar({
     <aside className={`${panelClass} grid content-start gap-4`}>
       <div className="flex items-center justify-between gap-2">
         <h2 className="m-0 text-sm font-semibold tracking-[0.08em] text-sub">クラバト編成</h2>
-        <AddMonthPopover onAddMonthGroup={onAddMonthGroup} />
+        <AddMonthPopover onAddMonthGroup={handleAddMonthGroup} />
       </div>
 
       {/* DndContextはサイドバー全体で1つにして、月をまたぐ移動を可能にする。 */}

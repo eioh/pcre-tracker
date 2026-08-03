@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import type { Active, Over } from "@dnd-kit/core";
+import type { Active, CollisionDetection, Over } from "@dnd-kit/core";
 import type { ClanBattleMonthGroup } from "../domain/types";
-import { ClanBattleSidebar, resolveDropTarget } from "./ClanBattleSidebar";
+import { ClanBattleSidebar, resolveDropTarget, treeCollisionDetection } from "./ClanBattleSidebar";
 
 // jsdom には ResizeObserver が無く、Radix Popover の位置計算が失敗するためスタブを補完する。
 beforeAll(() => {
@@ -25,10 +25,10 @@ function buildGroup(id: string, year: number, month: number, formationNames: str
   };
 }
 
-// サイドバーの既定propsを生成する（2026年8月に2編成、2026年7月に1編成）。
+// サイドバーの既定propsを生成する（2020年3月に2編成、2020年2月に1編成）。
 function buildProps() {
   return {
-    groups: [buildGroup("g1", 2026, 8, ["編成A", "編成B"]), buildGroup("g2", 2026, 7, ["編成C"])],
+    groups: [buildGroup("g1", 2020, 3, ["編成A", "編成B"]), buildGroup("g2", 2020, 2, ["編成C"])],
     selectedFormationId: "g1_編成A",
     onSelectFormation: vi.fn<(formationId: string) => void>(),
     onAddMonthGroup: vi.fn<(year: number, month: number) => void>(),
@@ -66,7 +66,7 @@ function buildOverRow(id: string, containerId: string, index: number, top: numbe
 // ドロップ先の月コンテナ（空の月・折りたたみ見出し）を組み立てる。
 function buildOverMonth(groupId: string, formationCount: number): Over {
   return {
-    id: `droppable-${groupId}`,
+    id: `clan-battle-month-end-${groupId}`,
     data: { current: { groupId, formationCount } },
     rect: buildRect(0, 40),
     disabled: false,
@@ -107,12 +107,63 @@ describe("resolveDropTarget", () => {
   });
 });
 
+// 衝突判定の入力（droppableの矩形一覧・ポインタ位置・ドラッグ中の矩形）を組み立てる。
+function buildCollisionArgs(
+  rects: Array<{ id: string; top: number; height: number }>,
+  pointerY: number,
+  dragged: { top: number; height: number },
+): Parameters<CollisionDetection>[0] {
+  return {
+    active: buildActive("drag", dragged.top, dragged.height),
+    collisionRect: buildRect(dragged.top, dragged.height),
+    droppableRects: new Map(rects.map((rect) => [rect.id, buildRect(rect.top, rect.height)])),
+    droppableContainers: rects.map((rect) => ({ id: rect.id })),
+    pointerCoordinates: { x: 100, y: pointerY },
+  } as unknown as Parameters<CollisionDetection>[0];
+}
+
+// 月ボディ・行・折りたたみ見出しが縦に並んだ状態の矩形一覧。
+const collisionLayout = [
+  { id: "clan-battle-month-body-g1", top: 90, height: 250 },
+  { id: "row1", top: 100, height: 40 },
+  { id: "row2", top: 148, height: 40 },
+  { id: "clan-battle-month-end-g2", top: 390, height: 30 },
+];
+
+describe("treeCollisionDetection", () => {
+  it("行の上にポインタがあるときは月ボディではなく行を返す", () => {
+    const collisions = treeCollisionDetection(buildCollisionArgs(collisionLayout, 120, { top: 110, height: 40 }));
+
+    expect(collisions.map((collision) => collision.id)).toEqual(["row1"]);
+  });
+
+  it("行の隙間にポインタがあるときは、矩形が重なる行へフォールバックする", () => {
+    // ポインタは row1(〜140) と row2(148〜) の隙間。ドラッグ中の矩形は両行に重なる。
+    const collisions = treeCollisionDetection(buildCollisionArgs(collisionLayout, 144, { top: 130, height: 40 }));
+
+    expect(collisions.length).toBeGreaterThan(0);
+    expect(collisions.every((collision) => collision.id === "row1" || collision.id === "row2")).toBe(true);
+  });
+
+  it("リスト下端の余白では月ボディを返し、ドロップ先を見失わない", () => {
+    const collisions = treeCollisionDetection(buildCollisionArgs(collisionLayout, 300, { top: 290, height: 40 }));
+
+    expect(collisions.map((collision) => collision.id)).toEqual(["clan-battle-month-body-g1"]);
+  });
+
+  it("折りたたみ見出しの上ではその見出しを返す", () => {
+    const collisions = treeCollisionDetection(buildCollisionArgs(collisionLayout, 400, { top: 390, height: 40 }));
+
+    expect(collisions.map((collision) => collision.id)).toEqual(["clan-battle-month-end-g2"]);
+  });
+});
+
 describe("ClanBattleSidebar（月フォルダの折りたたみ）", () => {
   it("選択中編成のある月だけ展開し、畳んだ月は編成数バッジを出して中身を描画しない", () => {
     render(<ClanBattleSidebar {...buildProps()} />);
 
-    expect(screen.getByRole("button", { name: /2026年8月/, expanded: true })).toBeInTheDocument();
-    const collapsedToggle = screen.getByRole("button", { name: /2026年7月/, expanded: false });
+    expect(screen.getByRole("button", { name: /2020年3月/, expanded: true })).toBeInTheDocument();
+    const collapsedToggle = screen.getByRole("button", { name: /2020年2月/, expanded: false });
     expect(collapsedToggle).toHaveTextContent("1");
     expect(screen.getByRole("button", { name: "編成Aをコピー" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "編成Cをコピー" })).not.toBeInTheDocument();
@@ -121,21 +172,21 @@ describe("ClanBattleSidebar（月フォルダの折りたたみ）", () => {
   it("月見出しを押すたびに展開と折りたたみが切り替わる", () => {
     render(<ClanBattleSidebar {...buildProps()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /2026年8月/, expanded: true }));
-    expect(screen.getByRole("button", { name: /2026年8月/, expanded: false })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /2020年3月/, expanded: true }));
+    expect(screen.getByRole("button", { name: /2020年3月/, expanded: false })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "編成Aをコピー" })).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /2026年8月/, expanded: false }));
+    fireEvent.click(screen.getByRole("button", { name: /2020年3月/, expanded: false }));
     expect(screen.getByRole("button", { name: "編成Aをコピー" })).toBeInTheDocument();
   });
 
   it("選択中編成のある月は手動で畳んでも見出しを選択色でハイライトする", () => {
     render(<ClanBattleSidebar {...buildProps()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /2026年8月/, expanded: true }));
+    fireEvent.click(screen.getByRole("button", { name: /2020年3月/, expanded: true }));
 
-    expect(screen.getByRole("button", { name: /2026年8月/, expanded: false }).className).toContain("bg-selected");
-    expect(screen.getByRole("button", { name: /2026年7月/, expanded: false }).className).not.toContain("bg-selected");
+    expect(screen.getByRole("button", { name: /2020年3月/, expanded: false }).className).toContain("bg-selected");
+    expect(screen.getByRole("button", { name: /2020年2月/, expanded: false }).className).not.toContain("bg-selected");
   });
 });
 
@@ -144,9 +195,9 @@ describe("ClanBattleSidebar（インライン編成追加）", () => {
     const props = buildProps();
     render(<ClanBattleSidebar {...props} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "2026年7月に編成を追加" }));
+    fireEvent.click(screen.getByRole("button", { name: "2020年2月に編成を追加" }));
 
-    expect(screen.getByRole("button", { name: /2026年7月/, expanded: true })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /2020年2月/, expanded: true })).toBeInTheDocument();
     const input = screen.getByRole("textbox", { name: "編成名" });
     fireEvent.change(input, { target: { value: "新編成" } });
     fireEvent.keyDown(input, { key: "Enter" });
@@ -159,7 +210,7 @@ describe("ClanBattleSidebar（インライン編成追加）", () => {
     const props = buildProps();
     render(<ClanBattleSidebar {...props} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "2026年8月に編成を追加" }));
+    fireEvent.click(screen.getByRole("button", { name: "2020年3月に編成を追加" }));
     const input = screen.getByRole("textbox", { name: "編成名" });
     fireEvent.change(input, { target: { value: "捨てる編成" } });
     fireEvent.keyDown(input, { key: "Escape" });
@@ -172,7 +223,7 @@ describe("ClanBattleSidebar（インライン編成追加）", () => {
     const props = buildProps();
     render(<ClanBattleSidebar {...props} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "2026年8月に編成を追加" }));
+    fireEvent.click(screen.getByRole("button", { name: "2020年3月に編成を追加" }));
     const input = screen.getByRole("textbox", { name: "編成名" });
     fireEvent.change(input, { target: { value: "捨てる編成" } });
     fireEvent.blur(input);
@@ -181,13 +232,64 @@ describe("ClanBattleSidebar（インライン編成追加）", () => {
     expect(screen.queryByRole("textbox", { name: "編成名" })).not.toBeInTheDocument();
   });
 
+  it("IME変換中のEnterでは編成を追加せず、入力欄も閉じない", () => {
+    const props = buildProps();
+    render(<ClanBattleSidebar {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "2020年3月に編成を追加" }));
+    const input = screen.getByRole("textbox", { name: "編成名" });
+    fireEvent.change(input, { target: { value: "へんせい" } });
+    fireEvent.keyDown(input, { key: "Enter", isComposing: true });
+
+    expect(props.onAddFormation).not.toHaveBeenCalled();
+    expect(screen.getByRole("textbox", { name: "編成名" })).toHaveValue("へんせい");
+  });
+
+  it("IME変換中のEscapeでは入力欄を閉じない", () => {
+    const props = buildProps();
+    render(<ClanBattleSidebar {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "2020年3月に編成を追加" }));
+    const input = screen.getByRole("textbox", { name: "編成名" });
+    fireEvent.change(input, { target: { value: "へんせい" } });
+    fireEvent.keyDown(input, { key: "Escape", isComposing: true });
+
+    expect(screen.getByRole("textbox", { name: "編成名" })).toHaveValue("へんせい");
+  });
+
+  it("ウィンドウが非アクティブになったblurでは入力内容を捨てない", () => {
+    const props = buildProps();
+    const hasFocusSpy = vi.spyOn(document, "hasFocus").mockReturnValue(false);
+    render(<ClanBattleSidebar {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "2020年3月に編成を追加" }));
+    const input = screen.getByRole("textbox", { name: "編成名" });
+    fireEvent.change(input, { target: { value: "残る編成" } });
+    fireEvent.blur(input);
+
+    expect(props.onAddFormation).not.toHaveBeenCalled();
+    expect(screen.getByRole("textbox", { name: "編成名" })).toHaveValue("残る編成");
+    hasFocusSpy.mockRestore();
+  });
+
+  it("同じ月の＋を押し直しても入力中の文字を消さない", () => {
+    const props = buildProps();
+    render(<ClanBattleSidebar {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "2020年3月に編成を追加" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "編成名" }), { target: { value: "入力中" } });
+    fireEvent.click(screen.getByRole("button", { name: "2020年3月に編成を追加" }));
+
+    expect(screen.getByRole("textbox", { name: "編成名" })).toHaveValue("入力中");
+  });
+
   it("インライン入力欄は同時に1つだけで、別の月の＋を押すと入力内容を引き継がない", () => {
     const props = buildProps();
     render(<ClanBattleSidebar {...props} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "2026年8月に編成を追加" }));
+    fireEvent.click(screen.getByRole("button", { name: "2020年3月に編成を追加" }));
     fireEvent.change(screen.getByRole("textbox", { name: "編成名" }), { target: { value: "8月の編成" } });
-    fireEvent.click(screen.getByRole("button", { name: "2026年7月に編成を追加" }));
+    fireEvent.click(screen.getByRole("button", { name: "2020年2月に編成を追加" }));
 
     const inputs = screen.getAllByRole("textbox", { name: "編成名" });
     expect(inputs).toHaveLength(1);
@@ -205,6 +307,25 @@ describe("ClanBattleSidebar（月追加ポップオーバー）", () => {
     fireEvent.click(screen.getByRole("button", { name: "追加" }));
 
     expect(props.onAddMonthGroup).toHaveBeenCalledWith(now.getFullYear(), now.getMonth() + 1);
+  });
+
+  it("既に同じ年月がある場合はonAddMonthGroupを呼ばず、その月を展開するだけにする", () => {
+    const now = new Date();
+    const props = {
+      ...buildProps(),
+      // 現在年月（ポップオーバーの既定値）の月グループを、選択中編成のない＝畳まれた状態で置く。
+      groups: [buildGroup("g1", now.getFullYear(), now.getMonth() + 1, ["編成A"]), buildGroup("g2", 2020, 1, ["編成B"])],
+      selectedFormationId: "g2_編成B",
+    };
+    const existingTitle = `${now.getFullYear()}年${now.getMonth() + 1}月`;
+    render(<ClanBattleSidebar {...props} />);
+    expect(screen.getByRole("button", { name: new RegExp(existingTitle), expanded: false })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "月を追加" }));
+    fireEvent.click(screen.getByRole("button", { name: "追加" }));
+
+    expect(props.onAddMonthGroup).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: new RegExp(existingTitle), expanded: true })).toBeInTheDocument();
   });
 
   it("常設の年月セレクト行と月ごとの編成追加フォームは表示しない", () => {
