@@ -223,7 +223,7 @@ function InlineFormationInput({
       value={value}
       aria-label="編成名"
       placeholder="編成名"
-      className="h-9"
+      className="h-9 max-md:min-h-11"
       onChange={(event) => onChange(event.target.value)}
       onKeyDown={(event) => {
         if (event.key === "Enter") {
@@ -302,7 +302,7 @@ function AddMonthPopover({ onAddMonthGroup }: { onAddMonthGroup: (year: number, 
               </Select>
             </label>
           </div>
-          <Button size="sm" className="h-9 bg-none bg-accent" onClick={handleAdd}>
+          <Button size="sm" className="h-9 bg-none bg-accent max-md:min-h-11" onClick={handleAdd}>
             追加
           </Button>
         </Popover.Content>
@@ -372,7 +372,12 @@ function MonthFolder({
         >
           <ChevronDown className={`size-4 shrink-0 transition-transform ${isCollapsed ? "" : "rotate-180"}`} aria-hidden="true" />
           <span className="truncate">{title}</span>
-          {isCollapsed ? <Badge variant="muted">{group.formations.length}</Badge> : null}
+          {isCollapsed ? (
+            <Badge variant="muted">
+              {group.formations.length}
+              <span className="sr-only">件の編成</span>
+            </Badge>
+          ) : null}
         </button>
         {/* ホバー時のみ表示（タッチ端末は常時表示）。max-md:min-h-11/min-w-11 はモバイル（768px未満）のみタップ領域を44pxへ広げるスタイル調整。 */}
         <Button
