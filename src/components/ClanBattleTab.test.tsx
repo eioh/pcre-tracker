@@ -116,6 +116,8 @@ describe("ClanBattleTab（編成コピー）", () => {
     const onChange = vi.fn();
     render(<ClanBattleTab masterCharacters={testCharacters} state={state} onChange={onChange} />);
 
+    // サイドバーは選択中編成のある月だけ展開するため、2つ目のグループは見出しを押して展開してからコピーする。
+    fireEvent.click(screen.getByRole("button", { name: /2020年2月/, expanded: false }));
     fireEvent.click(screen.getByRole("button", { name: "編成Bをコピー" }));
 
     expect(onChange).toHaveBeenCalledTimes(1);
