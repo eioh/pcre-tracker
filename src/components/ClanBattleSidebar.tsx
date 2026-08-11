@@ -224,13 +224,14 @@ function SortableFormationRow({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...listeners}
-      className={`group flex min-w-0 touch-manipulation select-none items-center rounded-[8px] border transition ${
+      // ボーダーは描かないが、幅を確定させて選択切替時の1pxのレイアウトシフトを防ぐためborder-transparentは残す。
+      className={`group flex min-w-0 touch-manipulation select-none items-center rounded-[8px] border border-transparent transition ${
         isDragging ? "opacity-40" : ""
       } ${
         isSelected
-          ? "border-accent bg-selected text-main"
-          : // 非選択行は背景を敷かず、パネルのグラデーション背景をそのまま透過させる（色を複製しないため）。
-            "border-white/10 text-muted hover:border-accent/60 hover:text-main"
+          ? "bg-selected text-main"
+          : // 非選択行は背景を敷かず、パネルのグラデーション背景をそのまま透過させる（色を複製しないため）。hoverだけ薄く敷いて反応を示す。
+            "text-muted hover:bg-white/5 hover:text-main"
       }`}
     >
       <button type="button" className="flex min-w-0 flex-1 items-center gap-1.5 px-3 py-2 text-left text-sm" onClick={onSelect}>
