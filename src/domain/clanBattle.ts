@@ -63,24 +63,58 @@ export function duplicateClanBattleFormation(formation: ClanBattleFormation): Cl
   };
 }
 
-// 編成配列内でactiveIdの編成をoverIdの位置へ移動した新しい配列を返す。移動が不要・不可能な場合は元の配列をそのまま返す。
-export function reorderClanBattleFormations(
-  formations: ClanBattleFormation[],
-  activeId: string,
-  overId: string,
-): ClanBattleFormation[] {
-  if (activeId === overId) {
-    return formations;
+// 編成formationIdを月グループtoGroupIdのtoIndex位置へ移動した新しいstateを返す。移動が不要・不可能な場合は元のstateをそのまま返す。
+export function moveClanBattleFormation(
+  state: ClanBattleState,
+  formationId: string,
+  toGroupId: string,
+  toIndex: number,
+): ClanBattleState {
+  const fromGroupIndex = state.groups.findIndex((group) =>
+    group.formations.some((formation) => formation.id === formationId),
+  );
+  if (fromGroupIndex === -1) {
+    return state;
   }
-  const fromIndex = formations.findIndex((formation) => formation.id === activeId);
-  const toIndex = formations.findIndex((formation) => formation.id === overId);
-  if (fromIndex === -1 || toIndex === -1) {
-    return formations;
+  const toGroupIndex = state.groups.findIndex((group) => group.id === toGroupId);
+  if (toGroupIndex === -1) {
+    return state;
   }
-  const next = [...formations];
-  const [moved] = next.splice(fromIndex, 1);
-  next.splice(toIndex, 0, moved!);
-  return next;
+
+  const fromGroup = state.groups[fromGroupIndex]!;
+  const fromIndex = fromGroup.formations.findIndex((formation) => formation.id === formationId);
+  const formation = fromGroup.formations[fromIndex]!;
+
+  if (fromGroupIndex === toGroupIndex) {
+    const length = fromGroup.formations.length;
+    let targetIndex = toIndex;
+    if (fromIndex < targetIndex) {
+      targetIndex -= 1;
+    }
+    targetIndex = Math.min(Math.max(targetIndex, 0), length - 1);
+    if (targetIndex === fromIndex) {
+      return state;
+    }
+    const nextFormations = [...fromGroup.formations];
+    nextFormations.splice(fromIndex, 1);
+    nextFormations.splice(targetIndex, 0, formation);
+    const nextGroups = [...state.groups];
+    nextGroups[fromGroupIndex] = { ...fromGroup, formations: nextFormations };
+    return { groups: nextGroups };
+  }
+
+  const toGroup = state.groups[toGroupIndex]!;
+  const targetIndex = Math.min(Math.max(toIndex, 0), toGroup.formations.length);
+
+  const nextFromFormations = [...fromGroup.formations];
+  nextFromFormations.splice(fromIndex, 1);
+  const nextToFormations = [...toGroup.formations];
+  nextToFormations.splice(targetIndex, 0, formation);
+
+  const nextGroups = [...state.groups];
+  nextGroups[fromGroupIndex] = { ...fromGroup, formations: nextFromFormations };
+  nextGroups[toGroupIndex] = { ...toGroup, formations: nextToFormations };
+  return { groups: nextGroups };
 }
 
 // キャラ名と育成入力の現在値から、編成内で独立保存するキャラ行を作成する。
