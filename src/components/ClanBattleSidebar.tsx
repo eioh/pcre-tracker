@@ -482,7 +482,9 @@ function MonthFolder({
 
       {/* 折りたたみ時は本文を描画しない（max-hトランジションで隠すだけだと、隠れたsortable/droppableがdnd-kitの測定対象に残り誤ドロップの温床になるため）。 */}
       {isCollapsed ? null : (
-        <div id={bodyId} ref={isEmpty ? undefined : setMonthBodyDroppableRef} className="mt-1 grid min-w-0 gap-1.5 pl-4">
+        // pl-8 は月見出しに対する1段ぶんのインデント。見出しのフォルダアイコン左端は 28px（トグルのpx-1.5 + chevron16px + gap6px）で、
+        // 編成行のファイルアイコン左端は pl + 枠線1px + ボタンのpx-3 = 45px となり、16px 右にずれてフォルダ配下に見える。
+        <div id={bodyId} ref={isEmpty ? undefined : setMonthBodyDroppableRef} className="mt-1 grid min-w-0 gap-1.5 pl-8">
           <SortableContext id={group.id} items={group.formations.map((formation) => formation.id)} strategy={noopSortingStrategy}>
             <div className="grid min-w-0 gap-1.5">
               {group.formations.map((formation, index) => (
