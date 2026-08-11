@@ -228,7 +228,8 @@ function SortableFormationRow({
       } ${
         isSelected
           ? "border-accent bg-selected text-main"
-          : "border-white/10 bg-black/20 text-muted hover:border-accent/60 hover:text-main"
+          : // 非選択行は背景を敷かず、パネルのグラデーション背景をそのまま透過させる（色を複製しないため）。
+            "border-white/10 text-muted hover:border-accent/60 hover:text-main"
       }`}
     >
       <button type="button" className="min-w-0 flex-1 px-3 py-2 text-left text-sm" onClick={onSelect}>
