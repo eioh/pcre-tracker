@@ -199,6 +199,10 @@ describe("ClanBattleSidebar（月フォルダの折りたたみ）", () => {
     expect(rowWrapper).not.toBeNull();
     expect(rowWrapper).toHaveClass("min-w-0");
     expect(rowWrapper?.parentElement).toHaveClass("min-w-0");
+    // アイコン追加で選択ボタンがflexになったため、名前側のmin-w-0+truncateが省略表示の要になる。
+    const nameSpan = rowWrapper?.querySelector("span.truncate");
+    expect(nameSpan).toHaveTextContent("とても長い編成名がここに入る想定のテスト用編成名");
+    expect(nameSpan).toHaveClass("min-w-0");
   });
 
   it("月見出しを押すたびに展開と折りたたみが切り替わる", () => {

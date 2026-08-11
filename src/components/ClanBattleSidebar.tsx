@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
-import { ChevronDown, Copy, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Copy, File, Folder, FolderOpen, Plus, Trash2 } from "lucide-react";
 import {
   DndContext,
   DragOverlay,
@@ -195,8 +195,9 @@ function DropIndicatorLine({ position }: { position: "before" | "after" }) {
 // オーバーレイの矩形がactive.rectになるため、高さがずれると挿入位置の前後判定もずれる。
 function FormationRowPreview({ formation }: { formation: ClanBattleFormation }) {
   return (
-    <div className="pointer-events-none flex min-w-0 items-center rounded-[8px] border border-accent bg-selected px-3 py-2 text-sm text-main shadow-panel max-md:min-h-11">
-      <span className="block truncate font-semibold">{formation.name}</span>
+    <div className="pointer-events-none flex min-w-0 items-center gap-1.5 rounded-[8px] border border-accent bg-selected px-3 py-2 text-sm text-main shadow-panel max-md:min-h-11">
+      <File className="size-4 shrink-0" aria-hidden="true" />
+      <span className="block min-w-0 truncate font-semibold">{formation.name}</span>
     </div>
   );
 }
@@ -232,8 +233,10 @@ function SortableFormationRow({
             "border-white/10 text-muted hover:border-accent/60 hover:text-main"
       }`}
     >
-      <button type="button" className="min-w-0 flex-1 px-3 py-2 text-left text-sm" onClick={onSelect}>
-        <span className="block truncate font-semibold">{formation.name}</span>
+      <button type="button" className="flex min-w-0 flex-1 items-center gap-1.5 px-3 py-2 text-left text-sm" onClick={onSelect}>
+        {/* アイコンはshrink-0、名前側はmin-w-0+truncateで、長い編成名がellipsisになるチェーンを保つ。 */}
+        <File className="size-4 shrink-0" aria-hidden="true" />
+        <span className="block min-w-0 truncate font-semibold">{formation.name}</span>
       </button>
       {/* ホバー時のみ表示（タッチ端末は常時表示）。Tailwind v4ではgroup-hover自体が@media(hover:hover)でラップされるため、
           非表示化のみ明示的に[@media(hover:hover)]:opacity-0で指定する。フォーカス時も表示してキーボード操作に対応する。 */}
@@ -263,36 +266,40 @@ function InlineFormationInput({
   onCancel: () => void;
 }) {
   return (
-    <Input
-      autoFocus
-      value={value}
-      aria-label="編成名"
-      placeholder="編成名"
-      className="h-9 min-w-0 max-md:min-h-11"
-      onChange={(event) => onChange(event.target.value)}
-      onKeyDown={(event) => {
-        // IME変換中のEnter・Escapeは変換の確定/取り消し操作なので、編成の作成・入力欄のキャンセルには使わない。
-        if (event.nativeEvent.isComposing) {
-          return;
-        }
-        if (event.key === "Enter") {
-          event.preventDefault();
-          onCommit();
-          return;
-        }
-        if (event.key === "Escape") {
-          event.preventDefault();
+    // 行と同じくアイコン+名前の並びにして「新規ファイル作成」の見た目にする。入力欄はflex-1+min-w-0で幅計算を壊さない。
+    <div className="flex min-w-0 items-center gap-1.5">
+      <File className="size-4 shrink-0 text-muted" aria-hidden="true" />
+      <Input
+        autoFocus
+        value={value}
+        aria-label="編成名"
+        placeholder="編成名"
+        className="h-9 min-w-0 flex-1 max-md:min-h-11"
+        onChange={(event) => onChange(event.target.value)}
+        onKeyDown={(event) => {
+          // IME変換中のEnter・Escapeは変換の確定/取り消し操作なので、編成の作成・入力欄のキャンセルには使わない。
+          if (event.nativeEvent.isComposing) {
+            return;
+          }
+          if (event.key === "Enter") {
+            event.preventDefault();
+            onCommit();
+            return;
+          }
+          if (event.key === "Escape") {
+            event.preventDefault();
+            onCancel();
+          }
+        }}
+        onBlur={() => {
+          // 別タブ・別アプリへ切り替えたときのblurでは入力内容を捨てない（ウィンドウ復帰後もそのまま続けられるようにする）。
+          if (!document.hasFocus()) {
+            return;
+          }
           onCancel();
-        }
-      }}
-      onBlur={() => {
-        // 別タブ・別アプリへ切り替えたときのblurでは入力内容を捨てない（ウィンドウ復帰後もそのまま続けられるようにする）。
-        if (!document.hasFocus()) {
-          return;
-        }
-        onCancel();
-      }}
-    />
+        }}
+      />
+    </div>
   );
 }
 
@@ -431,6 +438,11 @@ function MonthFolder({
           onClick={() => onToggleCollapsed(group.id)}
         >
           <ChevronDown className={`size-4 shrink-0 transition-transform ${isCollapsed ? "" : "rotate-180"}`} aria-hidden="true" />
+          {isCollapsed ? (
+            <Folder className="size-4 shrink-0 text-muted" aria-hidden="true" />
+          ) : (
+            <FolderOpen className="size-4 shrink-0 text-accent" aria-hidden="true" />
+          )}
           <span className="truncate">{title}</span>
           {isCollapsed ? (
             <Badge variant="muted">
