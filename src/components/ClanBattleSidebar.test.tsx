@@ -221,8 +221,9 @@ describe("ClanBattleSidebar（月フォルダの折りたたみ）", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /2020年3月/, expanded: true }));
 
-    expect(screen.getByRole("button", { name: /2020年3月/, expanded: false }).className).toContain("bg-selected");
-    expect(screen.getByRole("button", { name: /2020年2月/, expanded: false }).className).not.toContain("bg-selected");
+    // ハイライトは＋/削除アイコンの下まで通すため、トグルボタンではなくヘッダー行のラッパーに載る。
+    expect(screen.getByRole("button", { name: /2020年3月/, expanded: false }).parentElement).toHaveClass("bg-selected");
+    expect(screen.getByRole("button", { name: /2020年2月/, expanded: false }).parentElement).not.toHaveClass("bg-selected");
   });
 });
 

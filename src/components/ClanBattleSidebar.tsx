@@ -425,16 +425,21 @@ function MonthFolder({
 
   return (
     <section className="min-w-0">
-      <div className="group flex min-w-0 items-center gap-1">
+      {/* 畳んだ月に選択中編成がある場合は見出しを選択色にして、選択が迷子に見えないようにする。
+          背景は＋/削除アイコンの下まで通したいので、トグルボタンではなくヘッダー行のラッパーに敷く。 */}
+      <div
+        className={`group flex min-w-0 items-center gap-1 rounded-[8px] transition ${
+          isCollapsed && hasSelectedFormation ? "bg-selected" : ""
+        }`}
+      >
         <button
           type="button"
           ref={isCollapsed ? setMonthEndDroppableRef : undefined}
           aria-expanded={!isCollapsed}
           aria-controls={bodyId}
-          // 畳んだ月に選択中編成がある場合は見出しを選択色にして、選択が迷子に見えないようにする。
-          className={`inline-flex min-w-0 flex-1 items-center gap-1.5 rounded-[8px] px-1.5 py-1.5 text-left text-sm font-semibold transition max-md:min-h-11 ${
+          className={`inline-flex min-w-0 flex-1 items-center gap-1.5 rounded-[8px] px-1.5 py-1.5 text-left text-sm font-semibold text-main transition max-md:min-h-11 ${
             isCollapsed && isMonthEndDroppableOver ? "ring-2 ring-accent" : ""
-          } ${isCollapsed && hasSelectedFormation ? "bg-selected text-main" : "text-main hover:text-accent"}`}
+          } ${isCollapsed && hasSelectedFormation ? "" : "hover:text-accent"}`}
           onClick={() => onToggleCollapsed(group.id)}
         >
           <ChevronDown className={`size-4 shrink-0 transition-transform ${isCollapsed ? "" : "rotate-180"}`} aria-hidden="true" />
