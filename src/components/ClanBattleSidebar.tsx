@@ -195,7 +195,8 @@ function DropIndicatorLine({ position }: { position: "before" | "after" }) {
 // オーバーレイの矩形がactive.rectになるため、高さがずれると挿入位置の前後判定もずれる。
 function FormationRowPreview({ formation }: { formation: ClanBattleFormation }) {
   return (
-    <div className="pointer-events-none flex min-w-0 items-center gap-1.5 rounded-[8px] border border-accent bg-selected px-3 py-2 text-sm text-main shadow-panel max-md:min-h-11">
+    // pl-11 は編成行と同じインデント。オーバーレイの幅は元の行の矩形に合わせられるため、アイコン位置も行と揃う（高さは変えない）。
+    <div className="pointer-events-none flex min-w-0 items-center gap-1.5 rounded-[8px] border border-accent bg-selected py-2 pl-11 pr-3 text-sm text-main shadow-panel max-md:min-h-11">
       <File className="size-4 shrink-0" aria-hidden="true" />
       <span className="block min-w-0 truncate font-semibold">{formation.name}</span>
     </div>
@@ -234,7 +235,9 @@ function SortableFormationRow({
             "text-muted hover:bg-white/5 hover:text-main"
       }`}
     >
-      <button type="button" className="flex min-w-0 flex-1 items-center gap-1.5 px-3 py-2 text-left text-sm" onClick={onSelect}>
+      {/* インデントは月ボディではなくこのpl-11（44px）で作る。行ボックス自体はツリー全幅にして、選択・hoverの背景を左端まで届かせるため。
+          ファイルアイコン左端は 枠線1px + 44px = 45px で、月見出しのフォルダアイコン（28px）より17px右になる。 */}
+      <button type="button" className="flex min-w-0 flex-1 items-center gap-1.5 py-2 pl-11 pr-3 text-left text-sm" onClick={onSelect}>
         {/* アイコンはshrink-0、名前側はmin-w-0+truncateで、長い編成名がellipsisになるチェーンを保つ。 */}
         <File className="size-4 shrink-0" aria-hidden="true" />
         <span className="block min-w-0 truncate font-semibold">{formation.name}</span>
@@ -268,7 +271,8 @@ function InlineFormationInput({
 }) {
   return (
     // 行と同じくアイコン+名前の並びにして「新規ファイル作成」の見た目にする。入力欄はflex-1+min-w-0で幅計算を壊さない。
-    <div className="flex min-w-0 items-center gap-1.5">
+    // pl-11 は編成行のインデント（枠線1px + pl-11）に合わせるためのもの。
+    <div className="flex min-w-0 items-center gap-1.5 pl-11">
       <File className="size-4 shrink-0 text-muted" aria-hidden="true" />
       <Input
         autoFocus
@@ -483,9 +487,8 @@ function MonthFolder({
 
       {/* 折りたたみ時は本文を描画しない（max-hトランジションで隠すだけだと、隠れたsortable/droppableがdnd-kitの測定対象に残り誤ドロップの温床になるため）。 */}
       {isCollapsed ? null : (
-        // pl-8 は月見出しに対する1段ぶんのインデント。見出しのフォルダアイコン左端は 28px（トグルのpx-1.5 + chevron16px + gap6px）で、
-        // 編成行のファイルアイコン左端は pl + 枠線1px + ボタンのpx-3 = 45px となり、16px 右にずれてフォルダ配下に見える。
-        <div id={bodyId} ref={isEmpty ? undefined : setMonthBodyDroppableRef} className="mt-1 grid min-w-0 gap-1.5 pl-8">
+        // インデントは各行の内側パディングで作るため、月ボディ自体は左パディングを持たない（行の背景をツリー左端まで届かせるため）。
+        <div id={bodyId} ref={isEmpty ? undefined : setMonthBodyDroppableRef} className="mt-1 grid min-w-0 gap-1.5">
           <SortableContext id={group.id} items={group.formations.map((formation) => formation.id)} strategy={noopSortingStrategy}>
             <div className="grid min-w-0 gap-1.5">
               {group.formations.map((formation, index) => (
@@ -517,7 +520,8 @@ function MonthFolder({
           {isEmpty && !isAddingFormation ? (
             <p
               ref={setMonthEndDroppableRef}
-              className={`m-0 rounded-[8px] border border-dashed px-1.5 py-2 text-xs text-muted transition ${
+              // 破線の枠ごと1段インデントして、フォルダ配下であることを行と同じ深さで示す。
+              className={`m-0 ml-8 rounded-[8px] border border-dashed px-1.5 py-2 text-xs text-muted transition ${
                 isMonthEndDroppableOver ? "border-accent text-main" : "border-white/20"
               }`}
             >
