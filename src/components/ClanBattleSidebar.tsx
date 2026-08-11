@@ -488,7 +488,10 @@ function MonthFolder({
       {/* 折りたたみ時は本文を描画しない（max-hトランジションで隠すだけだと、隠れたsortable/droppableがdnd-kitの測定対象に残り誤ドロップの温床になるため）。 */}
       {isCollapsed ? null : (
         // インデントは各行の内側パディングで作るため、月ボディ自体は左パディングを持たない（行の背景をツリー左端まで届かせるため）。
-        <div id={bodyId} ref={isEmpty ? undefined : setMonthBodyDroppableRef} className="mt-1 grid min-w-0 gap-1.5">
+        <div id={bodyId} ref={isEmpty ? undefined : setMonthBodyDroppableRef} className="relative mt-1 grid min-w-0 gap-1.5">
+          {/* インデントガイドの縦線。見出しのシェブロン中心（トグルのpx-1.5=6px + size-4の半分8px = 14px）に合わせる。
+              行の背景は全幅のままにしたいので絶対配置で重ね、当たり判定に影響しないようpointer-events-noneにする。 */}
+          <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-[13.5px] w-px bg-panel-border" />
           <SortableContext id={group.id} items={group.formations.map((formation) => formation.id)} strategy={noopSortingStrategy}>
             <div className="grid min-w-0 gap-1.5">
               {group.formations.map((formation, index) => (
