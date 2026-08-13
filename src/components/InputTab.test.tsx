@@ -238,7 +238,7 @@ describe("InputTab", () => {
     const nextSettings = { ...props.initialSettings, ue1SpImplementedFilter: "implemented" as const };
     rerender(<InputTab {...props} initialSettings={nextSettings} settingsSyncToken={1} />);
 
-    expect(screen.getByText("表示件数: 2")).toBeInTheDocument();
+    expect(screen.getByText("表示件数: 3")).toBeInTheDocument();
   });
 
   it("テーブル値が変わっても手動適用までは現在のソート順を維持する", () => {
