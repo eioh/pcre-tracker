@@ -5,8 +5,8 @@ import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../../utils/starMemoryCost";
 import { cn } from "../../lib/utils";
-import { attributeTextClassMap, roleTextClassMap } from "./constants";
 import { InputCharacterEditSheet } from "./InputCharacterEditSheet";
+import { AttributeIconLabel, RoleIconLabel } from "./SemanticIconLabel";
 import { computeRowDerived } from "./rowDerived";
 import type { ProgressPatch, SaveStatus, VisibleRow } from "./types";
 import { TableCheckbox } from "../ui/table-checkbox";
@@ -117,9 +117,10 @@ const ListRow = memo(function ListRow({
           <span className="truncate text-[0.72rem] font-semibold leading-none">
             <span className={character.limited ? "text-limited-text" : "text-normal-text"}>{character.limited ? "限定" : "恒常"}</span>
             <span className="text-tag-separator"> / </span>
-            <span className={attributeTextClassMap[character.attribute]}>{character.attribute}</span>
-            <span className="text-tag-separator"> / </span>
-            <span className={roleTextClassMap[character.role]}>{character.role}</span>
+            <span className="inline-flex items-center gap-1.5 align-middle">
+              <AttributeIconLabel attribute={character.attribute} />
+              <RoleIconLabel role={character.role} />
+            </span>
           </span>
           <span className="block max-w-full truncate font-bold">{character.name}</span>
           {/* サマリー行。育成状態4項目を横並びで表示し、実装段階の最大まで強化済みの項目は緑系の色で示す。 */}

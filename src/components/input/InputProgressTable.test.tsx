@@ -290,9 +290,9 @@ describe("InputProgressTable", () => {
     render(<InputProgressTable {...props} />);
 
     expect(screen.getAllByText("恒常").length).toBeGreaterThan(0);
-    expect(screen.getByText("火")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "火" })).toBeInTheDocument();
     expect(screen.getAllByText("/").length).toBeGreaterThan(0);
-    expect(screen.getByText("アタッカー")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "アタッカー" })).toBeInTheDocument();
     expect(screen.getByText("ヒヨリ")).toBeInTheDocument();
   });
 
