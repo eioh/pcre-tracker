@@ -2,7 +2,8 @@ import { memo, useCallback } from "react";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../../utils/starMemoryCost";
-import { attributeTextClassMap, memorySourceLabelMap, roleTextClassMap, sourceChipClassMap } from "./constants";
+import { memorySourceLabelMap, sourceChipClassMap } from "./constants";
+import { AttributeIconLabel, RoleIconLabel } from "./SemanticIconLabel";
 import { ObtainedDatePicker } from "./progressFields";
 import {
   ConnectRankStepper,
@@ -128,9 +129,10 @@ const SheetBody = memo(function SheetBody({
         <div className="flex flex-wrap items-center gap-2 text-[0.72rem] font-semibold leading-none">
           <span className={character.limited ? "text-limited-text" : "text-normal-text"}>{character.limited ? "限定" : "恒常"}</span>
           <span className="text-tag-separator">/</span>
-          <span className={attributeTextClassMap[character.attribute]}>{character.attribute}</span>
-          <span className="text-tag-separator">/</span>
-          <span className={roleTextClassMap[character.role]}>{character.role}</span>
+          <span className="inline-flex items-center gap-1.5">
+            <AttributeIconLabel attribute={character.attribute} />
+            <RoleIconLabel role={character.role} />
+          </span>
         </div>
         <SheetTitle className="text-lg">{character.name}</SheetTitle>
         {/* 保存状態の変化（保存中→保存済み等）を支援技術にも通知するため aria-live を付与する */}

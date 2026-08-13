@@ -82,8 +82,8 @@ describe("InputProgressList", () => {
 
     expect(screen.getByText("ヒヨリ")).toBeInTheDocument();
     expect(screen.getByText("恒常")).toBeInTheDocument();
-    expect(screen.getByText("火")).toBeInTheDocument();
-    expect(screen.getByText("アタッカー")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "火" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "アタッカー" })).toBeInTheDocument();
     expect(screen.getByText("☆3")).toBeInTheDocument();
     expect(screen.getByText("CR1")).toBeInTheDocument();
     expect(screen.getByText("専用1: 0")).toBeInTheDocument();

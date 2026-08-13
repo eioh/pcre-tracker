@@ -3,7 +3,8 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../../utils/starMemoryCost";
-import { attributeTextClassMap, memorySourceLabelMap, roleTextClassMap, sourceChipClassMap } from "./constants";
+import { memorySourceLabelMap, sourceChipClassMap } from "./constants";
+import { AttributeIconLabel, RoleIconLabel } from "./SemanticIconLabel";
 import {
   ConnectRankSelect,
   GachaPullCountInput,
@@ -113,9 +114,10 @@ const TableRow = memo(function TableRow({
           <div className={characterTagLineClass}>
             <span className={character.limited ? "text-limited-text" : "text-normal-text"}>{character.limited ? "限定" : "恒常"}</span>
             <span className="text-tag-separator">/</span>
-            <span className={attributeTextClassMap[character.attribute]}>{character.attribute}</span>
-            <span className="text-tag-separator">/</span>
-            <span className={roleTextClassMap[character.role]}>{character.role}</span>
+            <span className="inline-flex items-center gap-1.5">
+              <AttributeIconLabel attribute={character.attribute} />
+              <RoleIconLabel role={character.role} />
+            </span>
           </div>
           <span className="block max-w-full truncate text-[1.05rem]">{character.name}</span>
         </div>
