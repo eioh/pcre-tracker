@@ -10,6 +10,9 @@ vitest.config.d.ts
 
 .codex/
 
+# Claude Code の個人環境向け実行権限。共有用の .claude/launch.json は追跡対象にする。
+.claude/settings.local.json
+
 # wrangler types で生成する Cloudflare ランタイム型定義（CI/ローカルで再生成する）。
 worker-configuration.d.ts
 # ローカル開発用のシークレット・環境変数（.dev.vars.example をコピーして作成する）。
