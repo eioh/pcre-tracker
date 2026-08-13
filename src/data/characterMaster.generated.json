@@ -31,7 +31,7 @@
     "implemented": {
       "star6": true,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     },
     "memoryPieceSources": [
@@ -398,7 +398,7 @@
     "implemented": {
       "star6": true,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     },
     "memoryPieceSources": [
@@ -628,7 +628,7 @@
     "implemented": {
       "star6": true,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     },
     "memoryPieceSources": [
@@ -811,7 +811,7 @@
     "implemented": {
       "star6": true,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     },
     "memoryPieceSources": [
@@ -834,7 +834,7 @@
     "implemented": {
       "star6": true,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     },
     "memoryPieceSources": [
@@ -1064,7 +1064,7 @@
     "implemented": {
       "star6": true,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": false
     },
     "memoryPieceSources": [
@@ -1634,7 +1634,7 @@
     "implemented": {
       "star6": false,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": true
     },
     "memoryPieceSources": [
@@ -1678,7 +1678,7 @@
     "implemented": {
       "star6": false,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": true
     },
     "memoryPieceSources": [
@@ -1700,7 +1700,7 @@
     "implemented": {
       "star6": false,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": true
     },
     "memoryPieceSources": [
@@ -1744,7 +1744,7 @@
     "implemented": {
       "star6": false,
       "ue1": true,
-      "ue1Sp": false,
+      "ue1Sp": true,
       "ue2": true
     },
     "memoryPieceSources": [
