@@ -47,6 +47,15 @@ Vitest の multi-project 構成です。
 
 ## コミットとプルリクエスト
 `main` ブランチで直接作業せず、`develop` または `feature/*` ブランチを使用します。
+
+### 統合前の確認と生成物
+- 作業開始前に `git status --short --branch` と未統合コミットを確認する。
+- 未コミット差分、または今回の作業と無関係な未統合コミットがある場合は、そのまま続行するか、`main` / `develop` を起点に別の feature ブランチを作成して開始するかをユーザーに確認する。
+- 統合は原則として `feature → develop → main` のマージで行い、`cherry-pick` は基本的に使用しない。
+- `cherry-pick` が必要な場合は、対象コミット、除外する変更、生成物への影響を説明し、ユーザーの承認を得てから実行する。
+- `src/data/characterMaster.generated.json` などの生成物は、入力となる正本データの変更と同じコミットに含める。
+- マージまたは `cherry-pick` の後は、統合先ブランチで `npm run generate` を実行し、`git diff --exit-code -- src/data/characterMaster.generated.json` により生成物が正本と一致することを確認する。
+
 コミットメッセージは Conventional Commits 形式 `<type>: <description>` を使い、`type` は英語、`description` は日本語で記述します。
 例:
 - `feat: ダッシュボードに装備進捗の集計を追加`
