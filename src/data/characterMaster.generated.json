@@ -150,7 +150,8 @@
       "ue2": false
     },
     "memoryPieceSources": [
-      "p_arena_coin"
+      "p_arena_coin",
+      "side_story"
     ],
     "searchTokens": [
       "ミヤコ",
