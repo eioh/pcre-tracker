@@ -4482,5 +4482,19 @@
       "ue2": false
     },
     "memoryPieceSources": []
+  },
+  {
+    "name": "ティア",
+    "baseName": "ティア",
+    "limited": true,
+    "attribute": "水",
+    "role": "デバッファー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
   }
 ]
