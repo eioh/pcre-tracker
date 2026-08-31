@@ -3094,6 +3094,19 @@
     }
   },
   {
+    "name": "ヴルム（ヴァルムドラッヘ）",
+    "baseName": "ヴルム",
+    "limited": true,
+    "attribute": "闇",
+    "role": "ブースター",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    }
+  },
+  {
     "name": "ペコリーヌ（クリスマス）",
     "baseName": "ペコリーヌ",
     "limited": true,
