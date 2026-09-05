@@ -9,6 +9,7 @@ function createCharacter(params: {
   // テスト用のマスターキャラを生成する。
   return {
     name: "ヒヨリ",
+    baseName: "ヒヨリ",
     limited: params.limited,
     attribute: "火",
     role: "アタッカー",

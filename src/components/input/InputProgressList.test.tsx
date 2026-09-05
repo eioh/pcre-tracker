@@ -13,6 +13,7 @@ function buildCharacter(overrides?: Partial<MasterCharacter>): MasterCharacter {
     limited: false,
     attribute: "火",
     role: "アタッカー",
+    formationOrder: 0,
     implemented: {
       star6: true,
       ue1: true,
@@ -233,6 +234,89 @@ describe("InputProgressList", () => {
     expect(within(dialog).getByText("保存済み ✓")).toBeInTheDocument();
   });
 
+  it("数値入力を変更した未確定状態だけ保存表示を編集中へ切り替える", () => {
+    const props = buildProps();
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    const ownedMemoryPieceInput = within(dialog).getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" });
+
+    // フォーカスしただけでは確定値との差分がないため、保存表示を変えない。
+    fireEvent.focus(ownedMemoryPieceInput);
+    expect(within(dialog).getByText("保存済み ✓")).toBeInTheDocument();
+
+    fireEvent.change(ownedMemoryPieceInput, { target: { value: "42" } });
+    expect(within(dialog).getByText("編集中...")).toBeInTheDocument();
+    expect(within(dialog).queryByText("保存済み ✓")).toBeNull();
+
+    // 確定前に元の文字列へ戻した場合は、未確定の変更がなくなる。
+    fireEvent.change(ownedMemoryPieceInput, { target: { value: "0" } });
+    expect(within(dialog).getByText("保存済み ✓")).toBeInTheDocument();
+  });
+
+  it("所持ピュアピとガチャ回数の未確定入力も編集中として表示する", () => {
+    const props = buildProps();
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    const ownedPurePieceInput = within(dialog).getByRole("spinbutton", { name: "ヒヨリの所持ピュアピ数" });
+    const gachaPullCountInput = within(dialog).getByRole("spinbutton", { name: "ヒヨリのガチャ回数" });
+
+    fireEvent.change(ownedPurePieceInput, { target: { value: "10" } });
+    expect(within(dialog).getByText("編集中...")).toBeInTheDocument();
+    fireEvent.change(ownedPurePieceInput, { target: { value: "0" } });
+    expect(within(dialog).getByText("保存済み ✓")).toBeInTheDocument();
+
+    fireEvent.change(gachaPullCountInput, { target: { value: "20" } });
+    expect(within(dialog).getByText("編集中...")).toBeInTheDocument();
+  });
+
+  it("数値入力の確定値が外部状態へ反映された後は実際の保存状態を表示する", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({ onUpdateProgress });
+    const { rerender } = render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    const input = within(dialog).getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" });
+    fireEvent.change(input, { target: { value: "42" } });
+    expect(within(dialog).getByText("編集中...")).toBeInTheDocument();
+    fireEvent.blur(input);
+
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ownedMemoryPiece: 42 });
+    rerender(
+      <InputProgressList
+        {...props}
+        visibleRows={[{ character: buildCharacter(), progress: buildProgress({ ownedMemoryPiece: 42 }) }]}
+        saveStatus="saving"
+      />,
+    );
+    expect(within(dialog).getByText("保存中...")).toBeInTheDocument();
+  });
+
+  it("同期エラー中は未確定入力があってもエラー表示を隠さない", () => {
+    const props = buildProps({ saveStatus: "error" });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    fireEvent.change(within(dialog).getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" }), { target: { value: "42" } });
+
+    expect(within(dialog).getByText("同期エラー")).toBeInTheDocument();
+    expect(within(dialog).queryByText("編集中...")).toBeNull();
+  });
+
+  it("編集シートを閉じて再度開くと未確定表示を残さない", () => {
+    const props = buildProps();
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    fireEvent.change(within(dialog).getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" }), { target: { value: "42" } });
+    expect(within(dialog).getByText("編集中...")).toBeInTheDocument();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "閉じる" }));
+    const reopenedDialog = openEditSheet("ヒヨリ");
+    expect(within(reopenedDialog).getByText("保存済み ✓")).toBeInTheDocument();
+  });
+
   it("シート内のステッパーでRANK・専用2を1段ずつ歩進できる", () => {
     const onUpdateProgress = vi.fn();
     const props = buildProps({ onUpdateProgress });
@@ -247,6 +331,42 @@ describe("InputProgressList", () => {
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { connectRank: 0 });
     fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリの専用2を上げる" }));
     expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { ue2Level: 1 });
+  });
+
+  it("シート内のコネクトRANKを中央のセレクトから直接選択できる", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({ onUpdateProgress });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    const combobox = within(dialog).getByRole("combobox", { name: "ヒヨリのコネクトRANK" });
+
+    fireEvent.click(combobox);
+    fireEvent.click(screen.getByRole("option", { name: "15" }));
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { connectRank: 15 });
+
+    fireEvent.click(combobox);
+    fireEvent.click(screen.getByRole("option", { name: "未開放" }));
+    expect(onUpdateProgress).toHaveBeenCalledWith("ヒヨリ", { connectRank: 0 });
+  });
+
+  it("RANK直接選択後も更新された値を基準に±操作できる", () => {
+    const onUpdateProgress = vi.fn();
+    const props = buildProps({ onUpdateProgress });
+    const { rerender } = render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet("ヒヨリ");
+    fireEvent.click(within(dialog).getByRole("combobox", { name: "ヒヨリのコネクトRANK" }));
+    fireEvent.click(screen.getByRole("option", { name: "15" }));
+    rerender(
+      <InputProgressList
+        {...props}
+        visibleRows={[{ character: buildCharacter(), progress: buildProgress({ connectRank: 15 }) }]}
+      />,
+    );
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "ヒヨリのコネクトRANKを下げる" }));
+    expect(onUpdateProgress).toHaveBeenLastCalledWith("ヒヨリ", { connectRank: 14 });
   });
 
   it("RANKステッパーは下限0で−を、上限15で+を無効化する", () => {

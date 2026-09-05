@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 
 type ClampedNumberInputResult = {
   value: string;
+  /** 表示中の入力文字列が外部の確定値と異なるか。保存表示の判定に利用する */
+  isDirty: boolean;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur: () => void;
   onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -9,7 +11,8 @@ type ClampedNumberInputResult = {
   stepBy: (delta: number) => void;
 };
 
-// 数値入力フィールドの状態管理・クランプ・コミット処理を共通化するフック。
+// 数値入力フィールドの外部確定値を入力文字列へ同期し、未確定状態・クランプ・コミット処理を共通化するフック。
+// externalValue と clamp、onCommit を入力として受け取り、表示値・未確定状態・入力イベント処理を返す。
 export function useClampedNumberInput(
   externalValue: number,
   clamp: (value: number) => number,
@@ -56,5 +59,12 @@ export function useClampedNumberInput(
     [clamp, externalValue, input, onCommit],
   );
 
-  return { value: input, onChange: handleChange, onBlur: handleBlur, onKeyDown: handleKeyDown, stepBy };
+  return {
+    value: input,
+    isDirty: input !== String(externalValue),
+    onChange: handleChange,
+    onBlur: handleBlur,
+    onKeyDown: handleKeyDown,
+    stepBy,
+  };
 }

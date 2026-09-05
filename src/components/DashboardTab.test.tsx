@@ -13,6 +13,7 @@ const masterCharacters: MasterCharacter[] = [
     role: "アタッカー",
     implemented: { star6: true, ue1: true, ue1Sp: true, ue2: true },
     memoryPieceSources: ["hard_quest"],
+    formationOrder: 0,
   },
   {
     name: "ユイ",
@@ -22,6 +23,7 @@ const masterCharacters: MasterCharacter[] = [
     role: "ヒーラー",
     implemented: { star6: true, ue1: false, ue1Sp: false, ue2: false },
     memoryPieceSources: ["side_story"],
+    formationOrder: 1,
   },
 ];
 
@@ -62,6 +64,7 @@ const state: StoredStateV1 = {
     ヒヨリ: 0,
     ユイ: 0,
   },
+  clanBattle: { groups: [] },
 };
 
 // DashboardTabの表示対象をテスト用データで描画する。
@@ -130,7 +133,7 @@ describe("DashboardTab", () => {
       progressByName: {
         ...state.progressByName,
         ヒヨリ: {
-          ...state.progressByName["ヒヨリ"],
+          ...state.progressByName["ヒヨリ"]!,
           obtainedDate: "2025-02-20",
         },
       },

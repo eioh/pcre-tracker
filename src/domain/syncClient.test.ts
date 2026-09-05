@@ -188,7 +188,10 @@ describe("putServerData", () => {
   });
 
   it("Content-Type: application/json を付与し baseRevision と payload を送る", async () => {
-    const fetchMock = vi.fn(async () => Response.json({ revision: 2, updatedAt: "2026-07-04T00:00:00.000Z" }));
+    // fetch の引数型を実装と揃え、送信オプションを型安全に検査できるモックを作る。
+    const fetchMock = vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>(
+      async () => Response.json({ revision: 2, updatedAt: "2026-07-04T00:00:00.000Z" }),
+    );
     vi.stubGlobal("fetch", fetchMock);
     const payload = makePayload();
     const result = await putServerData(1, payload);
@@ -214,7 +217,10 @@ describe("putServerData", () => {
   });
 
   it("baseRevision:null は初回アップロードとして送る", async () => {
-    const fetchMock = vi.fn(async () => Response.json({ revision: 1, updatedAt: "2026-07-04T00:00:00.000Z" }));
+    // fetch の引数型を実装と揃え、送信本文を型安全に検査できるモックを作る。
+    const fetchMock = vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>(
+      async () => Response.json({ revision: 1, updatedAt: "2026-07-04T00:00:00.000Z" }),
+    );
     vi.stubGlobal("fetch", fetchMock);
     await putServerData(null, makePayload());
     const sentBody = JSON.parse((fetchMock.mock.calls[0]![1] as RequestInit).body as string);

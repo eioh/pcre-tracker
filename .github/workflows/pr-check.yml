@@ -1,0 +1,41 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: ["develop", "main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  # PR ごとに最新の検証だけを残し、本番公開の concurrency とは分離する。
+  group: "pr-check-${{ github.event.pull_request.number }}"
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Cloudflare の secrets を使わず、公開処理の直前と同じ検証を行う。
+      - name: Verify
+        run: npm run verify
+        env:
+          # Workers テストが一時ファイルを短いパスへ作成できるよう Linux 上だけ指定する。
+          TMPDIR: /tmp

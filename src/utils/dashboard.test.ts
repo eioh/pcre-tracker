@@ -62,6 +62,7 @@ const state: StoredStateV1 = {
     ヒヨリ: 0,
     ユイ: 0,
   },
+  clanBattle: { groups: [] },
 };
 
 describe("buildDashboardSummary", () => {
@@ -115,12 +116,12 @@ describe("buildGachaPullChartItems", () => {
       ...state,
       progressByName: {
         ヒヨリ: {
-          ...state.progressByName["ヒヨリ"],
+          ...state.progressByName["ヒヨリ"]!,
           obtainedDate: "2026-01-05",
           gachaPullCount: 120,
         },
         ユイ: {
-          ...state.progressByName["ユイ"],
+          ...state.progressByName["ユイ"]!,
           obtainedDate: "2026-01-03",
           gachaPullCount: 0,
         },

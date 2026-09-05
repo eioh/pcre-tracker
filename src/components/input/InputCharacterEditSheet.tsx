@@ -1,4 +1,4 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useState } from "react";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import type { Ue1MemoryCalcMode } from "../../utils/ue1MemoryCost";
 import type { StarMemoryCalcMode } from "../../utils/starMemoryCost";
@@ -43,8 +43,11 @@ type SheetBodyProps = Omit<InputCharacterEditSheetProps, "row" | "onOpenChange" 
   saveStatus: SaveStatus;
 };
 
+type DisplayedSaveStatus = SaveStatus | "editing";
+
 // 保存ステータスごとの表示文言とトーン色。同期エラーのみ danger 系で強調し、他は muted 系で控えめに表示する。
-const saveStatusDisplayMap: Record<SaveStatus, { text: string; toneClass: string }> = {
+const saveStatusDisplayMap: Record<DisplayedSaveStatus, { text: string; toneClass: string }> = {
+  editing: { text: "編集中...", toneClass: "text-muted" },
   saving: { text: "保存中...", toneClass: "text-muted" },
   saved: { text: "保存済み ✓", toneClass: "text-muted" },
   syncing: { text: "同期中...", toneClass: "text-muted" },
@@ -122,6 +125,12 @@ const SheetBody = memo(function SheetBody({
     (checked: boolean | "indeterminate") => onUpdateProgress(character.name, { adventureMemoryPieceTarget: checked === true }),
     [onUpdateProgress, character.name],
   );
+  const [isOwnedMemoryPieceEditing, setIsOwnedMemoryPieceEditing] = useState(false);
+  const [isOwnedPurePieceEditing, setIsOwnedPurePieceEditing] = useState(false);
+  const [isGachaPullCountEditing, setIsGachaPullCountEditing] = useState(false);
+  const hasUncommittedNumberInput = isOwnedMemoryPieceEditing || isOwnedPurePieceEditing || isGachaPullCountEditing;
+  // 同期エラーは利用者の対処が必要なため最優先し、それ以外は未確定入力があれば「保存済み」を表示しない。
+  const displayedSaveStatus: DisplayedSaveStatus = saveStatus === "error" ? "error" : hasUncommittedNumberInput ? "editing" : saveStatus;
 
   return (
     <div className="grid gap-5">
@@ -136,8 +145,8 @@ const SheetBody = memo(function SheetBody({
         </div>
         <SheetTitle className="text-lg">{character.name}</SheetTitle>
         {/* 保存状態の変化（保存中→保存済み等）を支援技術にも通知するため aria-live を付与する */}
-        <SheetDescription aria-live="polite" className={saveStatusDisplayMap[saveStatus].toneClass}>
-          {saveStatusDisplayMap[saveStatus].text}
+        <SheetDescription aria-live="polite" className={saveStatusDisplayMap[displayedSaveStatus].toneClass}>
+          {saveStatusDisplayMap[displayedSaveStatus].text}
         </SheetDescription>
       </SheetHeader>
 
@@ -209,7 +218,12 @@ const SheetBody = memo(function SheetBody({
         {/* 数値ステッパーは −/入力/+ の横並びのため、2カラムでなく縦積みにする */}
         <div className="grid gap-3">
           <FieldRow label="所持メモピ">
-            <OwnedMemoryPieceStepper character={character} ownedMemoryPiece={progress.ownedMemoryPiece} onUpdateProgress={onUpdateProgress} />
+            <OwnedMemoryPieceStepper
+              character={character}
+              ownedMemoryPiece={progress.ownedMemoryPiece}
+              onUpdateProgress={onUpdateProgress}
+              onEditingChange={setIsOwnedMemoryPieceEditing}
+            />
           </FieldRow>
           <FieldRow label="所持ピュアピ">
             <OwnedPurePieceStepper
@@ -217,6 +231,7 @@ const SheetBody = memo(function SheetBody({
               ownedPurePiece={ownedPurePiece}
               isImplemented={isPurePieceImplemented}
               onUpdatePurePiece={onUpdatePurePiece}
+              onEditingChange={setIsOwnedPurePieceEditing}
             />
           </FieldRow>
         </div>
@@ -237,7 +252,12 @@ const SheetBody = memo(function SheetBody({
             <ObtainedDatePicker character={character} obtainedDate={progress.obtainedDate} onUpdateProgress={onUpdateProgress} />
           </FieldRow>
           <FieldRow label="ガチャ回数">
-            <GachaPullCountStepper character={character} gachaPullCount={progress.gachaPullCount} onUpdateProgress={onUpdateProgress} />
+            <GachaPullCountStepper
+              character={character}
+              gachaPullCount={progress.gachaPullCount}
+              onUpdateProgress={onUpdateProgress}
+              onEditingChange={setIsGachaPullCountEditing}
+            />
           </FieldRow>
         </div>
       </section>
@@ -302,7 +322,7 @@ export function InputCharacterEditSheet({ row, onOpenChange, saveStatus = "saved
     <Sheet open={row !== null} onOpenChange={onOpenChange}>
       {/* iOS の safe-area（ホームバー）を padding で回避しつつ、はみ出す分は縦スクロールで閲覧する */}
       <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+1.25rem)]">
-        {row ? <SheetBody character={row.character} progress={row.progress} saveStatus={saveStatus} {...bodyProps} /> : null}
+        {row ? <SheetBody key={row.character.name} character={row.character} progress={row.progress} saveStatus={saveStatus} {...bodyProps} /> : null}
       </SheetContent>
     </Sheet>
   );
