@@ -20,6 +20,7 @@ function buildCharacter(overrides?: Partial<MasterCharacter>): MasterCharacter {
       ue2: true,
     },
     memoryPieceSources: ["hard_quest"],
+    formationOrder: 0,
     ...overrides,
   };
 }

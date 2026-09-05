@@ -38,7 +38,7 @@ describe("PrivacyPolicyPage", () => {
     const onBack = vi.fn();
     render(<PrivacyPolicyPage onBack={onBack} />);
 
-    fireEvent.click(screen.getAllByRole("button", { name: "アプリに戻る" })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: "アプリに戻る" })[0]!);
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 });

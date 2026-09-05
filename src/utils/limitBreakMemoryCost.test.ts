@@ -6,6 +6,7 @@ import type { CharacterProgress, MasterCharacter } from "../domain/types";
 function createCharacter(limited: boolean): MasterCharacter {
   return {
     name: "ヒヨリ",
+    baseName: "ヒヨリ",
     limited,
     attribute: "火",
     role: "アタッカー",

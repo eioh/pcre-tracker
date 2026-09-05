@@ -32,7 +32,7 @@ describe("CoinShopTab", () => {
   it("キャラ名がモバイル2列・デスクトップ4列のグリッドで配置される", () => {
     render(<CoinShopTab />);
 
-    const firstCharCell = screen.getByText(coinShopData.dungeon_coin[0]);
+    const firstCharCell = screen.getByText(coinShopData.dungeon_coin[0]!);
     const grid = firstCharCell.parentElement;
     expect(grid).not.toBeNull();
     expect((grid as HTMLElement).className).toContain("grid-cols-2");

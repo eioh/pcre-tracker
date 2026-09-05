@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import type { LocalStorageBackupV1 } from "./domain/backup";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // useSync をモックし、セッションや同期ロジックに依存せず App のルーティングを検証する。
@@ -23,7 +24,7 @@ vi.mock("./lib/authClient", () => ({
 // バックアップ適用の失敗を注入できるようにするための差し替え口。既定では実実装へ委譲し、
 // 「インポート適用失敗時に保留中の編集が失われないこと」のテストでのみ throw に差し替える。
 const { mockApplyBackupPayloadToLocalStorage } = vi.hoisted(() => ({
-  mockApplyBackupPayloadToLocalStorage: vi.fn<(payload: unknown) => void>(),
+  mockApplyBackupPayloadToLocalStorage: vi.fn<(payload: LocalStorageBackupV1) => void>(),
 }));
 vi.mock("./domain/backup", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./domain/backup")>();

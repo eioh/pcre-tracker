@@ -1,9 +1,10 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import { toGachaPullCount } from "../../domain/storage";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import { cn } from "../../lib/utils";
 import { Input } from "../ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { formatUeLevel } from "./formatters";
 import { clampOwnedMemoryPiece, clampPurePiece } from "./progressFields";
 import type { ProgressPatch } from "./types";
@@ -136,8 +137,16 @@ type ConnectRankStepperProps = {
   onUpdateProgress: UpdateProgressHandler;
 };
 
-// コネクトRANKステッパー。0 は「未開放」として表示する（ConnectRankSelect と同じ表現）。
+// コネクトRANK入力。中央のセレクトで0〜15を直接選択でき、左右のボタンでは1段ずつ変更する。
+// character・現在値・最大判定・更新関数を受け取り、選択または歩進した値を進捗パッチとして通知する。
 export function ConnectRankStepper({ character, connectRank, isAtMax, onUpdateProgress }: ConnectRankStepperProps) {
+  // セレクトで選んだ文字列をドメインのコネクトRANK型へ変換して通知する。
+  const handleSelect = useCallback(
+    (value: string) => {
+      onUpdateProgress(character.name, { connectRank: Number(value) as CharacterProgress["connectRank"] });
+    },
+    [onUpdateProgress, character.name],
+  );
   // 現在値から1段ずらした RANK をパッチとして通知する。
   const handleStep = useCallback(
     (delta: number) => {
@@ -155,7 +164,25 @@ export function ConnectRankStepper({ character, connectRank, isAtMax, onUpdatePr
       onDecrement={() => handleStep(-1)}
       onIncrement={() => handleStep(1)}
     >
-      <StepperValue value={connectRank === 0 ? "未開放" : String(connectRank)} isAtMax={isAtMax} />
+      <Select value={String(connectRank)} onValueChange={handleSelect}>
+        <SelectTrigger
+          aria-label={`${character.name}のコネクトRANK`}
+          className={cn(
+            "h-11 min-h-11 justify-center px-2.5 font-bold tabular-nums",
+            isAtMax && "border-maxed-border bg-maxed-bg text-maxed-text",
+          )}
+        >
+          <SelectValue />
+          {isAtMax ? <span aria-hidden="true" className="ml-auto size-1.5 shrink-0 rounded-full bg-maxed-dot" /> : null}
+        </SelectTrigger>
+        <SelectContent>
+          {CONNECT_RANK_VALUES.map((rank) => (
+            <SelectItem key={rank} value={String(rank)}>
+              {rank === 0 ? "未開放" : rank}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </StepperShell>
   );
 }
@@ -283,10 +310,13 @@ type NumberInputStepperProps = {
   incrementLabel: string;
   /** input の max 属性（既存の数値入力と同一にする。上限なしの場合は未指定） */
   max?: number;
+  /** 表示中の入力が未確定かを編集シートへ通知する */
+  onEditingChange?: (editing: boolean) => void;
 };
 
 // 数値入力ステッパーの共通実装。[−][number input][+] の構成で、
 // +/− は draft 文字列基準の stepBy で即コミット、直接入力は従来通り blur/Enter で確定する。
+// 外部確定値・クランプ関数・確定通知などを受け取り、入力中かどうかも親へ通知する。
 function NumberInputStepper({
   externalValue,
   clamp,
@@ -295,8 +325,13 @@ function NumberInputStepper({
   decrementLabel,
   incrementLabel,
   max,
+  onEditingChange,
 }: NumberInputStepperProps) {
   const field = useClampedNumberInput(externalValue, clamp, onCommit);
+  // draft と外部確定値の差分が変わったときだけ、編集シートの保存表示へ未確定状態を伝える。
+  useEffect(() => {
+    onEditingChange?.(field.isDirty);
+  }, [field.isDirty, onEditingChange]);
   // 上下限判定も stepBy と同じく draft 文字列基準に揃える（入力途中でも一貫した挙動にする）。
   const current = clamp(Number(field.value) || 0);
   return (
@@ -329,10 +364,13 @@ type OwnedMemoryPieceStepperProps = {
   character: MasterCharacter;
   ownedMemoryPiece: number;
   onUpdateProgress: UpdateProgressHandler;
+  /** 未確定入力状態を編集シートへ通知する */
+  onEditingChange?: (editing: boolean) => void;
 };
 
 // 所持メモピ数ステッパー。0 以上の整数（上限なし）で、パッチは既存 OwnedMemoryPieceInput と同一。
-export function OwnedMemoryPieceStepper({ character, ownedMemoryPiece, onUpdateProgress }: OwnedMemoryPieceStepperProps) {
+// キャラ・確定済み所持数・更新関数を受け取り、確定値と未確定入力状態を親へ通知する。
+export function OwnedMemoryPieceStepper({ character, ownedMemoryPiece, onUpdateProgress, onEditingChange }: OwnedMemoryPieceStepperProps) {
   const commit = useCallback(
     (v: number) => onUpdateProgress(character.name, { ownedMemoryPiece: v }),
     [onUpdateProgress, character.name],
@@ -345,6 +383,7 @@ export function OwnedMemoryPieceStepper({ character, ownedMemoryPiece, onUpdateP
       inputAriaLabel={`${character.name}の所持メモピ数`}
       decrementLabel={`${character.name}の所持メモピ数を減らす`}
       incrementLabel={`${character.name}の所持メモピ数を増やす`}
+      onEditingChange={onEditingChange}
     />
   );
 }
@@ -355,10 +394,19 @@ type OwnedPurePieceStepperProps = {
   /** rowDerived の isPurePieceImplemented。false なら無効表示にする */
   isImplemented: boolean;
   onUpdatePurePiece: (name: string, value: number) => void;
+  /** 未確定入力状態を編集シートへ通知する */
+  onEditingChange?: (editing: boolean) => void;
 };
 
 // 所持ピュアピ数ステッパー。ピュアピ未実装キャラは既存同様「-」の無効表示にする。
-export function OwnedPurePieceStepper({ character, ownedPurePiece, isImplemented, onUpdatePurePiece }: OwnedPurePieceStepperProps) {
+// キャラ・確定済み所持数・実装有無・更新関数を受け取り、確定値と未確定入力状態を親へ通知する。
+export function OwnedPurePieceStepper({
+  character,
+  ownedPurePiece,
+  isImplemented,
+  onUpdatePurePiece,
+  onEditingChange,
+}: OwnedPurePieceStepperProps) {
   const commit = useCallback(
     (v: number) => onUpdatePurePiece(character.name, v),
     [onUpdatePurePiece, character.name],
@@ -394,6 +442,7 @@ export function OwnedPurePieceStepper({ character, ownedPurePiece, isImplemented
       decrementLabel={decrementLabel}
       incrementLabel={incrementLabel}
       max={99999}
+      onEditingChange={onEditingChange}
     />
   );
 }
@@ -402,10 +451,13 @@ type GachaPullCountStepperProps = {
   character: MasterCharacter;
   gachaPullCount: number;
   onUpdateProgress: UpdateProgressHandler;
+  /** 未確定入力状態を編集シートへ通知する */
+  onEditingChange?: (editing: boolean) => void;
 };
 
 // ガチャ回数ステッパー。0〜300 の範囲で、パッチは既存 GachaPullCountInput と同一。
-export function GachaPullCountStepper({ character, gachaPullCount, onUpdateProgress }: GachaPullCountStepperProps) {
+// キャラ・確定済み回数・更新関数を受け取り、確定値と未確定入力状態を親へ通知する。
+export function GachaPullCountStepper({ character, gachaPullCount, onUpdateProgress, onEditingChange }: GachaPullCountStepperProps) {
   const commit = useCallback(
     (v: number) => onUpdateProgress(character.name, { gachaPullCount: v }),
     [onUpdateProgress, character.name],
@@ -419,6 +471,7 @@ export function GachaPullCountStepper({ character, gachaPullCount, onUpdateProgr
       decrementLabel={`${character.name}のガチャ回数を減らす`}
       incrementLabel={`${character.name}のガチャ回数を増やす`}
       max={300}
+      onEditingChange={onEditingChange}
     />
   );
 }

@@ -49,9 +49,12 @@ npx wrangler d1 migrations apply pcre-tracker-db --local  # ローカル（minif
 ## デプロイ（Cloudflare Workers + Static Assets）
 
 - ホスティングは Cloudflare Workers + Static Assets です（カスタムドメイン `pkne.app` で稼働中）。
-- `main` ブランチへの push で `.github/workflows/deploy.yml` が `wrangler deploy` により自動デプロイします。
+- `develop` または `main` 向けの PR では `.github/workflows/pr-check.yml` が生成物の整合性、Worker 型生成、テスト、型チェック、本番ビルドを検証します。この検証は Cloudflare の Secrets を使用せず、D1 マイグレーションやデプロイも実行しません。
+- `main` ブランチへの push で `.github/workflows/deploy.yml` が同じ検証を再実行し、成功後に本番 D1 マイグレーションと `wrangler deploy` を順番に実行します。
 - ビルド構成: `vite build` で静的アセットを `dist/client/`、Worker とデプロイ用 `wrangler.json` を `dist/pcre_tracker/` に出力します。`@cloudflare/vite-plugin` が `assets.directory` を自動設定するため、`wrangler.jsonc` では手動指定していません。
-- ローカルでのデプロイは `npm run deploy`（`vite build && wrangler deploy`）で実行できます。
+- 手動公開も GitHub Actions の `Deploy to Cloudflare Workers` を `main` ref で実行します。`main` 以外の ref を選んだ場合、deploy job は実行されません。
+- ローカルでは `npm run verify` で公開前と同じ検証を実行できます。ローカルからのデプロイは、検証や本番 D1 マイグレーションの省略を防ぐため正式な公開経路として提供していません。
+- PR の検証をマージ必須にする場合は、GitHub の Ruleset またはブランチ保護で `verify` job を必須チェックに設定してください。
 
 ### セットアップ手順（本番は設定済み。再構築時の参考）
 
