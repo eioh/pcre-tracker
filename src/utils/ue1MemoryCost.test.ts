@@ -6,6 +6,7 @@ function createCharacter(implemented: MasterCharacter["implemented"]): MasterCha
   // テスト用のマスターキャラを生成する。
   return {
     name: "ヒヨリ",
+    baseName: "ヒヨリ",
     limited: false,
     attribute: "火",
     role: "アタッカー",

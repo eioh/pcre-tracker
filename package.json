@@ -10,10 +10,10 @@
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "cf-typegen": "wrangler types",
-    "deploy": "vite build && wrangler deploy",
+    "verify:generated": "npm run generate && git diff --exit-code -- src/data/characterMaster.generated.json",
+    "verify": "npm run verify:generated && npm run cf-typegen && npm test && npm run build",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ci": "TMPDIR=/tmp vitest run"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

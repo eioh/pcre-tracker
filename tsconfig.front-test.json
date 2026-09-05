@@ -1,0 +1,17 @@
+{
+  // フロント本体の厳格な型設定を継承し、Vitest・Testing Library のテストだけに必要な型を追加する。
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "types": ["vitest/globals", "@testing-library/jest-dom/vitest"],
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.front-test.tsbuildinfo"
+  },
+  // テスト、共通セットアップ、仮想モジュールのスタブと Vite の環境型を専用プロジェクトで検査する。
+  "include": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/test/**/*.ts",
+    "src/vite-env.d.ts"
+  ],
+  // 継承元が除外しているテスト群を、この専用プロジェクトでは型チェック対象へ戻す。
+  "exclude": []
+}

@@ -9,6 +9,7 @@ import {
 function createCharacter(implemented: MasterCharacter["implemented"]): MasterCharacter {
   return {
     name: "ヒヨリ",
+    baseName: "ヒヨリ",
     limited: false,
     attribute: "火",
     role: "アタッカー",

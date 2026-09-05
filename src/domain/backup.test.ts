@@ -41,7 +41,8 @@ describe("backup", () => {
   });
 
   it("旧形式バックアップJSON(文字列)はパースで失敗する", () => {
-    const rawText = serializeBackupPayload({
+    // 現行の型では表現できない旧形式を、パーサー境界へ渡す生JSONとして組み立てる。
+    const rawText = JSON.stringify({
       formatVersion: 1,
       exportedAt: "2026-02-23T00:00:00.000Z",
       storage: {
