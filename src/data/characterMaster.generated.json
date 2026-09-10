@@ -43,7 +43,7 @@
       "ゆい",
       "yui"
     ],
-    "formationOrder": 331
+    "formationOrder": 332
   },
   {
     "name": "レイ",
@@ -181,7 +181,7 @@
       "ゆき",
       "yuki"
     ],
-    "formationOrder": 335
+    "formationOrder": 336
   },
   {
     "name": "アンナ",
@@ -227,7 +227,7 @@
       "まほ",
       "maho"
     ],
-    "formationOrder": 329
+    "formationOrder": 330
   },
   {
     "name": "リノ",
@@ -755,7 +755,7 @@
       "きょうか",
       "kyouka"
     ],
-    "formationOrder": 338
+    "formationOrder": 339
   },
   {
     "name": "トモ",
@@ -824,7 +824,7 @@
       "あおい",
       "aoi"
     ],
-    "formationOrder": 323
+    "formationOrder": 324
   },
   {
     "name": "チカ",
@@ -847,7 +847,7 @@
       "ちか",
       "chika"
     ],
-    "formationOrder": 326
+    "formationOrder": 327
   },
   {
     "name": "マコト",
@@ -1428,7 +1428,7 @@
     "role": "デバッファー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
@@ -1690,7 +1690,7 @@
       "みさき(はろうぃん)",
       "misaki(harouin)"
     ],
-    "formationOrder": 340
+    "formationOrder": 341
   },
   {
     "name": "チカ（クリスマス）",
@@ -2184,7 +2184,7 @@
       "マホ(サマア)",
       "maho(samaa)"
     ],
-    "formationOrder": 327
+    "formationOrder": 328
   },
   {
     "name": "アオイ（編入生）",
@@ -2275,7 +2275,7 @@
       "ゆに",
       "yuni"
     ],
-    "formationOrder": 336
+    "formationOrder": 337
   },
   {
     "name": "キョウカ（ハロウィン）",
@@ -2297,7 +2297,7 @@
       "きょうか(はろうぃん)",
       "kyouka(harouin)"
     ],
-    "formationOrder": 342
+    "formationOrder": 343
   },
   {
     "name": "ミソギ（ハロウィン）",
@@ -3326,7 +3326,7 @@
       "ゆに(聖学祭)",
       "yuni(聖学祭)"
     ],
-    "formationOrder": 337
+    "formationOrder": 338
   },
   {
     "name": "イノリ（タイムトラベル）",
@@ -3597,7 +3597,7 @@
       "ユキ(オウエド)",
       "yuki(ooedo)"
     ],
-    "formationOrder": 330
+    "formationOrder": 331
   },
   {
     "name": "カオリ（ハロウィン）",
@@ -3707,7 +3707,7 @@
       "らんふぁ",
       "ranfua"
     ],
-    "formationOrder": 322
+    "formationOrder": 323
   },
   {
     "name": "ミソラ",
@@ -3739,7 +3739,7 @@
     "role": "ブースター",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
@@ -3751,7 +3751,7 @@
       "かりん",
       "karin"
     ],
-    "formationOrder": 325
+    "formationOrder": 326
   },
   {
     "name": "ネビア",
@@ -3773,7 +3773,7 @@
       "ねびあ",
       "nebia"
     ],
-    "formationOrder": 344
+    "formationOrder": 345
   },
   {
     "name": "イオ（ノワール）",
@@ -4340,7 +4340,7 @@
       "キョウカ(サマア)",
       "kyouka(samaa)"
     ],
-    "formationOrder": 339
+    "formationOrder": 340
   },
   {
     "name": "ミソギ（サマー）",
@@ -4431,7 +4431,7 @@
       "マホ(エクスプロウラア)",
       "maho(ekusupurooraa)"
     ],
-    "formationOrder": 328
+    "formationOrder": 329
   },
   {
     "name": "アヤネ（エクスプローラー）",
@@ -4813,7 +4813,7 @@
       "たまき(かふぇ)",
       "tamaki(kafye)"
     ],
-    "formationOrder": 343
+    "formationOrder": 344
   },
   {
     "name": "モニカ（カフェ）",
@@ -5262,7 +5262,7 @@
       "きゃる(編入生)",
       "kyaru(編入生)"
     ],
-    "formationOrder": 334
+    "formationOrder": 335
   },
   {
     "name": "スズナ（編入生）",
@@ -5475,7 +5475,7 @@
       "ハツネ(ニュウイヤア)",
       "hatsune(nyuuiyaa)"
     ],
-    "formationOrder": 333
+    "formationOrder": 334
   },
   {
     "name": "カスミ（ニューイヤー）",
@@ -5586,7 +5586,7 @@
       "えりす",
       "erisu"
     ],
-    "formationOrder": 332
+    "formationOrder": 333
   },
   {
     "name": "ユニ（ウィンター）",
@@ -6615,7 +6615,7 @@
       "エリス(サマア)",
       "erisu(samaa)"
     ],
-    "formationOrder": 324
+    "formationOrder": 325
   },
   {
     "name": "シェフィ（サマー）",
@@ -6761,7 +6761,7 @@
     "role": "ブースター",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     },
@@ -6791,7 +6791,7 @@
       "ゆきの",
       "yukino"
     ],
-    "formationOrder": 345
+    "formationOrder": 346
   },
   {
     "name": "サツキ",
@@ -7451,7 +7451,7 @@
       "きょうか(ごしっく)",
       "kyouka(goshikku)"
     ],
-    "formationOrder": 341
+    "formationOrder": 342
   },
   {
     "name": "キャル（覇瞳天星）",
@@ -7699,5 +7699,26 @@
       "teia"
     ],
     "formationOrder": 293
+  },
+  {
+    "name": "リーザ",
+    "baseName": "リーザ",
+    "limited": true,
+    "attribute": "風",
+    "role": "ジャマー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "リーザ",
+      "りいざ",
+      "リイザ",
+      "riiza"
+    ],
+    "formationOrder": 322
   }
 ]
