@@ -5320,7 +5320,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "hard_quest"
+    ],
     "searchTokens": [
       "ルカ(サラサリア)",
       "るか(さらさりあ)",
@@ -7692,7 +7694,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "ティア",
       "てぃあ",
