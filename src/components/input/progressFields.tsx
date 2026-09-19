@@ -2,6 +2,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { format, isValid, parseISO } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "../../lib/utils";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import { toGachaPullCount, toPurePieceCount } from "../../domain/storage";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
@@ -167,10 +168,13 @@ type ObtainedDatePickerProps = {
   character: MasterCharacter;
   obtainedDate: CharacterProgress["obtainedDate"];
   onUpdateProgress: UpdateProgressHandler;
+  inlineEditing?: boolean;
 };
 
 // 入手日ピッカー。Popover+Calendar での選択と、テスト・支援技術向けの sr-only な date input を併設する。
-export function ObtainedDatePicker({ character, obtainedDate, onUpdateProgress }: ObtainedDatePickerProps) {
+// inlineEditing が true の場合のみ、日付と更新通知を維持して枠なしのテーブルセルを返す。
+// テーブルでは親セル全体をクリック領域にし、モバイルの編集シートには適用しない。
+export function ObtainedDatePicker({ character, obtainedDate, onUpdateProgress, inlineEditing = false }: ObtainedDatePickerProps) {
   const selectedObtainedDate = useMemo(() => parseStoredDate(obtainedDate), [obtainedDate]);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   // sr-only な date input の直接変更を保存形式（YYYY-MM-DD / null）へ反映する。
@@ -203,11 +207,14 @@ export function ObtainedDatePicker({ character, obtainedDate, onUpdateProgress }
           <button
             type="button"
             aria-label={`${character.name}の入手日セル`}
-            className="inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-input-bg px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            className={cn(
+              "group inline-flex w-full items-center justify-between rounded-[10px] border border-white/20 bg-input-bg px-2.5 py-2 text-sm font-bold hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+              inlineEditing && "absolute inset-0 h-full min-w-0 rounded-none border-transparent bg-transparent px-2 hover:bg-row-hover focus-visible:ring-inset data-[state=open]:border-accent data-[state=open]:bg-input-bg",
+            )}
           >
             <span className="tabular-nums">{formatObtainedDate(obtainedDate)}</span>
             <span className="inline-flex items-center text-muted">
-              <CalendarIcon className="size-4" />
+              <CalendarIcon className={cn("size-4", inlineEditing && "opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 group-data-[state=open]:opacity-100")} />
             </span>
           </button>
         </Popover.Trigger>
