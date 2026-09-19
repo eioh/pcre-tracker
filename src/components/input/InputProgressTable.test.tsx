@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ComponentProps } from "react";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
 import { describe, expect, it, vi } from "vitest";
@@ -70,6 +70,38 @@ function selectOptionFromCombobox(combobox: HTMLElement, optionLabel: string): v
 }
 
 describe("InputProgressTable", () => {
+  // 実際のフォーカス移動を使い、編集開始・Enter 確定・表示復帰と二重保存防止を検証する。
+  it("数値セルはフォーカス中だけ編集でき、Enterで一度だけ保存する", () => {
+    const onUpdateProgress = vi.fn();
+    render(<InputProgressTable {...buildProps({ onUpdateProgress })} />);
+    const input = screen.getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" });
+
+    expect(input).toHaveAttribute("readonly");
+    act(() => input.focus());
+    expect(input).not.toHaveAttribute("readonly");
+    fireEvent.change(input, { target: { value: "42" } });
+    expect(onUpdateProgress).not.toHaveBeenCalled();
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(input).toHaveAttribute("readonly");
+    expect(onUpdateProgress).toHaveBeenCalledExactlyOnceWith("ヒヨリ", { ownedMemoryPiece: 42 });
+  });
+
+  // 隣のセルへの移動時にも保存と編集状態の切り替えが成立することを検証する。
+  it("別の数値セルに移ると元のセルを確定して次のセルを編集できる", () => {
+    const onUpdateProgress = vi.fn();
+    render(<InputProgressTable {...buildProps({ onUpdateProgress })} />);
+    const memory = screen.getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" });
+    const pure = screen.getByRole("spinbutton", { name: "ヒヨリの所持ピュアピ数" });
+    act(() => memory.focus());
+    fireEvent.change(memory, { target: { value: "12.9" } });
+    act(() => pure.focus());
+
+    expect(memory).toHaveAttribute("readonly");
+    expect(pure).not.toHaveAttribute("readonly");
+    expect(onUpdateProgress).toHaveBeenCalledExactlyOnceWith("ヒヨリ", { ownedMemoryPiece: 12 });
+  });
+
   it("行が0件のとき空表示メッセージを出す", () => {
     const props = buildProps({ visibleRows: [] });
     render(<InputProgressTable {...props} />);
@@ -82,6 +114,7 @@ describe("InputProgressTable", () => {
     render(<InputProgressTable {...props} />);
 
     expect(screen.getByRole("columnheader", { name: "所持メモピ" })).toBeInTheDocument();
+    expect(screen.getAllByRole("columnheader")).toHaveLength(15);
     expect(screen.queryByRole("button", { name: /所持メモピ/ })).toBeNull();
     expect(screen.queryByRole("button", { name: /必要メモピ合計/ })).toBeNull();
   });
@@ -139,6 +172,7 @@ describe("InputProgressTable", () => {
     render(<InputProgressTable {...props} />);
 
     const input = screen.getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" });
+    act(() => input.focus());
     fireEvent.change(input, { target: { value: "42" } });
     expect(onUpdateProgress).not.toHaveBeenCalled();
     fireEvent.blur(input);
@@ -152,6 +186,7 @@ describe("InputProgressTable", () => {
     render(<InputProgressTable {...props} />);
 
     const input = screen.getByRole("spinbutton", { name: "ヒヨリの所持ピュアピ数" });
+    act(() => input.focus());
     fireEvent.change(input, { target: { value: "77.9" } });
     fireEvent.blur(input);
 
@@ -305,7 +340,7 @@ describe("InputProgressTable", () => {
     const nameHeader = screen.getByRole("columnheader", { name: "キャラ" });
 
     expect(ownedHeader).toHaveClass("sticky", "left-0", "z-[6]");
-    expect(nameHeader).toHaveClass("sticky", "left-20", "z-[6]", "border-r");
+    expect(nameHeader).toHaveClass("sticky", "left-14", "z-[6]", "border-r");
   });
 
   it("所持列とキャラ列のボディセルを固定表示するクラスが付与される", () => {
@@ -317,7 +352,7 @@ describe("InputProgressTable", () => {
     const cells = within(bodyRow).getAllByRole("cell");
 
     expect(cells[0]).toHaveClass("sticky", "left-0", "z-[4]");
-    expect(cells[1]).toHaveClass("sticky", "left-20", "z-[4]", "border-r");
+    expect(cells[1]).toHaveClass("sticky", "left-14", "z-[4]", "border-r");
   });
 
   it("未実装キャラは専用装備セレクトを無効表示する", () => {
@@ -397,9 +432,11 @@ describe("InputProgressTable", () => {
     render(<InputProgressTable {...props} />);
 
     const input = screen.getByRole("spinbutton", { name: "ヒヨリの所持メモピ数" });
+    act(() => input.focus());
     fireEvent.change(input, { target: { value: "-3.8" } });
     expect(onUpdateProgress).not.toHaveBeenCalled();
     fireEvent.blur(input);
+    act(() => input.focus());
     fireEvent.change(input, { target: { value: "12.9" } });
     fireEvent.blur(input);
 
@@ -439,11 +476,14 @@ describe("InputProgressTable", () => {
     render(<InputProgressTable {...props} />);
 
     const input = screen.getByRole("spinbutton", { name: "ヒヨリのガチャ回数" });
+    act(() => input.focus());
     fireEvent.change(input, { target: { value: "-4.8" } });
     expect(onUpdateProgress).not.toHaveBeenCalled();
     fireEvent.blur(input);
+    act(() => input.focus());
     fireEvent.change(input, { target: { value: "12.9" } });
     fireEvent.keyDown(input, { key: "Enter" });
+    act(() => input.focus());
     fireEvent.change(input, { target: { value: "999" } });
     fireEvent.blur(input);
 

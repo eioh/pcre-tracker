@@ -41,10 +41,10 @@ export function useClampedNumberInput(
       if (event.key !== "Enter") {
         return;
       }
-      handleBlur();
+      // Enter の確定は blur に一本化し、同じ値の更新通知が二重に発生するのを防ぐ。
       event.currentTarget.blur();
     },
-    [handleBlur],
+    [],
   );
 
   // 入力途中（未 blur）の draft 文字列を一度クランプしてから delta 分歩進し、再クランプして即コミットする。
