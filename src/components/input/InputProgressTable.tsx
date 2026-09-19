@@ -52,6 +52,8 @@ type TableRowProps = {
 };
 
 // テーブル行コンポーネント。行単位でメモ化し不要な再レンダリングを防ぐ。
+// キャラと進捗・更新通知を受け取り、セル全体で操作できる入力行を返す。
+// 入力を絶対配置するため親セルの余白を除き、行高は仮想スクロールの推定値と揃える。
 const TableRow = memo(function TableRow({
   character,
   progress,
@@ -103,13 +105,13 @@ const TableRow = memo(function TableRow({
   );
 
   return (
-    <UiTableRow className="odd:[&>td]:bg-row-odd even:[&>td]:bg-row-even hover:[&>td]:bg-row-hover hover:[&>td]:border-row-hover-border">
-      <TableCell className="sticky left-0 z-[4] text-center">
-        <label className={`${tableSwitchClass} w-full justify-center`}>
+    <UiTableRow className="h-[72px] odd:[&>td]:bg-row-odd even:[&>td]:bg-row-even hover:[&>td]:bg-row-hover hover:[&>td]:border-row-hover-border">
+      <TableCell className="sticky left-0 z-[4] p-0 text-center">
+        <label className={`${tableSwitchClass} absolute inset-0 cursor-pointer justify-center`}>
           <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onCheckedChange={handleOwnedChange} />
         </label>
       </TableCell>
-      <TableCell className="sticky left-20 z-[4] border-r border-table-border whitespace-nowrap font-bold">
+      <TableCell className="sticky left-14 z-[4] border-r border-table-border whitespace-nowrap font-bold">
         <div className={characterNameCellLayoutClass}>
           <div className={characterTagLineClass}>
             <span className={character.limited ? "text-limited-text" : "text-normal-text"}>{character.limited ? "限定" : "恒常"}</span>
@@ -122,15 +124,15 @@ const TableRow = memo(function TableRow({
           <span className="block max-w-full truncate text-[1.05rem]">{character.name}</span>
         </div>
       </TableCell>
-      <TableCell className="text-center">
-        <label className={`${tableSwitchClass} w-full justify-center`}>
+      <TableCell className="relative p-0 text-center">
+        <label className={`${tableSwitchClass} absolute inset-0 cursor-pointer justify-center`}>
           <TableCheckbox checked={progress.limitBreak} aria-label={`${character.name}の限界突破状態`} onCheckedChange={handleLimitBreakChange} />
         </label>
       </TableCell>
-      <TableCell>
+      <TableCell className="relative p-0">
         <StarSelect character={character} star={progress.star} isAtMax={isStarAtMax} onUpdateProgress={onUpdateProgress} />
       </TableCell>
-      <TableCell>
+      <TableCell className="relative p-0">
         <ConnectRankSelect
           character={character}
           connectRank={progress.connectRank}
@@ -138,14 +140,14 @@ const TableRow = memo(function TableRow({
           onUpdateProgress={onUpdateProgress}
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="relative p-0">
         <Ue1Select character={character} value={ue1CompositeValue} isAtMax={isUe1AtMax} onUpdateProgress={onUpdateProgress} />
       </TableCell>
-      <TableCell>
+      <TableCell className="relative p-0">
         <Ue2Select character={character} value={ue2Value} isAtMax={isUe2AtMax} onUpdateProgress={onUpdateProgress} />
       </TableCell>
-      <TableCell className="text-center">
-        <label className={`${tableSwitchClass} w-full justify-center`}>
+      <TableCell className="relative p-0 text-center">
+        <label className={`${tableSwitchClass} absolute inset-0 cursor-pointer justify-center`}>
           <TableCheckbox
             checked={progress.adventureMemoryPieceTarget === true}
             aria-label={`${character.name}のアドベンチャーメモピ枠`}
@@ -153,10 +155,10 @@ const TableRow = memo(function TableRow({
           />
         </label>
       </TableCell>
-      <TableCell>
+      <TableCell className="relative p-0">
         <OwnedMemoryPieceInput character={character} ownedMemoryPiece={progress.ownedMemoryPiece} onUpdateProgress={onUpdateProgress} />
       </TableCell>
-      <TableCell>
+      <TableCell className="relative p-0">
         <OwnedPurePieceInput
           character={character}
           ownedPurePiece={ownedPurePiece}
@@ -164,10 +166,10 @@ const TableRow = memo(function TableRow({
           onUpdatePurePiece={onUpdatePurePiece}
         />
       </TableCell>
-      <TableCell className="text-center">
-        <ObtainedDatePicker character={character} obtainedDate={progress.obtainedDate} onUpdateProgress={onUpdateProgress} />
+      <TableCell className="relative p-0 text-center">
+        <ObtainedDatePicker character={character} obtainedDate={progress.obtainedDate} onUpdateProgress={onUpdateProgress} inlineEditing />
       </TableCell>
-      <TableCell className="border-r border-table-border">
+      <TableCell className="relative border-r border-table-border p-0">
         <GachaPullCountInput character={character} gachaPullCount={progress.gachaPullCount} onUpdateProgress={onUpdateProgress} />
       </TableCell>
       <TableCell>
@@ -296,7 +298,7 @@ export const InputProgressTable = memo(function InputProgressTable({
   const stickyNameHeadRef = useRef<HTMLTableCellElement | null>(null);
   const initialScrollLeftRef = useRef<number | null>(null);
   const [hasStickyShadow, setHasStickyShadow] = useState(false);
-  const [stickyShadowLeft, setStickyShadowLeft] = useState(280);
+  const [stickyShadowLeft, setStickyShadowLeft] = useState(256);
   const rowVirtualizer = useVirtualizer({
     count: visibleRows.length,
     getScrollElement: () => scrollParentRef.current,
@@ -391,23 +393,24 @@ export const InputProgressTable = memo(function InputProgressTable({
         style={{ left: stickyShadowLeft }}
       />
       <div ref={scrollParentRef} className={tableWrapClass}>
-        <Table className="min-w-[1280px] table-fixed">
+        {/* 見出し・選択値が収まる列幅に絞り、固定列の位置も所持列の56pxに揃える。 */}
+        <Table className="min-w-[1700px] table-fixed [&_th]:px-2">
         <colgroup>
-          <col className="w-20" />
+          <col className="w-14" />
           <col className="w-[200px]" />
-          <col className="w-[95px]" />
-          <col className="w-[150px]" />
-          <col className="w-[150px]" />
-          <col className="w-[150px]" />
-          <col className="w-[150px]" />
-          <col className="w-[130px]" />
-          <col className="w-[150px]" />
-          <col className="w-[150px]" />
-          <col className="w-[170px]" />
-          <col className="w-[150px]" />
-          <col className="w-[160px]" />
-          <col className="w-[150px]" />
-          <col className="w-[170px]" />
+          <col className="w-[76px]" />
+          <col className="w-16" />
+          <col className="w-[112px]" />
+          <col className="w-[104px]" />
+          <col className="w-[104px]" />
+          <col className="w-[112px]" />
+          <col className="w-[104px]" />
+          <col className="w-[112px]" />
+          <col className="w-[132px]" />
+          <col className="w-[100px]" />
+          <col className="w-[128px]" />
+          <col className="w-[140px]" />
+          <col className="w-[156px]" />
         </colgroup>
         <TableHeader>
           <UiTableRow>
@@ -416,7 +419,7 @@ export const InputProgressTable = memo(function InputProgressTable({
             </TableHead>
             <TableHead
               ref={stickyNameHeadRef}
-              className="sticky left-20 z-[6] border-r border-table-border bg-table-header-bg text-center"
+              className="sticky left-14 z-[6] border-r border-table-border bg-table-header-bg text-center"
             >
               キャラ
             </TableHead>
