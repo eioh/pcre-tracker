@@ -61,6 +61,8 @@
   --color-maxed-bg: #0f141b;
   --color-maxed-text: #e6edf3;
   --color-maxed-dot: #67aaf2;
+  /* 最大育成の文字を背景から見分けやすくし、☆専用色とは独立して調整できるようにする。 */
+  --color-maxed-value: #e2c788;
   /* モバイル一覧サマリー: 最大強化済み(属性/ロール色と揃えたソフトグリーン) */
   --color-maxed-green: #8bc8ab;
 
