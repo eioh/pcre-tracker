@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Maximize2, Trash2 } from "lucide-react";
+import { cn } from "../lib/utils";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../domain/levels";
 import type {
   CharacterProgress,
@@ -85,10 +86,20 @@ function toUe2SelectValue(member: ClanBattleMember): string {
   return String(member.ue2Level ?? "null");
 }
 
-// 差分がある入力欄の右側に表示する警告アイコン。
+// 最大育成・差分の有無を受け取り、セル全面で操作する選択欄のクラスを返す。
+// 警告用の余白を確保し、最大育成の文字色と差分警告を同時に読み取れるようにする。
+function getMemberFieldClass(isMaxed: boolean, hasDiff: boolean): string {
+  return cn(
+    "absolute inset-0 h-full w-full min-w-0 rounded-none border-transparent bg-transparent px-2 shadow-none tabular-nums focus:ring-inset enabled:hover:bg-row-hover data-[state=open]:border-accent data-[state=open]:bg-input-bg [&>svg]:size-3 [&>svg]:opacity-0 enabled:hover:[&>svg]:opacity-70 focus-visible:[&>svg]:opacity-70 data-[state=open]:[&>svg]:opacity-70",
+    isMaxed && "text-maxed-value",
+    hasDiff && "pr-12",
+  );
+}
+
+// 差分項目名を受け取り、操作を妨げず選択欄の手前に表示する警告アイコンを返す。
 function FieldDiffIcon({ label }: { label: string }) {
   return (
-    <span className="pointer-events-none absolute right-8 top-1/2 -translate-y-1/2 text-chip-master-text" aria-label={`${label}に差分があります`}>
+    <span className="pointer-events-none absolute right-6 top-1/2 -translate-y-1/2 text-chip-master-text" aria-label={`${label}に差分があります`}>
       <AlertTriangle className="size-4" aria-hidden="true" />
     </span>
   );
@@ -145,6 +156,7 @@ function TimelineModal({
 }
 
 // クラバト編成の年月、編成、キャラ、TLを1画面で管理する。
+// マスター・保存状態・変更通知を受け取り、編成キャラを育成テーブルと同じフラットな入力行で表示する。
 export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleTabProps) {
   const [characterSearchText, setCharacterSearchText] = useState("");
   const [selectedFormationId, setSelectedFormationId] = useState<string | null>(() => findFirstFormation(state.clanBattle)?.formation.id ?? null);
@@ -399,7 +411,7 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                 </div>
               </div>
 
-              <div className="grid gap-2">
+              <div className="overflow-x-auto rounded-[8px] border border-table-wrap-border bg-table-wrap-bg">
                 {selectedFormation.members.length === 0 ? (
                   <p className="rounded-[8px] border border-dashed border-white/20 p-4 text-center text-sm text-muted">
                     キャラを追加してください。
@@ -410,16 +422,18 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                   const isCurrentMonth = isCurrentClanBattleMonth(selectedGroup);
                   const diffs = isCurrentMonth ? getClanBattleMemberDiffs(member, state.progressByName[member.characterName]) : [];
                   const hasDiff = diffs.length > 0;
-                  // max-md:grid-cols-2 はモバイル（768px未満）のみSelect5個を2列に配置して縦の冗長さを抑えるスタイル調整（スタイルのみの差は max-md: バリアント、構造分岐は useIsMobile を使う規約）。
+                  // 狭い画面は2列、デスクトップは横一列にし、入力領域を行内の各セルへ広げる。
+                  // SP実装済みの専用1は、レベル上限だけでなくSP装備時に最大育成色を付ける。
                   return (
                     <article
                       key={member.id}
-                      className={`grid gap-3 rounded-[8px] border p-3 transition max-md:grid-cols-2 lg:grid-cols-[minmax(160px,1.2fr)_repeat(5,minmax(88px,1fr))_auto] lg:items-center ${
-                        hasDiff ? "border-accent/70 bg-black/20" : "border-white/15 bg-black/20"
-                      }`}
+                      className={cn(
+                        "grid grid-cols-2 gap-x-2 border-b border-table-border px-2 last:border-b-0 odd:bg-row-odd even:bg-row-even hover:bg-row-hover lg:min-w-[800px] lg:grid-cols-[minmax(160px,1.2fr)_88px_80px_112px_120px_112px_44px] lg:items-stretch",
+                        hasDiff && "border-l-2 border-l-accent",
+                      )}
                     >
                       {/* 名前ブロックはモバイルでは2列分を使い、キャラ名の折返しを防ぐ。 */}
-                      <div className="flex min-w-0 items-center gap-2 max-md:col-span-2">
+                      <div className="col-span-2 flex min-h-[72px] min-w-0 items-center gap-2 px-2 lg:col-span-1">
                         <div className="min-w-0">
                           <p className="m-0 truncate text-sm font-semibold">{member.characterName}</p>
                           <div className="mt-1 flex flex-wrap items-center gap-1.5">
@@ -431,12 +445,10 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                         </div>
                       </div>
 
-                      <label className="grid gap-1 text-xs text-muted">
+                      <label className="relative grid min-h-[72px] grid-rows-[auto_1fr] gap-1 pt-2 text-xs text-muted">
                         限界突破
                         <span
-                          className={`relative inline-flex h-10 items-center gap-2 rounded-[8px] border bg-input-bg px-3 ${
-                            hasDiff && diffs.includes("限界突破") ? "border-accent pr-9" : "border-white/20"
-                          }`}
+                          className="relative inline-flex min-h-11 cursor-pointer items-center gap-2 px-2 pr-10 hover:bg-row-hover"
                         >
                           <Checkbox checked={member.limitBreak} onCheckedChange={(checked) => updateMember(member.id, { limitBreak: checked === true })} />
                           <span>{member.limitBreak ? "済" : "未"}</span>
@@ -444,11 +456,11 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                         </span>
                       </label>
 
-                      <label className="grid gap-1 text-xs text-muted">
+                      <label className="relative grid min-h-[72px] grid-rows-[auto_1fr] gap-1 pt-2 text-xs text-muted">
                         ☆
                         <Select value={String(member.star)} onValueChange={(value) => updateMember(member.id, { star: Number(value) as CharacterProgress["star"] })}>
-                          <div className="relative">
-                            <SelectTrigger className={hasDiff && diffs.includes("☆") ? "border-accent" : undefined}>
+                          <div className="relative min-h-11">
+                            <SelectTrigger className={getMemberFieldClass(member.star === (character?.implemented.star6 ? 6 : 5), diffs.includes("☆"))}>
                               <SelectValue />
                             </SelectTrigger>
                             {hasDiff && diffs.includes("☆") ? <FieldDiffIcon label="☆" /> : null}
@@ -463,14 +475,14 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                         </Select>
                       </label>
 
-                      <label className="grid gap-1 text-xs text-muted">
+                      <label className="relative grid min-h-[72px] grid-rows-[auto_1fr] gap-1 pt-2 text-xs text-muted">
                         コネクトRANK
                         <Select
                           value={String(member.connectRank)}
                           onValueChange={(value) => updateMember(member.id, { connectRank: Number(value) as CharacterProgress["connectRank"] })}
                         >
-                          <div className="relative">
-                            <SelectTrigger className={hasDiff && diffs.includes("コネクトRANK") ? "border-accent" : undefined}>
+                          <div className="relative min-h-11">
+                            <SelectTrigger className={getMemberFieldClass(member.connectRank === 15, diffs.includes("コネクトRANK"))}>
                               <SelectValue />
                             </SelectTrigger>
                             {hasDiff && diffs.includes("コネクトRANK") ? <FieldDiffIcon label="コネクトRANK" /> : null}
@@ -486,10 +498,10 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                         </Select>
                       </label>
 
-                      <label className="grid gap-1 text-xs text-muted">
+                      <label className="relative grid min-h-[72px] grid-rows-[auto_1fr] gap-1 pt-2 text-xs text-muted">
                         専用1
                         <Select
-                          value={toUe1SelectValue(member)}
+                          value={character?.implemented.ue1 ? toUe1SelectValue(member) : "null"}
                           disabled={!character?.implemented.ue1}
                           onValueChange={(value) =>
                             updateMember(member.id, {
@@ -498,13 +510,15 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                             })
                           }
                         >
-                          <div className="relative">
-                            <SelectTrigger className={hasDiff && diffs.includes("専用1") ? "border-accent" : undefined}>
+                          <div className="relative min-h-11">
+                            <SelectTrigger className={getMemberFieldClass(Boolean(character?.implemented.ue1 && (character.implemented.ue1Sp ? member.ue1SpEquipped : member.ue1Level === UE1_LEVEL_VALUES.at(-1))), diffs.includes("専用1"))}>
                               <SelectValue />
                             </SelectTrigger>
                             {hasDiff && diffs.includes("専用1") ? <FieldDiffIcon label="専用1" /> : null}
                           </div>
                           <SelectContent>
+                            {/* 未実装の装備は空欄にせず、育成テーブルと同じ「-」で操作不可を示す。 */}
+                            {!character?.implemented.ue1 ? <SelectItem value="null">-</SelectItem> : null}
                             {UE1_LEVEL_VALUES.map((level) => (
                               <SelectItem key={level} value={String(level)}>
                                 {formatUeLevel(level)}
@@ -515,20 +529,21 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                         </Select>
                       </label>
 
-                      <label className="grid gap-1 text-xs text-muted">
+                      <label className="relative grid min-h-[72px] grid-rows-[auto_1fr] gap-1 pt-2 text-xs text-muted">
                         専用2
                         <Select
-                          value={toUe2SelectValue(member)}
+                          value={character?.implemented.ue2 ? toUe2SelectValue(member) : "null"}
                           disabled={!character?.implemented.ue2}
                           onValueChange={(value) => updateMember(member.id, { ue2Level: Number(value) as CharacterProgress["ue2Level"] })}
                         >
-                          <div className="relative">
-                            <SelectTrigger className={hasDiff && diffs.includes("専用2") ? "border-accent" : undefined}>
+                          <div className="relative min-h-11">
+                            <SelectTrigger className={getMemberFieldClass(Boolean(character?.implemented.ue2 && member.ue2Level === UE2_LEVEL_VALUES.at(-1)), diffs.includes("専用2"))}>
                               <SelectValue />
                             </SelectTrigger>
                             {hasDiff && diffs.includes("専用2") ? <FieldDiffIcon label="専用2" /> : null}
                           </div>
                           <SelectContent>
+                            {!character?.implemented.ue2 ? <SelectItem value="null">-</SelectItem> : null}
                             {UE2_LEVEL_VALUES.map((level) => (
                               <SelectItem key={level} value={String(level)}>
                                 {formatUeLevel(level)}
@@ -538,11 +553,11 @@ export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleT
                         </Select>
                       </label>
 
-                      {/* 削除ボタンはモバイルでは2列分の幅を使い、min-h-11/min-w-11 でタップ領域を44pxへ広げる。 */}
+                      {/* 狭い画面では削除操作を2列分に広げ、行内の入力と押し間違えにくくする。 */}
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-danger hover:text-danger-strong max-md:col-span-2 max-md:min-h-11 max-md:min-w-11"
+                        className="col-span-2 min-h-11 rounded-none text-danger hover:text-danger-strong lg:col-span-1 lg:h-full"
                         aria-label={`${member.characterName}を削除`}
                         onClick={() => handleDeleteMember(member.id)}
                       >

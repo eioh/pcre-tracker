@@ -14,10 +14,11 @@ type TableSelectProps = {
   appearance?: TableSelectAppearance;
 };
 
-// テーブル用セレクトの表示種別に応じたクラスを返す。
+// 表示種別を受け取り、最大強化は淡いゴールド、無効状態は淡い文字色のクラスを返す。
+// 値そのものを着色し、隣のセルの状態と取り違えないようにする。
 function getAppearanceClass(appearance: TableSelectAppearance): string {
   if (appearance === "maxed") {
-    return "border-maxed-border bg-maxed-bg text-maxed-text";
+    return "border-maxed-border bg-maxed-bg text-maxed-value";
   }
   if (appearance === "disabled") {
     return "cursor-default appearance-none text-disabled-text opacity-100";
@@ -26,11 +27,10 @@ function getAppearanceClass(appearance: TableSelectAppearance): string {
 }
 
 // 値・変更通知・SelectItem を受け取り、クリックで選択肢が開く枠なしのセルを返す。
-// 開いている間だけ入力面を表示し、最大強化の印と無効状態は維持する。
+// 開いている間だけ入力面を表示し、最大強化は値の文字色で示す。
 // 親セル全体をトリガーにして、セルの端からも選択肢を開けるようにする。
 export function TableSelect({ className, appearance = "default", disabled, children, ...props }: TableSelectProps) {
   const effectiveAppearance: TableSelectAppearance = disabled ? "disabled" : appearance;
-  const isMaxed = effectiveAppearance === "maxed";
   return (
     <Select disabled={disabled} {...props}>
       <SelectTrigger className={cn(
@@ -40,13 +40,6 @@ export function TableSelect({ className, appearance = "default", disabled, child
         className,
       )}>
         <SelectValue />
-        {isMaxed ? (
-          // 最大強化済みの状態だけを示す装飾で、Select のクリック判定を妨げない。
-          <span
-            aria-hidden="true"
-            className="pointer-events-none ml-auto size-1.5 shrink-0 rounded-full bg-maxed-dot shadow-[0_0_0_1px_rgba(148,163,184,0.18)]"
-          />
-        ) : null}
       </SelectTrigger>
       <SelectContent>{children}</SelectContent>
     </Select>

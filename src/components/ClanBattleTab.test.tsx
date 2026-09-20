@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { ClanBattleState, StoredStateV1 } from "../domain/types";
 import {
@@ -26,6 +26,52 @@ function buildStateWithFormation(): StoredStateV1 {
 }
 
 describe("ClanBattleTab（キャラ追加時のformationOrder自動ソート）", () => {
+  // 選択値の変更と親からの再描画を再現し、今月だけ育成入力との差分警告を表示する既存条件を確認する。
+  it.each([true, false])("編成の値を変更した際の差分警告は今月かどうかに従う（今月: %s）", (isCurrentMonth) => {
+    const state = buildStateWithFormation();
+    const today = new Date();
+    const group = state.clanBattle.groups[0]!;
+    group.year = isCurrentMonth ? today.getFullYear() : today.getFullYear() - 1;
+    group.month = today.getMonth() + 1;
+    const onChange = vi.fn();
+    const { rerender } = render(<ClanBattleTab masterCharacters={testCharacters} state={state} onChange={onChange} />);
+    const firstRow = screen.getAllByRole("article")[0]!;
+    expect(within(firstRow).queryByLabelText("☆に差分があります")).toBeNull();
+    const nextStar = group.formations[0]!.members[0]!.star === 1 ? 2 : 1;
+    fireEvent.click(within(firstRow).getAllByRole("combobox")[0]!);
+    fireEvent.click(screen.getByRole("option", { name: String(nextStar) }));
+    const next = onChange.mock.calls[0]![0] as ClanBattleState;
+    rerender(<ClanBattleTab masterCharacters={testCharacters} state={{ ...state, clanBattle: next }} onChange={onChange} />);
+    const warning = within(screen.getAllByRole("article")[0]!).queryByLabelText("☆に差分があります");
+    if (isCurrentMonth) {
+      expect(warning).toBeInTheDocument();
+    } else {
+      expect(warning).toBeNull();
+    }
+  });
+
+  // 最大値の表示と実際の変更通知を同時に検証し、見た目の変更で編集機能が失われないことを確認する。
+  it("最大育成はゴールドで表示し、フラットな選択欄から編成の値を更新できる", () => {
+    const state = buildStateWithFormation();
+    const member = state.clanBattle.groups[0]!.formations[0]!.members[0]!;
+    const character = { ...testCharacters[0]!, implemented: { star6: true, ue1: true, ue1Sp: true, ue2: true } };
+    Object.assign(member, { star: 6, connectRank: 15, ue1Level: 370, ue1SpEquipped: false, ue2Level: 5 });
+    const onChange = vi.fn();
+    const { rerender } = render(<ClanBattleTab masterCharacters={[character, testCharacters[2]!]} state={state} onChange={onChange} />);
+    const fields = within(screen.getAllByRole("article")[0]!).getAllByRole("combobox");
+    expect(fields[0]).toHaveClass("text-maxed-value");
+    expect(fields[1]).toHaveClass("text-maxed-value");
+    expect(fields[2]).not.toHaveClass("text-maxed-value");
+    expect(fields[3]).toHaveClass("text-maxed-value");
+
+    fireEvent.click(fields[2]!);
+    fireEvent.click(screen.getByRole("option", { name: "SP" }));
+    const next = onChange.mock.calls[0]![0] as ClanBattleState;
+    expect(next.groups[0]!.formations[0]!.members[0]).toMatchObject({ ue1Level: 370, ue1SpEquipped: true });
+    rerender(<ClanBattleTab masterCharacters={[character, testCharacters[2]!]} state={{ ...state, clanBattle: next }} onChange={onChange} />);
+    expect(within(screen.getAllByRole("article")[0]!).getAllByRole("combobox")[2]).toHaveClass("text-maxed-value");
+  });
+
   it("order最小・最大の2体入り編成に中間キャラを追加すると、昇順3体でonChangeへ渡る", () => {
     // テストの前提（3キャラの formationOrder が相異なる=中間が一意に決まる）をマスター再生成後も検知できるよう明示する。
     expect(testCharacters[0]!.formationOrder).toBeLessThan(testCharacters[1]!.formationOrder);
