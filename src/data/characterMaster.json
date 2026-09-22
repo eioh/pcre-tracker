@@ -4523,5 +4523,19 @@
       "ue2": false
     },
     "memoryPieceSources": []
+  },
+  {
+    "name": "クローチェ（サブマリン）",
+    "baseName": "クローチェ",
+    "limited": false,
+    "attribute": "水",
+    "role": "アタッカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
   }
 ]
