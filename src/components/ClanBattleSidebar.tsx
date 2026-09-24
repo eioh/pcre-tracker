@@ -24,6 +24,7 @@ import type {
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import type { SortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { sortClanBattleMonthGroups } from "../domain/clanBattle";
 import type { ClanBattleFormation, ClanBattleMonthGroup } from "../domain/types";
 import { panelClass } from "./input/uiStyles";
 import { Badge } from "./ui/badge";
@@ -110,11 +111,6 @@ function buildYearOptions(currentYear: number): number[] {
 // 年月グループの表示名を「YYYY年M月」形式で返す。
 function formatMonthGroupTitle(year: number, month: number): string {
   return `${year}年${month}月`;
-}
-
-// 月グループを新しい順で表示するための並び順を作る。
-function sortMonthGroups(groups: ClanBattleMonthGroup[]): ClanBattleMonthGroup[] {
-  return [...groups].sort((a, b) => b.year - a.year || b.month - a.month);
 }
 
 // 指定編成を含む月グループのIDを返す。
@@ -550,7 +546,7 @@ export function ClanBattleSidebar({
   onCopyFormation,
   onMoveFormation,
 }: ClanBattleSidebarProps) {
-  const sortedGroups = useMemo(() => sortMonthGroups(groups), [groups]);
+  const sortedGroups = useMemo(() => sortClanBattleMonthGroups(groups), [groups]);
   const selectedGroupId = useMemo(() => findGroupIdByFormationId(groups, selectedFormationId), [groups, selectedFormationId]);
   // 折りたたみ側を記録する（新規追加した月は自動的に展開状態になる）。初期値は選択中編成を含む月以外すべて折りたたみ。
   const [collapsedGroupIds, setCollapsedGroupIds] = useState<Set<string>>(

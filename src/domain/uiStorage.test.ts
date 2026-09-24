@@ -41,6 +41,7 @@ describe("uiStorage", () => {
         sortKey: "obtainedDate",
         sortDirection: "desc",
       },
+      clanBattle: { selectedFormationId: "formation-1" },
     };
 
     saveUiState(state);
@@ -125,6 +126,20 @@ describe("uiStorage", () => {
     const loaded = loadUiState();
     expect(loaded.input.sortKey).toBe("gachaPullCount");
     expect(loaded.input.sortDirection).toBe("desc");
+  });
+
+  it("clanBattle項目のない旧データや不正値は選択編成なしへ補正する", () => {
+    window.localStorage.setItem(
+      UI_STORAGE_KEY,
+      JSON.stringify({ schemaVersion: 1, activeTab: "clan_battle", input: buildDefaultUiState().input }),
+    );
+    expect(loadUiState().clanBattle).toEqual({ selectedFormationId: null });
+
+    window.localStorage.setItem(
+      UI_STORAGE_KEY,
+      JSON.stringify({ schemaVersion: 1, activeTab: "clan_battle", clanBattle: { selectedFormationId: 123 } }),
+    );
+    expect(loadUiState().clanBattle).toEqual({ selectedFormationId: null });
   });
 
   it("parseUiStateは壊れたJSONでも既定値を返す", () => {

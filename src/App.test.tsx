@@ -36,7 +36,9 @@ vi.mock("./domain/backup", async (importOriginal) => {
 });
 
 import App from "./App";
-import { STORAGE_KEY } from "./domain/storage";
+import { STORAGE_KEY, buildInitialState } from "./domain/storage";
+import { masterCharacters } from "./domain/master";
+import { createClanBattleFormation, createClanBattleMonthGroup } from "./domain/clanBattle";
 import { UI_STORAGE_KEY } from "./domain/uiStorage";
 
 // useSync の戻り値を未ログイン・同期なしの静的値に固定する。
@@ -150,6 +152,44 @@ describe("App: タブナビゲーション", () => {
     // モバイル用の短縮ラベルのタブは描画されない。
     expect(screen.queryByRole("tab", { name: "集計" })).not.toBeInTheDocument();
     expect(screen.queryByRole("tab", { name: "ランク計算" })).not.toBeInTheDocument();
+  });
+});
+
+describe("App: クラバト編成の選択保持", () => {
+  // タブ切替で TabsContent がアンマウントされても、選択した編成（とその月の展開）が復元されることを確認する。
+  it("既定以外の編成を選択してタブを往復しても同じ編成が選択されたままになる", { timeout: 20_000 }, async () => {
+    const olderFormation = createClanBattleFormation("古い月の編成");
+    const newerFormation = createClanBattleFormation("新しい月の編成");
+    const state = {
+      ...buildInitialState(masterCharacters),
+      clanBattle: {
+        groups: [
+          { ...createClanBattleMonthGroup(2020, 1), formations: [olderFormation] },
+          { ...createClanBattleMonthGroup(2020, 2), formations: [newerFormation] },
+        ],
+      },
+    };
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    window.localStorage.setItem(UI_STORAGE_KEY, JSON.stringify({ schemaVersion: 1, activeTab: "clan_battle" }));
+    render(<App />);
+
+    // 既定では最新月（2020年2月）の編成が選択される。
+    expect(await screen.findByDisplayValue("新しい月の編成", {}, { timeout: 10_000 })).toBeInTheDocument();
+
+    // 古い月を展開して既定以外の編成を選択する。
+    fireEvent.click(screen.getByRole("button", { name: /2020年1月/, expanded: false }));
+    fireEvent.click(screen.getByRole("button", { name: "古い月の編成" }));
+    expect(screen.getByDisplayValue("古い月の編成")).toBeInTheDocument();
+
+    // 別タブへ切り替えるとクラバト編成タブはアンマウントされる。
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "ダッシュボード" }));
+    expect(await screen.findByRole("heading", { name: "進捗ダッシュボード" }, { timeout: 10_000 })).toBeInTheDocument();
+    expect(screen.queryByDisplayValue("古い月の編成")).not.toBeInTheDocument();
+
+    // 戻ると同じ編成が選択され、その月が展開されている。
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "クラバト編成" }));
+    expect(await screen.findByDisplayValue("古い月の編成", {}, { timeout: 10_000 })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /2020年1月/, expanded: true })).toBeInTheDocument();
   });
 });
 

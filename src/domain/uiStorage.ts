@@ -56,10 +56,15 @@ export type InputViewSettings = {
   sortDirection: SortDirection;
 };
 
+export type ClanBattleViewSettings = {
+  selectedFormationId: string | null;
+};
+
 export type UiStateV1 = {
   schemaVersion: 1;
   activeTab: ActiveTab;
   input: InputViewSettings;
+  clanBattle: ClanBattleViewSettings;
 };
 
 const ACTIVE_TAB_VALUES: ActiveTab[] = ["input", "dashboard", "coin_shop", "connect_rank_calc", "clan_battle"];
@@ -143,6 +148,13 @@ const looseUiStateSchema = z
     schemaVersion: z.number().optional(),
     activeTab: z.unknown().optional(),
     input: z.unknown().optional(),
+    clanBattle: z.unknown().optional(),
+  })
+  .passthrough();
+
+const looseClanBattleSettingsSchema = z
+  .object({
+    selectedFormationId: z.unknown().optional(),
   })
   .passthrough();
 
@@ -157,12 +169,18 @@ export function buildDefaultInputViewSettings(): InputViewSettings {
   };
 }
 
+// クラバト画面設定の既定値を返す。
+export function buildDefaultClanBattleViewSettings(): ClanBattleViewSettings {
+  return { selectedFormationId: null };
+}
+
 // UI状態の既定値を返す。
 export function buildDefaultUiState(): UiStateV1 {
   return {
     schemaVersion: CURRENT_UI_SCHEMA_VERSION,
     activeTab: "input",
     input: buildDefaultInputViewSettings(),
+    clanBattle: buildDefaultClanBattleViewSettings(),
   };
 }
 
@@ -250,6 +268,18 @@ function normalizeInputSettings(rawInput: unknown): InputViewSettings {
   };
 }
 
+// 緩い入力オブジェクトからクラバト画面設定を正規化する（項目のない旧データは既定値）。
+function normalizeClanBattleSettings(rawClanBattle: unknown): ClanBattleViewSettings {
+  const parsed = looseClanBattleSettingsSchema.safeParse(rawClanBattle);
+  if (!parsed.success) {
+    return buildDefaultClanBattleViewSettings();
+  }
+  const { selectedFormationId } = parsed.data;
+  return {
+    selectedFormationId: typeof selectedFormationId === "string" && selectedFormationId !== "" ? selectedFormationId : null,
+  };
+}
+
 // 保存文字列を解析し、現在仕様のUI状態へ正規化する。
 export function parseUiState(rawText: string): UiStateV1 {
   try {
@@ -264,6 +294,7 @@ export function parseUiState(rawText: string): UiStateV1 {
       schemaVersion: CURRENT_UI_SCHEMA_VERSION,
       activeTab: normalizeEnumValue(raw.activeTab, ACTIVE_TAB_VALUES, "input"),
       input: normalizeInputSettings(raw.input),
+      clanBattle: normalizeClanBattleSettings(raw.clanBattle),
     };
   } catch {
     return buildDefaultUiState();

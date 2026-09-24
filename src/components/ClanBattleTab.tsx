@@ -21,6 +21,7 @@ import {
   isCurrentClanBattleMonth,
   moveClanBattleFormation,
   sortClanBattleMembers,
+  sortClanBattleMonthGroups,
   toClanBattleDamage,
 } from "../domain/clanBattle";
 import { isCharacterNameMatched } from "../utils/nameSearch";
@@ -37,6 +38,9 @@ type ClanBattleTabProps = {
   masterCharacters: MasterCharacter[];
   state: StoredStateV1;
   onChange: (nextClanBattle: ClanBattleState) => void;
+  // 選択中の編成ID（タブ切り替えをまたいで保持するため親のUI状態で管理する）。
+  selectedFormationId: string | null;
+  onSelectFormation: (formationId: string | null) => void;
 };
 
 type SelectedFormation = {
@@ -44,9 +48,9 @@ type SelectedFormation = {
   formation: ClanBattleFormation;
 };
 
-// 編成リストの選択状態を保存データから復元できるよう、先頭候補を返す。
+// 未選択・選択先消失時の既定候補として、最新の年月（サイドバー表示順）から最初の編成を返す。
 function findFirstFormation(state: ClanBattleState): SelectedFormation | null {
-  for (const group of state.groups) {
+  for (const group of sortClanBattleMonthGroups(state.groups)) {
     const formation = group.formations[0];
     if (formation) {
       return { group, formation };
@@ -157,24 +161,39 @@ function TimelineModal({
 
 // クラバト編成の年月、編成、キャラ、TLを1画面で管理する。
 // マスター・保存状態・変更通知を受け取り、編成キャラを育成テーブルと同じフラットな入力行で表示する。
-export function ClanBattleTab({ masterCharacters, state, onChange }: ClanBattleTabProps) {
+export function ClanBattleTab({
+  masterCharacters,
+  state,
+  onChange,
+  selectedFormationId,
+  onSelectFormation: setSelectedFormationId,
+}: ClanBattleTabProps) {
   const [characterSearchText, setCharacterSearchText] = useState("");
-  const [selectedFormationId, setSelectedFormationId] = useState<string | null>(() => findFirstFormation(state.clanBattle)?.formation.id ?? null);
   const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
   const selected = findSelectedFormation(state.clanBattle, selectedFormationId);
   const selectedGroup = selected?.group ?? null;
   const selectedFormation = selected?.formation ?? null;
+  // タブ表示時、未保存・削除済みIDで既定候補へフォールバックした場合は表示中の編成IDを保存値へ反映して選択を固定する。
+  // 表示時の1回だけに限定し、編成追加直後など親のstate反映前の一時的な不一致で選択を上書きしないようにする。
+  useEffect(() => {
+    const resolvedFormationId = selected?.formation.id ?? null;
+    if (resolvedFormationId !== selectedFormationId) {
+      setSelectedFormationId(resolvedFormationId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 表示時の初期解決のみを意図し、以降の選択変更はイベントハンドラ側で行う。
+  }, []);
   const characterByName = useMemo(() => new Map(masterCharacters.map((character) => [character.name, character])), [masterCharacters]);
   const characterCandidates = useMemo(
     () => filterCharacterCandidates(masterCharacters, characterSearchText).slice(0, 80),
     [characterSearchText, masterCharacters],
   );
   // clanBattle全体を受け取る更新関数で、親の保存状態と選択IDを同期する。
+  // 選択IDにnullを渡した場合（選択中の編成を削除した場合）は、更新後の状態で最新月の先頭編成を選び直す。
   const updateClanBattle = (updater: (previous: ClanBattleState) => ClanBattleState, nextSelectedFormationId?: string | null): void => {
     const nextState = updater(state.clanBattle);
     onChange(nextState);
     if (nextSelectedFormationId !== undefined) {
-      setSelectedFormationId(nextSelectedFormationId);
+      setSelectedFormationId(nextSelectedFormationId ?? findFirstFormation(nextState)?.formation.id ?? null);
     }
   };
 

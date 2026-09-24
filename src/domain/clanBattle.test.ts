@@ -6,6 +6,7 @@ import {
   moveClanBattleFormation,
   normalizeClanBattleState,
   sortClanBattleMembers,
+  sortClanBattleMonthGroups,
   toClanBattleDamage,
 } from "./clanBattle";
 import type {
@@ -403,5 +404,15 @@ describe("clanBattle", () => {
 
       expect(idsOf(state)).toEqual([["a", "b"], ["x", "y"]]);
     });
+  });
+
+  it("sortClanBattleMonthGroupsは元配列を変えずに新しい年月順へ並べる", () => {
+    const groups = [
+      { id: "2025-12", year: 2025, month: 12, formations: [] },
+      { id: "2026-02", year: 2026, month: 2, formations: [] },
+      { id: "2026-01", year: 2026, month: 1, formations: [] },
+    ] satisfies ClanBattleMonthGroup[];
+    expect(sortClanBattleMonthGroups(groups).map((group) => group.id)).toEqual(["2026-02", "2026-01", "2025-12"]);
+    expect(groups.map((group) => group.id)).toEqual(["2025-12", "2026-02", "2026-01"]);
   });
 });
