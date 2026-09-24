@@ -352,6 +352,15 @@ export default function App() {
     setUiState((previous) => ({ ...previous, input: settings }));
   }, []);
 
+  // クラバト画面の選択編成IDをUI状態へ保存し、タブ切り替え後も復元できるようにする。
+  const handleSelectClanBattleFormation = useCallback((formationId: string | null) => {
+    setUiState((previous) =>
+      previous.clanBattle.selectedFormationId === formationId
+        ? previous
+        : { ...previous, clanBattle: { ...previous.clanBattle, selectedFormationId: formationId } },
+    );
+  }, []);
+
   // キャラ名単位（☆6用）のピュアピ所持数を更新する。
   const handleUpdateCharacterPurePiece = useCallback(
     (name: string, value: number) => {
@@ -516,7 +525,13 @@ export default function App() {
         </TabsContent>
         <TabsContent value="clan_battle">
           <Suspense fallback={<TabLoadingFallback />}>
-            <ClanBattleTab masterCharacters={masterCharacters} state={state} onChange={handleUpdateClanBattle} />
+            <ClanBattleTab
+              masterCharacters={masterCharacters}
+              state={state}
+              onChange={handleUpdateClanBattle}
+              selectedFormationId={safeUiState.clanBattle.selectedFormationId}
+              onSelectFormation={handleSelectClanBattleFormation}
+            />
           </Suspense>
         </TabsContent>
         <TabsContent value="coin_shop">

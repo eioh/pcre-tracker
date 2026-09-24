@@ -158,6 +158,11 @@ export function formatClanBattleDamage(value: number): string {
   return parts.join("");
 }
 
+// 月グループを新しい年月順（サイドバーの表示順）に並べた新しい配列を返す。
+export function sortClanBattleMonthGroups(groups: ClanBattleMonthGroup[]): ClanBattleMonthGroup[] {
+  return [...groups].sort((a, b) => b.year - a.year || b.month - a.month);
+}
+
 // 現在年月と一致する月グループかを判定する。
 export function isCurrentClanBattleMonth(group: Pick<ClanBattleMonthGroup, "year" | "month">, today = new Date()): boolean {
   return group.year === today.getFullYear() && group.month === today.getMonth() + 1;
