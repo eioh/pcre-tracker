@@ -15,12 +15,15 @@
 
 ## ビルド・テスト・開発コマンド
 - `npm run cf-typegen`: Cloudflare ランタイム型（`worker-configuration.d.ts`、gitignore 済み）を生成。**クローン直後や `wrangler.jsonc` 変更後は型チェック前に実行が必要**
-- `npm run dev`: Vite 開発サーバーを起動（`@cloudflare/vite-plugin` により SPA と Worker API を同時起動）
+- `npm run dev`: Vite 開発サーバーを起動（`@cloudflare/vite-plugin` により SPA と Worker API を同時起動）。ポートは `vite.config.ts` の `server.port` で **5273** 固定（`.claude/launch.json`・`.dev.vars` の `BETTER_AUTH_URL` / `ALLOWED_ORIGINS` もこれに合わせる）
 - `npm run build`: TypeScript ビルド → 本番バンドル作成
 - `npm run preview`: ビルド成果物をローカル確認
 - `npm run typecheck`: 型チェック（`tsc -b`。フロント・Worker・テストの全プロジェクト参照を検査）
 - `npm test`: Vitest を 1 回実行（front / worker の 2 プロジェクト構成）
 - `npm run test:watch`: Vitest をウォッチ実行
+- `npm run generate`: 検索トークンなどの生成物（`src/data/characterMaster.generated.json`）を再生成
+- `npm run verify:generated`: `generate` を実行し、生成物が正本と一致するか（差分なし）を検証
+- `npm run verify`: 統合前の総合検証（`verify:generated` → `cf-typegen` → `test` → `build`）
 
 ## コーディング規約と命名
 TypeScript + React 関数コンポーネントを前提とし、インデントは 2 スペースを使用します。
@@ -38,6 +41,8 @@ TypeScript + React 関数コンポーネントを前提とし、インデント�
 - **Label コンポーネント**: フォームラベルには `@radix-ui/react-label` ベースの `Label` (`src/components/ui/label.tsx`) を使用する
 - **Radix 標準 API**: Checkbox は `onCheckedChange`、Select は `onValueChange` など、Radix の標準コールバック API をそのまま公開する。ネイティブ HTML イベントへの変換レイヤーを挟まない
 - **`cn()` ユーティリティ**: クラス名の結合には `src/lib/utils.ts` の `cn()` を使用する
+- **truncate と `min-w-0`**: grid/flex の中間ラッパー要素を新設・変更したら、配下に `truncate` があるか確認し、あればラッパーに `min-w-0` を付ける（min-width:auto が nowrap テキストの全幅まで膨張し、行がはみ出す）。D&D やインジケータ等で DOM 階層をいじった時は truncate 祖先チェーンを総点検する
+- **UI の受け入れ確認は極端なデータでも行う**: 長い文字列・多数件・空データを流す（truncate 崩れは短い名前では発火しない。コードレビューでは視覚回帰を検出できない）
 
 ## テスト方針
 Vitest の multi-project 構成です。
@@ -54,7 +59,7 @@ Vitest の multi-project 構成です。
 - 統合は原則として `feature → develop → main` のマージで行い、`cherry-pick` は基本的に使用しない。
 - `cherry-pick` が必要な場合は、対象コミット、除外する変更、生成物への影響を説明し、ユーザーの承認を得てから実行する。
 - `src/data/characterMaster.generated.json` などの生成物は、入力となる正本データの変更と同じコミットに含める。
-- マージまたは `cherry-pick` の後は、統合先ブランチで `npm run generate` を実行し、`git diff --exit-code -- src/data/characterMaster.generated.json` により生成物が正本と一致することを確認する。
+- マージまたは `cherry-pick` の後は、統合先ブランチで `npm run verify:generated` を実行し、生成物が正本と一致することを確認する。
 
 コミットメッセージは Conventional Commits 形式 `<type>: <description>` を使い、`type` は英語、`description` は日本語で記述します。
 例:
