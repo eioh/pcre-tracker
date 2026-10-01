@@ -197,7 +197,7 @@ describe("InputTab", () => {
     }
   });
 
-  it("詳細設定のフィルタ変更は表示に適用ボタンなしでテーブルへ反映される", () => {
+  it("詳細設定のフィルタ変更は即時反映され、一覧更新の案内を表示しない", () => {
     const props = buildProps();
     const [ownedCharacter, unownedCharacter] = props.masterCharacters;
     expect(ownedCharacter).toBeDefined();
@@ -212,6 +212,75 @@ describe("InputTab", () => {
     selectComboboxOption("所持", "所持のみ");
 
     expect(screen.getByText("表示件数: 1")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "一覧を更新" })).not.toBeInTheDocument();
+  });
+
+  it.each([false, true])("同じ育成値の再通知・フィルタ変更では一覧更新を表示しない（mobile=%s）", (isMobile) => {
+    if (isMobile) stubMobileMatchMedia();
+    try {
+      const props = buildProps();
+      const { rerender } = render(<InputTab {...props} />);
+      const unchangedState = {
+        ...props.state,
+        updatedAt: "2026-10-02T00:00:00.000Z",
+        progressByName: Object.fromEntries(Object.entries(props.state.progressByName).map(([name, progress]) => [name, { ...progress }])),
+      };
+      rerender(<InputTab {...props} state={unchangedState} />);
+      if (isMobile) {
+        fireEvent.click(screen.getByRole("button", { name: "未所持のみ" }));
+      } else {
+        openDetailSettings();
+        selectComboboxOption("所持", "未所持のみ");
+      }
+      expect(screen.getByText("表示件数: 5")).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "一覧を更新" })).not.toBeInTheDocument();
+      expect(screen.queryByText("育成データが変更されています")).not.toBeInTheDocument();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it.each([false, true])("編集による行の消失を更新まで保留し、再編集・再更新もできる（mobile=%s）", (isMobile) => {
+    if (isMobile) stubMobileMatchMedia();
+    try {
+      const props = buildProps();
+      const name = props.masterCharacters[0]!.name;
+      const initialSettings = { ...props.initialSettings, ownedFilter: "unowned" as const };
+      const { rerender } = render(<InputTab {...props} initialSettings={initialSettings} />);
+      expect(screen.queryByRole("button", { name: "一覧を更新" })).not.toBeInTheDocument();
+
+      const editedState = buildStateWithOwnedFlags(props.state, { [name]: true });
+      rerender(<InputTab {...props} state={editedState} initialSettings={initialSettings} />);
+      expect(screen.getByText("表示件数: 5")).toBeInTheDocument();
+      expect(screen.getByRole("status")).toHaveTextContent("育成データが変更されています");
+      // フィルタ入力を開かず、一覧側のボタンで再評価できる。
+      fireEvent.click(screen.getByRole("button", { name: "一覧を更新" }));
+      expect(screen.getByText("表示件数: 4")).toBeInTheDocument();
+      expect(screen.queryByText("育成データが変更されています")).not.toBeInTheDocument();
+
+      rerender(<InputTab {...props} state={{ ...editedState }} initialSettings={initialSettings} />);
+      expect(screen.queryByRole("button", { name: "一覧を更新" })).not.toBeInTheDocument();
+      rerender(<InputTab {...props} state={props.state} initialSettings={initialSettings} />);
+      expect(screen.getByText("表示件数: 4")).toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: "一覧を更新" }));
+      expect(screen.getByText("表示件数: 5")).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "一覧を更新" })).not.toBeInTheDocument();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("育成値を元に戻すと案内が消え、親の明示同期でも適用状態を更新する", () => {
+    const props = buildProps();
+    const name = props.masterCharacters[0]!.name;
+    const editedState = buildStateWithMemoryPieces(props.state, { [name]: 123 });
+    const { rerender } = render(<InputTab {...props} />);
+    rerender(<InputTab {...props} state={editedState} />);
+    expect(screen.getByRole("button", { name: "一覧を更新" })).toBeInTheDocument();
+    rerender(<InputTab {...props} state={props.state} />);
+    expect(screen.queryByRole("button", { name: "一覧を更新" })).not.toBeInTheDocument();
+    rerender(<InputTab {...props} state={editedState} settingsSyncToken={1} />);
+    expect(screen.queryByRole("button", { name: "一覧を更新" })).not.toBeInTheDocument();
   });
 
   it("settingsSyncToken更新時は詳細設定の開閉状態も再同期する", async () => {
@@ -269,9 +338,12 @@ describe("InputTab", () => {
 
     expect(getFirstBodyRowName(characterNames)).toBe(firstName);
 
-    fireEvent.click(screen.getByRole("button", { name: "表示に適用" }));
+    expect(screen.getByRole("status")).toHaveTextContent("育成データが変更されています");
+    fireEvent.click(screen.getByRole("button", { name: "一覧を更新" }));
 
     expect(getFirstBodyRowName(characterNames)).toBe(secondName);
+    expect(screen.queryByRole("button", { name: "一覧を更新" })).not.toBeInTheDocument();
+    expect(screen.queryByText("育成データが変更されています")).not.toBeInTheDocument();
   });
 
   it("デスクトップ幅ではテーブルレイアウトを表示しモバイル一覧は出さない", () => {

@@ -216,8 +216,19 @@ export function InputTab({
     setSearchText("");
   }, []);
 
-  // テーブル編集後の進捗スナップショットを現在値へ更新し、ソート順や絞り込みを再計算できるようにする。
-  const handleApplyDisplaySettings = useCallback((): void => {
+  // 一覧に適用済みの進捗と現在値を比較する。参照だけが変わった更新や編集の取り消しは変更扱いにしない。
+  const hasUnappliedProgressChanges = useMemo(() => {
+    const currentEntries = Object.entries(state.progressByName);
+    return currentEntries.length !== Object.keys(appliedProgressByName).length || currentEntries.some(([name, progress]) => {
+      const appliedProgress = appliedProgressByName[name];
+      return !appliedProgress || (Object.keys(progress) as Array<keyof CharacterProgress>).some(
+        (key) => progress[key] !== appliedProgress[key],
+      );
+    });
+  }, [state.progressByName, appliedProgressByName]);
+
+  // 編集後の進捗で一覧のソート順と絞り込みを再評価し、変更案内を解消する。
+  const handleRefreshList = useCallback((): void => {
     setAppliedProgressByName({ ...state.progressByName });
   }, [state.progressByName]);
 
@@ -401,7 +412,6 @@ export function InputTab({
         onSortKeyChange={handleSortKeyChange}
         sortDirection={sortDirection}
         onSortDirectionChange={setSortDirection}
-        onApplyDisplaySettings={handleApplyDisplaySettings}
       />
 
       <Separator className="mt-4" label="フィルタと必要メモピ/ハートの欠片計算の区切り" />
@@ -451,6 +461,16 @@ export function InputTab({
         ) : null}
       </section>
   );
+
+  // 一覧更新はフィルタ設定と分離する。モバイルではsticky領域、PCではテーブル直前に表示する。
+  const listRefreshNotice = hasUnappliedProgressChanges ? (
+    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-accent/30 bg-accent/10 px-3 py-2">
+      <p role="status" className="m-0 text-xs text-main md:text-sm">育成データが変更されています</p>
+      <Button type="button" size="sm" className="min-h-10 shrink-0" onClick={handleRefreshList}>
+        一覧を更新
+      </Button>
+    </div>
+  ) : null;
 
   if (isMobile) {
     // モバイル（768px 未満）: 検索バー+クイックフィルタチップを画面上部へ固定し、一覧は window スクロールに一本化する。
@@ -515,6 +535,7 @@ export function InputTab({
               ) : null}
             </Button>
           </div>
+          {listRefreshNotice ? <div className="mt-2">{listRefreshNotice}</div> : null}
         </div>
 
         <InputFilterSheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
@@ -572,6 +593,7 @@ export function InputTab({
         <Separator className="mt-4 mb-1" label="検索エリアとテーブルの区切り" />
 
         <p className="my-3.5 text-sm text-muted">表示件数: {visibleRowsWithCurrentProgress.length}</p>
+        {listRefreshNotice ? <div className="mb-3">{listRefreshNotice}</div> : null}
 
         <InputProgressTable
           visibleRows={visibleRowsWithCurrentProgress}
