@@ -82,6 +82,8 @@ function stubMobileMatchMedia() {
 
 beforeEach(() => {
   window.localStorage.clear();
+  // jsdomにページスクロールの実装はないため、画面切り替え時の呼び出しをスタブする。
+  vi.stubGlobal("scrollTo", vi.fn());
   mockUseSync.mockReset();
   capturedUseSyncOptions = null;
   stubSync();
@@ -190,6 +192,35 @@ describe("App: クラバト編成の選択保持", () => {
     fireEvent.mouseDown(screen.getByRole("tab", { name: "クラバト編成" }));
     expect(await screen.findByDisplayValue("古い月の編成", {}, { timeout: 10_000 })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /2020年1月/, expanded: true })).toBeInTheDocument();
+  });
+});
+
+describe("App: 画面切り替え時のページスクロール", () => {
+  it.each([false, true])("別画面へ切り替えると先頭へ戻り、同じ画面では位置を変えない（mobile=%s）", async (isMobile) => {
+    if (isMobile) {
+      stubMobileMatchMedia();
+    }
+    const scrollTo = vi.fn();
+    vi.stubGlobal("scrollTo", scrollTo);
+    // 仮想化リストの独自スクロールと区別するため、ショップから開始する。
+    window.localStorage.setItem(UI_STORAGE_KEY, JSON.stringify({ schemaVersion: 1, activeTab: "coin_shop" }));
+    render(<App />);
+    await screen.findByRole("tab", { name: "ダンジョン" }, { timeout: 10_000 });
+    expect(scrollTo).not.toHaveBeenCalled();
+
+    vi.stubGlobal("scrollY", 2396);
+    fireEvent.mouseDown(screen.getByRole("tab", { name: isMobile ? "集計" : "ダッシュボード" }));
+    await screen.findByRole("heading", { name: "進捗ダッシュボード" }, { timeout: 10_000 });
+    expect(scrollTo).toHaveBeenCalledWith({ top: 0, left: 0, behavior: "instant" });
+
+    scrollTo.mockClear();
+    fireEvent.mouseDown(screen.getByRole("tab", { name: isMobile ? "集計" : "ダッシュボード" }));
+    expect(scrollTo).not.toHaveBeenCalled();
+
+    // 往復時も別画面の位置を復元せず、先頭へ戻す。
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "ショップ" }));
+    await screen.findByRole("tab", { name: "ダンジョン" });
+    expect(scrollTo).toHaveBeenCalledWith({ top: 0, left: 0, behavior: "instant" });
   });
 });
 

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { masterCharacters } from "./domain/master";
 
 // タブ表示時にのみ読み込むことで初期バンドルを軽量化する。
@@ -84,6 +84,15 @@ function formatUpdatedAt(value: string): string {
 export default function App() {
   const [state, setState] = useState<StoredStateV1>(() => loadStoredState(masterCharacters));
   const [uiState, setUiState] = useState(() => loadUiState());
+  const previousActiveTabRef = useRef(uiState.activeTab);
+  // 別画面への切り替え後はページ先頭から表示する。初回表示や同じ画面内の編集では位置を変えない。
+  // DOM切り替え後・描画前に実行し、前画面の深いスクロール位置が新画面へ引き継がれるのを防ぐ。
+  useLayoutEffect(() => {
+    if (previousActiveTabRef.current !== uiState.activeTab) {
+      previousActiveTabRef.current = uiState.activeTab;
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+  }, [uiState.activeTab]);
   const [pendingImportFile, setPendingImportFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
