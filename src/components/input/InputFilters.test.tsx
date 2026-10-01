@@ -44,7 +44,6 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputFilters>>): C
     onSortKeyChange: vi.fn<(value: SortKey) => void>(),
     sortDirection: null,
     onSortDirectionChange: vi.fn<(value: SortDirection) => void>(),
-    onApplyDisplaySettings: vi.fn(),
     ...overrides,
   };
 }
@@ -173,22 +172,11 @@ describe("InputFilters", () => {
     expect(props.onSortDirectionChange).toHaveBeenCalledWith("desc");
   });
 
-  it("表示に適用ボタンで手動適用を通知する", () => {
+  it("フィルタ設定内には一覧の更新操作を表示しない", () => {
     const props = buildProps();
     render(<InputFilters {...props} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "表示に適用" }));
-
-    expect(props.onApplyDisplaySettings).toHaveBeenCalledTimes(1);
-  });
-
-  it("表示に適用ボタンをソート設定より前に表示する", () => {
-    const props = buildProps();
-    render(<InputFilters {...props} />);
-
-    const applyButton = screen.getByRole("button", { name: "表示に適用" });
-    const sortLabel = screen.getByText("ソート");
-
-    expect(applyButton.compareDocumentPosition(sortLabel)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(screen.queryByRole("button", { name: "表示に適用" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "一覧を更新" })).not.toBeInTheDocument();
   });
 });

@@ -48,7 +48,6 @@ type InputFiltersProps = {
   onSortKeyChange: (value: SortKey) => void;
   sortDirection: SortDirection;
   onSortDirectionChange: (value: SortDirection) => void;
-  onApplyDisplaySettings: () => void;
 };
 
 const sortKeyOptions: Array<{ value: SortKey; label: string }> = [
@@ -98,7 +97,6 @@ export const InputFilters = memo(function InputFilters({
   onSortKeyChange,
   sortDirection,
   onSortDirectionChange,
-  onApplyDisplaySettings,
 }: InputFiltersProps) {
   const selectedMemorySourceLabels = buildSummary(
     memorySourceFilters.map((filter) => (filter === "none" ? "情報なし" : memorySourceLabelMap[filter])),
@@ -133,9 +131,6 @@ export const InputFilters = memo(function InputFilters({
   return (
     <>
       <div className="mb-2 flex flex-wrap gap-2">
-        <Button type="button" variant="default" size="sm" className="bg-none bg-accent" onClick={onApplyDisplaySettings}>
-          表示に適用
-        </Button>
         <Button
           type="button"
           variant="outline"
