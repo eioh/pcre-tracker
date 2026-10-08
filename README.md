@@ -31,7 +31,7 @@ npx wrangler d1 migrations apply pcre-tracker-db --local  # ローカル（minif
 ```
 
 - マイグレーション SQL は `migrations/` にあります。テスト実行時（`npm test` の worker プロジェクト）は自動で適用されるため、テストだけなら手動適用は不要です。
-- better-auth の認証テーブル定義を変更した場合は `npx @better-auth/cli generate --config auth-cli.config.ts` で SQL を再生成し、新しいマイグレーションファイルとして `migrations/` に追加してください（適用済みファイルは編集しない）。
+- better-auth の認証テーブル定義を変更した場合は `npx auth@<版> generate --config auth-cli.config.ts --output <出力先>.sql` で SQL を再生成し、新しいマイグレーションファイルとして `migrations/` に追加してください（適用済みファイルは編集しない）。`<版>` には `package-lock.json` に記録された `better-auth` と同じ版を指定します（例: `npx auth@1.6.23 generate ...`）。CLI は devDependencies に含めず、必要なときだけ版を固定して実行します。
 
 ## データ構成
 
