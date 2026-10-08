@@ -202,7 +202,8 @@ type SyncPayloadV1 = {
 
 - better-auth の `user` スキーマは `email` を中核フィールドとするため、**メールアドレスの非保存という方針は撤回**する。OAuth プロバイダから取得した email の保存は許容する。
 - ただし、保存した email をアプリ画面上での表示や通知送信等の**二次利用はしない**。
-- `account` テーブルには better-auth のデフォルト動作として **access token / refresh token / scope（Google ログインでは ID token も）が保存される**ことを明記する。`account.encryptOAuthTokens` により、新たに保存・更新される access token / refresh token は暗号化して保存する（better-auth はアカウント作成時と再ログイン時の更新で暗号化する。既存の平文の値を暗号化し直す移行処理は行わない）。ID token は暗号化の対象外である。
+- `account` テーブルには better-auth のデフォルト動作として **access token / refresh token / scope（Google ログインでは ID token も）が保存される**ことを明記する。`account.encryptOAuthTokens` により、新たに保存・更新される access token / refresh token は暗号化して保存する（better-auth はアカウント作成時と再ログイン時の更新で暗号化する）。ID token は暗号化の対象外である。
+- アプリはこれらのトークンを利用しない（ログイン状態の判定はセッション Cookie のみで行い、プロバイダの API を呼ばない）。better-auth は既存の平文の値を暗号化し直さないため、マイグレーション `0003_clear_stored_oauth_tokens.sql` で保存済みの access token / refresh token / ID token とそれぞれの有効期限を NULL にした（scope・各 ID・日時は保持）。次回ログイン時に better-auth が新しいトークンを保存し直す（access token / refresh token は暗号化、ID token は暗号化なし）。トークンが NULL でも、既存アカウントでのログイン（トークンの上書き更新）・セッション取得・アカウント削除・同じメールアドレスによるアカウント連携は動作する。
 - `session` テーブルにはセッションの有効期限に加え、ログイン時の **IP アドレス・ユーザーエージェント**が保存される（better-auth の既定動作）。IP アドレスは Cloudflare が付与する `cf-connecting-ip` から取得する。
 - プライバシーポリシーには、**email・プロバイダ ID・表示名・トークン・セッションの IP アドレス / ユーザーエージェント**が保存される旨を記載すると規定する。
 - 従来の「PII 最小化」の方針は、「保存はしない」ではなく「**保存は better-auth の要件の範囲に留め、利用（表示・通知等の二次利用）を最小化する**」という趣旨に改める。
@@ -238,7 +239,7 @@ type SyncPayloadV1 = {
 - **OAuth state の Cookie 保存**: better-auth の `account.storeStateStrategy: "cookie"` により、ログイン開始時の state を `verification` テーブルではなく暗号化 Cookie（`BETTER_AUTH_SECRET` 由来の鍵で暗号化・改ざん検知、HttpOnly・SameSite=Lax、最長 10 分）に保存する。ログイン開始のたびに D1 へ書き込まない。
 - **認証エンドポイントのレート制限**: better-auth の組み込みレート制限を `storage: "memory"` で有効化する（`/sign-in/*` は IP 単位で 10 秒あたり 3 回、その他は 10 秒あたり 100 回）。カウンタは Worker アイソレートのメモリに置く補助的な制限であり、アイソレートをまたいだ集計はしない。クライアント IP は `cf-connecting-ip` からのみ取得する。
 - **Cloudflare 側のレート制限**: `/api/` への状態変更リクエストに対する IP 単位のレート制限は、Cloudflare の WAF レート制限ルールで行う（コード外の設定。Cloudflare ダッシュボードで管理する）。
-- **セキュリティヘッダ**: 静的アセットには `public/_headers` で CSP・`X-Content-Type-Options`・`Referrer-Policy`・`X-Frame-Options`・`Permissions-Policy` を付ける（CSP は Report-Only から始める）。`/api/*` の応答には Worker で `X-Content-Type-Options: nosniff` と、`Cache-Control` 未指定時の `no-store` を付ける。
+- **セキュリティヘッダ**: 静的アセットには `public/_headers` で CSP・`X-Content-Type-Options`・`Referrer-Policy`・`X-Frame-Options`・`Permissions-Policy` を付ける（CSP は Report-Only で本番に違反がないことを確認した後、強制モードに切り替えた）。`/api/*` の応答には Worker で `X-Content-Type-Options: nosniff` と、`Cache-Control` 未指定時の `no-store` を付ける。
 
 以下は「兆候が出たら追加」のまま据え置く:
 
