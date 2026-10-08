@@ -16,7 +16,10 @@ vitest.config.d.ts
 # wrangler types で生成する Cloudflare ランタイム型定義（CI/ローカルで再生成する）。
 worker-configuration.d.ts
 # ローカル開発用のシークレット・環境変数（.dev.vars.example をコピーして作成する）。
-.dev.vars
+# 環境別の .dev.vars.<環境名> や .env 系ファイルも誤ってコミットしないよう一括で除外し、雛形だけ追跡する。
+.dev.vars*
+!.dev.vars.example
+.env*
 # @cloudflare/vite-plugin のローカル状態ディレクトリ。
 .wrangler/
 # Codex CLI が生成するニュース画像キャッシュ（コードと無関係）。
