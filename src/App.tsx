@@ -161,6 +161,19 @@ export default function App() {
   // 直近に保存予約した state の参照。初回マウント（StrictMode の再実行を含む）では state が
   // 変化していないため、「保存中」を表示しない判定基準に使う。
   const lastScheduledSaveStateRef = useRef(state);
+  // 保存失敗からの回復時に、UI 設定を最新の値で保存し直すための参照。
+  const uiStateRef = useRef(uiState);
+  uiStateRef.current = uiState;
+
+  // 育成データを保存する。保存に失敗しているキーがある状態で育成データの保存が成功したら（容量が空いたなど）、
+  // UI 設定も最新の値で保存し直す（UI 設定は状態が変わるまで再保存されないため）。保存できたかを返す。
+  const saveStoredStateAndRecover = useCallback((value: StoredStateV1): boolean => {
+    const saved = saveStoredState(value);
+    if (saved && getDeviceDataSaveProblem() === "storage_error") {
+      saveUiState(uiStateRef.current);
+    }
+    return saved;
+  }, []);
   // ユーザー編集による debounce 保存が「保留中（未実行）」かどうかの ref。flushPendingSave のゲートに使う。
   // pagehide 等のイベントリスナー内から最新値を参照するため、state ではなく ref で追跡する（stale closure 回避）。
   const pendingSaveRef = useRef(false);
@@ -177,7 +190,7 @@ export default function App() {
     }
     const timerId = window.setTimeout(() => {
       // 保存できなかった場合は保留を下ろさない（pagehide 時の保存で再試行する。失敗は画面上部で知らせる）。
-      if (saveStoredState(state)) {
+      if (saveStoredStateAndRecover(state)) {
         pendingSaveRef.current = false;
       }
       setIsLocalSavePending(false);
@@ -186,7 +199,7 @@ export default function App() {
     return () => {
       window.clearTimeout(timerId);
     };
-  }, [state]);
+  }, [state, saveStoredStateAndRecover]);
 
   useEffect(() => {
     saveUiState(uiState);
@@ -206,10 +219,10 @@ export default function App() {
     if (!pendingSaveRef.current) {
       return;
     }
-    if (saveStoredState(stateRef.current)) {
+    if (saveStoredStateAndRecover(stateRef.current)) {
       pendingSaveRef.current = false;
     }
-  }, []);
+  }, [saveStoredStateAndRecover]);
 
   // デバウンス保存の 400ms 窓を塞ぐ防御: タブを閉じる・別タブ起点の SW 更新リロード・
   // モバイル OS による PWA の退避（eviction）など、「更新」ボタン以外の経路でページが

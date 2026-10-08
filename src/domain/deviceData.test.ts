@@ -270,7 +270,7 @@ describe("deviceData: 起動時に epoch を保存できない環境", () => {
     expect(tab.getDeviceDataSaveProblem()).toBe("none");
   });
 
-  it("端末データを削除したら、保存できていなかった値は再試行しない", async () => {
+  it("端末データを削除したら保存失敗の案内は解消し、失敗した値も書かれない", async () => {
     vi.resetModules();
     const tab = await import("./deviceData");
     const original = Storage.prototype.setItem;
@@ -289,7 +289,7 @@ describe("deviceData: 起動時に epoch を保存できない環境", () => {
     expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
   });
 
-  it("容量が空いた後に別のキーの保存が成功したら、保存できていなかった値も再試行して保存する", async () => {
+  it("保存に失敗した値は覚えておかず、別のキーの保存が成功しても書き込まない（その間に別のタブで所有者が変わっても古い値で上書きしない）", async () => {
     vi.resetModules();
     const tab = await import("./deviceData");
     const original = Storage.prototype.setItem;
@@ -299,11 +299,39 @@ describe("deviceData: 起動時に epoch を保存できない環境", () => {
       }
       original.call(this, key, value);
     });
-    expect(() => tab.writeDeviceStorage(STORAGE_KEY, "pending-edit")).toThrow();
+    expect(() => tab.writeDeviceStorage(STORAGE_KEY, "old-pending-edit")).toThrow();
     spy.mockRestore();
 
+    // 容量が空いた後に別のキーの保存が成功しても、失敗した値は書かれない（失敗中のまま案内を続ける）。
     expect(tab.writeDeviceStorage(UI_STORAGE_KEY, "ui")).toBe(true);
-    expect(window.localStorage.getItem(STORAGE_KEY)).toBe("pending-edit");
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+    expect(tab.getDeviceDataSaveProblem()).toBe("storage_error");
+
+    // 別のタブが所有者を変えて新しいデータを書いた後は、このタブからは何も書き込めない。
+    window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, "other-tab");
+    window.localStorage.setItem(STORAGE_KEY, "new-owner-data");
+    window.localStorage.setItem(LOCAL_DATA_OWNER_STORAGE_KEY, "new-owner");
+    expect(tab.writeDeviceStorage(UI_STORAGE_KEY, "ui-2")).toBe(false);
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe("new-owner-data");
+    expect(window.localStorage.getItem(LOCAL_DATA_OWNER_STORAGE_KEY)).toBe("new-owner");
+  });
+
+  it("1→2→1 と戻した編集は、容量が空いた後に 2 が復活しない", async () => {
+    // 保存済みの値は 1。
+    window.localStorage.setItem(STORAGE_KEY, "1");
+    const stopFailing = failEpochKeyCreation();
+    const tab = await importTabWithFailedEpoch();
+
+    // 2 は保存できない。
+    expect(tab.writeDeviceStorage(STORAGE_KEY, "2")).toBe(false);
+    expect(tab.getDeviceDataSaveProblem()).toBe("storage_error");
+    // 1 に戻すと、保存済みの値と一致するので失われる変更はない。
+    expect(tab.writeDeviceStorage(STORAGE_KEY, "1")).toBe(false);
     expect(tab.getDeviceDataSaveProblem()).toBe("none");
+
+    // 容量が空いて別のキーの保存が成功しても、2 は書かれない。
+    stopFailing();
+    expect(tab.writeDeviceStorage(UI_STORAGE_KEY, "ui")).toBe(true);
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe("1");
   });
 });
