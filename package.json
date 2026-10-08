@@ -11,7 +11,8 @@
     "typecheck": "tsc -b",
     "cf-typegen": "wrangler types",
     "verify:generated": "npm run generate && git diff --exit-code -- src/data/characterMaster.generated.json",
-    "verify": "npm run verify:generated && npm run cf-typegen && npm test && npm run build",
+    "verify:deploy-config": "node scripts/verify-deploy-config.mjs",
+    "verify": "npm run verify:generated && npm run cf-typegen && npm test && npm run build && npm run verify:deploy-config",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -45,7 +46,6 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@better-auth/cli": "^1.4.21",
     "@cloudflare/vite-plugin": "^1.43.0",
     "@cloudflare/vitest-pool-workers": "^0.18.0",
     "@tailwindcss/vite": "^4.2.0",
@@ -57,7 +57,7 @@
     "jsdom": "^26.1.0",
     "tailwindcss": "^4.2.0",
     "typescript": "^5.9.2",
-    "vite": "^7.1.3",
+    "vite": "^7.3.7",
     "vite-plugin-pwa": "^1.3.0",
     "vitest": "^4.1.9",
     "wrangler": "^4.107.0"

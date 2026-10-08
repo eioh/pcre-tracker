@@ -58,7 +58,27 @@ export function createAuth(env: AuthEnv) {
       // アカウント削除 API（/api/auth/* 配下）を有効化する（設計書指定）。
       deleteUser: { enabled: true },
     },
+    account: {
+      // OAuth ログイン開始時の state を DB（verification テーブル）ではなく暗号化 Cookie に保存する。
+      // ログイン開始のたびに D1 へ書き込まないようにするため。Cookie の中身は戻り先 URL・PKCE の
+      // code verifier・state 値・有効期限で、BETTER_AUTH_SECRET 由来の鍵で暗号化・改ざん検知される。
+      storeStateStrategy: "cookie",
+      // account テーブルに保存するアクセストークン・リフレッシュトークンを暗号化する。
+      encryptOAuthTokens: true,
+    },
+    rateLimit: {
+      // better-auth 組み込みのレート制限を明示的に有効化する（環境変数による既定値に依存しない）。
+      enabled: true,
+      // カウンタは Worker のメモリに置く（"database" はリクエストごとに D1 へ書き込むため使わない）。
+      // アイソレート単位の補助的な制限であり、主な対策は Cloudflare 側のレート制限ルールで行う。
+      storage: "memory",
+    },
     advanced: {
+      // クライアント IP は Cloudflare が付与する cf-connecting-ip から取得する
+      // （利用者が自由に付けられる X-Forwarded-For は信用しない）。セッションの IP 記録とレート制限に使われる。
+      ipAddress: {
+        ipAddressHeaders: ["cf-connecting-ip"],
+      },
       // セッション Cookie の属性を明示する（HttpOnly / Secure / SameSite=Lax。設計書指定）。
       defaultCookieAttributes: {
         httpOnly: true,

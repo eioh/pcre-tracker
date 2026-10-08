@@ -1,0 +1,40 @@
+# 依存関係の更新 PR を Dependabot で作成する設定。
+# 更新は develop に向けて月 1 回まとめて出し、通常の feature → develop → main の流れで本番へ反映する。
+version: 2
+updates:
+  # GitHub Actions（ワークフローでフル SHA に固定している action）の更新。
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "develop"
+    schedule:
+      interval: "monthly"
+    # 公開直後の版は取り込まず、7 日たってから更新 PR を作る。
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore"
+    groups:
+      # action の更新は 1 つの PR にまとめる。
+      github-actions:
+        patterns: ["*"]
+
+  # npm パッケージの更新。
+  - package-ecosystem: "npm"
+    directory: "/"
+    target-branch: "develop"
+    schedule:
+      interval: "monthly"
+    # 公開直後の版は取り込まず、7 日たってから更新 PR を作る。
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore"
+    groups:
+      # minor・patch の更新は 1 つの PR にまとめる（major は個別の PR で確認する）。
+      npm-minor-and-patch:
+        update-types: ["minor", "patch"]
+    ignore:
+      # better-auth 1.7 系への移行は設定・スキーマの確認を伴うため別作業で行う。
+      # 移行に着手するときにこの ignore を外す。
+      - dependency-name: "better-auth"
+        update-types: ["version-update:semver-minor"]
