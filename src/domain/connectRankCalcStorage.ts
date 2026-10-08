@@ -9,6 +9,7 @@ export {
   type ConnectRankCalcStateV1,
 } from "./connectRankCalcSchema";
 
+import { writeDeviceStorage } from "./deviceData";
 import { CONNECT_RANK_CALC_STORAGE_KEY } from "./storageKeys";
 import {
   buildDefaultConnectRankCalcState,
@@ -51,7 +52,7 @@ export function saveConnectRankCalcState(state: ConnectRankCalcStateV1): void {
 
   const serialized = JSON.stringify(state);
   try {
-    window.localStorage.setItem(CONNECT_RANK_CALC_STORAGE_KEY, serialized);
+    writeDeviceStorage(CONNECT_RANK_CALC_STORAGE_KEY, serialized);
   } catch (error) {
     console.warn(`コネクトランク計算データの保存に失敗しました: key=${CONNECT_RANK_CALC_STORAGE_KEY}`, { error, serialized });
   }

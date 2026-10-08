@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 // authClient はログイン UI（SyncHeader）が参照するためスタブ化する（実 API を呼ばせない）。
@@ -10,6 +10,7 @@ vi.mock("../lib/authClient", () => ({
 }));
 
 import { MobileHeader } from "./MobileHeader";
+import { signOut } from "../lib/authClient";
 
 type Props = ComponentProps<typeof MobileHeader>;
 
@@ -23,6 +24,9 @@ function buildProps(overrides: Partial<Props> = {}): Props {
     onOpenPrivacyPolicy: vi.fn(),
     onDeleteRequestStart: vi.fn(),
     onBeforeAccountDeleted: vi.fn(),
+    onLogoutStart: vi.fn(),
+    onDeleteDeviceData: vi.fn(),
+    hasUnsyncedChanges: vi.fn(() => false),
     updatedAt: "2026/7/8 12:00:00",
     onExportBackup: vi.fn(),
     onSelectImportFile: vi.fn(),
@@ -84,5 +88,35 @@ describe("MobileHeader", () => {
     openMenu();
 
     expect(screen.getByRole("button", { name: "ログイン" })).toBeInTheDocument();
+  });
+
+  it("ログイン中はメニュー内のログアウトから確認ダイアログを開き、受け取った props で処理する", async () => {
+    vi.mocked(signOut).mockResolvedValue({ data: { success: true }, error: null } as never);
+    const reload = vi.fn();
+    const originalLocation = window.location;
+    Object.defineProperty(window, "location", { configurable: true, value: { ...originalLocation, reload } });
+    try {
+      const props = buildProps({
+        isLoggedIn: true,
+        userLabel: "テスト表示名",
+        status: "idle",
+        hasUnsyncedChanges: vi.fn(() => true),
+      });
+      render(<MobileHeader {...props} />);
+
+      openMenu();
+      fireEvent.click(screen.getByRole("button", { name: "ログアウト" }));
+
+      const dialog = screen.getByRole("alertdialog");
+      expect(props.hasUnsyncedChanges).toHaveBeenCalled();
+      expect(within(dialog).getByText(/サーバーへまだ送られていない変更があります/)).toBeInTheDocument();
+      fireEvent.click(within(dialog).getByRole("button", { name: "この端末のデータを削除してログアウト" }));
+
+      await waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
+      expect(props.onLogoutStart).toHaveBeenCalledTimes(1);
+      expect(props.onDeleteDeviceData).toHaveBeenCalledTimes(1);
+    } finally {
+      Object.defineProperty(window, "location", { configurable: true, value: originalLocation });
+    }
   });
 });

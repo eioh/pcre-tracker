@@ -234,3 +234,45 @@ export function decideStartupAction(input: DecideStartupInput): SyncStartupActio
 export function isSafeToAutoAdopt(seqAtDecision: number, currentSeq: number): boolean {
   return currentSeq === seqAtDecision;
 }
+
+// ---------------------------------------------------------------------------
+// 端末データの所有者の判定（共有端末で別のアカウントがログインしたときの扱い）
+// ---------------------------------------------------------------------------
+
+// 端末データの所有者のユーザー ID を決める。
+// 所有者キーを導入する前の端末では所有者キーがないため、同期メタの userId（前回同期したアカウント）で補う。
+// どちらもなければ null（ログイン前に使っていた、所有者のいないデータ）。
+export function resolveLocalDataOwnerId(storedOwnerId: string | null, metaUserId: string | null): string | null {
+  return storedOwnerId ?? metaUserId;
+}
+
+// ログイン直後に、端末データをどう扱うかの判定結果。
+// - owned: 端末データはこのアカウントのもの。従来どおり同期する。
+// - take_ownership: 所有者がいない（ログイン前の自分のデータ）か、別のアカウントのものでも守るべき実データがない。
+//   所有者をこのアカウントにして、従来どおり同期する。
+// - confirm_switch: 別のアカウントの実データが残っている。利用者が選ぶまで、アップロードも採用もしない。
+export type LocalDataOwnership = "owned" | "take_ownership" | "confirm_switch";
+
+// 端末データの所有者判定の入力。
+export type DecideLocalDataOwnershipInput = {
+  // 端末データの所有者（resolveLocalDataOwnerId の結果）。
+  ownerId: string | null;
+  // 現在ログインしているユーザー ID。
+  userId: string;
+  // 端末に実データがあるか（hasLocalRealData の結果）。
+  localHasRealData: boolean;
+};
+
+// 端末データの所有者と現在のユーザーから、ログイン直後の扱いを決める（純関数）。
+export function decideLocalDataOwnership(input: DecideLocalDataOwnershipInput): LocalDataOwnership {
+  const { ownerId, userId, localHasRealData } = input;
+  if (ownerId === userId) {
+    return "owned";
+  }
+  if (ownerId === null) {
+    // ログイン前に使っていたデータは、ログインした本人のものとして扱う（従来どおり引き継ぎの判定へ進む）。
+    return "take_ownership";
+  }
+  // 別のアカウントのデータ。守るべき実データがなければ確認は不要。
+  return localHasRealData ? "confirm_switch" : "take_ownership";
+}

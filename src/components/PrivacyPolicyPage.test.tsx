@@ -25,6 +25,11 @@ describe("PrivacyPolicyPage", () => {
     expect(body).toMatch(/メールアドレスは画面上には表示しません/);
     // 未ログイン時はサーバーへ送信しない。
     expect(body).toMatch(/サーバーへは一切送信されません/);
+    // 端末に内部 ID を保存し、別のアカウントでのログイン時に確認する。ログアウト時に端末データの削除を選べる。
+    expect(body).toContain("内部 ID");
+    expect(body).toMatch(/別のアカウントでログインしたときに/);
+    expect(body).toMatch(/残すか削除するかを選べます/);
+    expect(body).toMatch(/削除したアカウントの内部 ID も端末のブラウザに残り/);
     // アカウント削除で認証情報・同期データが連動削除される。
     expect(body).toMatch(/同期済みの育成データが連動して削除/);
     // 7 日間の残存（必須）。

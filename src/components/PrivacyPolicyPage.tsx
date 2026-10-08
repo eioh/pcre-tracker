@@ -53,10 +53,20 @@ export function PrivacyPolicyPage({ onBack }: Props) {
         </section>
 
         <section className="flex flex-col gap-2">
-          <h2 className="text-base font-semibold text-main">3. 未ログイン時の扱い</h2>
+          <h2 className="text-base font-semibold text-main">3. 未ログイン時の扱いと端末に残るデータ</h2>
           <p className="m-0">
             ログインせずに利用する場合、育成データはお使いの端末のブラウザ（localStorage）にのみ保存され、
             <strong>サーバーへは一切送信されません</strong>。すべての機能をログインなしで利用できます。
+          </p>
+          <p className="m-0">
+            ログインして利用すると、この端末のデータをどのアカウントで使っているかを判別するため、アカウントの
+            <strong>内部 ID</strong>（メールアドレスや表示名ではない識別子）を端末のブラウザに保存します。内部 ID は
+            ログアウトしても端末に残り、別のアカウントでログインしたときに、端末に残っている前のアカウントのデータを
+            引き継ぐか、使わずに削除するかを確認するために使います。選ぶまでは、端末のデータをサーバーへ送信しません。
+          </p>
+          <p className="m-0">
+            ログアウトするときは、この端末の育成データと表示設定を<strong>残すか削除するかを選べます</strong>。
+            共有の端末では、削除してからログアウトすると、次に使う人にデータが残りません。
           </p>
         </section>
 
@@ -66,6 +76,10 @@ export function PrivacyPolicyPage({ onBack }: Props) {
             ログイン中のメニューからアカウントを削除できます。削除すると、サーバー上の認証情報（アカウント・セッション等）と
             同期済みの育成データが連動して削除されます。この端末のブラウザ（localStorage）に保存された育成データは削除されず、
             ローカルモードとして引き続き利用できます。
+          </p>
+          <p className="m-0">
+            削除したアカウントの内部 ID も端末のブラウザに残り、次に別のアカウントでログインしたときの確認に使います。
+            端末のデータも消したい場合は、ブラウザのサイトデータを削除してください。
           </p>
           <p className="m-0">
             なお、削除後も<strong>最大 7 日間</strong>は、データベースの災害復旧機能（Cloudflare D1 Time Travel。
