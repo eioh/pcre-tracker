@@ -80,6 +80,15 @@ describe("verifyDeployConfig", () => {
     expect(verifyDeployConfig({ rootDirectory: createFixture() })).toEqual([]);
   });
 
+  it("新しい wrangler の出力形式（connect・k2 が空配列、legacy_env なし）は合格する", () => {
+    const root = createFixture((config) => {
+      config.connect = [];
+      config.k2 = [];
+      delete config.legacy_env;
+    });
+    expect(verifyDeployConfig({ rootDirectory: root })).toEqual([]);
+  });
+
   it.each([
     ["build キーの追加", (config) => (config.build = { command: "echo" }), "build キー"],
     ["database_id の変更", (config) => (config.d1_databases[0].database_id = "other"), "database_id"],
@@ -95,6 +104,10 @@ describe("verifyDeployConfig", () => {
     ["未使用バインディングの追加", (config) => (config.services = [{ binding: "X", service: "y" }]), "services"],
     ["想定外のトップレベルキー", (config) => (config.find_additional_modules = true), "find_additional_modules"],
     ["no_bundle の欠落", (config) => delete config.no_bundle, "no_bundle"],
+    ["connect の追加", (config) => (config.connect = [{ protocol: "tcp", port: 8080 }]), "connect"],
+    ["k2 の追加", (config) => (config.k2 = [{ binding: "X", stream: "y" }]), "k2"],
+    ["legacy_env が false", (config) => (config.legacy_env = false), "legacy_env"],
+    ["legacy_env が文字列", (config) => (config.legacy_env = "true"), "legacy_env"],
     ["rules の追加", (config) => config.rules.push({ type: "Text", globs: ["**/*.txt"] }), "rules"],
   ])("%s は失敗する", (_label, mutate, expectedMessagePart) => {
     const errors = verifyDeployConfig({ rootDirectory: createFixture(mutate) });

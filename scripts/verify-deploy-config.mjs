@@ -30,8 +30,6 @@ const KEYS_SAME_AS_SOURCE = [
 // @cloudflare/vite-plugin / wrangler が生成時に必ず同じ値で出力するキー。
 // プラグイン更新で値が変わった場合は、内容を確認してからここを更新する。
 const KEYS_WITH_FIXED_VALUE = {
-  // 環境（env）を使わない構成。false にすると旧来のサービス環境として解釈される。
-  legacy_env: true,
   // vite でバンドル済みのため wrangler 側で再バンドルしない。
   no_bundle: true,
   // バンドルしないので実際には使われないが、生成物の既定値として固定する。
@@ -83,10 +81,14 @@ const KEYS_MUST_BE_EMPTY = [
   "vpc_services",
   "vpc_networks",
   "logfwdr",
+  // Worker が待ち受ける raw socket（TCP/UDP）の設定。connect ハンドラを使わないので空であること。
+  "connect",
+  // K2 ストリームへの producer バインディング。
+  "k2",
 ];
 
 // 個別の処理で検証するキー。
-const KEYS_CHECKED_INDIVIDUALLY = ["topLevelName", "main", "assets", "d1_databases"];
+const KEYS_CHECKED_INDIVIDUALLY = ["topLevelName", "legacy_env", "main", "assets", "d1_databases"];
 
 // 生成物に存在してよいトップレベルキーの一覧（これ以外のキーがあれば失敗させる）。
 const ALLOWED_TOP_LEVEL_KEYS = new Set([
@@ -364,6 +366,12 @@ export function verifyDeployConfig({ rootDirectory }) {
     }
   }
 
+  // legacy_env は true か未指定だけを受け付ける。false にすると旧来のサービス環境として解釈される。
+  // wrangler 4.145 以降はサービス環境が廃止され、生成物から legacy_env が消えた。
+  // 廃止後の挙動は legacy_env = true と同じで、このアプリは --env を付けずにデプロイするため、未指定でも安全。
+  if (Object.hasOwn(deployConfig, "legacy_env") && deployConfig.legacy_env !== true) {
+    errors.push("legacy_env は true か未指定でなければなりません");
+  }
   if (deployConfig.topLevelName !== undefined && deployConfig.topLevelName !== sourceConfig.name) {
     errors.push("topLevelName が wrangler.jsonc の name と一致しません");
   }
