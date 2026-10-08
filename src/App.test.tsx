@@ -36,6 +36,16 @@ vi.mock("./domain/backup", async (importOriginal) => {
 });
 
 import App from "./App";
+// App が React.lazy で遅延読み込みするタブのモジュールを、テストファイルの読み込み時に先読みしておく。
+// InputTab は react-day-picker・date-fns など依存が重く、初回の import だけで数秒かかり、並列実行の
+// 高負荷時には 10 秒を超える。先読みしないと最初にタブを待つテストの findBy の待ち時間にこの読み込みが
+// 含まれ、負荷次第で失敗する。テストファイルの import はテストのタイムアウト対象外のため、ここで読み込めば
+// 各テストの待機は描画だけになる（App 側は引き続き lazy + Suspense を経由して描画する）。
+import "./components/InputTab";
+import "./components/DashboardTab";
+import "./components/CoinShopTab";
+import "./components/ConnectRankCalcTab";
+import "./components/ClanBattleTab";
 import { STORAGE_KEY, buildInitialState } from "./domain/storage";
 import { masterCharacters } from "./domain/master";
 import { createClanBattleFormation, createClanBattleMonthGroup } from "./domain/clanBattle";
@@ -137,7 +147,7 @@ describe("App: プライバシーポリシーのルーティング", () => {
 });
 
 describe("App: タブナビゲーション", () => {
-  // 遅延読み込みタブを2つ（育成入力→ダッシュボード）待つため、テスト全体のタイムアウトを延長する。
+  // 遅延読み込みタブを2つ（育成入力→ダッシュボード）描画まで待つため、高負荷時に備えてテスト全体のタイムアウトを延長する。
   it("モバイルでは短縮ラベルの下部ナビを描画し、タブ切替後も育成入力が DOM に残る", { timeout: 20_000 }, async () => {
     stubMobileMatchMedia();
     // jsdom 未実装の window.scrollTo（仮想化リストが呼ぶ）をスタブし、エラーログを抑止する。
