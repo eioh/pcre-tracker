@@ -42,6 +42,10 @@
   "routes": [
     { "pattern": "pkne.app", "custom_domain": true }
   ],
+  // *.workers.dev の公開 URL を無効にし、本番はカスタムドメインからのみ到達させる。
+  "workers_dev": false,
+  // バージョンごとのプレビュー URL も公開しない（本番と同じ D1・シークレットに到達するため）。
+  "preview_urls": false,
   // 非機密の本番環境変数。ローカル開発では .dev.vars、Worker テストではテスト用バインディングが優先される。
   "vars": {
     // better-auth の baseURL（自動推定に依存せず明示設定する。設計書指定）。
