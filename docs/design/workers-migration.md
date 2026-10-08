@@ -238,7 +238,7 @@ type SyncPayloadV1 = {
 - **OAuth state の Cookie 保存**: better-auth の `account.storeStateStrategy: "cookie"` により、ログイン開始時の state を `verification` テーブルではなく暗号化 Cookie（`BETTER_AUTH_SECRET` 由来の鍵で暗号化・改ざん検知、HttpOnly・SameSite=Lax、最長 10 分）に保存する。ログイン開始のたびに D1 へ書き込まない。
 - **認証エンドポイントのレート制限**: better-auth の組み込みレート制限を `storage: "memory"` で有効化する（`/sign-in/*` は IP 単位で 10 秒あたり 3 回、その他は 10 秒あたり 100 回）。カウンタは Worker アイソレートのメモリに置く補助的な制限であり、アイソレートをまたいだ集計はしない。クライアント IP は `cf-connecting-ip` からのみ取得する。
 - **Cloudflare 側のレート制限**: `/api/` への状態変更リクエストに対する IP 単位のレート制限は、Cloudflare の WAF レート制限ルールで行う（コード外の設定。Cloudflare ダッシュボードで管理する）。
-- **セキュリティヘッダ**: 静的アセットには `public/_headers` で CSP・`X-Content-Type-Options`・`Referrer-Policy`・`X-Frame-Options`・`Permissions-Policy` を付ける（CSP は Report-Only から始める）。`/api/*` の応答には Worker で `X-Content-Type-Options: nosniff` と、`Cache-Control` 未指定時の `no-store` を付ける。
+- **セキュリティヘッダ**: 静的アセットには `public/_headers` で CSP・`X-Content-Type-Options`・`Referrer-Policy`・`X-Frame-Options`・`Permissions-Policy` を付ける（CSP は Report-Only で本番に違反がないことを確認した後、強制モードに切り替えた）。`/api/*` の応答には Worker で `X-Content-Type-Options: nosniff` と、`Cache-Control` 未指定時の `no-store` を付ける。
 
 以下は「兆候が出たら追加」のまま据え置く:
 
