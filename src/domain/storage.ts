@@ -1,6 +1,7 @@
 import { buildDefaultClanBattleState, normalizeClanBattleState } from "./clanBattle";
 import { characterProgressSchema } from "./schemas";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "./levels";
+import { writeDeviceStorage } from "./deviceData";
 import { STORAGE_KEY } from "./storageKeys";
 import type { CharacterProgress, ClanBattleFormation, ClanBattleMember, ClanBattleState, MasterCharacter, StoredStateV1 } from "./types";
 
@@ -386,9 +387,10 @@ export function loadStoredState(masterCharacters: MasterCharacter[]): StoredStat
   }
 }
 
+// 育成データを localStorage へ保存する（端末データの世代が古いタブからは書き込まない）。
 export function saveStoredState(state: StoredStateV1): void {
   if (typeof window === "undefined") {
     return;
   }
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  writeDeviceStorage(STORAGE_KEY, JSON.stringify(state));
 }

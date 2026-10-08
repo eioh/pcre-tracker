@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CONNECT_RANK_CALC_STORAGE_KEY } from "./connectRankCalcStorage";
+import { isDeviceDataEpochCurrent, removeDeviceStorage, writeDeviceStorage } from "./deviceData";
 import { STORAGE_KEY } from "./storage";
 import { UI_STORAGE_KEY } from "./uiStorage";
 
@@ -113,10 +114,33 @@ export function parseBackupPayload(rawText: string): LocalStorageBackupV1 {
   }
 }
 
+// 端末データの世代が古いタブで復元しようとしたときの例外。
+export class StaleDeviceDataError extends Error {
+  // 別のタブで端末データが削除・変更された後のタブからの書き込みであることを示す例外を生成する。
+  constructor() {
+    super("別のタブで端末データが変更されたため、このタブからは書き込めません");
+    this.name = "StaleDeviceDataError";
+  }
+}
+
+// localStorage の値を、null なら削除・それ以外なら書き込みで反映する（端末データの書き込み口を通す）。
+function writeOrRemove(key: typeof STORAGE_KEY | typeof UI_STORAGE_KEY | typeof CONNECT_RANK_CALC_STORAGE_KEY, value: string | null): void {
+  if (value === null) {
+    removeDeviceStorage(key);
+  } else {
+    writeDeviceStorage(key, value);
+  }
+}
+
 // バックアップ内容をlocalStorageへ適用する。
+// 別のタブで端末データが削除・変更された後のタブでは何も書き込まず、StaleDeviceDataError を投げる
+// （書き込みは端末データの書き込み口で止まるが、復元が成功したように見せないため）。
 export function applyBackupPayloadToLocalStorage(payload: LocalStorageBackupV1): void {
   if (typeof window === "undefined") {
     return;
+  }
+  if (!isDeviceDataEpochCurrent()) {
+    throw new StaleDeviceDataError();
   }
 
   const growthData = stringifyStorageValue(payload.storage[STORAGE_KEY]);
@@ -129,40 +153,15 @@ export function applyBackupPayloadToLocalStorage(payload: LocalStorageBackupV1):
   const previousCalcData = window.localStorage.getItem(CONNECT_RANK_CALC_STORAGE_KEY);
 
   try {
-    if (growthData === null) {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } else {
-      window.localStorage.setItem(STORAGE_KEY, growthData);
-    }
-
-    if (uiData === null) {
-      window.localStorage.removeItem(UI_STORAGE_KEY);
-    } else {
-      window.localStorage.setItem(UI_STORAGE_KEY, uiData);
-    }
-
+    writeOrRemove(STORAGE_KEY, growthData);
+    writeOrRemove(UI_STORAGE_KEY, uiData);
     // 未指定（undefined）の場合はローカルの計算データを削除し、旧バックアップ復元時のデータ残留を防ぐ。
-    if (calcData === undefined || calcData === null) {
-      window.localStorage.removeItem(CONNECT_RANK_CALC_STORAGE_KEY);
-    } else {
-      window.localStorage.setItem(CONNECT_RANK_CALC_STORAGE_KEY, calcData);
-    }
+    writeOrRemove(CONNECT_RANK_CALC_STORAGE_KEY, calcData === undefined ? null : calcData);
   } catch (error) {
-    if (previousGrowthData === null) {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } else {
-      window.localStorage.setItem(STORAGE_KEY, previousGrowthData);
-    }
-    if (previousUiData === null) {
-      window.localStorage.removeItem(UI_STORAGE_KEY);
-    } else {
-      window.localStorage.setItem(UI_STORAGE_KEY, previousUiData);
-    }
-    if (previousCalcData === null) {
-      window.localStorage.removeItem(CONNECT_RANK_CALC_STORAGE_KEY);
-    } else {
-      window.localStorage.setItem(CONNECT_RANK_CALC_STORAGE_KEY, previousCalcData);
-    }
+    // 途中で失敗した場合は適用前の値へ戻す（ロールバックも端末データの書き込み口を通す）。
+    writeOrRemove(STORAGE_KEY, previousGrowthData);
+    writeOrRemove(UI_STORAGE_KEY, previousUiData);
+    writeOrRemove(CONNECT_RANK_CALC_STORAGE_KEY, previousCalcData);
     throw error;
   }
 }
