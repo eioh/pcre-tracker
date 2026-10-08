@@ -76,7 +76,7 @@ npx wrangler d1 create pcre-tracker-db --location apac
 
 - GitHub / Google それぞれで OAuth アプリを登録してください（本番用とローカル開発用の 2 系統を分離）。
 - callback URL: `https://<ドメイン>/api/auth/callback/github` / `https://<ドメイン>/api/auth/callback/google`（ローカル用は `http://localhost:5273/api/auth/callback/<provider>`）。
-- 複数プロバイダのアカウントリンクは未対応です。別プロバイダでログインすると別アカウント扱いになります。
+- GitHub と Google で確認済みの同じメールアドレスを使うと、同じアカウントとして扱われます（better-auth の既定のアカウントリンク）。メールアドレスが異なる場合は別アカウントになり、手動で統合する機能はありません。
 
 #### Worker シークレットの登録
 

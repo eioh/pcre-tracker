@@ -30,7 +30,13 @@ describe("PrivacyPolicyPage", () => {
     // 7 日間の残存（必須）。
     expect(body).toContain("7 日間");
     expect(body).toMatch(/Time Travel/);
-    // GitHub / Google が別アカウント扱い。
+    // セッションに IP アドレス・ユーザーエージェントを保存し、トークンは暗号化して保存する。
+    expect(body).toContain("IP アドレス");
+    expect(body).toContain("ユーザーエージェント");
+    expect(body).toMatch(/暗号化して保存/);
+    // GitHub / Google は確認済みの同じメールアドレスなら同じアカウント、異なれば別アカウント。
+    expect(body).toMatch(/同じメールアドレス/);
+    expect(body).toMatch(/同じアカウント/);
     expect(body).toMatch(/別々のアカウント/);
   });
 
