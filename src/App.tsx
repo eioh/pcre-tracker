@@ -1,4 +1,14 @@
-import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { masterCharacters } from "./domain/master";
 
 // タブ表示時にのみ読み込むことで初期バンドルを軽量化する。
@@ -42,7 +52,14 @@ import { PrivacyPolicyPage } from "./components/PrivacyPolicyPage";
 import { useSync } from "./hooks/useSync";
 import { useIsMobile } from "./hooks/useIsMobile";
 import { clearSyncMeta } from "./domain/syncMeta";
-import { clearDeviceUserData, isDeviceDataEpochCurrent, sealDeviceDataWrites } from "./domain/deviceData";
+import {
+  clearDeviceUserData,
+  getDeviceDataSaveProblem,
+  isDeviceDataEpochCurrent,
+  sealDeviceDataWrites,
+  subscribeDeviceDataSaveProblem,
+  type DeviceDataSaveProblem,
+} from "./domain/deviceData";
 import { DEVICE_DATA_EPOCH_STORAGE_KEY } from "./domain/storageKeys";
 import { Button } from "./components/ui/button";
 
@@ -159,8 +176,10 @@ export default function App() {
       pendingSaveRef.current = true;
     }
     const timerId = window.setTimeout(() => {
-      saveStoredState(state);
-      pendingSaveRef.current = false;
+      // 保存できなかった場合は保留を下ろさない（pagehide 時の保存で再試行する。失敗は画面上部で知らせる）。
+      if (saveStoredState(state)) {
+        pendingSaveRef.current = false;
+      }
       setIsLocalSavePending(false);
     }, STORED_STATE_SAVE_DEBOUNCE_MS);
     saveTimerRef.current = timerId;
@@ -187,8 +206,9 @@ export default function App() {
     if (!pendingSaveRef.current) {
       return;
     }
-    saveStoredState(stateRef.current);
-    pendingSaveRef.current = false;
+    if (saveStoredState(stateRef.current)) {
+      pendingSaveRef.current = false;
+    }
   }, []);
 
   // デバウンス保存の 400ms 窓を塞ぐ防御: タブを閉じる・別タブ起点の SW 更新リロード・
@@ -262,6 +282,13 @@ export default function App() {
     clearDeviceUserData();
     return true;
   }, [stopSync, cancelPendingSave]);
+
+  // 端末データを保存できなかったか（容量超過など）。保存できなかった変更を無言で捨てないよう、画面で知らせる。
+  const deviceDataSaveProblem = useSyncExternalStore<DeviceDataSaveProblem>(
+    subscribeDeviceDataSaveProblem,
+    getDeviceDataSaveProblem,
+    () => "none",
+  );
 
   // 別のタブで端末データが削除・変更されたことを検知したか（閉じられない再読み込み案内を出す）。
   const [isDeviceDataChangedElsewhere, setIsDeviceDataChangedElsewhere] = useState(false);
@@ -798,6 +825,45 @@ export default function App() {
         別のタブで端末データが削除・変更されたときの再読み込み案内。このタブの state は古いデータのため、
         閉じる操作は受け付けず、再読み込みだけを選べるようにする。
       */}
+      {/*
+        端末データを保存できなかったときの案内（容量超過など）。保存できるまで表示し続ける。
+        保存できなかったキーの保存が成功すると消える（容量を空ければ次の保存で回復する）。
+      */}
+      {deviceDataSaveProblem === "storage_error" ? (
+        <div
+          role="alert"
+          className="fixed inset-x-0 top-0 z-40 border-b border-danger/60 bg-danger-bg px-4 py-2 text-center text-sm text-danger"
+        >
+          この端末にデータを保存できませんでした。ブラウザの保存容量などを確認してください。保存できるまでの変更は、画面を閉じたり再読み込みしたりすると失われます。
+        </div>
+      ) : null}
+
+      {/*
+        このタブでは端末データの状態を確かめられず、保存を止めているときの案内。再読み込みすれば保存できる。
+        別のタブでの変更の案内と同じく、閉じる操作は受け付けない。
+      */}
+      <AlertDialog open={deviceDataSaveProblem === "reload_required" && !isDeviceDataChangedElsewhere}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>この端末にデータを保存できません</AlertDialogTitle>
+            <AlertDialogDescription>
+              このタブでは保存先の状態を確かめられないため、保存を止めています。画面を再読み込みしてください。再読み込みするまでの変更は保存されません。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={(event) => {
+                // ダイアログを閉じずにそのまま再読み込みする。
+                event.preventDefault();
+                window.location.reload();
+              }}
+            >
+              再読み込み
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={isDeviceDataChangedElsewhere}>
         <AlertDialogContent>
           <AlertDialogHeader>

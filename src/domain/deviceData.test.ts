@@ -173,18 +173,69 @@ describe("deviceData: 各保存関数は epoch が古いタブから書き込ま
 });
 
 describe("deviceData: 起動時に epoch を保存できない環境", () => {
-  it("読み込み時に保存が失敗しても例外を投げず、このタブでは端末データへ書き込まない", async () => {
-    vi.spyOn(console, "warn").mockImplementation(() => {});
-    const setItemSpy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
-      throw new DOMException("quota exceeded", "QuotaExceededError");
+  // epoch キーの新規作成だけが失敗する状態（容量制限で新しいキーは追加できないが、既存キーの更新は通る）を作る。
+  // 戻り値の関数で失敗を止める（容量が空いた状態を再現する）。
+  function failEpochKeyCreation() {
+    const original = Storage.prototype.setItem;
+    const spy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key, value) {
+      if (key === DEVICE_DATA_EPOCH_STORAGE_KEY) {
+        throw new DOMException("quota exceeded", "QuotaExceededError");
+      }
+      original.call(this, key, value);
     });
-    vi.resetModules();
-    const freshDeviceData = await import("./deviceData");
-    setItemSpy.mockRestore();
+    return () => spy.mockRestore();
+  }
 
-    expect(freshDeviceData.isDeviceDataEpochCurrent()).toBe(false);
-    expect(freshDeviceData.writeDeviceStorage(STORAGE_KEY, "value")).toBe(false);
+  // 起動時（モジュール読み込み時）に epoch の保存が失敗したタブを、別のモジュール状態として読み込む。
+  async function importTabWithFailedEpoch() {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.resetModules();
+    return await import("./deviceData");
+  }
+
+  it("読み込み時に保存が失敗しても例外を投げず、容量が空くまでの保存は失敗として知らせる", async () => {
+    const stopFailing = failEpochKeyCreation();
+    const tab = await importTabWithFailedEpoch();
+    const listener = vi.fn();
+    tab.subscribeDeviceDataSaveProblem(listener);
+
+    // 既存キーの更新自体は通る状態でも、epoch を確定できないので書き込まず、無言で捨てずに知らせる。
+    expect(tab.writeDeviceStorage(STORAGE_KEY, "edited")).toBe(false);
     expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+    expect(tab.getDeviceDataSaveProblem()).toBe("storage_error");
+    expect(listener).toHaveBeenCalled();
+    stopFailing();
+  });
+
+  it("初期化失敗後、epoch キーが存在しないまま容量が空けば次の保存で回復する", async () => {
+    const stopFailing = failEpochKeyCreation();
+    const tab = await importTabWithFailedEpoch();
+    expect(tab.writeDeviceStorage(STORAGE_KEY, "edited")).toBe(false);
+    expect(tab.getDeviceDataSaveProblem()).toBe("storage_error");
+
+    // 容量が空いた。
+    stopFailing();
+    expect(tab.writeDeviceStorage(STORAGE_KEY, "edited-again")).toBe(true);
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe("edited-again");
+    expect(window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY)).not.toBeNull();
+    expect(tab.isDeviceDataEpochCurrent()).toBe(true);
+    expect(tab.getDeviceDataSaveProblem()).toBe("none");
+  });
+
+  it("初期化失敗後に epoch キーが存在する場合は控えに採用せず、保存せずに再読み込みを求める", async () => {
+    const stopFailing = failEpochKeyCreation();
+    const tab = await importTabWithFailedEpoch();
+    stopFailing();
+    // 起動後に別のタブが epoch キーを作成した（その前後で端末データが変わった可能性を否定できない）。
+    window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, "other-tab");
+    window.localStorage.setItem(STORAGE_KEY, "other-tab-data");
+
+    expect(tab.writeDeviceStorage(STORAGE_KEY, "stale-edit")).toBe(false);
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe("other-tab-data");
+    expect(window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY)).toBe("other-tab");
+    expect(tab.getDeviceDataSaveProblem()).toBe("reload_required");
+    // 容量があっても、このタブのうちは回復しない（再読み込みで控え直す）。
+    expect(tab.isDeviceDataEpochCurrent()).toBe(false);
   });
 
   it("読み込み時に localStorage の読み取りが失敗しても例外を投げない", async () => {
@@ -193,9 +244,66 @@ describe("deviceData: 起動時に epoch を保存できない環境", () => {
       throw new DOMException("denied", "SecurityError");
     });
     vi.resetModules();
-    const freshDeviceData = await import("./deviceData");
+    const tab = await import("./deviceData");
     getItemSpy.mockRestore();
+    expect(tab.getDeviceDataSaveProblem()).toBe("none");
+  });
 
-    expect(freshDeviceData.isDeviceDataEpochCurrent()).toBe(false);
+  it("書き込みが容量超過で失敗したら知らせ、そのキーの保存が成功したら解消する", async () => {
+    vi.resetModules();
+    const tab = await import("./deviceData");
+    const original = Storage.prototype.setItem;
+    const spy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key, value) {
+      if (key === STORAGE_KEY) {
+        throw new DOMException("quota exceeded", "QuotaExceededError");
+      }
+      original.call(this, key, value);
+    });
+    expect(() => tab.writeDeviceStorage(STORAGE_KEY, "big")).toThrow();
+    expect(tab.getDeviceDataSaveProblem()).toBe("storage_error");
+    // 別のキーの保存が成功しても、育成データが保存されるまでは解消しない。
+    expect(tab.writeDeviceStorage(UI_STORAGE_KEY, "ui")).toBe(true);
+    expect(tab.getDeviceDataSaveProblem()).toBe("storage_error");
+
+    spy.mockRestore();
+    expect(tab.writeDeviceStorage(STORAGE_KEY, "small")).toBe(true);
+    expect(tab.getDeviceDataSaveProblem()).toBe("none");
+  });
+
+  it("端末データを削除したら、保存できていなかった値は再試行しない", async () => {
+    vi.resetModules();
+    const tab = await import("./deviceData");
+    const original = Storage.prototype.setItem;
+    const spy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key, value) {
+      if (key === STORAGE_KEY) {
+        throw new DOMException("quota exceeded", "QuotaExceededError");
+      }
+      original.call(this, key, value);
+    });
+    expect(() => tab.writeDeviceStorage(STORAGE_KEY, "previous-user-edit")).toThrow();
+    spy.mockRestore();
+
+    tab.clearDeviceUserData();
+    expect(tab.getDeviceDataSaveProblem()).toBe("none");
+    expect(tab.writeDeviceStorage(LOCAL_DATA_OWNER_STORAGE_KEY, "owner")).toBe(true);
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+
+  it("容量が空いた後に別のキーの保存が成功したら、保存できていなかった値も再試行して保存する", async () => {
+    vi.resetModules();
+    const tab = await import("./deviceData");
+    const original = Storage.prototype.setItem;
+    const spy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key, value) {
+      if (key === STORAGE_KEY) {
+        throw new DOMException("quota exceeded", "QuotaExceededError");
+      }
+      original.call(this, key, value);
+    });
+    expect(() => tab.writeDeviceStorage(STORAGE_KEY, "pending-edit")).toThrow();
+    spy.mockRestore();
+
+    expect(tab.writeDeviceStorage(UI_STORAGE_KEY, "ui")).toBe(true);
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe("pending-edit");
+    expect(tab.getDeviceDataSaveProblem()).toBe("none");
   });
 });

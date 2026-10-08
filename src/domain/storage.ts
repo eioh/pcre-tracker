@@ -388,9 +388,15 @@ export function loadStoredState(masterCharacters: MasterCharacter[]): StoredStat
 }
 
 // 育成データを localStorage へ保存する（端末データの世代が古いタブからは書き込まない）。
-export function saveStoredState(state: StoredStateV1): void {
+// 保存できたら true を返す。保存できなかった理由（容量超過など）は端末データの書き込み口が記録し、App が利用者に知らせる。
+export function saveStoredState(state: StoredStateV1): boolean {
   if (typeof window === "undefined") {
-    return;
+    return false;
   }
-  writeDeviceStorage(STORAGE_KEY, JSON.stringify(state));
+  try {
+    return writeDeviceStorage(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.warn(`育成データの保存に失敗しました: key=${STORAGE_KEY}`, { error });
+    return false;
+  }
 }

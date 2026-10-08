@@ -708,3 +708,91 @@ describe("App: ログアウト時の端末データ削除", () => {
     }
   });
 });
+
+describe("App: 端末データを保存できないとき", () => {
+  // epoch キーの新規作成だけが失敗する状態（容量制限で新しいキーは追加できないが、既存キーの更新は通る）を作り、
+  // その状態で読み込んだ App（起動時に epoch を確定できなかったタブ）を返す。failing.value を false にすると容量が空く。
+  async function importAppWithFailedEpoch() {
+    const failing = { value: true };
+    const original = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key: string, value: string) {
+      if (failing.value && key === DEVICE_DATA_EPOCH_STORAGE_KEY) {
+        throw new DOMException("quota exceeded", "QuotaExceededError");
+      }
+      original.call(this, key, value);
+    });
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.resetModules();
+    const { default: FreshApp } = await import("./App");
+    return { FreshApp, failing };
+  }
+
+  // モバイル編集シートで 1 件編集する。
+  async function editFirstRow() {
+    const openRowButtons = await screen.findAllByRole("button", { name: /の編集シートを開く$/ }, { timeout: 10_000 });
+    fireEvent.click(openRowButtons[0]!);
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: /の所持メモピ数を増やす$/ }));
+  }
+
+  // 保存済みの育成データに、編集（メモピ 0 → 1）が含まれているか。
+  function savedEditExists(): boolean {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (raw === null) {
+      return false;
+    }
+    const saved = JSON.parse(raw) as { progressByName: Record<string, { ownedMemoryPiece: number }> };
+    return Object.values(saved.progressByName).some((progress) => progress.ownedMemoryPiece === 1);
+  }
+
+  it("epoch 初期化に失敗したタブで編集すると、保存失敗が表示される（無言で捨てない）", { timeout: 20_000 }, async () => {
+    const { FreshApp } = await importAppWithFailedEpoch();
+    stubMobileMatchMedia();
+    render(<FreshApp />);
+    await editFirstRow();
+
+    expect(
+      await screen.findByText(/この端末にデータを保存できませんでした/, undefined, { timeout: 3_000 }),
+    ).toBeInTheDocument();
+    expect(savedEditExists()).toBe(false);
+  });
+
+  it("初期化失敗後、epoch キーが存在しないまま容量が空けば次の保存で回復し、案内が消える", { timeout: 20_000 }, async () => {
+    const { FreshApp, failing } = await importAppWithFailedEpoch();
+    stubMobileMatchMedia();
+    render(<FreshApp />);
+    await editFirstRow();
+    await screen.findByText(/この端末にデータを保存できませんでした/, undefined, { timeout: 3_000 });
+
+    // 容量が空いた。保存できなかった編集は保留のまま残っているので、pagehide 時の保存で保存される。
+    failing.value = false;
+    act(() => {
+      fireEvent(window, new Event("pagehide"));
+    });
+
+    expect(savedEditExists()).toBe(true);
+    expect(window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY)).not.toBeNull();
+    await waitFor(() => expect(screen.queryByText(/この端末にデータを保存できませんでした/)).not.toBeInTheDocument());
+  });
+
+  it("初期化失敗後に epoch キーが存在する場合は保存せず、再読み込みを案内する", { timeout: 20_000 }, async () => {
+    const { reload, restore } = stubReload();
+    try {
+      const { FreshApp, failing } = await importAppWithFailedEpoch();
+      failing.value = false;
+      // 起動後に別のタブが epoch キーを作成した。
+      window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, "other-tab");
+      stubMobileMatchMedia();
+      render(<FreshApp />);
+
+      const dialog = await screen.findByRole("alertdialog", undefined, { timeout: 3_000 });
+      expect(within(dialog).getByText("この端末にデータを保存できません")).toBeInTheDocument();
+      expect(window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY)).toBe("other-tab");
+      expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+
+      fireEvent.click(within(dialog).getByRole("button", { name: "再読み込み" }));
+      expect(reload).toHaveBeenCalledTimes(1);
+    } finally {
+      restore();
+    }
+  });
+});

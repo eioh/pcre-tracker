@@ -59,36 +59,166 @@ function readOrCreateEpoch(): string | null {
     window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, created);
     return created;
   } catch (error) {
-    console.warn("端末データの世代を保存できないため、このタブでは端末データを保存しません", { error });
+    console.warn("端末データの世代を保存できませんでした", { error });
     return null;
   }
 }
 
 // このタブが控えている epoch。モジュール読み込み時（＝タブ起動時）に確定させる。
 // 遅延初期化にすると、別のタブが epoch を進めた後に初めて書き込むタブが新しい値を控えてしまい、書き戻しを止められない。
-// null は起動時に確定できなかったことを表す。後から読み直すと同じ理由で書き戻しを止められないため、
-// このタブの間は端末データへ書き込まない側に倒す（アプリは起動し、表示と操作はできる。
-// 起動時に世代を保存できない状態では、端末データの保存もほぼ失敗するため、失うものは小さい）。
+// null は起動時に確定できなかったこと（容量超過など）を表す。確定できるまで、このタブからは端末データへ書き込まない
+// （回復の条件は checkDeviceDataEpoch を参照）。
 let capturedEpoch: string | null = readOrCreateEpoch();
 
-// このタブの控えが localStorage の現在の epoch と一致するか（＝このタブから端末データへ書き込んでよいか）を返す。
-// キーが存在しない場合（サイトデータの手動消去など。アプリ自身は epoch キーを削除しない）は、
+// 起動時に epoch を確定できず、その後に epoch キーが存在していたか（このタブでは再読み込みするまで保存できない）。
+let reloadRequired = false;
+
+// 端末データの書き込み可否の判定結果。
+// - current: 書き込んでよい。
+// - stale: 別のタブで端末データが削除・変更された（再読み込み案内は App の storage イベントの経路で出す）。
+// - storage_error: localStorage の読み書きに失敗した（容量超過など）。容量が空けば次の保存で回復する。
+// - reload_required: このタブでは epoch を確定できない。再読み込みが必要。
+type DeviceDataEpochState = "current" | "stale" | "storage_error" | "reload_required";
+
+// このタブから端末データへ書き込んでよいかを判定する。
+// 起動時に epoch を確定できなかったタブは、ここで確定を再試行する。
+// - epoch キーがまだ存在しない: どのタブも epoch を進めていない（端末データの削除・所有者の変更は、必ず先に
+//   epoch キーを書き込み、その書き込みが失敗すれば削除や変更に進まない）。このタブの state が古くなる操作は
+//   起きていないので、ここで作成して控えにする。作成が失敗すれば storage_error（容量が空けば次の保存で回復する）。
+// - epoch キーが既に存在する: 起動後に別のタブが作成・更新した値かもしれず、その前後で端末データが削除・変更された
+//   可能性を否定できない。控えには採用せず、再読み込みを求める（再読み込みすれば起動時に通常どおり控えられる）。
+// 控えがあるタブでキーが存在しない場合（サイトデータの手動消去など。アプリ自身は epoch キーを削除しない）は、
 // 別のタブが epoch を進めた証拠がないため一致とみなし、控えの値で作り直す。
-// 起動時に epoch を確定できなかったタブと、localStorage の読み書きに失敗した場合は一致しないとみなす。
-export function isDeviceDataEpochCurrent(): boolean {
-  if (typeof window === "undefined" || capturedEpoch === null) {
-    return false;
+function checkDeviceDataEpoch(): DeviceDataEpochState {
+  if (typeof window === "undefined") {
+    return "storage_error";
+  }
+  if (capturedEpoch === null) {
+    if (reloadRequired) {
+      return "reload_required";
+    }
+    try {
+      if (window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY) !== null) {
+        updateSaveProblem(() => {
+          reloadRequired = true;
+        });
+        return "reload_required";
+      }
+      const created = createEpochValue();
+      window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, created);
+      capturedEpoch = created;
+      return "current";
+    } catch {
+      return "storage_error";
+    }
   }
   try {
     const stored = window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY);
     if (stored === null) {
       window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, capturedEpoch);
-      return true;
+      return "current";
     }
-    return stored === capturedEpoch;
+    return stored === capturedEpoch ? "current" : "stale";
   } catch {
-    return false;
+    return "storage_error";
   }
+}
+
+// このタブの控えが localStorage の現在の epoch と一致するか（＝このタブから端末データへ書き込んでよいか）を返す。
+export function isDeviceDataEpochCurrent(): boolean {
+  return checkDeviceDataEpoch() === "current";
+}
+
+// ---------------------------------------------------------------------------
+// 保存できなかったことの通知（無言でデータを捨てないため）
+// ---------------------------------------------------------------------------
+
+// 端末データの保存の問題。none 以外のときは App が利用者に知らせる。
+// - storage_error: 保存できなかったキーがある（容量超過など）。そのキーの保存が成功すれば解消する。
+// - reload_required: このタブでは保存できない。再読み込みが必要。
+export type DeviceDataSaveProblem = "none" | "storage_error" | "reload_required";
+
+// 直近の保存が失敗したままのキーと、そのキーに最後に書き込もうとした値（null は削除）。
+// そのキーの保存が成功するか、別のキーの保存が成功したときの再試行が成功したら取り除く。
+const failedWrites = new Map<DeviceDataStorageKey, string | null>();
+// 保存の問題の変化を受け取るリスナー。
+const saveProblemListeners = new Set<() => void>();
+
+// 現在の保存の問題を返す（useSyncExternalStore のスナップショット）。
+export function getDeviceDataSaveProblem(): DeviceDataSaveProblem {
+  if (reloadRequired) {
+    return "reload_required";
+  }
+  return failedWrites.size > 0 ? "storage_error" : "none";
+}
+
+// 保存の問題の変化を購読する。戻り値で購読を解除する。
+export function subscribeDeviceDataSaveProblem(listener: () => void): () => void {
+  saveProblemListeners.add(listener);
+  return () => {
+    saveProblemListeners.delete(listener);
+  };
+}
+
+// 保存の問題が変わったらリスナーへ知らせる。
+function updateSaveProblem(change: () => void): void {
+  const before = getDeviceDataSaveProblem();
+  change();
+  if (getDeviceDataSaveProblem() !== before) {
+    for (const listener of saveProblemListeners) {
+      listener();
+    }
+  }
+}
+
+// キーの保存が失敗したことを、書き込もうとした値とともに記録する。
+function markSaveFailed(key: DeviceDataStorageKey, value: string | null): void {
+  updateSaveProblem(() => {
+    failedWrites.set(key, value);
+  });
+}
+
+// キーの保存が成功したことを記録し、保存できていない他のキーを再試行する。
+// 保存が成功した＝容量が空いた・epoch を確定できた可能性があるため、利用者が同じキーを再び編集するのを待たずに回復させる。
+// 再試行する値は、そのキーにこのタブが最後に書き込もうとした値（成功していれば保存されていたはずの値）。
+// 呼び出し元で epoch が現在の値と一致することを確かめた直後に呼ぶ。
+function markSaveSucceeded(key: DeviceDataStorageKey): void {
+  if (failedWrites.size === 0) {
+    return;
+  }
+  updateSaveProblem(() => {
+    failedWrites.delete(key);
+    for (const [pendingKey, pendingValue] of failedWrites) {
+      try {
+        if (pendingValue === null) {
+          window.localStorage.removeItem(pendingKey);
+        } else {
+          window.localStorage.setItem(pendingKey, pendingValue);
+        }
+        failedWrites.delete(pendingKey);
+      } catch {
+        // まだ保存できない。次の保存の成功時に再試行する。
+      }
+    }
+  });
+}
+
+// 書き込みを拒否した理由に応じて、保存できなかったことを記録する。
+// stale（別のタブで変更済み）は App の再読み込み案内の経路で知らせるため、ここでは記録しない。
+// 保存先の値が既に書き込もうとした値と同じなら、失われるものがないので記録しない。
+function recordRefusedWrite(key: DeviceDataStorageKey, state: DeviceDataEpochState, value: string | null): void {
+  // reload_required は checkDeviceDataEpoch で記録済み。
+  if (state !== "storage_error") {
+    return;
+  }
+  try {
+    if (window.localStorage.getItem(key) === value) {
+      return;
+    }
+  } catch {
+    // 読み取りもできない場合は、保存できなかったものとして扱う。
+  }
+  markSaveFailed(key, value);
 }
 
 // 端末データの epoch を進める（このタブの控えも新しい値へ更新する）。
@@ -113,22 +243,34 @@ export function sealDeviceDataWrites(): void {
   window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, createEpochValue());
 }
 
-// 端末データのキーへ値を書き込む。epoch が古いタブからの書き込みは何もしない。
-// 書き込んだら true を返す。localStorage の例外（容量超過など）は呼び出し側で扱えるようそのまま投げる。
+// 端末データのキーへ値を書き込む。書き込めない状態のタブからは何もしない。書き込んだら true を返す。
+// 書き込めなかったときは、理由に応じて保存の問題として記録する（App が利用者に知らせる）。
+// localStorage の例外（容量超過など）は、記録したうえで呼び出し側で扱えるようそのまま投げる（バックアップ復元のロールバック等）。
 export function writeDeviceStorage(key: DeviceDataStorageKey, value: string): boolean {
-  if (!isDeviceDataEpochCurrent()) {
+  const state = checkDeviceDataEpoch();
+  if (state !== "current") {
+    recordRefusedWrite(key, state, value);
     return false;
   }
-  window.localStorage.setItem(key, value);
+  try {
+    window.localStorage.setItem(key, value);
+  } catch (error) {
+    markSaveFailed(key, value);
+    throw error;
+  }
+  markSaveSucceeded(key);
   return true;
 }
 
-// 端末データのキーを削除する。epoch が古いタブからの削除は何もしない。削除したら true を返す。
+// 端末データのキーを削除する。書き込めない状態のタブからは何もしない。削除したら true を返す。
 export function removeDeviceStorage(key: DeviceDataStorageKey): boolean {
-  if (!isDeviceDataEpochCurrent()) {
+  const state = checkDeviceDataEpoch();
+  if (state !== "current") {
+    recordRefusedWrite(key, state, null);
     return false;
   }
   window.localStorage.removeItem(key);
+  markSaveSucceeded(key);
   return true;
 }
 
@@ -142,4 +284,8 @@ export function clearDeviceUserData(): void {
   for (const key of DEVICE_DATA_STORAGE_KEYS) {
     window.localStorage.removeItem(key);
   }
+  // 保存できていなかった値も捨てる（削除後の保存の成功時に再試行され、削除したデータが戻るのを防ぐ）。
+  updateSaveProblem(() => {
+    failedWrites.clear();
+  });
 }
