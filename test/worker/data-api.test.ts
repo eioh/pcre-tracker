@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import worker from "../../worker/index";
-import { enforceRateLimit, RATE_LIMIT_MAX_REQUESTS, RATE_LIMIT_WINDOW_MS } from "../../worker/data";
+import {
+  enforceRateLimit,
+  MAX_BODY_BYTES,
+  RATE_LIMIT_MAX_REQUESTS,
+  RATE_LIMIT_WINDOW_MS,
+} from "../../worker/data";
+import type { AuthEnv } from "../../worker/auth";
 import {
   buildGetRequest,
   buildPutRequest,
@@ -142,6 +148,130 @@ describe("/api/data 入力検証", () => {
     const request = buildPutRequest(cookie, undefined, { rawBody });
     const response = await worker.fetch(request, testEnv);
     expect(response.status).toBe(413);
+  });
+});
+
+describe("/api/data ボディの読み込み上限", () => {
+  // ストリーム 1 回の pull で流すチャンクの大きさ（64KB）。
+  const CHUNK_BYTES = 64 * 1024;
+
+  // 指定バイト数のボディを CHUNK_BYTES ずつ流す ReadableStream と、pull された回数の参照を返す。
+  // 内容は先頭に prefix（JSON の本体）を置き、残りを空白で埋める。
+  function createCountingStream(prefix: string, totalBytes: number): { stream: ReadableStream<Uint8Array>; pulls: () => number } {
+    const bytes = new Uint8Array(totalBytes).fill(0x20);
+    bytes.set(new TextEncoder().encode(prefix), 0);
+    let offset = 0;
+    let pullCount = 0;
+    const stream = new ReadableStream<Uint8Array>(
+      {
+        // 呼ばれるたびに次のチャンクを 1 つだけ流す（読み手が止まれば以降は呼ばれない）。
+        pull(controller) {
+          pullCount += 1;
+          if (offset >= bytes.byteLength) {
+            controller.close();
+            return;
+          }
+          const end = Math.min(offset + CHUNK_BYTES, bytes.byteLength);
+          controller.enqueue(bytes.slice(offset, end));
+          offset = end;
+        },
+      },
+      { highWaterMark: 0 },
+    );
+    return { stream, pulls: () => pullCount };
+  }
+
+  // Content-Length を付けずにストリームで送る PUT リクエストを組み立てる。
+  function buildStreamingPutRequest(cookie: string, stream: ReadableStream<Uint8Array>): Request {
+    return new Request(`${TEST_ORIGIN}/api/data`, {
+      method: "PUT",
+      headers: { Cookie: cookie, Origin: TEST_ORIGIN, "Content-Type": "application/json" },
+      body: stream,
+    });
+  }
+
+  // Content-Length なしの 4MB ストリームは 413 になり、上限を少し超えたところで読み込みを止める。
+  it("Content-Length なしの 4MB ストリームは 413 で、1MB 未満で読み込みを止める", async () => {
+    const { cookie } = await createUserWithSession();
+    const { stream, pulls } = createCountingStream("", 4 * 1024 * 1024);
+    const request = buildStreamingPutRequest(cookie, stream);
+    expect(request.headers.get("Content-Length")).toBeNull();
+
+    const response = await worker.fetch(request, testEnv);
+    expect(response.status).toBe(413);
+    // 読み込んだ量（pull 回数 × チャンク）が 1MB 未満で止まっていること。
+    expect(pulls() * CHUNK_BYTES).toBeLessThan(1024 * 1024);
+  });
+
+  // 上限内のストリームは最後まで読み込まれ、通常どおり保存できる。
+  it("上限内のストリームは 200 で保存できる", async () => {
+    const { cookie } = await createUserWithSession();
+    const json = JSON.stringify({ baseRevision: null, payload: buildSyncPayload("ストリーム") });
+    const { stream } = createCountingStream(json, MAX_BODY_BYTES - 1024);
+
+    const response = await worker.fetch(buildStreamingPutRequest(cookie, stream), testEnv);
+    expect(response.status).toBe(200);
+    const getBody = (await (await worker.fetch(buildGetRequest(cookie), testEnv)).json()) as { payload: unknown };
+    expect(getBody.payload).toEqual(buildSyncPayload("ストリーム"));
+  });
+
+  // 受信時は上限内でも、既定値の補完で保存サイズが上限を超えるペイロードは 413 で保存しない。
+  it("既定値の補完で上限を超えるペイロードは 413", async () => {
+    const { cookie } = await createUserWithSession();
+    const payload = buildSyncPayload() as unknown as {
+      storage: { pcr_growth_tracker: { clanBattle: { groups: unknown[] } } };
+    };
+    const formations = Array.from({ length: 30_000 }, (_, index) => ({ id: index.toString(36) }));
+    payload.storage.pcr_growth_tracker.clanBattle.groups = [{ id: "g", year: 2026, month: 10, formations }];
+    const rawBody = JSON.stringify({ baseRevision: null, payload });
+    // 受信時のボディは上限内であること（前段のサイズ検証では弾かれない）。
+    expect(new TextEncoder().encode(rawBody).byteLength).toBeLessThan(MAX_BODY_BYTES);
+
+    const response = await worker.fetch(buildPutRequest(cookie, undefined, { rawBody }), testEnv);
+    expect(response.status).toBe(413);
+    // 行は作られていない。
+    expect((await worker.fetch(buildGetRequest(cookie), testEnv)).status).toBe(404);
+  });
+});
+
+describe("/api/data 想定外のエラー", () => {
+  // app_state へのクエリだけを失敗させる D1 を持つ env を作る（認証・レート制限は本物の D1 で動かす）。
+  function createFailingAppStateEnv(message: string): AuthEnv {
+    const failingDb = new Proxy(testEnv.DB, {
+      // prepare だけ差し替え、app_state を含む SQL では例外を投げる。
+      get(target, property, receiver) {
+        if (property === "prepare") {
+          return (sql: string) => {
+            if (sql.includes("app_state")) {
+              throw new Error(message);
+            }
+            return target.prepare(sql);
+          };
+        }
+        const value = Reflect.get(target, property, receiver) as unknown;
+        return typeof value === "function" ? (value as (...args: unknown[]) => unknown).bind(target) : value;
+      },
+    });
+    return { ...testEnv, DB: failingDb };
+  }
+
+  // D1 が例外を投げても JSON の 500 を返し、例外メッセージは応答に含めない。
+  it("D1 の例外は JSON の 500 になり、例外メッセージを漏らさない", async () => {
+    const { cookie } = await createUserWithSession();
+    const secretMessage = "internal-detail-should-not-leak";
+    const failingEnv = createFailingAppStateEnv(secretMessage);
+
+    for (const request of [
+      buildGetRequest(cookie),
+      buildPutRequest(cookie, { baseRevision: null, payload: buildSyncPayload() }),
+    ]) {
+      const response = await worker.fetch(request, failingEnv);
+      expect(response.status).toBe(500);
+      expect(response.headers.get("content-type")).toContain("application/json");
+      const text = await response.text();
+      expect(text).not.toContain(secretMessage);
+      expect((JSON.parse(text) as { error: string }).error).toBe("internal_error");
+    }
   });
 });
 

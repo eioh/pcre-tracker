@@ -7,10 +7,11 @@ import { parseAllowedOrigins, type Auth, type AuthEnv } from "./auth";
 // 設計書「データ設計」「認証・セキュリティ設計」「乱用対策」節に従い、以下を実装する:
 // - CSRF ミドルウェア（Origin 検証 / Content-Type 必須化 / 許可メソッド限定）
 // - セッション認証と全クエリの user_id スコープ（データ隔離）
-// - ボディサイズ上限 512KB（JSON parse 前に検証）
+// - ボディサイズ上限 512KB（JSON parse 前に上限付きで読み込み、既定値補完後の保存サイズも検証）
 // - SyncPayloadV1 の深い Zod 検証
 // - サーバー発行 revision による楽観ロック
 // - PUT の固定ウィンドウレート制限（30 回 / 5 分）
+// - 想定外の例外は内容を伏せた JSON の 500 で返す
 
 // ペイロードサイズ上限（バイト）。設計書「乱用対策」節の 512KB。
 export const MAX_BODY_BYTES = 512 * 1024;
@@ -31,6 +32,40 @@ const putRequestSchema = z.object({
 // エラー応答 JSON を生成する共通ヘルパー。
 function errorResponse(status: number, error: string, message: string): Response {
   return Response.json({ error, message }, { status });
+}
+
+// リクエストボディを上限バイト数まで逐次読み込む。
+// 上限を超えた時点で読み込みを打ち切ってストリームを取り消し、null を返す（全量をメモリに載せない）。
+// Content-Length を付けない（chunked 等の）リクエストでも、上限を超える分は読まずに済む。
+export async function readBodyWithLimit(request: Request, maxBytes: number): Promise<Uint8Array | null> {
+  if (request.body === null) {
+    return new Uint8Array(0);
+  }
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+    const chunk = value instanceof Uint8Array ? value : new Uint8Array(value as ArrayBuffer);
+    totalBytes += chunk.byteLength;
+    if (totalBytes > maxBytes) {
+      // 残りのボディは読まずに取り消す。取り消し自体の失敗は判定に影響しないため無視する。
+      await reader.cancel().catch(() => undefined);
+      return null;
+    }
+    chunks.push(chunk);
+  }
+  // 読み込んだチャンクを 1 つの連続したバイト列にまとめる。
+  const body = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return body;
 }
 
 // Content-Type ヘッダから MIME タイプ部分（`;` より前）を取り出して application/json か判定する。
@@ -126,9 +161,9 @@ async function handlePut(db: D1Database, userId: string, request: Request): Prom
     return errorResponse(413, "payload_too_large", "ペイロードが 512KB を超えています。");
   }
 
-  // 実際のボディバイト数を検証する（こちらが確定判定）。
-  const bodyBytes = await request.arrayBuffer();
-  if (bodyBytes.byteLength > MAX_BODY_BYTES) {
+  // 実際のボディバイト数を上限付きで読み込みながら検証する（こちらが確定判定）。
+  const bodyBytes = await readBodyWithLimit(request, MAX_BODY_BYTES);
+  if (bodyBytes === null) {
     return errorResponse(413, "payload_too_large", "ペイロードが 512KB を超えています。");
   }
 
@@ -148,6 +183,10 @@ async function handlePut(db: D1Database, userId: string, request: Request): Prom
 
   const { baseRevision, payload } = validation.data;
   const payloadText = JSON.stringify(payload);
+  // Zod の既定値補完で検証後のペイロードは受信時より大きくなりうるため、保存する JSON の実バイト数も上限で検証する。
+  if (new TextEncoder().encode(payloadText).byteLength > MAX_BODY_BYTES) {
+    return errorResponse(413, "payload_too_large", "ペイロードが 512KB を超えています。");
+  }
   const updatedAt = new Date().toISOString();
 
   if (baseRevision === null) {
@@ -189,6 +228,18 @@ export async function handleDataRequest(request: Request, env: AuthEnv, auth: Au
     return csrfError;
   }
 
+  // 認証以降の処理で想定外の例外（D1 の障害など）が起きても、例外の内容を応答に含めず JSON の 500 を返す。
+  try {
+    return await handleAuthenticatedDataRequest(request, env, auth);
+  } catch (error) {
+    // 原因調査のため例外はログに残す（リクエストボディ・ペイロードは出力しない）。
+    console.error("/api/data の処理中にエラーが発生しました", error);
+    return errorResponse(500, "internal_error", "サーバーでエラーが発生しました。しばらく待ってから再試行してください。");
+  }
+}
+
+// CSRF 検証を通過したリクエストに対し、認証 → （PUT のみ）レート制限 → 各メソッド処理を行う。
+async function handleAuthenticatedDataRequest(request: Request, env: AuthEnv, auth: Auth): Promise<Response> {
   // セッション認証。user_id は必ずサーバー側セッションから取得する（クライアント提供 ID は信用しない）。
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) {
