@@ -18,6 +18,7 @@ const reloadSpy = vi.fn();
 beforeEach(() => {
   mockDeleteUser.mockReset();
   reloadSpy.mockReset();
+  vi.mocked(signOut).mockReset();
   // jsdom の location.reload を差し替える（削除成功時のリロードを検証・抑止するため）。
   Object.defineProperty(window, "location", {
     configurable: true,
@@ -34,6 +35,9 @@ function renderLoggedIn(overrides?: Partial<Parameters<typeof SyncHeader>[0]>) {
   const onOpenPrivacyPolicy = vi.fn();
   const onDeleteRequestStart = vi.fn();
   const onBeforeAccountDeleted = vi.fn();
+  const onLogoutStart = vi.fn();
+  const onDeleteDeviceData = vi.fn();
+  const hasUnsyncedChanges = vi.fn(() => false);
   render(
     <SyncHeader
       isLoggedIn
@@ -43,10 +47,13 @@ function renderLoggedIn(overrides?: Partial<Parameters<typeof SyncHeader>[0]>) {
       onOpenPrivacyPolicy={onOpenPrivacyPolicy}
       onDeleteRequestStart={onDeleteRequestStart}
       onBeforeAccountDeleted={onBeforeAccountDeleted}
+      onLogoutStart={onLogoutStart}
+      onDeleteDeviceData={onDeleteDeviceData}
+      hasUnsyncedChanges={hasUnsyncedChanges}
       {...overrides}
     />,
   );
-  return { onOpenPrivacyPolicy, onDeleteRequestStart, onBeforeAccountDeleted };
+  return { onOpenPrivacyPolicy, onDeleteRequestStart, onBeforeAccountDeleted, onLogoutStart, onDeleteDeviceData };
 }
 
 describe("SyncHeader: PII（email 非表示）", () => {
@@ -142,13 +149,18 @@ describe("SyncHeader: dropdown 変形（デスクトップヘッダー）", () =
     expect(screen.getByRole("menuitem", { name: "アカウント削除" })).toBeInTheDocument();
   });
 
-  it("ログアウト項目の選択で signOut が呼ばれる", () => {
+  it("ログアウト項目の選択でメニューが閉じても確認ダイアログが開き、まだ signOut は呼ばれない", () => {
     renderLoggedIn({ variant: "dropdown" });
 
     openAccountMenu(/テスト表示名/);
     fireEvent.click(screen.getByRole("menuitem", { name: "ログアウト" }));
 
-    expect(vi.mocked(signOut)).toHaveBeenCalledTimes(1);
+    const dialog = screen.getByRole("alertdialog");
+    expect(within(dialog).getByText("ログアウトしますか？")).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "キャンセル" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "データを残してログアウト" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "この端末のデータを削除してログアウト" })).toBeInTheDocument();
+    expect(vi.mocked(signOut)).not.toHaveBeenCalled();
   });
 
   it("アカウント削除項目の選択でメニューが閉じても確認ダイアログが表示される", () => {
@@ -183,6 +195,9 @@ describe("SyncHeader: dropdown 変形（デスクトップヘッダー）", () =
         onOpenPrivacyPolicy={vi.fn()}
         onDeleteRequestStart={vi.fn()}
         onBeforeAccountDeleted={vi.fn()}
+        onLogoutStart={vi.fn()}
+        onDeleteDeviceData={vi.fn()}
+        hasUnsyncedChanges={() => false}
         variant="dropdown"
       />,
     );
@@ -202,6 +217,9 @@ describe("SyncHeader: ログインダイアログのポリシーリンク", () =
         onOpenPrivacyPolicy={onOpenPrivacyPolicy}
         onDeleteRequestStart={vi.fn()}
         onBeforeAccountDeleted={vi.fn()}
+        onLogoutStart={vi.fn()}
+        onDeleteDeviceData={vi.fn()}
+        hasUnsyncedChanges={() => false}
       />,
     );
 
@@ -209,5 +227,115 @@ describe("SyncHeader: ログインダイアログのポリシーリンク", () =
     const link = screen.getByRole("button", { name: "プライバシーポリシー" });
     fireEvent.click(link);
     expect(onOpenPrivacyPolicy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("SyncHeader: ログアウト確認ダイアログ", () => {
+  // ユーザー名チップからメニューを開き、ログアウトの確認ダイアログを開く（dropdown 変形）。
+  function openLogoutDialogFromDropdown() {
+    fireEvent.keyDown(screen.getByRole("button", { name: /テスト表示名/ }), { key: "Enter" });
+    fireEvent.click(screen.getByRole("menuitem", { name: "ログアウト" }));
+    return screen.getByRole("alertdialog");
+  }
+
+  // signOut を成功させ、呼び出し順を記録する。
+  function stubSignOutSuccess(order: string[]) {
+    vi.mocked(signOut).mockImplementation((async () => {
+      order.push("signOut");
+      return { data: { success: true }, error: null };
+    }) as never);
+  }
+
+  it("データを残してログアウト: 同期停止 → signOut の順に呼び、端末データは削除しない", async () => {
+    const order: string[] = [];
+    stubSignOutSuccess(order);
+    const { onLogoutStart, onDeleteDeviceData } = renderLoggedIn({ variant: "dropdown" });
+    onLogoutStart.mockImplementation(() => order.push("stopSync"));
+
+    const dialog = openLogoutDialogFromDropdown();
+    fireEvent.click(within(dialog).getByRole("button", { name: "データを残してログアウト" }));
+
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+    expect(order).toEqual(["stopSync", "signOut"]);
+    expect(onDeleteDeviceData).not.toHaveBeenCalled();
+    expect(reloadSpy).not.toHaveBeenCalled();
+  });
+
+  it("この端末のデータを削除してログアウト: 同期停止 → signOut → 削除 → 再読み込みの順に呼ぶ", async () => {
+    const order: string[] = [];
+    stubSignOutSuccess(order);
+    const { onLogoutStart, onDeleteDeviceData } = renderLoggedIn({ variant: "dropdown" });
+    onLogoutStart.mockImplementation(() => order.push("stopSync"));
+    onDeleteDeviceData.mockImplementation(() => order.push("deleteDeviceData"));
+    reloadSpy.mockImplementation(() => order.push("reload"));
+
+    const dialog = openLogoutDialogFromDropdown();
+    fireEvent.click(within(dialog).getByRole("button", { name: "この端末のデータを削除してログアウト" }));
+
+    await waitFor(() => expect(reloadSpy).toHaveBeenCalledTimes(1));
+    expect(order).toEqual(["stopSync", "signOut", "deleteDeviceData", "reload"]);
+  });
+
+  it("signOut が失敗したら端末データを削除せず、ダイアログ内で失敗を伝える", async () => {
+    vi.mocked(signOut).mockResolvedValue({ data: null, error: { status: 500, statusText: "error" } } as never);
+    const { onDeleteDeviceData } = renderLoggedIn({ variant: "dropdown" });
+
+    const dialog = openLogoutDialogFromDropdown();
+    fireEvent.click(within(dialog).getByRole("button", { name: "この端末のデータを削除してログアウト" }));
+
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent("ログアウトに失敗しました");
+    expect(onDeleteDeviceData).not.toHaveBeenCalled();
+    expect(reloadSpy).not.toHaveBeenCalled();
+    // もう一度選べる。
+    expect(within(dialog).getByRole("button", { name: "この端末のデータを削除してログアウト" })).toBeEnabled();
+  });
+
+  it("signOut が例外を投げても端末データを削除しない", async () => {
+    vi.mocked(signOut).mockRejectedValue(new Error("network"));
+    const { onDeleteDeviceData } = renderLoggedIn({ variant: "dropdown" });
+
+    const dialog = openLogoutDialogFromDropdown();
+    fireEvent.click(within(dialog).getByRole("button", { name: "この端末のデータを削除してログアウト" }));
+
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent("ログアウトに失敗しました");
+    expect(onDeleteDeviceData).not.toHaveBeenCalled();
+    expect(reloadSpy).not.toHaveBeenCalled();
+  });
+
+  it("サーバーへ送られていない変更があれば警告を出す", () => {
+    renderLoggedIn({ variant: "dropdown", hasUnsyncedChanges: () => true });
+    const dialog = openLogoutDialogFromDropdown();
+    expect(within(dialog).getByText(/サーバーへまだ送られていない変更があります/)).toBeInTheDocument();
+  });
+
+  it("未同期の変更がなければ警告を出さない", () => {
+    renderLoggedIn({ variant: "dropdown", hasUnsyncedChanges: () => false });
+    const dialog = openLogoutDialogFromDropdown();
+    expect(within(dialog).queryByText(/サーバーへまだ送られていない変更があります/)).not.toBeInTheDocument();
+  });
+
+  it("キャンセルでは何もしない", () => {
+    const { onLogoutStart, onDeleteDeviceData } = renderLoggedIn({ variant: "dropdown" });
+    const dialog = openLogoutDialogFromDropdown();
+    fireEvent.click(within(dialog).getByRole("button", { name: "キャンセル" }));
+
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+    expect(onLogoutStart).not.toHaveBeenCalled();
+    expect(vi.mocked(signOut)).not.toHaveBeenCalled();
+    expect(onDeleteDeviceData).not.toHaveBeenCalled();
+  });
+
+  it("inline 変形でもログアウトボタンから確認ダイアログを開き、削除してログアウトできる", async () => {
+    const order: string[] = [];
+    stubSignOutSuccess(order);
+    const { onDeleteDeviceData } = renderLoggedIn({ variant: "inline" });
+
+    fireEvent.click(screen.getByRole("button", { name: "ログアウト" }));
+    const dialog = screen.getByRole("alertdialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "この端末のデータを削除してログアウト" }));
+
+    await waitFor(() => expect(reloadSpy).toHaveBeenCalledTimes(1));
+    expect(order).toEqual(["signOut"]);
+    expect(onDeleteDeviceData).toHaveBeenCalledTimes(1);
   });
 });

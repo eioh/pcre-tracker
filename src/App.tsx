@@ -42,7 +42,7 @@ import { PrivacyPolicyPage } from "./components/PrivacyPolicyPage";
 import { useSync } from "./hooks/useSync";
 import { useIsMobile } from "./hooks/useIsMobile";
 import { clearSyncMeta } from "./domain/syncMeta";
-import { isDeviceDataEpochCurrent } from "./domain/deviceData";
+import { clearDeviceUserData, isDeviceDataEpochCurrent, sealDeviceDataWrites } from "./domain/deviceData";
 import { DEVICE_DATA_EPOCH_STORAGE_KEY } from "./domain/storageKeys";
 import { Button } from "./components/ui/button";
 
@@ -247,6 +247,15 @@ export default function App() {
     onLocalDataCleared: handleLocalDataCleared,
   });
   const { stopSync } = sync;
+
+  // ログアウト成功後に「この端末のデータを削除」を選んでいたときに呼ぶ（呼び出し後に SyncHeader がリロードする）。
+  // 先に端末データの世代を進めて、別のタブとこのタブの両方からの書き戻しを止めてから 6 キーを削除する。
+  const handleDeleteDeviceDataOnLogout = useCallback(() => {
+    stopSync();
+    cancelPendingSave();
+    sealDeviceDataWrites();
+    clearDeviceUserData();
+  }, [stopSync, cancelPendingSave]);
 
   // 別のタブで端末データが削除・変更されたことを検知したか（閉じられない再読み込み案内を出す）。
   const [isDeviceDataChangedElsewhere, setIsDeviceDataChangedElsewhere] = useState(false);
@@ -485,6 +494,9 @@ export default function App() {
           onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
           onDeleteRequestStart={sync.stopSync}
           onBeforeAccountDeleted={handleBeforeAccountDeleted}
+          onLogoutStart={sync.stopSync}
+          onDeleteDeviceData={handleDeleteDeviceDataOnLogout}
+          hasUnsyncedChanges={sync.hasUnsyncedChanges}
           updatedAt={state.updatedAt ? formatUpdatedAt(state.updatedAt) : "-"}
           onExportBackup={handleExportBackup}
           onSelectImportFile={handleSelectImportFile}
@@ -509,6 +521,9 @@ export default function App() {
             onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
             onDeleteRequestStart={sync.stopSync}
             onBeforeAccountDeleted={handleBeforeAccountDeleted}
+            onLogoutStart={sync.stopSync}
+            onDeleteDeviceData={handleDeleteDeviceDataOnLogout}
+            hasUnsyncedChanges={sync.hasUnsyncedChanges}
           />
           <HeaderDataMenu
             onExport={handleExportBackup}

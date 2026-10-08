@@ -41,8 +41,14 @@ import { masterCharacters } from "./domain/master";
 import { createClanBattleFormation, createClanBattleMonthGroup } from "./domain/clanBattle";
 import { UI_STORAGE_KEY } from "./domain/uiStorage";
 import type { UseSyncResult } from "./hooks/useSync";
+import { signOut } from "./lib/authClient";
 import { isDeviceDataEpochCurrent } from "./domain/deviceData";
-import { DEVICE_DATA_EPOCH_STORAGE_KEY } from "./domain/storageKeys";
+import {
+  DEVICE_DATA_EPOCH_STORAGE_KEY,
+  LOCAL_DATA_OWNER_STORAGE_KEY,
+  SYNC_META_STORAGE_KEY,
+  TOUCHED_STORAGE_KEY,
+} from "./domain/storageKeys";
 
 // useSync の戻り値を未ログイン・同期なしの静的値に固定する（overrides で一部を差し替えられる）。
 function stubSync(overrides: Partial<UseSyncResult> = {}): UseSyncResult {
@@ -602,5 +608,40 @@ describe("App: 別のタブで端末データが変わったとき", () => {
     fireEvent(window, new Event("pagehide"));
     await new Promise((resolve) => setTimeout(resolve, 600));
     expect(window.localStorage.getItem(STORAGE_KEY)).toBe(otherTabValue);
+  });
+});
+
+describe("App: ログアウト時の端末データ削除", () => {
+  it("「この端末のデータを削除してログアウト」で signOut 成功後に端末データを削除して再読み込みする", { timeout: 20_000 }, async () => {
+    const { reload, restore } = stubReload();
+    try {
+      vi.mocked(signOut).mockResolvedValue({ data: { success: true }, error: null } as never);
+      const sync = stubSync({ isLoggedIn: true, status: "idle", userLabel: "テスト表示名" });
+      window.localStorage.setItem(TOUCHED_STORAGE_KEY, "1");
+      window.localStorage.setItem(SYNC_META_STORAGE_KEY, JSON.stringify({ userId: "u1", revision: 1, localChangeSeq: 0, lastSyncedSeq: 0 }));
+      window.localStorage.setItem(LOCAL_DATA_OWNER_STORAGE_KEY, JSON.stringify({ userId: "u1" }));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(buildInitialState(masterCharacters)));
+      render(<App />);
+
+      fireEvent.keyDown(screen.getByRole("button", { name: /テスト表示名/ }), { key: "Enter" });
+      fireEvent.click(screen.getByRole("menuitem", { name: "ログアウト" }));
+      const dialog = screen.getByRole("alertdialog");
+      fireEvent.click(within(dialog).getByRole("button", { name: "この端末のデータを削除してログアウト" }));
+
+      await waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
+      expect(vi.mocked(signOut)).toHaveBeenCalledTimes(1);
+      expect(sync.stopSync).toHaveBeenCalled();
+      for (const key of [STORAGE_KEY, UI_STORAGE_KEY, TOUCHED_STORAGE_KEY, SYNC_META_STORAGE_KEY, LOCAL_DATA_OWNER_STORAGE_KEY]) {
+        expect(window.localStorage.getItem(key)).toBeNull();
+      }
+      // 再読み込みまでの間、このタブからは端末データへ書き込めない（pagehide でも書き戻さない）。
+      expect(isDeviceDataEpochCurrent()).toBe(false);
+      fireEvent(window, new Event("pagehide"));
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+      expect(window.localStorage.getItem(UI_STORAGE_KEY)).toBeNull();
+    } finally {
+      restore();
+    }
   });
 });

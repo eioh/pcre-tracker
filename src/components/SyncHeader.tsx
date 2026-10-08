@@ -38,6 +38,12 @@ type Props = {
   onDeleteRequestStart: () => void;
   // アカウント削除成功の直前に呼ぶ。同期メタ破棄など App 側の後処理を委譲する（設計判断 3）。
   onBeforeAccountDeleted: () => void;
+  // ログアウト（signOut）の直前に呼ぶ。同期を停止し、ログアウト〜削除の間の PUT を防ぐ。
+  onLogoutStart: () => void;
+  // ログアウト成功後、「この端末のデータを削除してログアウト」を選んでいたときに呼ぶ（呼び出し後にリロードする）。
+  onDeleteDeviceData: () => void;
+  // サーバーへまだ送られていない変更があるかを返す（ログアウト確認の警告に使う）。
+  hasUnsyncedChanges: () => boolean;
   // レイアウト変形。"inline"（既定）は従来の横並び表示（モバイルのシート内で使用）、
   // "dropdown" はログイン後 UI をユーザー名チップ + ドロップダウンメニューに集約する（デスクトップヘッダー用）。
   variant?: "inline" | "dropdown";
@@ -72,6 +78,9 @@ export function SyncHeader({
   onOpenPrivacyPolicy,
   onDeleteRequestStart,
   onBeforeAccountDeleted,
+  onLogoutStart,
+  onDeleteDeviceData,
+  hasUnsyncedChanges,
   variant = "inline",
 }: Props) {
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
@@ -83,6 +92,13 @@ export function SyncHeader({
   // Radix の AlertDialogAction は onClick と（クローズに伴う）onOpenChange の両方を発火させるため、
   // 成功時のリロードが二重に走らないようにする。
   const isClosingDeleteResultRef = useRef(false);
+  // ログアウト確認ダイアログの状態。
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  // ダイアログを開いた時点で、サーバーへ送られていない変更があったか（警告の表示用）。
+  const [logoutHasUnsyncedChanges, setLogoutHasUnsyncedChanges] = useState(false);
+  // ログアウトに失敗したか（失敗時は端末データを削除せず、ダイアログ内で案内する）。
+  const [logoutFailed, setLogoutFailed] = useState(false);
 
   // GitHub / Google でのソーシャルログインを開始する。
   const handleSignIn = (provider: "github" | "google") => {
@@ -90,9 +106,41 @@ export function SyncHeader({
     void signIn.social({ provider, callbackURL: "/" });
   };
 
-  // ログアウトする。
-  const handleSignOut = () => {
-    void signOut();
+  // ログアウト確認ダイアログを開く（未同期の変更の有無はこの時点で確定させる）。
+  const openLogoutDialog = () => {
+    setLogoutHasUnsyncedChanges(hasUnsyncedChanges());
+    setLogoutFailed(false);
+    setIsLogoutDialogOpen(true);
+  };
+
+  // ログアウトする。deleteDeviceData が true なら、ログアウト成功後に端末データを削除して再読み込みする。
+  // 処理順: 同期停止 → signOut → 成功時のみ端末データ削除 → 再読み込み。
+  // 先に削除すると、ログアウトに失敗したときにサーバーから再び取り込まれてしまうため、削除は必ず成功後に行う。
+  const handleLogout = async (deleteDeviceData: boolean) => {
+    setIsLoggingOut(true);
+    setLogoutFailed(false);
+    onLogoutStart();
+    let succeeded = false;
+    try {
+      const result = await signOut();
+      succeeded = !result?.error;
+    } catch {
+      // ネットワーク例外等（クライアントが throw する経路）も失敗扱いにする。
+      succeeded = false;
+    }
+    if (!succeeded) {
+      // 失敗: 端末データは削除せず、ダイアログ内で案内する（このタブで編集を続けられる）。
+      setIsLoggingOut(false);
+      setLogoutFailed(true);
+      return;
+    }
+    if (deleteDeviceData) {
+      onDeleteDeviceData();
+      window.location.reload();
+      return;
+    }
+    setIsLoggingOut(false);
+    setIsLogoutDialogOpen(false);
   };
 
   // アカウント削除を実行する（better-auth の /api/auth/delete-user を呼ぶ）。
@@ -193,7 +241,7 @@ export function SyncHeader({
                 ) : null}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={handleSignOut}>
+              <DropdownMenuItem onSelect={openLogoutDialog}>
                 <LogOut className="size-4" aria-hidden="true" />
                 ログアウト
               </DropdownMenuItem>
@@ -223,7 +271,7 @@ export function SyncHeader({
             ) : (
               <span className="text-xs text-muted">ログイン中</span>
             )}
-            <Button variant="outline" size="sm" onClick={handleSignOut}>
+            <Button variant="outline" size="sm" onClick={openLogoutDialog}>
               <LogOut className="size-4" aria-hidden="true" />
               ログアウト
             </Button>
@@ -239,6 +287,51 @@ export function SyncHeader({
             </Button>
           </div>
         )}
+
+        {/*
+          ログアウトの確認ダイアログ。共有端末で次の利用者にデータが残らないよう、端末データを削除するかを選べる。
+          ドロップダウン・インラインの両方から開く（メニューが閉じても表示されるよう SyncHeader ルートに置く）。
+        */}
+        <AlertDialog open={isLogoutDialogOpen} onOpenChange={(open) => !isLoggingOut && setIsLogoutDialogOpen(open)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>ログアウトしますか？</AlertDialogTitle>
+              <AlertDialogDescription>
+                この端末の育成データと表示設定を残すか、削除するかを選んでください。残した場合、次に別のアカウントでログインしたときに、このデータをどうするか確認します。共有の端末では、データを削除してからログアウトすることをおすすめします。
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            {logoutHasUnsyncedChanges ? (
+              <p className="m-0 text-sm text-danger">
+                サーバーへまだ送られていない変更があります。この端末のデータを削除すると、その変更は失われます。
+              </p>
+            ) : null}
+            {logoutFailed ? (
+              <p className="m-0 text-sm text-danger" role="alert">
+                ログアウトに失敗しました。通信環境を確認してもう一度お試しください。
+              </p>
+            ) : null}
+            {isLoggingOut ? (
+              <p className="m-0 text-sm text-accent" role="status">
+                ログアウト中...
+              </p>
+            ) : null}
+            {/* 3 つのボタンは文言が長いため、画面幅によらず縦に並べる。 */}
+            <AlertDialogFooter className="sm:flex-col-reverse sm:justify-start">
+              <AlertDialogCancel disabled={isLoggingOut}>キャンセル</AlertDialogCancel>
+              <Button
+                variant="outline"
+                className="border-danger/60 bg-danger-bg/40 text-danger hover:border-danger-strong hover:text-danger-strong"
+                disabled={isLoggingOut}
+                onClick={() => void handleLogout(true)}
+              >
+                この端末のデータを削除してログアウト
+              </Button>
+              <Button variant="outline" disabled={isLoggingOut} onClick={() => void handleLogout(false)}>
+                データを残してログアウト
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* 破壊的操作の確認ダイアログ。削除内容を明示する（設計判断 3）。 */}
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={(open) => !isDeleting && setIsDeleteDialogOpen(open)}>

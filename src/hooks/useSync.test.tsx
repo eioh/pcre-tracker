@@ -598,6 +598,9 @@ describe("useSync: userLabel の PII 是正（email 形式の表示名）", () =
         onOpenPrivacyPolicy={vi.fn()}
         onDeleteRequestStart={vi.fn()}
         onBeforeAccountDeleted={vi.fn()}
+        onLogoutStart={vi.fn()}
+        onDeleteDeviceData={vi.fn()}
+        hasUnsyncedChanges={sync.hasUnsyncedChanges}
       />
     );
   }
