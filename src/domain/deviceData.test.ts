@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { applyBackupPayloadToLocalStorage, StaleDeviceDataError } from "./backup";
 import { buildDefaultConnectRankCalcState } from "./connectRankCalcSchema";
 import { saveConnectRankCalcState } from "./connectRankCalcStorage";
@@ -36,6 +36,10 @@ function fillDeviceData() {
     window.localStorage.setItem(key, `before:${key}`);
   }
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 beforeEach(() => {
   // epoch キーも消える。キーがない状態は「別のタブが進めた証拠なし」として控えの値で作り直される。
@@ -165,5 +169,33 @@ describe("deviceData: 各保存関数は epoch が古いタブから書き込ま
       },
     });
     expect(window.localStorage.getItem(STORAGE_KEY)).toBe('{"schemaVersion":1,"progressByName":{}}');
+  });
+});
+
+describe("deviceData: 起動時に epoch を保存できない環境", () => {
+  it("読み込み時に保存が失敗しても例外を投げず、このタブでは端末データへ書き込まない", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const setItemSpy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("quota exceeded", "QuotaExceededError");
+    });
+    vi.resetModules();
+    const freshDeviceData = await import("./deviceData");
+    setItemSpy.mockRestore();
+
+    expect(freshDeviceData.isDeviceDataEpochCurrent()).toBe(false);
+    expect(freshDeviceData.writeDeviceStorage(STORAGE_KEY, "value")).toBe(false);
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+
+  it("読み込み時に localStorage の読み取りが失敗しても例外を投げない", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const getItemSpy = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new DOMException("denied", "SecurityError");
+    });
+    vi.resetModules();
+    const freshDeviceData = await import("./deviceData");
+    getItemSpy.mockRestore();
+
+    expect(freshDeviceData.isDeviceDataEpochCurrent()).toBe(false);
   });
 });

@@ -44,40 +44,51 @@ function createEpochValue(): string {
 }
 
 // タブ起動時の epoch を読み込む。キーがなければ新しい値を作って保存する。
+// localStorage の読み書きに失敗したとき（容量超過・ストレージが使えない環境など）は null を返す。
+// モジュール読み込み時に呼ぶため、例外を投げるとアプリ全体が起動できなくなる。ここでは例外を外へ出さない。
 function readOrCreateEpoch(): string | null {
   if (typeof window === "undefined") {
     return null;
   }
-  const stored = window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY);
-  if (stored !== null) {
-    return stored;
+  try {
+    const stored = window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY);
+    if (stored !== null) {
+      return stored;
+    }
+    const created = createEpochValue();
+    window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, created);
+    return created;
+  } catch (error) {
+    console.warn("端末データの世代を保存できないため、このタブでは端末データを保存しません", { error });
+    return null;
   }
-  const created = createEpochValue();
-  window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, created);
-  return created;
 }
 
 // このタブが控えている epoch。モジュール読み込み時（＝タブ起動時）に確定させる。
 // 遅延初期化にすると、別のタブが epoch を進めた後に初めて書き込むタブが新しい値を控えてしまい、書き戻しを止められない。
+// null は起動時に確定できなかったことを表す。後から読み直すと同じ理由で書き戻しを止められないため、
+// このタブの間は端末データへ書き込まない側に倒す（アプリは起動し、表示と操作はできる。
+// 起動時に世代を保存できない状態では、端末データの保存もほぼ失敗するため、失うものは小さい）。
 let capturedEpoch: string | null = readOrCreateEpoch();
 
 // このタブの控えが localStorage の現在の epoch と一致するか（＝このタブから端末データへ書き込んでよいか）を返す。
 // キーが存在しない場合（サイトデータの手動消去など。アプリ自身は epoch キーを削除しない）は、
 // 別のタブが epoch を進めた証拠がないため一致とみなし、控えの値で作り直す。
+// 起動時に epoch を確定できなかったタブと、localStorage の読み書きに失敗した場合は一致しないとみなす。
 export function isDeviceDataEpochCurrent(): boolean {
-  if (typeof window === "undefined") {
+  if (typeof window === "undefined" || capturedEpoch === null) {
     return false;
   }
-  if (capturedEpoch === null) {
-    capturedEpoch = readOrCreateEpoch();
-    return true;
+  try {
+    const stored = window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY);
+    if (stored === null) {
+      window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, capturedEpoch);
+      return true;
+    }
+    return stored === capturedEpoch;
+  } catch {
+    return false;
   }
-  const stored = window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY);
-  if (stored === null) {
-    window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, capturedEpoch);
-    return true;
-  }
-  return stored === capturedEpoch;
 }
 
 // 端末データの epoch を進める（このタブの控えも新しい値へ更新する）。
