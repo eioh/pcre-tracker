@@ -35,10 +35,13 @@ describe("PrivacyPolicyPage", () => {
     // 7 日間の残存（必須）。
     expect(body).toContain("7 日間");
     expect(body).toMatch(/Time Travel/);
-    // セッションに IP アドレス・ユーザーエージェントを保存し、トークンは暗号化して保存する。
+    // セッションに IP アドレス・ユーザーエージェントを保存する。
     expect(body).toContain("IP アドレス");
     expect(body).toContain("ユーザーエージェント");
-    expect(body).toMatch(/新たに保存・更新されるアクセストークンとリフレッシュトークンは暗号化して保存/);
+    // 保存済みのトークンは一度削除済みで、以後のログインで保存されるアクセス・リフレッシュトークンは暗号化する。
+    expect(body).toMatch(/保存済みのトークン（スコープを除く）は一度すべて削除しました/);
+    expect(body).toMatch(/その削除後のログインで保存されたもの/);
+    expect(body).toMatch(/アクセストークンとリフレッシュトークンは暗号化して保存します/);
     expect(body).toContain("ID トークン");
     expect(body).toMatch(/ID トークンは暗号化の対象外/);
     // GitHub / Google は確認済みの同じメールアドレスなら同じアカウント、異なれば別アカウント。
