@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { authClient, signIn, signOut } from "../lib/authClient";
+import { isDeviceDataEpochCurrent } from "../domain/deviceData";
 import type { SyncStatus } from "../hooks/useSync";
 import { cn } from "../lib/utils";
 import {
@@ -41,7 +42,8 @@ type Props = {
   // ログアウト（signOut）の直前に呼ぶ。同期を停止し、ログアウト〜削除の間の PUT を防ぐ。
   onLogoutStart: () => void;
   // ログアウト成功後、「この端末のデータを削除してログアウト」を選んでいたときに呼ぶ（呼び出し後にリロードする）。
-  onDeleteDeviceData: () => void;
+  // 別のタブで端末データが変わっていて削除しなかった場合は false を返す。
+  onDeleteDeviceData: () => boolean;
   // サーバーへまだ送られていない変更があるかを返す（ログアウト確認の警告に使う）。
   hasUnsyncedChanges: () => boolean;
   // レイアウト変形。"inline"（既定）は従来の横並び表示（モバイルのシート内で使用）、
@@ -99,6 +101,8 @@ export function SyncHeader({
   const [logoutHasUnsyncedChanges, setLogoutHasUnsyncedChanges] = useState(false);
   // ログアウトに失敗したか（失敗時は端末データを削除せず、ダイアログ内で案内する）。
   const [logoutFailed, setLogoutFailed] = useState(false);
+  // 別のタブで端末データが変わっていたため、削除を始めなかったか（再読み込みを案内する）。
+  const [logoutDeviceDataChanged, setLogoutDeviceDataChanged] = useState(false);
 
   // GitHub / Google でのソーシャルログインを開始する。
   const handleSignIn = (provider: "github" | "google") => {
@@ -110,15 +114,22 @@ export function SyncHeader({
   const openLogoutDialog = () => {
     setLogoutHasUnsyncedChanges(hasUnsyncedChanges());
     setLogoutFailed(false);
+    setLogoutDeviceDataChanged(false);
     setIsLogoutDialogOpen(true);
   };
 
   // ログアウトする。deleteDeviceData が true なら、ログアウト成功後に端末データを削除して再読み込みする。
   // 処理順: 同期停止 → signOut → 成功時のみ端末データ削除 → 再読み込み。
   // 先に削除すると、ログアウトに失敗したときにサーバーから再び取り込まれてしまうため、削除は必ず成功後に行う。
+  // 別のタブで端末データが変わった後のタブからは削除を始めない（別のタブの新しいデータを消さないため）。
+  // signOut の応答待ちの間に変わった場合は、削除処理（onDeleteDeviceData）が世代を確かめて削除しない。
   const handleLogout = async (deleteDeviceData: boolean) => {
-    setIsLoggingOut(true);
     setLogoutFailed(false);
+    if (deleteDeviceData && !isDeviceDataEpochCurrent()) {
+      setLogoutDeviceDataChanged(true);
+      return;
+    }
+    setIsLoggingOut(true);
     onLogoutStart();
     let succeeded = false;
     try {
@@ -135,6 +146,7 @@ export function SyncHeader({
       return;
     }
     if (deleteDeviceData) {
+      // 削除しなかった場合（応答待ちの間に別のタブで端末データが変わった場合）も、ログアウト済みなので再読み込みする。
       onDeleteDeviceData();
       window.location.reload();
       return;
@@ -308,6 +320,11 @@ export function SyncHeader({
             {logoutFailed ? (
               <p className="m-0 text-sm text-danger" role="alert">
                 ログアウトに失敗しました。通信環境を確認してもう一度お試しください。
+              </p>
+            ) : null}
+            {logoutDeviceDataChanged ? (
+              <p className="m-0 text-sm text-danger" role="alert">
+                別のタブでこの端末のデータが変更されたため、削除できません。画面を再読み込みしてから、もう一度お試しください。
               </p>
             ) : null}
             {isLoggingOut ? (

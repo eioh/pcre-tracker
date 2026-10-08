@@ -25,7 +25,7 @@ type Props = {
   // ログアウトの直前に呼ぶ（SyncHeader へそのまま渡す）。
   onLogoutStart: () => void;
   // ログアウト成功後に端末データを削除するときに呼ぶ（SyncHeader へそのまま渡す）。
-  onDeleteDeviceData: () => void;
+  onDeleteDeviceData: () => boolean;
   // サーバーへまだ送られていない変更があるかを返す（SyncHeader へそのまま渡す）。
   hasUnsyncedChanges: () => boolean;
   // フォーマット済みの最終更新テキスト（App 側で整形済み）。

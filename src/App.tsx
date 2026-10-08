@@ -250,11 +250,17 @@ export default function App() {
 
   // ログアウト成功後に「この端末のデータを削除」を選んでいたときに呼ぶ（呼び出し後に SyncHeader がリロードする）。
   // 先に端末データの世代を進めて、別のタブとこのタブの両方からの書き戻しを止めてから 6 キーを削除する。
-  const handleDeleteDeviceDataOnLogout = useCallback(() => {
+  // signOut の応答待ちの間に別のタブで端末データが変わっていたら（世代が進んでいたら）、
+  // それは別のタブの新しいデータと所有者なので削除しない。削除したら true を返す。
+  const handleDeleteDeviceDataOnLogout = useCallback((): boolean => {
     stopSync();
     cancelPendingSave();
+    if (!isDeviceDataEpochCurrent()) {
+      return false;
+    }
     sealDeviceDataWrites();
     clearDeviceUserData();
+    return true;
   }, [stopSync, cancelPendingSave]);
 
   // 別のタブで端末データが削除・変更されたことを検知したか（閉じられない再読み込み案内を出す）。

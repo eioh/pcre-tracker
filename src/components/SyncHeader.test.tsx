@@ -11,11 +11,14 @@ vi.mock("../lib/authClient", () => ({
 
 import { SyncHeader } from "./SyncHeader";
 import { signOut } from "../lib/authClient";
+import { isDeviceDataEpochCurrent } from "../domain/deviceData";
+import { DEVICE_DATA_EPOCH_STORAGE_KEY } from "../domain/storageKeys";
 
 // window.location.reload をスパイに差し替えるためのユーティリティ。
 const reloadSpy = vi.fn();
 
 beforeEach(() => {
+  window.localStorage.clear();
   mockDeleteUser.mockReset();
   reloadSpy.mockReset();
   vi.mocked(signOut).mockReset();
@@ -323,6 +326,22 @@ describe("SyncHeader: ログアウト確認ダイアログ", () => {
     expect(onLogoutStart).not.toHaveBeenCalled();
     expect(vi.mocked(signOut)).not.toHaveBeenCalled();
     expect(onDeleteDeviceData).not.toHaveBeenCalled();
+  });
+
+  it("別のタブで端末データが変わった後は、削除してログアウトを始めずに案内する", () => {
+    const { onLogoutStart, onDeleteDeviceData } = renderLoggedIn({ variant: "dropdown" });
+    // 別のタブが端末データの epoch を進めた状況を再現する。
+    isDeviceDataEpochCurrent();
+    window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, "other-tab");
+
+    const dialog = openLogoutDialogFromDropdown();
+    fireEvent.click(within(dialog).getByRole("button", { name: "この端末のデータを削除してログアウト" }));
+
+    expect(within(dialog).getByRole("alert")).toHaveTextContent("別のタブでこの端末のデータが変更されたため、削除できません");
+    expect(onLogoutStart).not.toHaveBeenCalled();
+    expect(vi.mocked(signOut)).not.toHaveBeenCalled();
+    expect(onDeleteDeviceData).not.toHaveBeenCalled();
+    expect(reloadSpy).not.toHaveBeenCalled();
   });
 
   it("inline 変形でもログアウトボタンから確認ダイアログを開き、削除してログアウトできる", async () => {

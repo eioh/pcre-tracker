@@ -103,6 +103,8 @@ beforeEach(() => {
   // jsdomにページスクロールの実装はないため、画面切り替え時の呼び出しをスタブする。
   vi.stubGlobal("scrollTo", vi.fn());
   mockUseSync.mockReset();
+  // ログアウトのテストで差し替えた signOut の実装と呼び出し回数を戻す。
+  vi.mocked(signOut).mockReset();
   capturedUseSyncOptions = null;
   stubSync();
 });
@@ -612,6 +614,44 @@ describe("App: 別のタブで端末データが変わったとき", () => {
 });
 
 describe("App: ログアウト時の端末データ削除", () => {
+  it("signOut の応答待ちの間に別のタブで端末データが変わったら、削除せずに再読み込みする", { timeout: 20_000 }, async () => {
+    const { reload, restore } = stubReload();
+    try {
+      let resolveSignOut: ((value: unknown) => void) | null = null;
+      vi.mocked(signOut).mockImplementation((() =>
+        new Promise((resolve) => {
+          resolveSignOut = resolve;
+        })) as never);
+      stubSync({ isLoggedIn: true, status: "idle", userLabel: "テスト表示名" });
+      render(<App />);
+
+      fireEvent.keyDown(screen.getByRole("button", { name: /テスト表示名/ }), { key: "Enter" });
+      fireEvent.click(screen.getByRole("menuitem", { name: "ログアウト" }));
+      const dialog = screen.getByRole("alertdialog");
+      fireEvent.click(within(dialog).getByRole("button", { name: "この端末のデータを削除してログアウト" }));
+      await waitFor(() => expect(resolveSignOut).not.toBeNull());
+
+      // 応答待ちの間に、別のタブが所有者を変えてデータを採用した状況を再現する。
+      simulateEpochBumpedInAnotherTab();
+      const otherTabData = JSON.stringify({ marker: "other-tab" });
+      const otherTabOwner = JSON.stringify({ userId: "u_other" });
+      window.localStorage.setItem(STORAGE_KEY, otherTabData);
+      window.localStorage.setItem(LOCAL_DATA_OWNER_STORAGE_KEY, otherTabOwner);
+      window.localStorage.setItem(TOUCHED_STORAGE_KEY, "1");
+
+      await act(async () => {
+        resolveSignOut?.({ data: { success: true }, error: null });
+      });
+
+      await waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
+      expect(window.localStorage.getItem(STORAGE_KEY)).toBe(otherTabData);
+      expect(window.localStorage.getItem(LOCAL_DATA_OWNER_STORAGE_KEY)).toBe(otherTabOwner);
+      expect(window.localStorage.getItem(TOUCHED_STORAGE_KEY)).toBe("1");
+    } finally {
+      restore();
+    }
+  });
+
   it("「この端末のデータを削除してログアウト」で signOut 成功後に端末データを削除して再読み込みする", { timeout: 20_000 }, async () => {
     const { reload, restore } = stubReload();
     try {
