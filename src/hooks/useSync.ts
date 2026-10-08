@@ -109,6 +109,8 @@ export type UseSyncResult = {
   accountSwitch: AccountSwitchInfo | null;
   // 確認ダイアログの選択を処理中か（引き継ぎ・上書きの PUT やログアウトの完了まで true）。
   isAccountSwitchBusy: boolean;
+  // 確認ダイアログの「ログアウトする」でログアウトに失敗したか（ダイアログ内で失敗を伝える）。
+  accountSwitchSignOutFailed: boolean;
   // 確認ダイアログで端末データを使う選択（サーバーなし:「引き継ぐ」/ サーバーあり:「上書き」）。PUT を伴うため非同期。
   resolveAccountSwitchCarryOver: () => Promise<void>;
   // 確認ダイアログで端末データを使わない選択（サーバーなし:「初期状態から始める」/ サーバーあり:「サーバーのデータを使う」）。
@@ -154,6 +156,7 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
   const [conflict, setConflict] = useState<ConflictInfo | null>(null);
   const [accountSwitch, setAccountSwitch] = useState<AccountSwitchInfo | null>(null);
   const [isAccountSwitchBusy, setIsAccountSwitchBusy] = useState(false);
+  const [accountSwitchSignOutFailed, setAccountSwitchSignOutFailed] = useState(false);
   // 確認ダイアログの選択の二重実行を防ぐためのフラグ（state の反映を待たずに判定する）。
   const isAccountSwitchBusyRef = useRef(false);
 
@@ -620,6 +623,7 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     const ownership = decideLocalDataOwnership({ ownerId, userId, localHasRealData });
     if (ownership === "confirm_switch") {
       // PUT も採用もしない。所有者キーと前のアカウントのメタも変えないので、リロードしても再び確認が出る。
+      setAccountSwitchSignOutFailed(false);
       setAccountSwitch({
         userId,
         server:
@@ -891,14 +895,19 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     }
     isAccountSwitchBusyRef.current = true;
     setIsAccountSwitchBusy(true);
+    setAccountSwitchSignOutFailed(false);
     invalidatePendingSync();
     try {
       const result = await signOut();
-      if (!result?.error) {
+      if (result?.error) {
+        // ダイアログを残し、失敗を伝えてもう一度選べるようにする。
+        setAccountSwitchSignOutFailed(true);
+      } else {
         setAccountSwitch(null);
       }
     } catch {
-      // 通信エラー等。ダイアログを残し、もう一度選べるようにする。
+      // 通信エラー等。ダイアログを残し、失敗を伝えてもう一度選べるようにする。
+      setAccountSwitchSignOutFailed(true);
     } finally {
       isAccountSwitchBusyRef.current = false;
       setIsAccountSwitchBusy(false);
@@ -931,6 +940,7 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       stopSync,
       accountSwitch,
       isAccountSwitchBusy,
+      accountSwitchSignOutFailed,
       resolveAccountSwitchCarryOver,
       resolveAccountSwitchDiscard,
       cancelAccountSwitchAndSignOut,
@@ -949,6 +959,7 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       stopSync,
       accountSwitch,
       isAccountSwitchBusy,
+      accountSwitchSignOutFailed,
       resolveAccountSwitchCarryOver,
       resolveAccountSwitchDiscard,
       cancelAccountSwitchAndSignOut,

@@ -742,6 +742,11 @@ export default function App() {
             </p>
           ) : null}
           <p className="m-0 text-xs text-muted">ログアウトする場合、この端末のデータは変更されずに残ります。</p>
+          {sync.accountSwitchSignOutFailed ? (
+            <p className="m-0 text-sm text-danger" role="alert">
+              ログアウトに失敗しました。通信環境を確認してもう一度お試しください。
+            </p>
+          ) : null}
           {sync.isAccountSwitchBusy ? (
             <p className="m-0 text-sm text-accent" role="status">
               処理中...

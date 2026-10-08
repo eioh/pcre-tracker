@@ -1099,6 +1099,15 @@ describe("useSync: 端末データの所有者の確認", () => {
 
     expect(result.current.accountSwitch).not.toBeNull();
     expect(result.current.isAccountSwitchBusy).toBe(false);
+    expect(result.current.accountSwitchSignOutFailed).toBe(true);
+
+    // もう一度選んで成功すれば、失敗の表示は消えてダイアログも閉じる。
+    mockSignOut.mockResolvedValue({ data: { success: true }, error: null });
+    await act(async () => {
+      await result.current.cancelAccountSwitchAndSignOut();
+    });
+    expect(result.current.accountSwitchSignOutFailed).toBe(false);
+    expect(result.current.accountSwitch).toBeNull();
   });
 
   it("GET 待ち中に別アカウントへ切り替わったら、旧アカウントの文脈で確認を出さない", async () => {

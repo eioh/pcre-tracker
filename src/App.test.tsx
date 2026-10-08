@@ -65,6 +65,7 @@ function stubSync(overrides: Partial<UseSyncResult> = {}): UseSyncResult {
     stopSync: vi.fn(),
     accountSwitch: null,
     isAccountSwitchBusy: false,
+    accountSwitchSignOutFailed: false,
     resolveAccountSwitchCarryOver: vi.fn(async () => {}),
     resolveAccountSwitchDiscard: vi.fn(),
     cancelAccountSwitchAndSignOut: vi.fn(async () => {}),
@@ -506,6 +507,28 @@ describe("App: 別のアカウントのデータの確認ダイアログ", () =>
     expect(sync.resolveAccountSwitchDiscard).toHaveBeenCalledTimes(1);
     fireEvent.click(within(dialog).getByRole("button", { name: "この端末のデータでサーバーを上書き" }));
     expect(sync.resolveAccountSwitchCarryOver).toHaveBeenCalledTimes(1);
+  });
+
+  it("「ログアウトする」が失敗したらダイアログ内で失敗を伝える", () => {
+    stubSync({
+      isLoggedIn: true,
+      status: "idle",
+      userLabel: "テスト表示名",
+      accountSwitchSignOutFailed: true,
+      accountSwitch: {
+        userId: "u_new",
+        server: { kind: "not_found" },
+        localUpdatedAt: "2026-10-01T00:00:00.000Z",
+        previousOwnerHasUnsyncedChanges: false,
+      },
+    });
+    render(<App />);
+
+    const dialog = screen.getByRole("alertdialog");
+    expect(within(dialog).getByRole("alert")).toHaveTextContent(
+      "ログアウトに失敗しました。通信環境を確認してもう一度お試しください。",
+    );
+    expect(within(dialog).getByRole("button", { name: "ログアウトする" })).toBeEnabled();
   });
 
   it("処理中はすべてのボタンを無効にして処理中を表示する", () => {
