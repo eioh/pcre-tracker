@@ -1,26 +1,37 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { loadConnectRankCalcState, saveConnectRankCalcState } from "../domain/connectRankCalcStorage";
+import {
+  bumpDeviceDataEpoch,
+  clearDeviceUserData,
+  isDeviceDataEpochCurrent,
+  sealDeviceDataWrites,
+  writeDeviceStorage,
+} from "../domain/deviceData";
 import { saveStoredState } from "../domain/storage";
 import { CONNECT_RANK_CALC_STORAGE_KEY, STORAGE_KEY } from "../domain/storageKeys";
 import type { SyncPayloadV1 } from "../domain/sync";
 import {
   buildSyncPayloadFromCurrent,
+  decideLocalDataOwnership,
   decideStartupAction,
   fetchServerData,
   hasLocalRealData,
   isSafeToAutoAdopt,
   putServerData,
+  resolveLocalDataOwnerId,
 } from "../domain/syncClient";
 import {
   clearSyncMeta,
+  loadLocalDataOwner,
   loadSyncMeta,
   loadTouchedFlag,
   markTouched,
+  saveLocalDataOwner,
   saveSyncMeta,
   type SyncMetaV1,
 } from "../domain/syncMeta";
 import type { MasterCharacter, StoredStateV1 } from "../domain/types";
-import { useSession } from "../lib/authClient";
+import { signOut, useSession } from "../lib/authClient";
 
 // PUT のデバウンス間隔（ミリ秒）。10 秒（レート制限 30 回/5 分に対し十分低頻度。設計判断 3）。
 const PUT_DEBOUNCE_MS = 10_000;
@@ -46,6 +57,24 @@ export type ConflictInfo = {
   // 競合解決に使う、GET で得たサーバーの最新 revision と payload。
   serverRevision: number;
   serverPayload: SyncPayloadV1;
+};
+
+// 別のアカウントのデータが端末に残っているときの、ログイン中アカウントのサーバー側の状態。
+export type AccountSwitchServerState =
+  | { kind: "not_found" }
+  | { kind: "found"; revision: number; payload: SyncPayloadV1; updatedAt: string };
+
+// 別のアカウントのデータが端末に残っているときの確認ダイアログに渡す情報。
+// 前の所有者の ID は画面に出さないため持たない。
+export type AccountSwitchInfo = {
+  // この確認がどのアカウントの文脈で作られたか（選択の実行時に最新セッションと照合する）。
+  userId: string;
+  // ログイン中アカウントのサーバー側の状態（GET の結果）。
+  server: AccountSwitchServerState;
+  // 端末データの updatedAt。
+  localUpdatedAt: string;
+  // 前のアカウントでサーバーへ送られていない変更が端末データに含まれるか。
+  previousOwnerHasUnsyncedChanges: boolean;
 };
 
 // useSync が App へ返すインターフェース。
@@ -76,6 +105,18 @@ export type UseSyncResult = {
   // 完了処理（メタ書き込み・再予約）を無効化する。削除〜リロードの間に PUT が走って削除済み行を
   // 再作成するのを防ぐ（Phase 4）。
   stopSync: () => void;
+  // 別のアカウントのデータが端末に残っているときの確認ダイアログ情報（null なら非表示）。
+  accountSwitch: AccountSwitchInfo | null;
+  // 確認ダイアログの選択を処理中か（引き継ぎ・上書きの PUT やログアウトの完了まで true）。
+  isAccountSwitchBusy: boolean;
+  // 確認ダイアログで端末データを使う選択（サーバーなし:「引き継ぐ」/ サーバーあり:「上書き」）。PUT を伴うため非同期。
+  resolveAccountSwitchCarryOver: () => Promise<void>;
+  // 確認ダイアログで端末データを使わない選択（サーバーなし:「初期状態から始める」/ サーバーあり:「サーバーのデータを使う」）。
+  resolveAccountSwitchDiscard: () => void;
+  // 確認ダイアログで「ログアウトする」を選んだとき。端末データと所有者は変えずにログアウトする。
+  cancelAccountSwitchAndSignOut: () => Promise<void>;
+  // ログイン中アカウントの、サーバーへ送られていない変更があるか（ログアウト確認の警告に使う）。
+  hasUnsyncedChanges: () => boolean;
 };
 
 // useSync の呼び出しに必要な依存。
@@ -86,14 +127,17 @@ export type UseSyncOptions = {
   masterCharacters: MasterCharacter[];
   // サーバーデータ採用時に呼ぶ。App 側で「ダイアログ表示 → リロード」を行う（既存インポート復元と同じパターン）。
   onServerDataAdopted: () => void;
+  // 確認ダイアログで端末データを削除し、サーバーにもデータがなかったときに呼ぶ。App 側で「ダイアログ表示 → リロード」を行う。
+  onLocalDataCleared: () => void;
 };
 
 // フロントエンド同期層の React 統合フック。
 //
-// 責務: セッション監視・アカウント切替検知・起動時 GET フロー・10 秒デバウンス PUT・
-// 409/競合ダイアログ管理・401 ログアウト扱い。純粋な判定ロジックは syncClient.ts に委譲する。
+// 責務: セッション監視・端末データの所有者の判定（共有端末で別のアカウントがログインしたときの確認）・
+// 起動時 GET フロー・10 秒デバウンス PUT・409/競合ダイアログ管理・401 ログアウト扱い。
+// 純粋な判定ロジックは syncClient.ts に委譲する。
 export function useSync(options: UseSyncOptions): UseSyncResult {
-  const { getState, masterCharacters, onServerDataAdopted } = options;
+  const { getState, masterCharacters, onServerDataAdopted, onLocalDataCleared } = options;
   const session = useSession();
 
   // 現在のセッションユーザー ID（未ログインなら null）。
@@ -108,12 +152,18 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
 
   const [status, setStatus] = useState<SyncStatus>("loading");
   const [conflict, setConflict] = useState<ConflictInfo | null>(null);
+  const [accountSwitch, setAccountSwitch] = useState<AccountSwitchInfo | null>(null);
+  const [isAccountSwitchBusy, setIsAccountSwitchBusy] = useState(false);
+  // 確認ダイアログの選択の二重実行を防ぐためのフラグ（state の反映を待たずに判定する）。
+  const isAccountSwitchBusyRef = useRef(false);
 
   // getState / onServerDataAdopted は毎レンダーで参照が変わりうるため、effect の依存から外すために ref に保持する。
   const getStateRef = useRef(getState);
   getStateRef.current = getState;
   const onServerDataAdoptedRef = useRef(onServerDataAdopted);
   onServerDataAdoptedRef.current = onServerDataAdopted;
+  const onLocalDataClearedRef = useRef(onLocalDataCleared);
+  onLocalDataClearedRef.current = onLocalDataCleared;
 
   // 常に最新のセッションユーザー ID を参照するための ref。
   // async 処理（GET/PUT）の復帰後にクロージャ変数 userId と比較することで、待機中のアカウント切替を検知する。
@@ -149,8 +199,22 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     );
   }, [masterCharacters]);
 
+  // 同期の世代を進め、予約済みのデバウンス PUT を取り消す。
+  // 開始済み（in-flight）の PUT/GET は開始時の世代を控えているため、復帰後の完了処理が黙って中断される。
+  const invalidatePendingSync = useCallback(() => {
+    syncGenerationRef.current += 1;
+    if (putTimerRef.current !== null) {
+      window.clearTimeout(putTimerRef.current);
+      putTimerRef.current = null;
+    }
+  }, []);
+
   // ローカル編集を記録する。touched を立て、localChangeSeq を加算し、デバウンス PUT を予約する。
   const notifyLocalChange = useCallback(() => {
+    // 別のタブで端末データが削除・変更された後のタブでは、何も記録せず PUT も予約しない。
+    if (!isDeviceDataEpochCurrent()) {
+      return;
+    }
     // 未ログイン時は同期メタを一切触らない（ローカルモード完全維持）。touched だけ立てる。
     markTouched();
     if (!userId) {
@@ -179,12 +243,8 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     // デバウンス予約のキャンセルだけでは、既に putServerData を await 中の runPut が
     // 成功復帰後に「後続編集あり → 再予約」して旧 in-memory state で localStorage を
     // 上書きする経路が残るため、世代不一致で完了処理ごと中断させる。
-    syncGenerationRef.current += 1;
-    // 予約済みのデバウンス PUT をキャンセルする（旧 in-memory state での上書きを防ぐ）。
-    if (putTimerRef.current !== null) {
-      window.clearTimeout(putTimerRef.current);
-      putTimerRef.current = null;
-    }
+    // 予約済みのデバウンス PUT もキャンセルする（旧 in-memory state での上書きを防ぐ）。
+    invalidatePendingSync();
     if (!userId) {
       return;
     }
@@ -194,19 +254,15 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     }
     // 永続 dirty 化のみ（PUT 予約なし）。リロード後の起動フローで同期される。
     saveSyncMeta({ ...meta, localChangeSeq: meta.localChangeSeq + 1 });
-  }, [userId, readMeta]);
+  }, [userId, readMeta, invalidatePendingSync]);
 
-  // アカウント削除の直前に同期を停止する（Phase 4）。
+  // アカウント削除・ログアウトの直前や、別のタブで端末データが変わったときに同期を停止する（Phase 4）。
   // 世代を進めて in-flight の PUT/GET の完了処理を黙って中断させ、予約済みデバウンス PUT もキャンセルする。
   // これにより、削除リクエスト〜リロードの間に PUT が走って削除済みの app_state 行を再作成する
   // レースを閉じる（削除成功後はサーバーがセッションも失効させるため、以降の PUT は 401 になる）。
   const stopSync = useCallback(() => {
-    syncGenerationRef.current += 1;
-    if (putTimerRef.current !== null) {
-      window.clearTimeout(putTimerRef.current);
-      putTimerRef.current = null;
-    }
-  }, []);
+    invalidatePendingSync();
+  }, [invalidatePendingSync]);
 
   // 直前の PUT を実行する内部処理（デバウンス満了時・明示 flush 時に呼ぶ）。
   const runPut = useCallback(async () => {
@@ -219,6 +275,10 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     }
     // dirty でなければ送らない。
     if (meta.localChangeSeq <= meta.lastSyncedSeq) {
+      return;
+    }
+    // 別のタブで端末データが削除・変更された後のタブからは送らない（古い state を別のアカウントへ送らない）。
+    if (!isDeviceDataEpochCurrent()) {
       return;
     }
     // この PUT が「どこまでの編集を送るか」を開始時点の seq で確定する（設計判断 1）。
@@ -245,24 +305,7 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       if (latestUserIdRef.current !== userId) {
         return;
       }
-      const latest = readMeta();
-      // PUT 中にメタ破棄（clearSyncMeta）や別アカウントのメタへの差し替えが起きていないかも確認する。
-      if (!latest || latest.userId !== userId) {
-        return;
-      }
-      saveSyncMeta({
-        userId,
-        revision: result.revision,
-        localChangeSeq: latest.localChangeSeq,
-        lastSyncedSeq: seqBeingSent,
-      });
-      // まだ後続編集が残っていれば次のデバウンス PUT を予約する。
-      if (latest.localChangeSeq > seqBeingSent) {
-        setStatus("syncing");
-        schedulePut();
-      } else {
-        setStatus("idle");
-      }
+      recordPutSuccess(result.revision, seqBeingSent);
       return;
     }
 
@@ -297,13 +340,50 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     }, PUT_DEBOUNCE_MS);
   }, []);
 
+  // PUT 成功時のメタ更新（runPut・初回アップロード・端末データでの上書きで共通）。
+  // revision を更新し、送信直前に控えた seq だけを lastSyncedSeq に記録する。送信中の編集は dirty のまま残し、
+  // 次のデバウンス PUT で送る。呼び出し側で世代とセッションの再検証を済ませてから呼ぶ。
+  const recordPutSuccess = useCallback(
+    (revision: number, seqBeingSent: number) => {
+      if (!userId) {
+        return;
+      }
+      const latest = readMeta();
+      // PUT 中にメタ破棄（clearSyncMeta）や別アカウントのメタへの差し替えが起きていたら書かない。
+      if (!latest || latest.userId !== userId) {
+        setStatus("idle");
+        return;
+      }
+      saveSyncMeta({
+        userId,
+        revision,
+        localChangeSeq: latest.localChangeSeq,
+        lastSyncedSeq: seqBeingSent,
+      });
+      // まだ後続編集が残っていれば次のデバウンス PUT を予約する。
+      if (latest.localChangeSeq > seqBeingSent) {
+        setStatus("syncing");
+        schedulePut();
+      } else {
+        setStatus("idle");
+      }
+    },
+    [userId, readMeta, schedulePut],
+  );
+
   // 401 検出時の共通処理: メタ破棄・状態リセット。better-auth 側のセッションも失効しているため UI はログアウト表示へ戻る。
+  // 消すのは自分（401 になったアカウント）のメタだけ。別のアカウントのメタは、所有者の確認で
+  // 利用者が選ぶまで残す。所有者キーは消さない（次に別のアカウントでログインしたときの確認に使う）。
   const handleUnauthorized = useCallback(() => {
-    clearSyncMeta();
+    const meta = loadSyncMeta();
+    if (meta && meta.userId === userId) {
+      clearSyncMeta();
+    }
     startupRanForUserRef.current = null;
     setConflict(null);
+    setAccountSwitch(null);
     setStatus("logged_out");
-  }, []);
+  }, [userId]);
 
   // サーバーの最新データを GET し、競合ダイアログ情報を組み立てて提示する（409 / 409 後の再取得で使う）。
   const presentConflictFromServer = useCallback(async () => {
@@ -321,6 +401,10 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     }
     // GET 中に世代が進んでいたら（インポート等）同様に中断する。
     if (syncGenerationRef.current !== generationAtStart) {
+      return;
+    }
+    // 別のタブで端末データが削除・変更されていたら、このタブでは競合を提示しない。
+    if (!isDeviceDataEpochCurrent()) {
       return;
     }
     if (result.kind === "unauthorized") {
@@ -356,32 +440,45 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       if (latestUserIdRef.current !== userId) {
         return;
       }
+      // 別のタブで端末データが削除・変更された後のタブでは採用しない（書き込みも採用通知もしない）。
+      if (!isDeviceDataEpochCurrent()) {
+        return;
+      }
       // 世代を進め、開始済み（in-flight）の PUT/GET の完了処理を無効化する。
       // ここからリロード（App 側ダイアログ経由）までの間に旧 in-memory state の PUT 完了処理が
       // 走ると、採用したサーバーデータの localStorage を上書きしてしまうため。
-      syncGenerationRef.current += 1;
       // 予約済みのデバウンス PUT も同じ理由でキャンセルする。
-      if (putTimerRef.current !== null) {
-        window.clearTimeout(putTimerRef.current);
-        putTimerRef.current = null;
-      }
-      // 2 キーを localStorage へ書き込む。
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload.storage[STORAGE_KEY]));
+      invalidatePendingSync();
+      // 2 キーを localStorage へ書き込む（端末データの書き込み口を通す）。
+      writeDeviceStorage(STORAGE_KEY, JSON.stringify(payload.storage[STORAGE_KEY]));
       saveConnectRankCalcState(payload.storage[CONNECT_RANK_CALC_STORAGE_KEY]);
       // 採用直後は「サーバーと完全一致」なので dirty でない状態にする（seq を揃える）。
       saveSyncMeta({ userId, revision, localChangeSeq: 0, lastSyncedSeq: 0 });
       onServerDataAdoptedRef.current();
     },
-    [userId],
+    [userId, invalidatePendingSync],
   );
 
-  // ローカルデータを baseRevision:null でアップロードする（引き継ぎ分岐 1）。
+  // ローカルデータを baseRevision:null でアップロードする（引き継ぎ分岐 1・別のアカウントのデータの引き継ぎ）。
   const uploadLocalAsNew = useCallback(async () => {
     if (!userId) {
       return;
     }
+    // 別のタブで端末データが削除・変更された後のタブからは送らない。
+    if (!isDeviceDataEpochCurrent()) {
+      return;
+    }
     // 開始時点の世代を控える（PUT 中のインポート等で前提が崩れたら完了処理を中断する）。
     const generationAtStart = syncGenerationRef.current;
+    // 送信中の編集も localChangeSeq に数えられるよう、PUT の前に自分のメタを確立する。
+    // サーバーにまだ行がないため revision は null（未確立）、送るデータがあるので dirty にしておく。
+    let meta = readMeta();
+    if (!meta || meta.userId !== userId) {
+      meta = { userId, revision: null, localChangeSeq: 1, lastSyncedSeq: 0 };
+      saveSyncMeta(meta);
+    }
+    // この PUT で送る編集の範囲を、送信直前の seq で確定する。
+    const seqBeingSent = meta.localChangeSeq;
     saveStoredState(getStateRef.current());
     const payload = buildSyncPayloadFromCurrent(getStateRef.current());
     setStatus("syncing");
@@ -395,9 +492,7 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       if (latestUserIdRef.current !== userId) {
         return;
       }
-      // アップロード成功: 完全同期状態としてメタを確立する。
-      saveSyncMeta({ userId, revision: result.revision, localChangeSeq: 0, lastSyncedSeq: 0 });
-      setStatus("idle");
+      recordPutSuccess(result.revision, seqBeingSent);
       return;
     }
     if (result.kind === "conflict") {
@@ -410,7 +505,58 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       return;
     }
     setStatus("error");
-  }, [userId, presentConflictFromServer, handleUnauthorized]);
+  }, [userId, readMeta, recordPutSuccess, presentConflictFromServer, handleUnauthorized]);
+
+  // 端末のデータで、サーバーの baseRevision のデータを上書きする PUT
+  // （競合解決「この端末のデータを使う」・別のアカウントのデータでの上書き）。
+  const putLocalOverServer = useCallback(
+    async (baseRevision: number) => {
+      if (!userId) {
+        return;
+      }
+      // 別のタブで端末データが削除・変更された後のタブからは送らない。
+      if (!isDeviceDataEpochCurrent()) {
+        return;
+      }
+      // 開始時点の世代を控える（PUT 中のインポート等で前提が崩れたら完了処理を中断する）。
+      const generationAtStart = syncGenerationRef.current;
+      // 送信中の編集も localChangeSeq に数えられるよう、自分のメタがなければ PUT の前に確立する。
+      let meta = readMeta();
+      if (!meta || meta.userId !== userId) {
+        meta = { userId, revision: baseRevision, localChangeSeq: 1, lastSyncedSeq: 0 };
+        saveSyncMeta(meta);
+      }
+      // 送信直前の seq を控え、成功時はこの値だけを lastSyncedSeq にする（送信中の編集は dirty のまま残す）。
+      const seqBeingSent = meta.localChangeSeq;
+      saveStoredState(getStateRef.current());
+      const payload = buildSyncPayloadFromCurrent(getStateRef.current());
+      setStatus("syncing");
+      const result = await putServerData(baseRevision, payload);
+      // PUT 中に世代が進んでいたら後続処理をすべて中断する。
+      if (syncGenerationRef.current !== generationAtStart) {
+        return;
+      }
+      if (result.kind === "ok") {
+        // PUT 中にアカウントが切り替わっていたらメタを書かない（await 後は開始時点の前提を再検証する）。
+        if (latestUserIdRef.current !== userId) {
+          return;
+        }
+        recordPutSuccess(result.revision, seqBeingSent);
+        return;
+      }
+      if (result.kind === "conflict") {
+        // 再度 409（さらに別更新が挟まった）: 再度ダイアログを提示する。
+        await presentConflictFromServer();
+        return;
+      }
+      if (result.kind === "unauthorized") {
+        handleUnauthorized();
+        return;
+      }
+      setStatus("error");
+    },
+    [userId, readMeta, recordPutSuccess, presentConflictFromServer, handleUnauthorized],
+  );
 
   // 通常 PUT（同期済み revision 一致 & dirty）を実行する。
   const runDirtyPut = useCallback(async () => {
@@ -423,17 +569,19 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       return;
     }
 
-    // --- アカウント切替検知（設計判断 1）: メタの userId が現セッションと不一致ならメタ破棄 → 初回引き継ぎへ倒す。---
-    let meta = readMeta();
-    if (meta && meta.userId !== userId) {
-      clearSyncMeta();
-      meta = null;
+    const meta = readMeta();
+    // 所有者キーを導入する前の端末: 所有者キーがなくメタがあれば、メタの userId を所有者として保存する。
+    // 最初の await より前に行い、以後 401 などでメタが消えても所有者は残るようにする。
+    if (loadLocalDataOwner() === null && meta) {
+      saveLocalDataOwner(meta.userId);
     }
+    // 判定に使う同期メタは自分のものだけ。別のアカウントのメタは、所有者の確認で利用者が選ぶまで残す。
+    const ownMeta = meta && meta.userId === userId ? meta : null;
 
     // GET 前に控える localChangeSeq（自動採用直前の再検証に使う。設計判断 6）。
-    const seqAtDecision = meta ? meta.localChangeSeq : 0;
-    const dirty = meta ? meta.localChangeSeq > meta.lastSyncedSeq : false;
-    const knownRevision = meta ? meta.revision : null;
+    const seqAtDecision = ownMeta ? ownMeta.localChangeSeq : 0;
+    const dirty = ownMeta ? ownMeta.localChangeSeq > ownMeta.lastSyncedSeq : false;
+    const knownRevision = ownMeta ? ownMeta.revision : null;
     // 開始時点の世代を控える（GET 中にインポート等が挟まったら判定前提が崩れるため中断する）。
     const generationAtStart = syncGenerationRef.current;
 
@@ -459,8 +607,45 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     if (syncGenerationRef.current !== generationAtStart) {
       return;
     }
+    // GET 中に別のタブで端末データが削除・変更されていたら中断する（このタブの state は古い）。
+    if (!isDeviceDataEpochCurrent()) {
+      return;
+    }
 
     const localHasRealData = computeHasLocalRealData();
+
+    // --- 端末データの所有者の判定: 別のアカウントの実データが残っていれば、利用者が選ぶまで何もしない。---
+    const latestMeta = readMeta();
+    const ownerId = resolveLocalDataOwnerId(loadLocalDataOwner(), latestMeta?.userId ?? null);
+    const ownership = decideLocalDataOwnership({ ownerId, userId, localHasRealData });
+    if (ownership === "confirm_switch") {
+      // PUT も採用もしない。所有者キーと前のアカウントのメタも変えないので、リロードしても再び確認が出る。
+      setAccountSwitch({
+        userId,
+        server:
+          fetchResult.kind === "found"
+            ? {
+                kind: "found",
+                revision: fetchResult.revision,
+                payload: fetchResult.payload,
+                updatedAt: fetchResult.updatedAt,
+              }
+            : { kind: "not_found" },
+        localUpdatedAt: getStateRef.current().updatedAt,
+        previousOwnerHasUnsyncedChanges:
+          latestMeta !== null &&
+          latestMeta.userId === ownerId &&
+          latestMeta.localChangeSeq > latestMeta.lastSyncedSeq,
+      });
+      setStatus("idle");
+      return;
+    }
+    // 所有者をこのアカウントにする。別のアカウントのメタが残っていれば破棄する
+    // （守るべき実データがないか、ログイン前に使っていた所有者のいないデータのため）。
+    saveLocalDataOwner(userId);
+    if (latestMeta && latestMeta.userId !== userId) {
+      clearSyncMeta();
+    }
     const normalizedFetch: { kind: "found"; revision: number } | { kind: "not_found" } =
       fetchResult.kind === "found" ? { kind: "found", revision: fetchResult.revision } : { kind: "not_found" };
 
@@ -558,14 +743,18 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       return;
     }
     if (!userId) {
-      // 未ログイン: 同期メタを持っていても触らない（次回ログイン時にアカウント突き合わせで処理）。
+      // 未ログイン: 同期メタ・所有者を持っていても触らない（次回ログイン時に所有者の突き合わせで処理）。
+      // ログアウトしたら、所有者の確認ダイアログは閉じる（選択は次のログインまで保留）。
       startupRanForUserRef.current = null;
+      setAccountSwitch(null);
       setStatus("logged_out");
       return;
     }
     // ログイン確定。まだこの userId で起動フローを走らせていなければ走らせる。
     if (startupRanForUserRef.current !== userId) {
       startupRanForUserRef.current = userId;
+      // 前のユーザーの文脈で出した所有者の確認は閉じる。
+      setAccountSwitch(null);
       void runStartupFlowRef.current();
     }
   }, [session.isPending, userId]);
@@ -607,38 +796,112 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     if (current.userId !== latestUserIdRef.current) {
       return;
     }
-    // 開始時点の世代を控える（PUT 中のインポート等で前提が崩れたら完了処理を中断する）。
-    const generationAtStart = syncGenerationRef.current;
-    saveStoredState(getStateRef.current());
-    const payload = buildSyncPayloadFromCurrent(getStateRef.current());
-    setStatus("syncing");
-    const result = await putServerData(current.serverRevision, payload);
-    // PUT 中に世代が進んでいたら後続処理をすべて中断する。
-    if (syncGenerationRef.current !== generationAtStart) {
-      return;
-    }
-    if (result.kind === "ok") {
-      // PUT 中にアカウントが切り替わっていたらメタを書かない（await 後は開始時点の前提を再検証する）。
-      if (latestUserIdRef.current !== userId) {
-        return;
+    await putLocalOverServer(current.serverRevision);
+  }, [conflict, userId, putLocalOverServer]);
+
+  // 所有者の確認: 選択を実行してよいか（確認の文脈と最新セッション・処理中か・端末データの世代）を判定する。
+  // 確認の文脈が古ければ（表示中にアカウントが切り替わっていたら）ダイアログを閉じるだけにする。
+  const canResolveAccountSwitch = useCallback(
+    (current: AccountSwitchInfo | null): current is AccountSwitchInfo => {
+      if (!current || !userId || isAccountSwitchBusyRef.current) {
+        return false;
       }
-      const latest = loadSyncMeta();
-      const localChangeSeq = latest && latest.userId === userId ? latest.localChangeSeq : 0;
-      saveSyncMeta({ userId, revision: result.revision, localChangeSeq, lastSyncedSeq: localChangeSeq });
+      if (current.userId !== latestUserIdRef.current || current.userId !== userId) {
+        setAccountSwitch(null);
+        return false;
+      }
+      // 別のタブで端末データが削除・変更された後のタブでは何もしない（App 側で再読み込みを案内する）。
+      return isDeviceDataEpochCurrent();
+    },
+    [userId],
+  );
+
+  // 所有者の確認:「この端末のデータを引き継ぐ」/「この端末のデータでサーバーを上書き」。
+  // 所有者をこのアカウントに変え、端末のデータを PUT する。PUT が終わるまでダイアログを閉じず処理中にする。
+  const resolveAccountSwitchCarryOver = useCallback(async () => {
+    const current = accountSwitch;
+    if (!canResolveAccountSwitch(current)) {
+      return;
+    }
+    isAccountSwitchBusyRef.current = true;
+    setIsAccountSwitchBusy(true);
+    try {
+      // 所有者の変更: 別のタブはこれ以降書き込めなくなる。このタブの開始済みの同期処理も無効にする。
+      bumpDeviceDataEpoch();
+      invalidatePendingSync();
+      // 前のアカウントのメタを破棄し、所有者をこのアカウントにする（自分のメタは各 PUT 関数が PUT の前に確立する）。
+      const meta = readMeta();
+      if (meta && meta.userId !== current.userId) {
+        clearSyncMeta();
+      }
+      saveLocalDataOwner(current.userId);
+      if (current.server.kind === "not_found") {
+        await uploadLocalAsNew();
+      } else {
+        await putLocalOverServer(current.server.revision);
+      }
+    } finally {
+      isAccountSwitchBusyRef.current = false;
+      setIsAccountSwitchBusy(false);
+      // 処理中に別の確認へ置き換わっていたら、そちらは閉じない。
+      setAccountSwitch((previous) => (previous === current ? null : previous));
+    }
+  }, [accountSwitch, canResolveAccountSwitch, invalidatePendingSync, readMeta, uploadLocalAsNew, putLocalOverServer]);
+
+  // 所有者の確認:「使わずに初期状態から始める」/「サーバーのデータを使う」。
+  // 端末データを削除して所有者をこのアカウントにし、サーバーにデータがあれば採用する。どちらも App 側で再読み込みする。
+  const resolveAccountSwitchDiscard = useCallback(() => {
+    const current = accountSwitch;
+    if (!canResolveAccountSwitch(current)) {
+      return;
+    }
+    setAccountSwitch(null);
+    // 端末データの削除: 別のタブはこれ以降書き込めなくなる。このタブの開始済みの同期処理も無効にする。
+    bumpDeviceDataEpoch();
+    invalidatePendingSync();
+    clearDeviceUserData();
+    saveLocalDataOwner(current.userId);
+    if (current.server.kind === "found") {
+      adoptServerPayload(current.server.revision, current.server.payload);
+    } else {
       setStatus("idle");
+      onLocalDataClearedRef.current();
+    }
+    // 再読み込みまでの間に、このタブに残った古い state（pagehide 時の保存など）が書き戻されないよう、
+    // このタブからの端末データへの書き込みも止める。
+    sealDeviceDataWrites();
+  }, [accountSwitch, canResolveAccountSwitch, invalidatePendingSync, adoptServerPayload]);
+
+  // 所有者の確認:「ログアウトする」。端末データ・所有者・前のアカウントのメタは変えずにログアウトする。
+  // ログアウトに失敗したらダイアログを残す（もう一度選べる）。
+  const cancelAccountSwitchAndSignOut = useCallback(async () => {
+    if (isAccountSwitchBusyRef.current) {
       return;
     }
-    if (result.kind === "conflict") {
-      // 再度 409（さらに別更新が挟まった）: 再度ダイアログを提示する。
-      await presentConflictFromServer();
-      return;
+    isAccountSwitchBusyRef.current = true;
+    setIsAccountSwitchBusy(true);
+    invalidatePendingSync();
+    try {
+      const result = await signOut();
+      if (!result?.error) {
+        setAccountSwitch(null);
+      }
+    } catch {
+      // 通信エラー等。ダイアログを残し、もう一度選べるようにする。
+    } finally {
+      isAccountSwitchBusyRef.current = false;
+      setIsAccountSwitchBusy(false);
     }
-    if (result.kind === "unauthorized") {
-      handleUnauthorized();
-      return;
+  }, [invalidatePendingSync]);
+
+  // ログイン中アカウントの、サーバーへ送られていない変更があるかを返す（ログアウト確認の警告に使う）。
+  const hasUnsyncedChanges = useCallback((): boolean => {
+    if (!userId) {
+      return false;
     }
-    setStatus("error");
-  }, [conflict, userId, presentConflictFromServer, handleUnauthorized]);
+    const meta = readMeta();
+    return meta !== null && meta.userId === userId && meta.localChangeSeq > meta.lastSyncedSeq;
+  }, [userId, readMeta]);
 
   const isLoggedIn = userId !== null;
   const isSessionPending = session.isPending;
@@ -655,6 +918,12 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       resolveConflictUseServer,
       resolveConflictUseLocal,
       stopSync,
+      accountSwitch,
+      isAccountSwitchBusy,
+      resolveAccountSwitchCarryOver,
+      resolveAccountSwitchDiscard,
+      cancelAccountSwitchAndSignOut,
+      hasUnsyncedChanges,
     }),
     [
       isLoggedIn,
@@ -667,6 +936,12 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       resolveConflictUseServer,
       resolveConflictUseLocal,
       stopSync,
+      accountSwitch,
+      isAccountSwitchBusy,
+      resolveAccountSwitchCarryOver,
+      resolveAccountSwitchDiscard,
+      cancelAccountSwitchAndSignOut,
+      hasUnsyncedChanges,
     ],
   );
 }

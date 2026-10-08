@@ -6,9 +6,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const mockUseSync = vi.fn();
 // App が useSync へ渡した options の捕捉先。テストから onServerDataAdopted（サーバーデータ採用
 // コールバック）を直接呼び、「localStorage 直接書き換え → 採用通知」のフローを再現するために使う。
-let capturedUseSyncOptions: { onServerDataAdopted: () => void } | null = null;
+let capturedUseSyncOptions: { onServerDataAdopted: () => void; onLocalDataCleared: () => void } | null = null;
 vi.mock("./hooks/useSync", () => ({
-  useSync: (options: { onServerDataAdopted: () => void }) => {
+  useSync: (options: { onServerDataAdopted: () => void; onLocalDataCleared: () => void }) => {
     capturedUseSyncOptions = options;
     return mockUseSync();
   },
@@ -40,10 +40,13 @@ import { STORAGE_KEY, buildInitialState } from "./domain/storage";
 import { masterCharacters } from "./domain/master";
 import { createClanBattleFormation, createClanBattleMonthGroup } from "./domain/clanBattle";
 import { UI_STORAGE_KEY } from "./domain/uiStorage";
+import type { UseSyncResult } from "./hooks/useSync";
+import { isDeviceDataEpochCurrent } from "./domain/deviceData";
+import { DEVICE_DATA_EPOCH_STORAGE_KEY } from "./domain/storageKeys";
 
-// useSync の戻り値を未ログイン・同期なしの静的値に固定する。
-function stubSync() {
-  mockUseSync.mockReturnValue({
+// useSync の戻り値を未ログイン・同期なしの静的値に固定する（overrides で一部を差し替えられる）。
+function stubSync(overrides: Partial<UseSyncResult> = {}): UseSyncResult {
+  const value: UseSyncResult = {
     isLoggedIn: false,
     isSessionPending: false,
     userLabel: null,
@@ -52,9 +55,18 @@ function stubSync() {
     notifyLocalChange: vi.fn(),
     notifyLocalDataImported: vi.fn(),
     resolveConflictUseServer: vi.fn(),
-    resolveConflictUseLocal: vi.fn(),
+    resolveConflictUseLocal: vi.fn(async () => {}),
     stopSync: vi.fn(),
-  });
+    accountSwitch: null,
+    isAccountSwitchBusy: false,
+    resolveAccountSwitchCarryOver: vi.fn(async () => {}),
+    resolveAccountSwitchDiscard: vi.fn(),
+    cancelAccountSwitchAndSignOut: vi.fn(async () => {}),
+    hasUnsyncedChanges: vi.fn(() => false),
+    ...overrides,
+  };
+  mockUseSync.mockReturnValue(value);
+  return value;
 }
 
 // テスト内でパス名を差し替えるヘルパー（history.pushState では jsdom の pathname が変わる）。
@@ -396,5 +408,199 @@ describe("App: localStorage 直接書き換えフローでの保留保存キャ�
     expect(raw).not.toBeNull();
     const saved = JSON.parse(raw!) as { progressByName: Record<string, { ownedMemoryPiece: number }> };
     expect(Object.values(saved.progressByName).some((progress) => progress.ownedMemoryPiece === 1)).toBe(true);
+  });
+});
+
+// window.location.reload をスパイに差し替える（jsdom の reload は未実装のため）。戻り値の restore で元に戻す。
+function stubReload() {
+  const reload = vi.fn();
+  const originalLocation = window.location;
+  Object.defineProperty(window, "location", { configurable: true, value: { ...originalLocation, reload } });
+  return {
+    reload,
+    restore: () => Object.defineProperty(window, "location", { configurable: true, value: originalLocation }),
+  };
+}
+
+// 別のタブが端末データの epoch を進めた状況を再現する（このタブの控えとは異なる値を書き込む）。
+function simulateEpochBumpedInAnotherTab(): string {
+  isDeviceDataEpochCurrent();
+  const value = `other-tab-${Math.random()}`;
+  window.localStorage.setItem(DEVICE_DATA_EPOCH_STORAGE_KEY, value);
+  return value;
+}
+
+// モバイル編集シートで1件編集し、debounce 保存（400ms）が保留中の状態を作る。
+async function renderMobileWithPendingEdit() {
+  stubMobileMatchMedia();
+  vi.stubGlobal("scrollTo", vi.fn());
+  render(<App />);
+  const openRowButtons = await screen.findAllByRole("button", { name: /の編集シートを開く$/ }, { timeout: 10_000 });
+  fireEvent.click(openRowButtons[0]!);
+  const dialog = screen.getByRole("dialog");
+  fireEvent.click(within(dialog).getByRole("button", { name: /の所持メモピ数を増やす$/ }));
+}
+
+describe("App: 別のアカウントのデータの確認ダイアログ", () => {
+  it("サーバーにデータがない場合は「引き継ぐ」「初期状態から始める」「ログアウトする」を出す", () => {
+    const sync = stubSync({
+      isLoggedIn: true,
+      status: "idle",
+      userLabel: "テスト表示名",
+      accountSwitch: {
+        userId: "u_new",
+        server: { kind: "not_found" },
+        localUpdatedAt: "2026-10-01T00:00:00.000Z",
+        previousOwnerHasUnsyncedChanges: true,
+      },
+    });
+    render(<App />);
+
+    const dialog = screen.getByRole("alertdialog");
+    expect(within(dialog).getByText("別のアカウントのデータがこの端末に残っています")).toBeInTheDocument();
+    // 前のアカウントの未同期変更の警告。サーバーがないので更新日時は出さない。
+    expect(within(dialog).getByText(/前のアカウントのサーバーへまだ送られていない変更/)).toBeInTheDocument();
+    expect(within(dialog).queryByText(/サーバー側の更新/)).not.toBeInTheDocument();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "この端末のデータを引き継ぐ" }));
+    expect(sync.resolveAccountSwitchCarryOver).toHaveBeenCalledTimes(1);
+    fireEvent.click(within(dialog).getByRole("button", { name: "使わずに初期状態から始める" }));
+    expect(sync.resolveAccountSwitchDiscard).toHaveBeenCalledTimes(1);
+    fireEvent.click(within(dialog).getByRole("button", { name: "ログアウトする" }));
+    expect(sync.cancelAccountSwitchAndSignOut).toHaveBeenCalledTimes(1);
+  });
+
+  it("サーバーにデータがある場合は「サーバーのデータを使う」「上書き」と両方の更新日時を出す", () => {
+    const sync = stubSync({
+      isLoggedIn: true,
+      status: "idle",
+      userLabel: "テスト表示名",
+      accountSwitch: {
+        userId: "u_new",
+        server: {
+          kind: "found",
+          revision: 9,
+          payload: { formatVersion: 1, storage: {} } as never,
+          updatedAt: "2026-10-01T00:00:00.000Z",
+        },
+        localUpdatedAt: "2026-09-01T00:00:00.000Z",
+        previousOwnerHasUnsyncedChanges: false,
+      },
+    });
+    render(<App />);
+
+    const dialog = screen.getByRole("alertdialog");
+    expect(within(dialog).getByText(/サーバー側の更新/)).toBeInTheDocument();
+    expect(within(dialog).getByText(/この端末の更新/)).toBeInTheDocument();
+    expect(within(dialog).queryByText(/前のアカウントのサーバーへまだ送られていない変更/)).not.toBeInTheDocument();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "サーバーのデータを使う" }));
+    expect(sync.resolveAccountSwitchDiscard).toHaveBeenCalledTimes(1);
+    fireEvent.click(within(dialog).getByRole("button", { name: "この端末のデータでサーバーを上書き" }));
+    expect(sync.resolveAccountSwitchCarryOver).toHaveBeenCalledTimes(1);
+  });
+
+  it("処理中はすべてのボタンを無効にして処理中を表示する", () => {
+    stubSync({
+      isLoggedIn: true,
+      status: "syncing",
+      userLabel: "テスト表示名",
+      isAccountSwitchBusy: true,
+      accountSwitch: {
+        userId: "u_new",
+        server: { kind: "not_found" },
+        localUpdatedAt: "2026-10-01T00:00:00.000Z",
+        previousOwnerHasUnsyncedChanges: false,
+      },
+    });
+    render(<App />);
+
+    const dialog = screen.getByRole("alertdialog");
+    expect(within(dialog).getByRole("status")).toHaveTextContent("処理中...");
+    expect(within(dialog).getByRole("button", { name: "この端末のデータを引き継ぐ" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "使わずに初期状態から始める" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "ログアウトする" })).toBeDisabled();
+  });
+
+  it("端末データを削除してサーバーにもデータがないときは、保留中の保存を取り消して再読み込みを案内する", { timeout: 20_000 }, async () => {
+    const { reload, restore } = stubReload();
+    try {
+      await renderMobileWithPendingEdit();
+      // useSync が端末データを削除した直後に onLocalDataCleared を呼ぶ順序を再現する。
+      window.localStorage.removeItem(STORAGE_KEY);
+      act(() => {
+        capturedUseSyncOptions!.onLocalDataCleared();
+      });
+
+      expect(screen.getByText("この端末のデータを削除しました")).toBeInTheDocument();
+      // 保留中の保存は取り消され、pagehide でも debounce 満了でも書き戻されない。
+      fireEvent(window, new Event("pagehide"));
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+
+      // 閉じると再読み込みする（既存のメッセージダイアログは onClick と onOpenChange の両方で閉じ処理が走る）。
+      fireEvent.click(screen.getByRole("button", { name: "閉じる" }));
+      expect(reload).toHaveBeenCalled();
+    } finally {
+      restore();
+    }
+  });
+});
+
+describe("App: 別のタブで端末データが変わったとき", () => {
+  it("epoch キーの storage イベントで同期を止め、閉じられない再読み込み案内を出す", () => {
+    const { reload, restore } = stubReload();
+    try {
+      const sync = stubSync({ isLoggedIn: true, status: "idle", userLabel: "テスト表示名" });
+      render(<App />);
+
+      const value = simulateEpochBumpedInAnotherTab();
+      act(() => {
+        window.dispatchEvent(new StorageEvent("storage", { key: DEVICE_DATA_EPOCH_STORAGE_KEY, newValue: value }));
+      });
+
+      const dialog = screen.getByRole("alertdialog");
+      expect(within(dialog).getByText("別のタブでこの端末のデータが変更されました")).toBeInTheDocument();
+      expect(sync.stopSync).toHaveBeenCalled();
+      // Escape では閉じない。
+      fireEvent.keyDown(dialog, { key: "Escape" });
+      expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+
+      fireEvent.click(within(dialog).getByRole("button", { name: "再読み込み" }));
+      expect(reload).toHaveBeenCalledTimes(1);
+    } finally {
+      restore();
+    }
+  });
+
+  it("別のキーの storage イベントや、epoch が変わっていないときは案内を出さない", () => {
+    const sync = stubSync();
+    render(<App />);
+    isDeviceDataEpochCurrent();
+
+    act(() => {
+      window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY, newValue: "x" }));
+      window.dispatchEvent(
+        new StorageEvent("storage", {
+          key: DEVICE_DATA_EPOCH_STORAGE_KEY,
+          newValue: window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY),
+        }),
+      );
+    });
+
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+    expect(sync.stopSync).not.toHaveBeenCalled();
+  });
+
+  it("別のタブで epoch が進んだ後は、保留中の編集を pagehide でも debounce でも書き戻さない", { timeout: 20_000 }, async () => {
+    await renderMobileWithPendingEdit();
+    simulateEpochBumpedInAnotherTab();
+    // 別のタブが端末データを削除・書き換えた状態を再現する。
+    const otherTabValue = JSON.stringify({ marker: "other-tab" });
+    window.localStorage.setItem(STORAGE_KEY, otherTabValue);
+
+    fireEvent(window, new Event("pagehide"));
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe(otherTabValue);
   });
 });

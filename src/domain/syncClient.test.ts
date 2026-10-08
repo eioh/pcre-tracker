@@ -6,11 +6,13 @@ import { SYNC_FORMAT_VERSION, type SyncPayloadV1 } from "./sync";
 import {
   buildSyncPayload,
   buildSyncPayloadFromCurrent,
+  decideLocalDataOwnership,
   decideStartupAction,
   fetchServerData,
   hasLocalRealData,
   isSafeToAutoAdopt,
   putServerData,
+  resolveLocalDataOwnerId,
   type LocalStateSnapshot,
 } from "./syncClient";
 import type { StoredStateV1 } from "./types";
@@ -231,4 +233,40 @@ describe("putServerData", () => {
 // テスト間で localStorage を汚さないようにする。
 beforeEach(() => {
   window.localStorage.clear();
+});
+
+describe("resolveLocalDataOwnerId", () => {
+  it("所有者キーがあればそれを使う", () => {
+    expect(resolveLocalDataOwnerId("u_owner", "u_meta")).toBe("u_owner");
+  });
+
+  it("所有者キーがない旧版端末では同期メタの userId で補う", () => {
+    expect(resolveLocalDataOwnerId(null, "u_meta")).toBe("u_meta");
+  });
+
+  it("どちらもなければ null（所有者のいないデータ）", () => {
+    expect(resolveLocalDataOwnerId(null, null)).toBeNull();
+  });
+});
+
+describe("decideLocalDataOwnership", () => {
+  it("所有者が現在のユーザーなら owned", () => {
+    expect(decideLocalDataOwnership({ ownerId: "u1", userId: "u1", localHasRealData: true })).toBe("owned");
+  });
+
+  it("所有者がいなければ（ログイン前のデータ）実データがあっても take_ownership", () => {
+    expect(decideLocalDataOwnership({ ownerId: null, userId: "u1", localHasRealData: true })).toBe("take_ownership");
+  });
+
+  it("別のユーザーの実データが残っていれば confirm_switch", () => {
+    expect(decideLocalDataOwnership({ ownerId: "u_old", userId: "u1", localHasRealData: true })).toBe(
+      "confirm_switch",
+    );
+  });
+
+  it("別のユーザーのものでもローカルが初期状態なら確認せず take_ownership", () => {
+    expect(decideLocalDataOwnership({ ownerId: "u_old", userId: "u1", localHasRealData: false })).toBe(
+      "take_ownership",
+    );
+  });
 });

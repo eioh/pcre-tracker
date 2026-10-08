@@ -42,6 +42,9 @@ import { PrivacyPolicyPage } from "./components/PrivacyPolicyPage";
 import { useSync } from "./hooks/useSync";
 import { useIsMobile } from "./hooks/useIsMobile";
 import { clearSyncMeta } from "./domain/syncMeta";
+import { isDeviceDataEpochCurrent } from "./domain/deviceData";
+import { DEVICE_DATA_EPOCH_STORAGE_KEY } from "./domain/storageKeys";
+import { Button } from "./components/ui/button";
 
 const STORED_STATE_SAVE_DEBOUNCE_MS = 400;
 
@@ -131,6 +134,7 @@ export default function App() {
   }, []);
 
   // アカウント削除成功の直前に呼ぶ。同期メタのみ破棄し、touched と育成データは残す（設計判断 3）。
+  // 端末データの所有者キーも残す（削除したアカウントのデータとして、次に別のアカウントでログインしたときに確認する）。
   const handleBeforeAccountDeleted = useCallback(() => {
     clearSyncMeta();
   }, []);
@@ -224,8 +228,53 @@ export default function App() {
     });
   }, [cancelPendingSave]);
 
+  // 別のアカウントのデータを使わない選択で端末データを削除し、サーバーにもデータがなかったとき:
+  // 保留中の debounce 保存を取り消し、「ダイアログ表示 → リロード」で初期状態から始める。
+  const handleLocalDataCleared = useCallback(() => {
+    cancelPendingSave();
+    setMessageDialog({
+      title: "この端末のデータを削除しました",
+      description: "初期状態から始めます。閉じると画面を再読み込みします。",
+      reloadOnClose: true,
+    });
+  }, [cancelPendingSave]);
+
   // 同期層（セッション監視・起動時 GET・デバウンス PUT・競合ダイアログ）。
-  const sync = useSync({ getState, masterCharacters, onServerDataAdopted: handleServerDataAdopted });
+  const sync = useSync({
+    getState,
+    masterCharacters,
+    onServerDataAdopted: handleServerDataAdopted,
+    onLocalDataCleared: handleLocalDataCleared,
+  });
+  const { stopSync } = sync;
+
+  // 別のタブで端末データが削除・変更されたことを検知したか（閉じられない再読み込み案内を出す）。
+  const [isDeviceDataChangedElsewhere, setIsDeviceDataChangedElsewhere] = useState(false);
+
+  // 別のタブで端末データの世代（epoch）が進んだら、このタブの同期と保存を止めて再読み込みを案内する。
+  // このタブの state は古いデータのため、書き込みは端末データの書き込み口で止まるが、表示と同期も止める。
+  // bfcache から復帰したページは復帰中の storage イベントを受け取れないため、pageshow でも確認する。
+  useEffect(() => {
+    const handleDeviceDataChanged = () => {
+      if (isDeviceDataEpochCurrent()) {
+        return;
+      }
+      stopSync();
+      cancelPendingSave();
+      setIsDeviceDataChangedElsewhere(true);
+    };
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === DEVICE_DATA_EPOCH_STORAGE_KEY) {
+        handleDeviceDataChanged();
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("pageshow", handleDeviceDataChanged);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("pageshow", handleDeviceDataChanged);
+    };
+  }, [stopSync, cancelPendingSave]);
 
   // モバイル編集シートへ渡す保存ステータス。ローカル保存中を最優先し、ログイン時のみ同期の
   // 進行中/エラーを補助表示する。sync.status の idle は編集直後でも（PUT の 10 秒 debounce により）
@@ -640,6 +689,105 @@ export default function App() {
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => void sync.resolveConflictUseLocal()}>この端末のデータを使う</AlertDialogCancel>
             <AlertDialogAction onClick={() => sync.resolveConflictUseServer()}>サーバーのデータを使う</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/*
+        別のアカウントのデータが端末に残っているときの確認ダイアログ（共有端末で別のアカウントがログインしたとき）。
+        利用者が選ぶまでアップロードも採用もしない。閉じる操作では選択を確定しない（競合ダイアログと同じ作り）。
+        引き継ぎ・上書きの PUT とログアウトが終わるまでは開いたまま処理中にし、編集操作を受け付けない。
+      */}
+      <AlertDialog open={sync.accountSwitch !== null}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>別のアカウントのデータがこの端末に残っています</AlertDialogTitle>
+            <AlertDialogDescription>
+              {sync.accountSwitch?.server.kind === "found"
+                ? "この端末には、別のアカウントで使っていた育成データが残っています。ログイン中のアカウントにもサーバーにデータがあります。サーバーのデータを使うと、この端末のデータは削除されます。この端末のデータでサーバーを上書きすると、サーバーのデータは失われます。"
+                : "この端末には、別のアカウントで使っていた育成データが残っています。ログイン中のアカウントには、まだサーバーにデータがありません。この端末のデータをこのアカウントに引き継ぐか、この端末のデータを削除して初期状態から始めるかを選んでください。"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {sync.accountSwitch?.server.kind === "found" ? (
+            <p className="m-0 text-sm text-muted">
+              サーバー側の更新: {formatUpdatedAt(sync.accountSwitch.server.updatedAt)}
+              <br />
+              この端末の更新: {formatUpdatedAt(sync.accountSwitch.localUpdatedAt)}
+            </p>
+          ) : null}
+          {sync.accountSwitch?.previousOwnerHasUnsyncedChanges ? (
+            <p className="m-0 text-sm text-danger">
+              この端末のデータには、前のアカウントのサーバーへまだ送られていない変更が含まれています。この端末のデータを削除すると、その変更は失われます。
+            </p>
+          ) : null}
+          <p className="m-0 text-xs text-muted">ログアウトする場合、この端末のデータは変更されずに残ります。</p>
+          {sync.isAccountSwitchBusy ? (
+            <p className="m-0 text-sm text-accent" role="status">
+              処理中...
+            </p>
+          ) : null}
+          {/* 3 つのボタンは文言が長いため、画面幅によらず縦に並べる（主ボタンが上）。 */}
+          <AlertDialogFooter className="sm:flex-col-reverse sm:justify-start">
+            <Button
+              variant="ghost"
+              disabled={sync.isAccountSwitchBusy}
+              onClick={() => void sync.cancelAccountSwitchAndSignOut()}
+            >
+              ログアウトする
+            </Button>
+            {sync.accountSwitch?.server.kind === "found" ? (
+              <>
+                <Button
+                  variant="outline"
+                  className="border-danger/60 bg-danger-bg/40 text-danger hover:border-danger-strong hover:text-danger-strong"
+                  disabled={sync.isAccountSwitchBusy}
+                  onClick={() => void sync.resolveAccountSwitchCarryOver()}
+                >
+                  この端末のデータでサーバーを上書き
+                </Button>
+                <Button disabled={sync.isAccountSwitchBusy} onClick={() => sync.resolveAccountSwitchDiscard()}>
+                  サーバーのデータを使う
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  className="border-danger/60 bg-danger-bg/40 text-danger hover:border-danger-strong hover:text-danger-strong"
+                  disabled={sync.isAccountSwitchBusy}
+                  onClick={() => sync.resolveAccountSwitchDiscard()}
+                >
+                  使わずに初期状態から始める
+                </Button>
+                <Button disabled={sync.isAccountSwitchBusy} onClick={() => void sync.resolveAccountSwitchCarryOver()}>
+                  この端末のデータを引き継ぐ
+                </Button>
+              </>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/*
+        別のタブで端末データが削除・変更されたときの再読み込み案内。このタブの state は古いデータのため、
+        閉じる操作は受け付けず、再読み込みだけを選べるようにする。
+      */}
+      <AlertDialog open={isDeviceDataChangedElsewhere}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>別のタブでこの端末のデータが変更されました</AlertDialogTitle>
+            <AlertDialogDescription>最新の状態を表示するため、画面を再読み込みします。</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={(event) => {
+                // ダイアログを閉じずにそのまま再読み込みする。
+                event.preventDefault();
+                window.location.reload();
+              }}
+            >
+              再読み込み
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
