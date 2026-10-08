@@ -958,6 +958,54 @@ describe("useSync: 端末データの所有者の確認", () => {
     expect(calls.put).toBe(0);
   });
 
+  it("ローカル初期状態で所有者が別のアカウントなら確認なしで採用し、前のアカウントで開いていた別タブの保存は書き込まれない", async () => {
+    // touched なし・初期状態のデータ。前のアカウントのメタと所有者だけが残っている。
+    const state = buildInitialState(masterCharacters);
+    saveStoredState(state);
+    saveSyncMeta({ userId: "u_old", revision: 4, localChangeSeq: 0, lastSyncedSeq: 0 });
+    saveLocalDataOwner("u_old");
+    // 前のアカウントで開いていた別のタブを、現在の epoch を控えた別のモジュール状態として用意する。
+    isDeviceDataEpochCurrent();
+    vi.resetModules();
+    const oldTabDeviceData = await import("../domain/deviceData");
+    const oldTabStorage = await import("../domain/storage");
+    expect(oldTabDeviceData.isDeviceDataEpochCurrent()).toBe(true);
+
+    const serverPayload = makeMarkedServerPayload();
+    const calls = stubFetch({ get: () => foundResponse(9, serverPayload) });
+    setLoggedIn("u_new");
+    const { result, onServerDataAdopted } = renderUseSync(state);
+
+    // 確認なしでサーバーのデータを採用する。
+    await waitFor(() => expect(onServerDataAdopted).toHaveBeenCalledTimes(1));
+    expect(result.current.accountSwitch).toBeNull();
+    expect(loadLocalDataOwner()).toBe("u_new");
+    expect(calls.put).toBe(0);
+    const adopted = window.localStorage.getItem(STORAGE_KEY);
+
+    // 所有者が別のアカウントから変わったので epoch が進み、別のタブの古い state は書き込めない。
+    expect(oldTabDeviceData.isDeviceDataEpochCurrent()).toBe(false);
+    oldTabStorage.saveStoredState({ ...state, updatedAt: "2000-01-01T00:00:00.000Z" });
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe(adopted);
+    // このタブは引き続き書き込める。
+    expect(isDeviceDataEpochCurrent()).toBe(true);
+  });
+
+  it("所有者のいないデータを引き継ぐときは epoch を進めない", async () => {
+    const state = buildInitialState(masterCharacters);
+    saveStoredState(state);
+    window.localStorage.setItem(TOUCHED_STORAGE_KEY, "1");
+    isDeviceDataEpochCurrent();
+    const epochBefore = window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY);
+    const calls = stubFetch({});
+
+    setLoggedIn("u1");
+    renderUseSync(state);
+    await waitFor(() => expect(calls.put).toBe(1));
+    expect(loadLocalDataOwner()).toBe("u1");
+    expect(window.localStorage.getItem(DEVICE_DATA_EPOCH_STORAGE_KEY)).toBe(epochBefore);
+  });
+
   it("401 で自分のメタを消しても所有者は残り、次に別のアカウントでログインすると確認が出る", async () => {
     const state = buildInitialState(masterCharacters);
     saveStoredState(state);

@@ -640,6 +640,16 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
       setStatus("idle");
       return;
     }
+    // 確認なしでも、別のアカウントから所有者が変わる場合は、所有者を書き換える前に端末データの世代を進める。
+    // 前のアカウントで開いていた別のタブは古い state と保存処理を持ったままなので、世代を進めないと、
+    // この後に採用するこのアカウントのデータを、そのタブの編集が古い state で上書きできてしまう。
+    // このタブの開始済みの同期処理も無効にする（このタブの控えは更新されるので、以降の書き込みはできる）。
+    // 所有者がいない（ログイン前に使っていた）データや同じアカウントの場合は進めない。
+    // 別のタブも同じ利用者が同じデータを編集しているだけで、守るべき別の利用者のデータがないため。
+    if (ownerId !== null && ownerId !== userId) {
+      bumpDeviceDataEpoch();
+      invalidatePendingSync();
+    }
     // 所有者をこのアカウントにする。別のアカウントのメタが残っていれば破棄する
     // （守るべき実データがないか、ログイン前に使っていた所有者のいないデータのため）。
     saveLocalDataOwner(userId);
@@ -731,6 +741,7 @@ export function useSync(options: UseSyncOptions): UseSyncResult {
     runDirtyPut,
     adoptServerPayload,
     handleUnauthorized,
+    invalidatePendingSync,
   ]);
 
   const runStartupFlowRef = useRef(runStartupFlow);
