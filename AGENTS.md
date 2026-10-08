@@ -19,11 +19,12 @@
 - `npm run build`: TypeScript ビルド → 本番バンドル作成
 - `npm run preview`: ビルド成果物をローカル確認
 - `npm run typecheck`: 型チェック（`tsc -b`。フロント・Worker・テストの全プロジェクト参照を検査）
-- `npm test`: Vitest を 1 回実行（front / worker の 2 プロジェクト構成）
+- `npm test`: Vitest を 1 回実行（front / worker / scripts の 3 プロジェクト構成）
 - `npm run test:watch`: Vitest をウォッチ実行
 - `npm run generate`: 検索トークンなどの生成物（`src/data/characterMaster.generated.json`）を再生成
 - `npm run verify:generated`: `generate` を実行し、生成物が正本と一致するか（差分なし）を検証
-- `npm run verify`: 統合前の総合検証（`verify:generated` → `cf-typegen` → `test` → `build`）
+- `npm run verify:deploy-config`: ビルドで生成された `dist/pcre_tracker/wrangler.json` が `wrangler.jsonc` と整合するかを検証（`build` 後に実行）
+- `npm run verify`: 統合前の総合検証（`verify:generated` → `cf-typegen` → `test` → `build` → `verify:deploy-config`）
 
 ## コーディング規約と命名
 TypeScript + React 関数コンポーネントを前提とし、インデントは 2 スペースを使用します。
@@ -48,6 +49,7 @@ TypeScript + React 関数コンポーネントを前提とし、インデント�
 Vitest の multi-project 構成です。
 - **front プロジェクト**: Testing Library（`@testing-library/react`, `jsdom`）。テストは対象コードの近くに配置します（例: `src/utils/dashboard.test.ts`、`src/domain/storage.test.ts`）
 - **worker プロジェクト**: `@cloudflare/vitest-pool-workers`（実 Worker + ローカル D1）。`test/worker/` に配置し、`migrations/` の SQL はセットアップで自動適用されます
+- **scripts プロジェクト**: `scripts/` 配下の Node.js スクリプトのテスト（Node 環境、`scripts/**/*.test.mjs`）。設定は `vitest.config.ts` に直接記述しています
 マージ前に、スキーマ検証・保存処理・主要な計算ロジック・データ隔離（ユーザー間）を優先してカバーしてください。
 
 ## コミットとプルリクエスト
