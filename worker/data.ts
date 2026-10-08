@@ -76,18 +76,22 @@ function validateCsrf(request: Request, allowedOrigins: string[]): Response | nu
 
 // PUT のレート制限（固定ウィンドウ 30 回 / 5 分）を適用する。
 // カウンタを原子的に加算し、超過していればエラー Response を、許容内なら null を返す。
-async function enforceRateLimit(db: D1Database, userId: string, now: number): Promise<Response | null> {
+// テストで固定時刻を与えられるよう、現在時刻 now（ミリ秒）を引数で受け取る。
+export async function enforceRateLimit(db: D1Database, userId: string, now: number): Promise<Response | null> {
   // 現在時刻が属するウィンドウの開始時刻（ウィンドウ幅で切り捨て）。
   const windowStart = Math.floor(now / RATE_LIMIT_WINDOW_MS) * RATE_LIMIT_WINDOW_MS;
   // UPSERT + RETURNING でカウントを原子的に加算し、加算後の値を取得する（設計書「乱用対策」節の方式）。
+  // DO UPDATE に WHERE を付け、上限に達したウィンドウでは行を更新しない（上限到達後のリクエストで DB に書き込まない）。
+  // 更新されなかった場合は RETURNING が行を返さないため、row は null になる。
   const row = await db
     .prepare(
       "INSERT INTO rate_limit (user_id, window_start, count) VALUES (?, ?, 1) " +
-        "ON CONFLICT(user_id, window_start) DO UPDATE SET count = count + 1 RETURNING count",
+        "ON CONFLICT(user_id, window_start) DO UPDATE SET count = rate_limit.count + 1 " +
+        "WHERE rate_limit.count < ? RETURNING count",
     )
-    .bind(userId, windowStart)
+    .bind(userId, windowStart, RATE_LIMIT_MAX_REQUESTS)
     .first<{ count: number }>();
-  if (row !== null && row.count > RATE_LIMIT_MAX_REQUESTS) {
+  if (row === null) {
     return errorResponse(429, "rate_limited", "リクエストが多すぎます。しばらく待ってから再試行してください。");
   }
   return null;
