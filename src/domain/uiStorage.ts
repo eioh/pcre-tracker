@@ -4,8 +4,11 @@ import { MEMORY_PIECE_SOURCES, type MemoryPieceSource } from "./types";
 import type { StarMemoryCalcMode } from "../utils/starMemoryCost";
 import type { Ue1HeartFragmentCalcMode } from "../utils/ue1HeartFragmentCost";
 import type { Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
+import { writeDeviceStorage } from "./deviceData";
+import { UI_STORAGE_KEY } from "./storageKeys";
 
-export const UI_STORAGE_KEY = "pcr_growth_tracker_ui";
+// 保存キーは storageKeys.ts へ移したため、既存の import 元を保つよう re-export する。
+export { UI_STORAGE_KEY };
 export const CURRENT_UI_SCHEMA_VERSION = 1 as const;
 
 export type ActiveTab = "input" | "dashboard" | "coin_shop" | "connect_rank_calc" | "clan_battle";
@@ -322,7 +325,7 @@ export function saveUiState(state: UiStateV1): void {
 
   const serialized = JSON.stringify(state);
   try {
-    window.localStorage.setItem(UI_STORAGE_KEY, serialized);
+    writeDeviceStorage(UI_STORAGE_KEY, serialized);
   } catch (error) {
     console.warn(`UI設定の保存に失敗しました: key=${UI_STORAGE_KEY}`, { error, serialized });
   }

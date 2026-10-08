@@ -20,3 +20,18 @@ export const TOUCHED_STORAGE_KEY = "pcr_growth_tracker_touched";
 // 同期メタ情報（サーバー revision・ローカル変更カウンタ等）の保存キー。
 // touched フラグと同様に端末ローカル専用であり、同期対象・バックアップ対象外。
 export const SYNC_META_STORAGE_KEY = "pcr_growth_tracker_sync";
+
+// UI 設定（表示中のタブ・入力画面の絞り込み等）の保存キー。
+// 定義元は従来 `uiStorage.ts` だったが、端末データの一括削除（`deviceData.ts`）から循環参照なしに
+// 参照できるようここへ移し、`uiStorage.ts` からは re-export する。
+export const UI_STORAGE_KEY = "pcr_growth_tracker_ui";
+
+// この端末のデータ（育成・計算タブ・UI 設定・touched・同期メタ）を、どのアカウントで使っているかを表すキー。
+// 値は `{ userId }` の JSON。ログアウトしても残し、別のアカウントでログインしたときの確認に使う。
+// 端末ローカル専用であり、同期対象・バックアップ対象外。
+export const LOCAL_DATA_OWNER_STORAGE_KEY = "pcr_growth_tracker_owner";
+
+// 端末データの世代（epoch）を表すキー。端末データの削除や所有者の変更のたびに新しい値へ更新する。
+// 各タブは起動時の値を控え、値が変わっていたら（＝別のタブで削除・所有者変更が起きたら）端末データへ書き込まない。
+// 端末データの削除対象には含めない。同期対象・バックアップ対象外。
+export const DEVICE_DATA_EPOCH_STORAGE_KEY = "pcr_growth_tracker_device_epoch";

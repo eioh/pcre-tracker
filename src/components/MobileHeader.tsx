@@ -22,6 +22,12 @@ type Props = {
   onDeleteRequestStart: () => void;
   // アカウント削除成功の直前に呼ぶ（SyncHeader へそのまま渡す）。
   onBeforeAccountDeleted: () => void;
+  // ログアウトの直前に呼ぶ（SyncHeader へそのまま渡す）。
+  onLogoutStart: () => void;
+  // ログアウト成功後に端末データを削除するときに呼ぶ（SyncHeader へそのまま渡す）。
+  onDeleteDeviceData: () => boolean;
+  // サーバーへまだ送られていない変更があるかを返す（SyncHeader へそのまま渡す）。
+  hasUnsyncedChanges: () => boolean;
   // フォーマット済みの最終更新テキスト（App 側で整形済み）。
   updatedAt: string;
   // バックアップJSONをダウンロードする。
@@ -46,6 +52,9 @@ export function MobileHeader({
   onOpenPrivacyPolicy,
   onDeleteRequestStart,
   onBeforeAccountDeleted,
+  onLogoutStart,
+  onDeleteDeviceData,
+  hasUnsyncedChanges,
   updatedAt,
   onExportBackup,
   onSelectImportFile,
@@ -126,6 +135,9 @@ export function MobileHeader({
                 onOpenPrivacyPolicy={onOpenPrivacyPolicy}
                 onDeleteRequestStart={onDeleteRequestStart}
                 onBeforeAccountDeleted={onBeforeAccountDeleted}
+                onLogoutStart={onLogoutStart}
+                onDeleteDeviceData={onDeleteDeviceData}
+                hasUnsyncedChanges={hasUnsyncedChanges}
               />
             </div>
 
