@@ -202,7 +202,7 @@ type SyncPayloadV1 = {
 
 - better-auth の `user` スキーマは `email` を中核フィールドとするため、**メールアドレスの非保存という方針は撤回**する。OAuth プロバイダから取得した email の保存は許容する。
 - ただし、保存した email をアプリ画面上での表示や通知送信等の**二次利用はしない**。
-- `account` テーブルには better-auth のデフォルト動作として **access token / refresh token / scope が保存される**ことを明記する。access token / refresh token は `account.encryptOAuthTokens` で暗号化して保存する。
+- `account` テーブルには better-auth のデフォルト動作として **access token / refresh token / scope（Google ログインでは ID token も）が保存される**ことを明記する。`account.encryptOAuthTokens` により、新たに保存・更新される access token / refresh token は暗号化して保存する（better-auth はアカウント作成時と再ログイン時の更新で暗号化する。既存の平文の値を暗号化し直す移行処理は行わない）。ID token は暗号化の対象外である。
 - `session` テーブルにはセッションの有効期限に加え、ログイン時の **IP アドレス・ユーザーエージェント**が保存される（better-auth の既定動作）。IP アドレスは Cloudflare が付与する `cf-connecting-ip` から取得する。
 - プライバシーポリシーには、**email・プロバイダ ID・表示名・トークン・セッションの IP アドレス / ユーザーエージェント**が保存される旨を記載すると規定する。
 - 従来の「PII 最小化」の方針は、「保存はしない」ではなく「**保存は better-auth の要件の範囲に留め、利用（表示・通知等の二次利用）を最小化する**」という趣旨に改める。

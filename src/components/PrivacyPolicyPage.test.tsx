@@ -33,7 +33,9 @@ describe("PrivacyPolicyPage", () => {
     // セッションに IP アドレス・ユーザーエージェントを保存し、トークンは暗号化して保存する。
     expect(body).toContain("IP アドレス");
     expect(body).toContain("ユーザーエージェント");
-    expect(body).toMatch(/暗号化して保存/);
+    expect(body).toMatch(/新たに保存・更新されるアクセストークンとリフレッシュトークンは暗号化して保存/);
+    expect(body).toContain("ID トークン");
+    expect(body).toMatch(/ID トークンは暗号化の対象外/);
     // GitHub / Google は確認済みの同じメールアドレスなら同じアカウント、異なれば別アカウント。
     expect(body).toMatch(/同じメールアドレス/);
     expect(body).toMatch(/同じアカウント/);

@@ -32,8 +32,9 @@ export function PrivacyPolicyPage({ onBack }: Props) {
             <li>プロバイダ ID（GitHub / Google 側のアカウント識別子）</li>
             <li>表示名</li>
             <li>
-              OAuth トークン（アクセストークン・リフレッシュトークン・スコープ）。これらは認証基盤（better-auth）の
-              <code className="px-1">account</code> テーブルに保存されます。アクセストークンとリフレッシュトークンは暗号化して保存します。
+              OAuth トークン（アクセストークン・リフレッシュトークン・スコープと、Google でログインした場合は ID トークン）。
+              これらは認証基盤（better-auth）の <code className="px-1">account</code> テーブルに保存されます。
+              新たに保存・更新されるアクセストークンとリフレッシュトークンは暗号化して保存します。ID トークンは暗号化の対象外です。
             </li>
             <li>
               ログインセッションの情報（セッションの有効期限と、ログイン時の IP アドレス・ブラウザのユーザーエージェント）
