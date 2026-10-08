@@ -308,7 +308,7 @@ export function SyncHeader({
           <AlertDialogHeader>
             <AlertDialogTitle>ログイン</AlertDialogTitle>
             <AlertDialogDescription>
-              ログインすると育成データを複数端末で同期できます。GitHub と Google は別アカウント扱いになります（アカウント統合には対応していません）。
+              ログインすると育成データを複数端末で同期できます。GitHub と Google で確認済みの同じメールアドレスを使っている場合は同じアカウントになり、メールアドレスが異なる場合は別のアカウントになります。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex flex-col gap-2.5">

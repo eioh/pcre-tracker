@@ -9,14 +9,51 @@
  * - `/api/auth/*`: better-auth のハンドラ（ソーシャルログイン・セッション・アカウント削除）
  * - `/api/data`: 同期データの取得・保存（`worker/data.ts`）
  * - `scheduled`: 期限切れ rate_limit 行の日次掃除（Cron Trigger）
+ *
+ * `/api/*` のすべての応答には `withApiSecurityHeaders`（`worker/securityHeaders.ts`）でセキュリティ関連ヘッダを付ける。
  */
 import { createAuth, type AuthEnv } from "./auth";
 import { cleanupExpiredRateLimitRows, handleDataRequest } from "./data";
+import { withApiSecurityHeaders } from "./securityHeaders";
 
 // この Worker が参照する env の型。
 // シークレット（wrangler secret / .dev.vars）は wrangler types の生成型に安定して現れないため、
 // 生成型に依存せず必要なバインディング・変数を明示した AuthEnv を用いる。
 type WorkerEnv = AuthEnv;
+
+/**
+ * /api/* のリクエストを各ハンドラへ振り分ける。
+ *
+ * @param request 受信した HTTP リクエスト
+ * @param env バインディング（D1）とシークレット・環境変数
+ * @returns 各 API ハンドラの応答、未定義パスは 404 の JSON レスポンス
+ */
+async function routeApiRequest(request: Request, env: WorkerEnv): Promise<Response> {
+  const url = new URL(request.url);
+
+  // better-auth が管理する認証エンドポイント（/api/auth/*）。
+  // env はリクエスト時にしか得られないため、インスタンスはリクエストごとにファクトリで生成する。
+  if (url.pathname.startsWith("/api/auth/")) {
+    const auth = createAuth(env);
+    return auth.handler(request);
+  }
+
+  // 同期データ API（/api/data）。CSRF 検証・認証・レート制限は handleDataRequest 内で行う。
+  if (url.pathname === "/api/data") {
+    const auth = createAuth(env);
+    return handleDataRequest(request, env, auth);
+  }
+
+  // 上記以外の /api/* は未定義エンドポイントとして 404 JSON を返す。
+  return Response.json(
+    {
+      error: "not_found",
+      message: "Unknown API endpoint.",
+      path: url.pathname,
+    },
+    { status: 404 },
+  );
+}
 
 export default {
   /**
@@ -25,33 +62,10 @@ export default {
    *
    * @param request 受信した HTTP リクエスト
    * @param env バインディング（D1）とシークレット・環境変数
-   * @returns 各 API ハンドラの応答、未定義パスは 404 の JSON レスポンス
+   * @returns セキュリティ関連ヘッダを付けた各 API ハンドラの応答
    */
   async fetch(request: Request, env: WorkerEnv): Promise<Response> {
-    const url = new URL(request.url);
-
-    // better-auth が管理する認証エンドポイント（/api/auth/*）。
-    // env はリクエスト時にしか得られないため、インスタンスはリクエストごとにファクトリで生成する。
-    if (url.pathname.startsWith("/api/auth/")) {
-      const auth = createAuth(env);
-      return auth.handler(request);
-    }
-
-    // 同期データ API（/api/data）。CSRF 検証・認証・レート制限は handleDataRequest 内で行う。
-    if (url.pathname === "/api/data") {
-      const auth = createAuth(env);
-      return handleDataRequest(request, env, auth);
-    }
-
-    // 上記以外の /api/* は未定義エンドポイントとして 404 JSON を返す。
-    return Response.json(
-      {
-        error: "not_found",
-        message: "Unknown API endpoint.",
-        path: url.pathname,
-      },
-      { status: 404 },
-    );
+    return withApiSecurityHeaders(await routeApiRequest(request, env));
   },
 
   /**

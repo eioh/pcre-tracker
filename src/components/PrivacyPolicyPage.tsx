@@ -32,8 +32,12 @@ export function PrivacyPolicyPage({ onBack }: Props) {
             <li>プロバイダ ID（GitHub / Google 側のアカウント識別子）</li>
             <li>表示名</li>
             <li>
-              OAuth トークン（アクセストークン・リフレッシュトークン・スコープ）。これらは認証基盤（better-auth）の
-              <code className="px-1">account</code> テーブルにデフォルト動作として保存されます。
+              OAuth トークン（アクセストークン・リフレッシュトークン・スコープと、Google でログインした場合は ID トークン）。
+              これらは認証基盤（better-auth）の <code className="px-1">account</code> テーブルに保存されます。
+              新たに保存・更新されるアクセストークンとリフレッシュトークンは暗号化して保存します。ID トークンは暗号化の対象外です。
+            </li>
+            <li>
+              ログインセッションの情報（セッションの有効期限と、ログイン時の IP アドレス・ブラウザのユーザーエージェント）
             </li>
             <li>同期対象の育成データ（育成状況・コネクトランク計算タブのデータ）</li>
           </ul>
@@ -71,10 +75,12 @@ export function PrivacyPolicyPage({ onBack }: Props) {
         </section>
 
         <section className="flex flex-col gap-2">
-          <h2 className="text-base font-semibold text-main">5. アカウントの統合について</h2>
+          <h2 className="text-base font-semibold text-main">5. GitHub と Google のアカウントの扱い</h2>
           <p className="m-0">
-            GitHub と Google は<strong>別々のアカウント</strong>として扱われます。両者を同一ユーザーとして統合する機能には
-            対応していません。異なるプロバイダでログインした場合、それぞれ独立したアカウント・同期データになります。
+            GitHub と Google のそれぞれで確認済みの<strong>同じメールアドレス</strong>を使っている場合は、
+            <strong>同じアカウント</strong>として扱われ、同期データも共通になります。
+            メールアドレスが異なる場合は<strong>別々のアカウント</strong>となり、それぞれ独立した同期データになります。
+            別々になったアカウントを後から手動で統合する機能はありません。
           </p>
         </section>
 
