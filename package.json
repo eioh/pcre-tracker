@@ -11,7 +11,8 @@
     "typecheck": "tsc -b",
     "cf-typegen": "wrangler types",
     "verify:generated": "npm run generate && git diff --exit-code -- src/data/characterMaster.generated.json",
-    "verify": "npm run verify:generated && npm run cf-typegen && npm test && npm run build",
+    "verify:deploy-config": "node scripts/verify-deploy-config.mjs",
+    "verify": "npm run verify:generated && npm run cf-typegen && npm test && npm run build && npm run verify:deploy-config",
     "test": "vitest run",
     "test:watch": "vitest"
   },
