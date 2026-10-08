@@ -20,12 +20,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: "22"
           cache: "npm"
@@ -39,3 +39,56 @@ jobs:
         env:
           # Workers テストが一時ファイルを短いパスへ作成できるよう Linux 上だけ指定する。
           TMPDIR: /tmp
+
+      # 本番の build ジョブと同じ手順で成果物を作り、deploy-dry-run ジョブへ渡す。
+      - name: Remove local dev vars from build output
+        run: rm -f dist/pcre_tracker/.dev.vars
+
+      # dist/client/.assetsignore（ドットファイル）を含めるため include-hidden-files を有効にする。
+      - name: Upload build output
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist
+          path: dist/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
+  # 本番の deploy ジョブと同じ導入手順で、認証以外の公開処理を dry-run で確認する（Secrets は使わない）。
+  deploy-dry-run:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: "22"
+          # package.json に packageManager が追加されても自動キャッシュを有効にしない。
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Download build output
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist
+
+      # ドットファイルが成果物から漏れていないこと（.assetsignore）と、生成設定が届いていることを確認する。
+      - name: Check build output files
+        run: ls -la dist/client/.assetsignore dist/pcre_tracker/wrangler.json
+
+      - name: Verify deploy config
+        run: node scripts/verify-deploy-config.mjs
+
+      - name: Deploy dry-run
+        run: npx --no-install wrangler deploy --dry-run --config dist/pcre_tracker/wrangler.json --outdir "$RUNNER_TEMP/dry"
