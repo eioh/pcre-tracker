@@ -3933,7 +3933,7 @@
     "role": "ブレイカー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     }
@@ -3946,7 +3946,7 @@
     "role": "アタッカー",
     "implemented": {
       "star6": false,
-      "ue1": false,
+      "ue1": true,
       "ue1Sp": false,
       "ue2": false
     }
@@ -4543,6 +4543,20 @@
     "baseName": "サレン",
     "limited": true,
     "attribute": "闇",
+    "role": "ブレイカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "アメス（ガンナー）",
+    "baseName": "アメス",
+    "limited": true,
+    "attribute": "火",
     "role": "ブレイカー",
     "implemented": {
       "star6": false,
