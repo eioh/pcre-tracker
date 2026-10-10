@@ -6,6 +6,8 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
+    // TypeScript 7 は @types を自動で読み込まないため、設定ファイル・スクリプトが使う Node.js の型を明示する。
+    "types": ["node"],
     "strict": true,
     "noEmit": true,
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.node.tsbuildinfo"
