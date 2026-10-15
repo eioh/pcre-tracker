@@ -6787,7 +6787,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "ユキノ",
       "ゆきの",
@@ -6807,7 +6809,9 @@
       "ue1Sp": false,
       "ue2": false
     },
-    "memoryPieceSources": [],
+    "memoryPieceSources": [
+      "master_coin"
+    ],
     "searchTokens": [
       "サツキ",
       "さつき",
