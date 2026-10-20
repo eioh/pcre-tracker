@@ -1,0 +1,48 @@
+name: Master Sync Fetch Probe
+
+# マスターデータ同期の段階1で、GitHub Actions の runner から取得元（wiki・公式サイト）へ届くかを確かめる疎通確認。
+# 取得したページ本文は公開リポジトリ・成果物に載せず、ステータス・サイズ・ハッシュ・title だけを出力する。
+on:
+  push:
+    branches: ["feature/master-sync-fetch-probe"]
+    paths:
+      - "scripts/master-sync/**"
+      - ".github/workflows/master-sync-fetch-probe.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: master-sync-fetch-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+          package-manager-cache: false
+
+      # 取得スクリプトは Node.js 標準 API だけを使うため npm ci は不要。
+      - name: Fetch sources
+        run: node scripts/master-sync/fetch.mjs --out "$RUNNER_TEMP/snapshots"
+
+      # 取得結果の一覧（本文を含まない）だけを成果物にし、受け渡し経路も確かめる。
+      - name: Upload manifest
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: master-sync-manifest
+          path: ${{ runner.temp }}/snapshots/manifest.json
+          if-no-files-found: error
+          retention-days: 1
