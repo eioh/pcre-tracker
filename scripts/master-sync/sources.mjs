@@ -73,6 +73,9 @@ export function buildSources({ maxHardArea = 82 } = {}) {
       title: "イベントで配布されたピース",
       required: true,
     },
+    // 自動取得の可否を確認するための WIKIWIKI の利用規約・利用ルール（解析対象ではない）。
+    { id: "wikiwiki-policies", kind: "terms", url: "https://wikiwiki.jp/pp/policies", title: "WIKIWIKI 利用規約", required: false },
+    { id: "wikiwiki-rules", kind: "terms", url: "https://wikiwiki.jp/pp/rules", title: "WIKIWIKI 利用ルール", required: false },
     {
       id: "official-news",
       kind: "official-news",
