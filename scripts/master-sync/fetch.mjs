@@ -133,6 +133,9 @@ export async function fetchSnapshots({
   }
 
   const entries = [];
+  // 遮断・アクセス制限を受けたオリジン。以降はそのオリジンへ要求を送らない（制限中に再要求を重ねないため）。
+  /** @type {Set<string>} */
+  const blockedOrigins = new Set();
   for (const source of sources) {
     const url = new URL(source.url);
     const robots = robotsByOrigin.get(url.origin);
@@ -141,13 +144,21 @@ export async function fetchSnapshots({
       entries.push({ ...source, outcome: "robots-disallowed", status: null, fetchedAt: null, file: null });
       continue;
     }
+    if (blockedOrigins.has(url.origin)) {
+      entries.push({ ...source, outcome: "skipped-after-block", status: null, fetchedAt: null, file: null });
+      continue;
+    }
     const result = await politeFetch(source.url);
     const body = new TextDecoder("utf-8").decode(result.bytes);
     const file = `${source.id}.html`;
     writeFileSync(join(outDir, file), result.bytes);
+    const outcome = result.error ? "network-error" : classifyResponse(/** @type {number} */ (result.status), body);
+    if (outcome === "blocked") {
+      blockedOrigins.add(url.origin);
+    }
     entries.push({
       ...source,
-      outcome: result.error ? "network-error" : classifyResponse(/** @type {number} */ (result.status), body),
+      outcome,
       status: result.status,
       error: result.error,
       blockReason: result.status === null ? null : detectBlockPage(result.status, body),

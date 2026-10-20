@@ -5,7 +5,8 @@
 export const USER_AGENT = "pcre-tracker-master-sync/0.1 (+https://github.com/eioh/pcre-tracker)";
 
 // 同じホストへ続けて要求するときの最小間隔（ミリ秒）。低頻度での取得を守るための値。
-export const DEFAULT_REQUEST_INTERVAL_MS = 5000;
+// 5 秒間隔では wikiwiki.jp が 6 件目以降に 429（アクセス確認中）を返したため、間隔を広げている。
+export const DEFAULT_REQUEST_INTERVAL_MS = 20000;
 
 // 1 リクエストあたりのタイムアウト（ミリ秒）。
 export const DEFAULT_TIMEOUT_MS = 30000;

@@ -80,11 +80,11 @@ describe("fetchSnapshots", () => {
     expect(JSON.parse(readFileSync(join(outDir, "manifest.json"), "utf8")).entries).toHaveLength(1);
   });
 
-  it("必須の取得元が遮断されたら全体を保留にし、任意の取得元の 404 では保留にしない", async () => {
+  it("必須の取得元が遮断されたら全体を保留にし、同じオリジンへの以降の要求をやめる", async () => {
     const outDir = makeTempDir();
     const required = wikiPageUrl("隊列");
     const optional = wikiPageUrl("ステージ攻略/H83");
-    const { impl } = fakeFetch(Object.fromEntries([ROBOTS, [required, [403, BLOCK_PAGE]]]));
+    const { impl, calls } = fakeFetch(Object.fromEntries([ROBOTS, [required, [429, "<title>アクセス確認中 - WIKIWIKI</title>"]]]));
     const clock = fakeClock();
     const manifest = await fetchSnapshots({
       sources: [
@@ -96,9 +96,11 @@ describe("fetchSnapshots", () => {
       sleepImpl: clock.sleepImpl,
       now: clock.now,
     });
-    expect(manifest.entries.map((entry) => entry.outcome)).toEqual(["blocked", "not-found"]);
+    expect(manifest.entries.map((entry) => entry.outcome)).toEqual(["blocked", "skipped-after-block"]);
     expect(manifest.overall.ok).toBe(false);
-    expect(manifest.overall.holdReasons).toEqual(["必須の取得元「隊列」を取得できませんでした（blocked / HTTP 403）"]);
+    // 遮断を受けたオリジンには、それ以降の要求を送らない。
+    expect(calls.map((call) => call.url)).toEqual(["https://wikiwiki.jp/robots.txt", required]);
+    expect(manifest.overall.holdReasons).toEqual(["必須の取得元「隊列」を取得できませんでした（blocked / HTTP 429）"]);
     expect(formatManifestMarkdown(manifest)).toContain("全体: 保留");
   });
 
