@@ -8,6 +8,8 @@
 //   4. 合格なら、マスターを書き換えて生成物を作り直し（参照整合性チェックを含む）、feature/master-sync-<候補ハッシュ> に commit する
 //   5. その作業ツリーで npm run verify を実行する（--skip-verify で省略）
 //
+// 候補ブランチを作ったときは、出力先に段階3の AI レビュー用パケット（review-packet/）も書き出す。
+//
 // 使い方: node scripts/master-sync/candidate.mjs --snapshot <スナップショット> [--base <git の参照>] [--today YYYY-MM-DD] [--out <出力先>] [--skip-verify]
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -19,6 +21,7 @@ import { todayInJst } from "./compare.mjs";
 import { gateCandidate } from "./gate.mjs";
 import { loadExistingMaster } from "./integrity.mjs";
 import { buildReport, formatReportMarkdown } from "./report.mjs";
+import { writeReviewPacket } from "./review.mjs";
 
 // 書き換えの対象になるマスターデータのファイル（キーは ExistingMaster の項目）。
 const MASTER_FILES = {
@@ -221,7 +224,11 @@ function main() {
   const { report: _report, ...summary } = result;
   writeFileSync(join(outDir, "candidate.json"), `${JSON.stringify(summary, null, 2)}\n`, "utf8");
   writeFileSync(join(outDir, "candidate.md"), formatCandidateMarkdown(result), "utf8");
-  console.log(`結果: ${result.status}\n出力: ${outDir}${result.branch ? `\nブランチ: ${result.branch}` : ""}`);
+  // 候補ブランチを作ったときは、段階3の AI レビュー用のパケットも書き出す。
+  const packet = result.worktree ? writeReviewPacket({ candidateDir: outDir, snapshotDir: resolve(/** @type {string} */ (options.snapshot)) }) : null;
+  console.log(
+    `結果: ${result.status}\n出力: ${outDir}${result.branch ? `\nブランチ: ${result.branch}` : ""}${packet ? `\nレビュー用パケット: ${packet.packetDir}` : ""}`,
+  );
   if ((result.gate && !result.gate.ok) || (result.verify && !result.verify.ok)) {
     process.exitCode = 1;
   }

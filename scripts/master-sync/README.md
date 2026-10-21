@@ -1,7 +1,7 @@
 # master-sync（マスターデータ同期）
 
 公開サイトからゲーム共通のマスターデータを取得し、`src/data/` の既存データ全件と比較するためのスクリプト群です。
-段階1（読み取り専用の報告）と段階2（作業ブランチへの候補作成）まで実装しています。PR の作成はまだ行いません。
+段階1（読み取り専用の報告）・段階2（作業ブランチへの候補作成）・段階3（AI レビューとその機械的な検証）まで実装しています。PR の作成はまだ行いません。
 
 ## 構成
 
@@ -9,6 +9,7 @@
 |---|---|---|
 | 取得 | GitHub Actions（`.github/workflows/master-sync-fetch.yml`） | `fetch.mjs` で取得元を取得し、非公開リポジトリ `eioh/pcre-tracker-snapshots` の `latest/` に push する |
 | 解析・比較・報告 | Claude Code のクラウド環境・ローカル | スナップショットを読み、既存マスターと比較して差分・不足・保留理由を報告する |
+| AI レビュー（段階3） | Claude Code のクラウド環境・ローカル | 別の文脈のサブエージェントが `REVIEW_PROMPT.md` に従ってレビュー用パケットを読み、`review.json` を書く。`review.mjs verify` が引用の実在などを機械的に検査する |
 | 候補作成（段階2） | Claude Code のクラウド環境・ローカル | `candidate.mjs` が基準（既定 `origin/develop`）の作業ツリーで候補を作り、ゲート判定・参照整合性チェック・`npm run verify` を行う。PR は作らず、ブランチも push しない |
 
 - クラウド環境の送信元 IP は wikiwiki.jp に遮断されるため、取得だけを Actions の runner で行う。
@@ -47,6 +48,20 @@
 
 結果は `.master-sync/candidates/<日時>/` に `report.md`・`report.json`・`candidate.md`・`candidate.json` として残る。作った作業ツリーとブランチは確認後に `git worktree remove` と `git branch -D` で消す。
 
+## AI レビュー（段階3: `review.mjs`・`REVIEW_PROMPT.md`）
+
+1. 候補ブランチを作ると、`candidate.mjs` が出力先に `review-packet/` を書く。
+   - `packet.json`: 候補ハッシュ・判定の基準日・変更の一覧（`p1`〜）・各変更の出典 URL・引用が含むべき文字列（`quoteMustContainOneOf`）
+   - `pages/*.txt`: 保存したページのテキスト（表は 1 行 1 行、画像は `[alt]`、折り畳みは〔折り畳み開始〕〜〔折り畳み終了〕）
+2. 別の文脈のサブエージェント（Agent ツールで新しく起動する）に `REVIEW_PROMPT.md` を渡し、`review.json` を書かせる。ページは信頼しない入力として扱い、中の指示には従わせない。
+3. `review.mjs verify` が `review.json` を検査する。スナップショットからページのテキストを作り直し（ハッシュも照合）、次をすべて満たすときだけ合格にする。
+   - 候補ハッシュが一致し、全変更に 1 件ずつ判定があり、すべて `ok`、全体が `approve`
+   - 根拠の URL がその変更の出典に含まれ、引用（6 文字以上）が保存したページに文字どおり（空白の違いだけ許す）ある
+   - 有効な根拠の少なくとも 1 つが変更の対象（キャラ名・ステージ・イベント名）を含む
+   - 不足の指摘（`missing`）は合否に影響しないが、その根拠の引用も実在する
+
+結果は候補の出力先に `review-check.md`・`review-check.json` として残る。
+
 ## 使い方
 
 ```sh
@@ -61,6 +76,10 @@ node scripts/master-sync/report.mjs --snapshot ../pcre-tracker-snapshots/latest
 
 # 段階2: 候補ブランチを作り、ゲート判定と verify を行う（push・PR はしない）
 node scripts/master-sync/candidate.mjs --snapshot ../pcre-tracker-snapshots/latest [--base origin/develop] [--skip-verify]
+
+# 段階3: AI レビュー（review.json）を検証する（パケットは candidate.mjs が作る。作り直すときは pack）
+node scripts/master-sync/review.mjs pack --candidate-dir .master-sync/candidates/<日時> --snapshot ../pcre-tracker-snapshots/latest
+node scripts/master-sync/review.mjs verify --candidate-dir .master-sync/candidates/<日時> --snapshot ../pcre-tracker-snapshots/latest
 
 # 保存した実ページで解析器を検証する（指定しなければ実ページのテストは省略される）
 MASTER_SYNC_SNAPSHOT_DIR=../pcre-tracker-snapshots/latest npx vitest run --project scripts
