@@ -5,7 +5,7 @@ name: Master Sync Fetch
 # 解析・比較・報告はクラウド環境側がスナップショット用リポジトリを読んで行う。
 on:
   push:
-    branches: ["feature/master-sync-fetch-probe"]
+    branches: ["feature/master-sync"]
     # 解析・比較の変更では取得し直さない（取得元への要求を増やさない）よう、取得に関わるファイルだけを対象にする。
     paths:
       - "scripts/master-sync/fetch.mjs"
