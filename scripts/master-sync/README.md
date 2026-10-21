@@ -22,6 +22,17 @@
 - 遮断・429 を受けたら、そのホストへの以降の要求をやめる。
 - 必須の取得元が 1 件でも取れなければ、manifest の `overall.ok` を false にして全体を保留にする。
 
+## 判定規則（`compare.mjs`）
+
+- 値は「真・偽・不明」の 3 値。空欄・取得失敗は不明とし、既存値を false にしたり削除したりしない。
+- 削除・true→false・既存キャラの並び替え・既存値の変更（限定区分など）は変更候補にせず、保留にする。
+- 日付は日本時間の今日と比べる。今日より前だけを実装済みとし、当日は翌日に再確認（保留）、未来日・「近日予定」は参考に回す。
+- 新キャラは、個別ページのリンクがあり、属性・ロールが実装日一覧と属性・ロールのページで一致し、編成順に挿入だけで入る場合に候補にする。
+- 編成順は「←後方 前方→」の表記で掲載方向を確かめて反転し、折り畳み内の旧版の表は読まない。
+- HARD は「メモリーピース」表と `H` のステージ番号だけを読み、VH の「ピュアメモリーピース」とは混同しない。「未実装」の見出し以降のステージは未実装とする。
+- 別名表（`aliases.json`）にも既存マスターにもない名前は保留にする。
+- 取得件数が既存件数の 9 割を下回ったら、全体を保留にする。
+
 ## 使い方
 
 ```sh
@@ -30,4 +41,10 @@ node scripts/master-sync/fetch.mjs
 
 # 保存先・対象を指定する
 node scripts/master-sync/fetch.mjs --out /tmp/snapshots --only formation,attribute
+
+# スナップショットを解析・比較し、.master-sync/reports/<日時>/ に report.md と report.json を書く（マスターは書き換えない）
+node scripts/master-sync/report.mjs --snapshot ../pcre-tracker-snapshots/latest
+
+# 保存した実ページで解析器を検証する（指定しなければ実ページのテストは省略される）
+MASTER_SYNC_SNAPSHOT_DIR=../pcre-tracker-snapshots/latest npx vitest run --project scripts
 ```

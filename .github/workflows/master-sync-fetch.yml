@@ -6,8 +6,11 @@ name: Master Sync Fetch
 on:
   push:
     branches: ["feature/master-sync-fetch-probe"]
+    # 解析・比較の変更では取得し直さない（取得元への要求を増やさない）よう、取得に関わるファイルだけを対象にする。
     paths:
-      - "scripts/master-sync/**"
+      - "scripts/master-sync/fetch.mjs"
+      - "scripts/master-sync/robots.mjs"
+      - "scripts/master-sync/sources.mjs"
       - ".github/workflows/master-sync-fetch.yml"
   workflow_dispatch:
 
