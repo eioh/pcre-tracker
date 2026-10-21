@@ -104,6 +104,17 @@ function movedElements(expected, actual) {
 }
 
 /**
+ * 利用者が確認済みで、マスターの値を正とする差分（acknowledged.json）。
+ * - limited: マスターの値と、そのときの入手手段が一致する間だけ保留から外す（どちらかが変われば再び保留に出す）
+ * - formationOrder: マスターの位置を正とするキャラ。編成順の並び替えの判定と挿入位置の基準から外す
+ * @typedef {{
+ *   limited: { name: string, masterValue: boolean, acquisition: string, reason: string }[],
+ *   formationOrder: { name: string, reason: string }[],
+ * }} Acknowledged
+ */
+const EMPTY_ACKNOWLEDGED = { limited: [], formationOrder: [] };
+
+/**
  * 比較結果の 1 件。
  * @typedef {{ area: string, target: string, kind: string, detail: string, before?: unknown, after?: unknown, sources: string[] }} Finding
  */
@@ -123,10 +134,11 @@ function movedElements(expected, actual) {
  *   },
  *   urls: Record<string, string>,
  *   aliases: Record<string, string>,
+ *   acknowledged?: Acknowledged,
  *   today: string,
  * }} input
  */
-export function compareWithMaster({ master, parsed, urls, aliases, today }) {
+export function compareWithMaster({ master, parsed, urls, aliases, acknowledged = EMPTY_ACKNOWLEDGED, today }) {
   /** @type {Finding[]} */
   const proposals = [];
   /** @type {Finding[]} */
@@ -305,7 +317,18 @@ export function compareWithMaster({ master, parsed, urls, aliases, today }) {
 
     // 既存キャラの限定区分。既存値の変更は自動反映しない。
     const limited = LIMITED_BY_ACQUISITION[row.acquisition];
-    if (limited !== undefined && limited !== existing.limited) {
+    const limitedAcknowledgement = acknowledged.limited.find(
+      (entry) => entry.name === name && entry.masterValue === existing.limited && entry.acquisition === row.acquisition,
+    );
+    if (limited !== undefined && limited !== existing.limited && limitedAcknowledgement) {
+      notes.push({
+        area: "限定区分",
+        target: name,
+        kind: "確認済みの差分（マスターを正とする）",
+        detail: `マスター: limited=${existing.limited} / 入手手段: ${row.acquisition}。${limitedAcknowledgement.reason}`,
+        sources: source,
+      });
+    } else if (limited !== undefined && limited !== existing.limited) {
       holds.push({
         area: "限定区分",
         target: name,
@@ -336,9 +359,22 @@ export function compareWithMaster({ master, parsed, urls, aliases, today }) {
   }
 
   // ---- 編成順 ----
+  // マスターの位置を正とする確認済みのキャラは、並び替えの判定と挿入位置の基準から外す。
+  const acknowledgedOrder = new Map(acknowledged.formationOrder.map((entry) => [entry.name, entry.reason]));
   const masterOrderSet = new Set(master.formationOrder);
-  const existingInWiki = formationNames.filter((name) => masterOrderSet.has(name));
-  const moved = movedElements(master.formationOrder, existingInWiki);
+  const comparableOrder = master.formationOrder.filter((name) => !acknowledgedOrder.has(name));
+  const comparableSet = new Set(comparableOrder);
+  const existingInWiki = formationNames.filter((name) => comparableSet.has(name));
+  const moved = movedElements(comparableOrder, existingInWiki);
+  for (const [name, reason] of acknowledgedOrder) {
+    notes.push({
+      area: "編成順",
+      target: name,
+      kind: "確認済みの差分（マスターの位置を正とする）",
+      detail: reason,
+      sources: [url("formation")],
+    });
+  }
   const missingInWiki = master.formationOrder.filter((name) => !formationNames.includes(name));
   const newInWiki = formationNames.filter((name) => !masterOrderSet.has(name));
   if (moved.length > 0) {
@@ -361,8 +397,8 @@ export function compareWithMaster({ master, parsed, urls, aliases, today }) {
   }
   for (const name of newInWiki) {
     const index = formationNames.indexOf(name);
-    const before = formationNames.slice(0, index).reverse().find((candidate) => masterOrderSet.has(candidate)) ?? null;
-    const after = formationNames.slice(index + 1).find((candidate) => masterOrderSet.has(candidate)) ?? null;
+    const before = formationNames.slice(0, index).reverse().find((candidate) => comparableSet.has(candidate)) ?? null;
+    const after = formationNames.slice(index + 1).find((candidate) => comparableSet.has(candidate)) ?? null;
     const finding = {
       area: "編成順",
       target: name,

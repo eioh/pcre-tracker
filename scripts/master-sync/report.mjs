@@ -24,7 +24,10 @@ export const REPORT_SCHEMA_VERSION = 1;
 export function buildReport({ snapshotDir, repoRoot, today }) {
   const manifest = JSON.parse(readFileSync(join(snapshotDir, "manifest.json"), "utf8"));
   const master = loadExistingMaster(repoRoot);
-  const aliases = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "aliases.json"), "utf8")).aliases;
+  const scriptDir = dirname(fileURLToPath(import.meta.url));
+  const aliases = JSON.parse(readFileSync(join(scriptDir, "aliases.json"), "utf8")).aliases;
+  const { limited, formationOrder } = JSON.parse(readFileSync(join(scriptDir, "acknowledged.json"), "utf8"));
+  const acknowledged = { limited, formationOrder };
   /** @type {Record<string, string>} */
   const urls = Object.fromEntries(manifest.entries.map((entry) => [entry.id, entry.url]));
   /** @type {string[]} */
@@ -73,7 +76,7 @@ export function buildReport({ snapshotDir, repoRoot, today }) {
     parsed.role &&
     parsed.eventPieces;
   const comparison = canCompare
-    ? compareWithMaster({ master, parsed: /** @type {any} */ (parsed), urls, aliases, today })
+    ? compareWithMaster({ master, parsed: /** @type {any} */ (parsed), urls, aliases, acknowledged, today })
     : { globalHoldReasons: [], proposals: [], holds: [], notes: [] };
 
   return {

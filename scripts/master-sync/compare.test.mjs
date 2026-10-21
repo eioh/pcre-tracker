@@ -194,6 +194,32 @@ describe("compareWithMaster", () => {
     expect(holds.map((finding) => [finding.target, finding.kind])).toEqual([["古いイベント", "対象キャラの不一致"]]);
   });
 
+  it("確認済みの限定区分の差分は参考に回し、マスターの値か入手手段が変われば再び保留にする", () => {
+    const acknowledged = {
+      limited: [{ name: "A", masterValue: false, acquisition: "イベント限定", reason: "配布キャラ" }],
+      formationOrder: [],
+    };
+    const rows = [row("A", { acquisition: "イベント限定" }), row("B", { acquisition: "イベント限定" })];
+    const result = compareWithMaster({ ...input({ rows }), acknowledged });
+    expect(result.holds.map((finding) => [finding.target, finding.kind])).toEqual([["B", "限定区分の不一致"]]);
+    expect(result.notes.filter((finding) => finding.area === "限定区分").map((finding) => finding.target)).toEqual(["A"]);
+    const changed = compareWithMaster({ ...input({ rows: [row("A", { acquisition: "ガチャ(期間限定)" }), row("B")] }), acknowledged });
+    expect(changed.holds.map((finding) => [finding.target, finding.kind])).toEqual([["A", "限定区分の不一致"]]);
+  });
+
+  it("確認済みの編成順のキャラは並び替えの判定と挿入位置の基準から外す", () => {
+    const characters = [character("A"), character("B"), character("C")];
+    const rows = [row("A"), row("B"), row("C"), row("D", { dates: { character: "2026/10/09", ue1: "", ue1Sp: "", ue2: "", star6: "" } })];
+    const acknowledged = { limited: [], formationOrder: [{ name: "C", reason: "マスターが正しい" }] };
+    // wiki では C が先頭に動き、新キャラ D は C の直後にある。C を基準にせず A の後ろ・B の前に挿入する。
+    const result = compareWithMaster({ ...input({ characters, rows, formation: ["C", "A", "D", "B"] }), acknowledged });
+    expect(result.holds).toEqual([]);
+    expect(result.proposals.map((finding) => [finding.kind, finding.after])).toEqual([
+      ["新キャラ追加", expect.objectContaining({ name: "D" })],
+      ["編成順に挿入", { insertAfter: "A", insertBefore: "B" }],
+    ]);
+  });
+
   it("取得件数が既存より大きく少なければ全体保留にし、候補をすべて保留へ移す", () => {
     const characters = Array.from({ length: 20 }, (_, index) => character(`C${index}`));
     const rows = [...characters.slice(0, 5).map((entry) => row(entry.name)), row("新", { dates: { character: "2026/10/01", ue1: "", ue1Sp: "", ue2: "", star6: "" } })];
