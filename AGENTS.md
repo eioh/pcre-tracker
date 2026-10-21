@@ -68,4 +68,6 @@ Vitest の multi-project 構成です。
 - `feat: ダッシュボードに装備進捗の集計を追加`
 - `fix: ローカル保存のスキーマ移行漏れを修正`
 
+コミットメッセージに `Claude-Session:` 行（Claude Code のセッション URL）は付けません。`Co-Authored-By:` 行は付けてかまいません。
+
 PR には目的、変更概要、実施した確認（`npm test`、`npm run typecheck`、`npm run build`）、UI 変更時のスクリーンショットを含めてください。
