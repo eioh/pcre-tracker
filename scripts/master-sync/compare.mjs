@@ -288,7 +288,7 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
       }
     }
 
-    // 既存キャラの属性・ロール。3 つの取得元が一致してマスターと違う場合だけ候補にし、取得元どうしの不一致は保留にする。
+    // 既存キャラの属性・ロール。マスターと違えば、取得元どうしが一致していても既存値の変更なので保留にする。
     for (const [label, key, pageMap, allowed] of /** @type {const} */ ([
       ["属性", "attribute", attributeByName, ATTRIBUTES],
       ["ロール", "role", roleByName, ROLES],
@@ -299,20 +299,13 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
       if (agreed && fromList === existing[key]) {
         continue;
       }
-      const finding = {
+      holds.push({
         area: label,
         target: name,
         kind: `${label}の不一致`,
-        detail: `マスター: ${existing[key]} / 実装日一覧: ${fromList || "空欄"} / ${label}ページ: ${fromPage.join("・") || "未掲載"}`,
-        before: existing[key],
-        after: agreed ? fromList : undefined,
+        detail: `マスター: ${existing[key]} / 実装日一覧: ${fromList || "空欄"} / ${label}ページ: ${fromPage.join("・") || "未掲載"}${agreed ? "（取得元どうしは一致）" : ""}`,
         sources: [url("implementation-dates"), url(key)],
-      };
-      if (agreed) {
-        proposals.push({ ...finding, kind: `${label}を変更する` });
-      } else {
-        holds.push(finding);
-      }
+      });
     }
 
     // 既存キャラの限定区分。既存値の変更は自動反映しない。
@@ -490,6 +483,10 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
   // ---- サイドストーリー（イベントで配布されたピース） ----
   const masterEvents = new Map(master.sideStory.map((entry) => [eventKey(entry.event, null), entry]));
   const matchedMasterKeys = new Set();
+  /** @type {Map<string, string>} 照合できた既存イベント名 → サイドストーリー追加日（YYYY-MM-DD） */
+  const masterSideDates = new Map();
+  /** @type {{ finding: Finding, date: string }[]} */
+  const sideStoryAdditions = [];
   for (const event of parsed.eventPieces.events) {
     const displayName = event.part ? `${event.event} ${event.part}` : event.event;
     // マスターが前編・後編を分けずに 1 件で持っている場合に備え、分割名なしのキーでも照合する。
@@ -501,6 +498,9 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
     const source = [url("event-pieces")];
     if (entry) {
       matchedMasterKeys.add(key);
+      if (side.date && !masterSideDates.has(entry.event)) {
+        masterSideDates.set(entry.event, side.date);
+      }
       if (side.status !== "released") {
         holds.push({
           area: "サイドストーリー",
@@ -535,7 +535,7 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
         sources: source,
       };
       if (pieces.length === 2 && unknown.length === 0) {
-        proposals.push(finding);
+        sideStoryAdditions.push({ finding, date: /** @type {string} */ (side.date) });
       } else {
         holds.push({
           ...finding,
@@ -553,6 +553,11 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
     } else if (side.status === "planned") {
       notes.push({ area: "サイドストーリー", target: displayName, kind: "サイドストーリー追加は予定", detail: event.sideStoryAdded, sources: source });
     }
+  }
+  // 追加するサイドストーリーは、既存の並び（サイドストーリー追加日の順）で、追加日がより後の最初のイベントの前に入れる。
+  for (const { finding, date } of sideStoryAdditions) {
+    const insertBefore = master.sideStory.find((entry) => (masterSideDates.get(entry.event) ?? "") > date)?.event ?? null;
+    proposals.push({ ...finding, after: { ...finding.after, sideStoryAdded: date, insertBefore } });
   }
   for (const [key, entry] of masterEvents) {
     if (!matchedMasterKeys.has(key)) {

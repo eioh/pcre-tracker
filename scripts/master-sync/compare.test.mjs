@@ -190,7 +190,9 @@ describe("compareWithMaster", () => {
       { event: "未来のイベント", part: null, pieces: ["A", "B"], sideStoryAdded: "", section: "" },
     ];
     const { proposals, holds } = compareWithMaster(input({ sideStory, events }));
-    expect(proposals.map((finding) => [finding.target, finding.after])).toEqual([["新しいイベント", { event: "新しいイベント", characters: ["B", "A"] }]]);
+    expect(proposals.map((finding) => [finding.target, finding.after])).toEqual([
+      ["新しいイベント", { event: "新しいイベント", characters: ["B", "A"], sideStoryAdded: "2026-10-16", insertBefore: null }],
+    ]);
     expect(holds.map((finding) => [finding.target, finding.kind])).toEqual([["古いイベント", "対象キャラの不一致"]]);
   });
 
@@ -218,6 +220,28 @@ describe("compareWithMaster", () => {
       ["新キャラ追加", expect.objectContaining({ name: "D" })],
       ["編成順に挿入", { insertAfter: "A", insertBefore: "B" }],
     ]);
+  });
+
+  it("既存キャラの属性は、取得元どうしが一致していても変更候補にせず保留にする", () => {
+    const rows = [row("A", { attribute: "水" }), row("B")];
+    const { proposals, holds } = compareWithMaster(input({ rows, attribute: { 水: ["A"], 火: ["B"] } }));
+    expect(proposals).toEqual([]);
+    expect(holds.map((finding) => [finding.target, finding.kind])).toEqual([["A", "属性の不一致"]]);
+    expect(holds[0].detail).toContain("取得元どうしは一致");
+  });
+
+  it("追加するサイドストーリーは、既存イベントの追加日をもとに挿入位置を決める", () => {
+    const sideStory = [
+      { event: "一", characters: ["A", "B"] },
+      { event: "三", characters: ["A", "B"] },
+    ];
+    const events = [
+      { event: "一", part: null, pieces: ["A", "B"], sideStoryAdded: "2025/01/16", section: "" },
+      { event: "二", part: null, pieces: ["B", "A"], sideStoryAdded: "2025/03/17", section: "" },
+      { event: "三", part: null, pieces: ["A", "B"], sideStoryAdded: "2025/04/16", section: "" },
+    ];
+    const { proposals } = compareWithMaster(input({ sideStory, events }));
+    expect(proposals.map((finding) => finding.after)).toEqual([{ event: "二", characters: ["B", "A"], sideStoryAdded: "2025-03-17", insertBefore: "三" }]);
   });
 
   it("取得件数が既存より大きく少なければ全体保留にし、候補をすべて保留へ移す", () => {

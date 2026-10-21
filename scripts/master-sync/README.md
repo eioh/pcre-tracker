@@ -1,7 +1,7 @@
 # master-sync（マスターデータ同期）
 
 公開サイトからゲーム共通のマスターデータを取得し、`src/data/` の既存データ全件と比較するためのスクリプト群です。
-現在は段階1（読み取り専用）で、マスターデータは書き換えません。
+段階1（読み取り専用の報告）と段階2（作業ブランチへの候補作成）まで実装しています。PR の作成はまだ行いません。
 
 ## 構成
 
@@ -9,6 +9,7 @@
 |---|---|---|
 | 取得 | GitHub Actions（`.github/workflows/master-sync-fetch.yml`） | `fetch.mjs` で取得元を取得し、非公開リポジトリ `eioh/pcre-tracker-snapshots` の `latest/` に push する |
 | 解析・比較・報告 | Claude Code のクラウド環境・ローカル | スナップショットを読み、既存マスターと比較して差分・不足・保留理由を報告する |
+| 候補作成（段階2） | Claude Code のクラウド環境・ローカル | `candidate.mjs` が基準（既定 `origin/develop`）の作業ツリーで候補を作り、ゲート判定・参照整合性チェック・`npm run verify` を行う。PR は作らず、ブランチも push しない |
 
 - クラウド環境の送信元 IP は wikiwiki.jp に遮断されるため、取得だけを Actions の runner で行う。
 - このリポジトリは公開されているため、取得したページ本文はここにコミットしない（`.master-sync/` は追跡対象外）。
@@ -34,6 +35,18 @@
 - 利用者が確認してマスターを正とした差分は `acknowledged.json` に記録し、保留ではなく参考欄に「確認済みの差分」として出す（限定区分はマスターの値と入手手段が記録時と同じ間だけ有効）。
 - 取得件数が既存件数の 9 割を下回ったら、全体を保留にする。
 
+## 候補作成とゲート判定（段階2: `candidate.mjs`・`apply.mjs`・`gate.mjs`）
+
+1. 基準のコミットを `.master-sync/worktrees/<基準のコミット>` に取り出し、そのマスターと比べて報告を作る。
+2. 全体保留・変更候補なし・同じ候補ハッシュのブランチが既にある場合は、ブランチを作らずに終える。
+3. `apply.mjs` が変更候補を当てはめる。当てはめるのは「新キャラ追加・編成順に挿入・専用装備/★6 の false→true・HARD ステージを追加・サイドストーリーを追加」だけで、他の種類が来たら例外にする。
+4. `gate.mjs` が当てはめとは独立に元データと候補の差分を検査する（削除・true→false・並び替え・既存値の変更・報告にない変更・コインショップの変更・新キャラの形式・参照整合性・候補数と変更数の一致）。1 つでも破れば不合格でブランチを作らない。
+5. 合格なら、マスターを書き換えて生成物を作り直し（参照整合性チェックを含む）、`feature/master-sync-<候補ハッシュ>` に commit して、その作業ツリーで `npm run verify` を実行する。
+   - 候補ハッシュは変更候補の内容から作るので、同じ変更なら基準が進んでも同じ名前になる（重複防止）。
+   - 基準の `package-lock.json` が同じなら `node_modules` を共有し、違えば作業ツリーで `npm ci` する。
+
+結果は `.master-sync/candidates/<日時>/` に `report.md`・`report.json`・`candidate.md`・`candidate.json` として残る。作った作業ツリーとブランチは確認後に `git worktree remove` と `git branch -D` で消す。
+
 ## 使い方
 
 ```sh
@@ -45,6 +58,9 @@ node scripts/master-sync/fetch.mjs --out /tmp/snapshots --only formation,attribu
 
 # スナップショットを解析・比較し、.master-sync/reports/<日時>/ に report.md と report.json を書く（マスターは書き換えない）
 node scripts/master-sync/report.mjs --snapshot ../pcre-tracker-snapshots/latest
+
+# 段階2: 候補ブランチを作り、ゲート判定と verify を行う（push・PR はしない）
+node scripts/master-sync/candidate.mjs --snapshot ../pcre-tracker-snapshots/latest [--base origin/develop] [--skip-verify]
 
 # 保存した実ページで解析器を検証する（指定しなければ実ページのテストは省略される）
 MASTER_SYNC_SNAPSHOT_DIR=../pcre-tracker-snapshots/latest npx vitest run --project scripts
