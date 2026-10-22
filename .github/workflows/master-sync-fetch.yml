@@ -1,0 +1,85 @@
+name: Master Sync Fetch
+
+# マスターデータ同期（段階1）の取得処理。クラウド環境の IP は wikiwiki.jp に遮断されるため、取得は GitHub Actions の runner で行う。
+# 取得したページ本文は公開リポジトリ（このリポジトリ）や成果物に載せず、非公開のスナップショット用リポジトリへ push する。
+# 解析・比較・報告はクラウド環境側がスナップショット用リポジトリを読んで行う。
+on:
+  push:
+    branches: ["feature/master-sync"]
+    # 解析・比較の変更では取得し直さない（取得元への要求を増やさない）よう、取得に関わるファイルだけを対象にする。
+    paths:
+      - "scripts/master-sync/fetch.mjs"
+      - "scripts/master-sync/robots.mjs"
+      - "scripts/master-sync/sources.mjs"
+      - ".github/workflows/master-sync-fetch.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: master-sync-fetch
+  cancel-in-progress: false
+
+env:
+  # スナップショットを保存する非公開リポジトリ。
+  SNAPSHOT_REPOSITORY: eioh/pcre-tracker-snapshots
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+          package-manager-cache: false
+
+      # 取得スクリプトは Node.js 標準 API だけを使うため npm ci は不要。
+      - name: Fetch sources
+        run: node scripts/master-sync/fetch.mjs --out "$RUNNER_TEMP/snapshots"
+
+      # 書き込み権限はスナップショット用リポジトリに限定したデプロイキーだけを使う。
+      # 鍵が未登録ならこの手順を飛ばす（取得結果はジョブ概要にのみ残る）。
+      - name: Push snapshots to private repository
+        env:
+          DEPLOY_KEY: ${{ secrets.MASTER_SYNC_SNAPSHOTS_DEPLOY_KEY }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          if [ -z "$DEPLOY_KEY" ]; then
+            echo "MASTER_SYNC_SNAPSHOTS_DEPLOY_KEY が未登録のため push を省略します"
+            exit 0
+          fi
+          key_dir="$RUNNER_TEMP/ssh"
+          mkdir -m 700 "$key_dir"
+          printf '%s\n' "$DEPLOY_KEY" > "$key_dir/id"
+          chmod 600 "$key_dir/id"
+          # GitHub が HTTPS の API で公開している SSH ホスト鍵だけを信頼し、接続先のなりすましを防ぐ。
+          curl -fsSL https://api.github.com/meta | jq -r '.ssh_keys[] | "github.com " + .' > "$key_dir/known_hosts"
+          test -s "$key_dir/known_hosts"
+          export GIT_SSH_COMMAND="ssh -i $key_dir/id -o IdentitiesOnly=yes -o UserKnownHostsFile=$key_dir/known_hosts -o StrictHostKeyChecking=yes"
+          repo_dir="$RUNNER_TEMP/snapshot-repo"
+          git clone --depth 1 "git@github.com:${SNAPSHOT_REPOSITORY}.git" "$repo_dir"
+          # 最新の取得結果だけを置き、過去分は git の履歴で辿る。
+          rm -rf "$repo_dir/latest"
+          cp -r "$RUNNER_TEMP/snapshots" "$repo_dir/latest"
+          cd "$repo_dir"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A latest
+          if git diff --cached --quiet; then
+            echo "スナップショットに変更はありません"
+            exit 0
+          fi
+          started_at=$(node -e 'console.log(JSON.parse(require("fs").readFileSync("latest/manifest.json","utf8")).startedAt)')
+          git commit -q -m "snapshot: ${started_at}" -m "取得スクリプト: eioh/pcre-tracker@${SOURCE_SHA}"
+          git push origin HEAD:main
+          echo "push したスナップショットのコミット: $(git rev-parse HEAD)" | tee -a "$GITHUB_STEP_SUMMARY"

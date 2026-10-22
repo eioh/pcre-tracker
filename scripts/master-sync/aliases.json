@@ -1,0 +1,4 @@
+{
+  "description": "wiki 上の表記（正規化後）→ characterMaster.json の name の対応表。別衣装・通称・表記揺れを既存キャラに対応させる。ここにもマスターにもない名前は保留になる。",
+  "aliases": {}
+}
