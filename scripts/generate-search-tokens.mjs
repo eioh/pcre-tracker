@@ -1,6 +1,7 @@
 import { readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { toHiragana, toKatakana, toRomaji } from "wanakana";
+import { checkReferenceIntegrity } from "./master-sync/integrity.mjs";
 
 const sourceMasterPath = resolve(process.cwd(), "src/data/characterMaster.json");
 const coinShopPath = resolve(process.cwd(), "src/data/coinShopMemoryPiece.json");
@@ -89,6 +90,21 @@ function buildFormationOrderMap(masterNames) {
   return map;
 }
 
+// HARD・サイドストーリー・コインショップのキャラ名がマスターに存在するか、重複がないかを検査し、問題があれば例外にする。
+function assertReferenceIntegrity(characters, formationOrder) {
+  const issues = checkReferenceIntegrity({
+    characters,
+    formationOrder,
+    hardQuest: JSON.parse(readFileSync(hardQuestPath, "utf8")),
+    sideStory: JSON.parse(readFileSync(sideStoryPath, "utf8")),
+    coinShop: JSON.parse(readFileSync(coinShopPath, "utf8")),
+  });
+  if (issues.length > 0) {
+    const lines = issues.map((issue) => `- ${issue.file} [${issue.location}] ${issue.name ? `${issue.name}: ` : ""}${issue.problem}`);
+    throw new Error(`マスターデータの参照整合性に問題があります:\n${lines.join("\n")}`);
+  }
+}
+
 // マスターデータへ検索トークンとコインショップ・ハードクエスト・サイドストーリー情報を統合して保存する。
 function generateSearchTokens() {
   const rawText = readFileSync(sourceMasterPath, "utf8");
@@ -105,6 +121,7 @@ function generateSearchTokens() {
     characters.filter((character) => character && typeof character.name === "string").map((character) => character.name),
   );
   const formationOrderMap = buildFormationOrderMap(masterNames);
+  assertReferenceIntegrity(characters, [...formationOrderMap.keys()]);
 
   const enriched = characters.map((character) => {
     if (!character || typeof character !== "object" || typeof character.name !== "string") {

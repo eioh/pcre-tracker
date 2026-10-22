@@ -24,3 +24,6 @@ worker-configuration.d.ts
 .wrangler/
 # Codex CLI が生成するニュース画像キャッシュ（コードと無関係）。
 .codex-news-cache/
+
+# master-sync（マスターデータ同期）の取得スナップショット・報告。公開リポジトリに取得元の本文を載せないため追跡しない。
+.master-sync/

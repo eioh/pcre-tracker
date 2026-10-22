@@ -44,6 +44,8 @@
   - 新キャラ追加時は、隊列表等で編成順の位置を確認し、`formationOrder.json` の該当位置に名前を1行挿入する
   - 番号は `npm run generate` が配列の並びから自動採番するため、手で番号を管理しない
   - `characterMaster.json` と `formationOrder.json` のキャラ集合が一致しないと `npm run generate` がエラーになる（入れ忘れ検出）
+- 参照整合性:
+  - `hardQuestMemoryPiece.json`・`sideStoryMemoryPiece.json`・`coinShopMemoryPiece.json` のキャラ名が `characterMaster.json` に存在しない場合や、サイドストーリーのイベント名・同じコイン種別内のキャラ名が重複している場合も `npm run generate` がエラーになる（表記揺れ・入力ミスの検出）
 
 ## 4. 作業手順
 
