@@ -2,7 +2,7 @@
 // PR は作らず、ブランチも push しない。
 //
 // 手順:
-//   1. 基準（既定は origin/develop）の作業ツリーを .master-sync/worktrees/ に作り、そのマスターと比較して報告を作る
+//   1. 基準（既定は origin/main。マスターデータだけの更新は main から切って main へ統合するため）の作業ツリーを .master-sync/worktrees/ に作り、そのマスターと比較して報告を作る
 //   2. 全体保留・変更候補なしなら、ブランチを作らずに終える
 //   3. 変更候補を当てはめ、元データとの差分をゲート判定する
 //   4. 合格なら、マスターを書き換えて生成物を作り直し（参照整合性チェックを含む）、feature/master-sync-<候補ハッシュ> に commit する
@@ -186,7 +186,7 @@ export function createCandidate({ repoRoot, snapshotDir, baseRef, today, skipVer
 // コマンドライン引数を解析する。
 function parseArgs(argv) {
   /** @type {{ snapshot: string | null, base: string, today: string | null, out: string | null, skipVerify: boolean }} */
-  const options = { snapshot: null, base: "origin/develop", today: null, out: null, skipVerify: false };
+  const options = { snapshot: null, base: "origin/main", today: null, out: null, skipVerify: false };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     const value = argv[index + 1];

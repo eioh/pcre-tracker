@@ -10,7 +10,7 @@
 | 取得 | GitHub Actions（`.github/workflows/master-sync-fetch.yml`） | `fetch.mjs` で取得元を取得し、非公開リポジトリ `eioh/pcre-tracker-snapshots` の `latest/` に push する |
 | 解析・比較・報告 | Claude Code のクラウド環境・ローカル | スナップショットを読み、既存マスターと比較して差分・不足・保留理由を報告する |
 | AI レビュー（段階3） | Claude Code のクラウド環境・ローカル | 別の文脈のサブエージェントが `REVIEW_PROMPT.md` に従ってレビュー用パケットを読み、`review.json` を書く。`review.mjs verify` が引用の実在などを機械的に検査する |
-| 候補作成（段階2） | Claude Code のクラウド環境・ローカル | `candidate.mjs` が基準（既定 `origin/develop`）の作業ツリーで候補を作り、ゲート判定・参照整合性チェック・`npm run verify` を行う。PR は作らず、ブランチも push しない |
+| 候補作成（段階2） | Claude Code のクラウド環境・ローカル | `candidate.mjs` が基準（既定 `origin/main`。マスターデータだけの更新は main から切って main へ統合する）の作業ツリーで候補を作り、ゲート判定・参照整合性チェック・`npm run verify` を行う。PR は作らず、ブランチも push しない |
 
 - クラウド環境の送信元 IP は wikiwiki.jp に遮断されるため、取得だけを Actions の runner で行う。
 - このリポジトリは公開されているため、取得したページ本文はここにコミットしない（`.master-sync/` は追跡対象外）。
@@ -75,7 +75,7 @@ node scripts/master-sync/fetch.mjs --out /tmp/snapshots --only formation,attribu
 node scripts/master-sync/report.mjs --snapshot ../pcre-tracker-snapshots/latest
 
 # 段階2: 候補ブランチを作り、ゲート判定と verify を行う（push・PR はしない）
-node scripts/master-sync/candidate.mjs --snapshot ../pcre-tracker-snapshots/latest [--base origin/develop] [--skip-verify]
+node scripts/master-sync/candidate.mjs --snapshot ../pcre-tracker-snapshots/latest [--base origin/main] [--skip-verify]
 
 # 段階3: AI レビュー（review.json）を検証する（パケットは candidate.mjs が作る。作り直すときは pack）
 node scripts/master-sync/review.mjs pack --candidate-dir .master-sync/candidates/<日時> --snapshot ../pcre-tracker-snapshots/latest
