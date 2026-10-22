@@ -18,7 +18,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { applyProposals } from "./apply.mjs";
 import { todayInJst } from "./compare.mjs";
-import { gateCandidate } from "./gate.mjs";
+import { changesDigest, gateCandidate } from "./gate.mjs";
 import { loadExistingMaster } from "./integrity.mjs";
 import { buildReport, formatReportMarkdown } from "./report.mjs";
 import { writeReviewPacket } from "./review.mjs";
@@ -146,6 +146,7 @@ export function createCandidate({ repoRoot, snapshotDir, baseRef, today, skipVer
     ...gate.changes.map((change) => `- ${change}`),
     "",
     `Master-Sync-Candidate: ${hash}`,
+    `Master-Sync-Changes-Digest: ${changesDigest(gate.changes)}`,
     `Master-Sync-Base: ${baseSha}`,
     `Master-Sync-Snapshot: ${report.snapshot.startedAt}`,
   ].join("\n");
