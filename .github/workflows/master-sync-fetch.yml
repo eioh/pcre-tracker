@@ -2,16 +2,13 @@ name: Master Sync Fetch
 
 # マスターデータ同期（段階1）の取得処理。クラウド環境の IP は wikiwiki.jp に遮断されるため、取得は GitHub Actions の runner で行う。
 # 取得したページ本文は公開リポジトリ（このリポジトリ）や成果物に載せず、非公開のスナップショット用リポジトリへ push する。
-# 解析・比較・報告はクラウド環境側がスナップショット用リポジトリを読んで行う。
+# 解析・比較・報告はクラウド環境側（Claude の定期タスク）がスナップショット用リポジトリを読んで行う。
 on:
-  push:
-    branches: ["feature/master-sync"]
-    # 解析・比較の変更では取得し直さない（取得元への要求を増やさない）よう、取得に関わるファイルだけを対象にする。
-    paths:
-      - "scripts/master-sync/fetch.mjs"
-      - "scripts/master-sync/robots.mjs"
-      - "scripts/master-sync/sources.mjs"
-      - ".github/workflows/master-sync-fetch.yml"
+  # 1 日 1 回、日本時間 6:17 に取得する（cron は UTC。毎時 0 分の混雑を避けて分をずらす）。
+  # 定期タスクはこの後（日本時間 7 時台）に起動し、当日のスナップショットがあることを確かめてから処理する。
+  schedule:
+    - cron: "17 21 * * *"
+  # 取得処理を変えたときの確認用。feature ブランチを ref に指定して手動で実行できる（ワークフロー自体は main にある必要がある）。
   workflow_dispatch:
 
 permissions:
