@@ -59,6 +59,9 @@ Vitest の multi-project 構成です。
 - 作業開始前に `git status --short --branch` と未統合コミットを確認する。
 - 未コミット差分、または今回の作業と無関係な未統合コミットがある場合は、そのまま続行するか、`main` / `develop` を起点に別の feature ブランチを作成して開始するかをユーザーに確認する。
 - 統合は原則として `feature → develop → main` のマージで行い、`cherry-pick` は基本的に使用しない。
+- 例外: マスターデータ（`src/data/` の正本 JSON と生成物）だけの更新は、`main` から `feature/*` を切り、`main` 宛ての PR でマージする（マスターデータ同期の自動候補もこの流れ）。
+  - 手作業のデータ修正も同じ流れで行い、データだけの修正を `develop` で行わない（`main` と `develop` で同じ JSON を別々に直すと衝突し、同期が同じ更新を再提案するため）。
+  - `main` に反映したら、`main` を `develop` にマージして差を残さない。
 - `cherry-pick` が必要な場合は、対象コミット、除外する変更、生成物への影響を説明し、ユーザーの承認を得てから実行する。
 - `src/data/characterMaster.generated.json` などの生成物は、入力となる正本データの変更と同じコミットに含める。
 - マージまたは `cherry-pick` の後は、統合先ブランチで `npm run verify:generated` を実行し、生成物が正本と一致することを確認する。
