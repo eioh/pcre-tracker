@@ -23,6 +23,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # 来歴チェックで、PR を基準に重ねたマージコミット（HEAD）の 2 つの親（基準の先端・PR の先頭）を読むため。
+          fetch-depth: 2
 
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -32,6 +34,14 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # マスターデータ同期の自動候補（feature/master-sync-<候補ハッシュ>）だけ、AI レビューを通った中身から変わっていないかを確かめる。
+      # ブランチ名は外部から決められる値なので、式に直接埋め込まず環境変数で渡す。
+      - name: Check master-sync provenance
+        if: startsWith(github.head_ref, 'feature/master-sync-')
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: node scripts/master-sync/provenance.mjs --branch "$HEAD_REF" --head-commit HEAD^2 --base HEAD^1 --merged HEAD
 
       # Cloudflare の secrets を使わず、公開処理の直前と同じ検証を行う。
       - name: Verify

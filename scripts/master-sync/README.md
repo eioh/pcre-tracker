@@ -1,7 +1,7 @@
 # master-sync（マスターデータ同期）
 
 公開サイトからゲーム共通のマスターデータを取得し、`src/data/` の既存データ全件と比較するためのスクリプト群です。
-段階1（読み取り専用の報告）・段階2（作業ブランチへの候補作成）・段階3（AI レビューとその機械的な検証）まで実装しています。PR の作成はまだ行いません。
+段階1（読み取り専用の報告）・段階2（作業ブランチへの候補作成）・段階3（AI レビューとその機械的な検証）・段階4（合格した候補の draft PR と保留台帳）まで実装しています。定期実行（段階5）はまだありません。実行の手順は [RUNBOOK.md](./RUNBOOK.md) にまとめています。
 
 ## 構成
 
@@ -10,6 +10,8 @@
 | 取得 | GitHub Actions（`.github/workflows/master-sync-fetch.yml`） | `fetch.mjs` で取得元を取得し、非公開リポジトリ `eioh/pcre-tracker-snapshots` の `latest/` に push する |
 | 解析・比較・報告 | Claude Code のクラウド環境・ローカル | スナップショットを読み、既存マスターと比較して差分・不足・保留理由を報告する |
 | AI レビュー（段階3） | Claude Code のクラウド環境・ローカル | 別の文脈のサブエージェントが `REVIEW_PROMPT.md` に従ってレビュー用パケットを読み、`review.json` を書く。`review.mjs verify` が引用の実在などを機械的に検査する |
+| PR・保留台帳（段階4） | Claude Code のクラウド環境（スクリプト）＋ Claude（GitHub 連携） | `open-pr.mjs prepare` がすべての合格を確かめてから候補ブランチを push し、PR の内容を書く。Claude がその内容のまま `main` 宛ての draft PR を作る。保留台帳の Issue も毎回作り直す |
+| 来歴チェック（段階4） | GitHub Actions（PR Check） | `feature/master-sync-<候補ハッシュ>` からの PR だけ、`provenance.mjs` が中身を検査する |
 | 候補作成（段階2） | Claude Code のクラウド環境・ローカル | `candidate.mjs` が基準（既定 `origin/main`。マスターデータだけの更新は main から切って main へ統合する）の作業ツリーで候補を作り、ゲート判定・参照整合性チェック・`npm run verify` を行う。PR は作らず、ブランチも push しない |
 
 - クラウド環境の送信元 IP は wikiwiki.jp に遮断されるため、取得だけを Actions の runner で行う。
@@ -62,6 +64,23 @@
 
 結果は候補の出力先に `review-check.md`・`review-check.json` として残る。
 
+## PR・保留台帳・来歴チェック（段階4: `open-pr.mjs`・`provenance.mjs`）
+
+- `open-pr.mjs prepare` は次をすべて満たすときだけ、候補ブランチを push して `pr.json`（draft・`main` 宛て）を書く。
+  - ゲート合格・`npm run verify` 成功（`--skip-verify` の候補は不可）
+  - AI レビューを、スナップショットから作り直したページで再検証して合格
+  - 候補ブランチの来歴チェックに合格し、作業ツリーに未コミットの変更がない
+  - 同じ名前のブランチが origin にない（ブランチ名が候補ハッシュなので、同じ変更の PR は二重にできない）
+- 未マージの同期 PR があるときは新しい PR を作らない（RUNBOOK.md の手順 5）。
+- `open-pr.mjs ledger` は、保留・確認済みの差分・参照整合性・今回の候補の結果から保留台帳の本文を作る。Issue「マスターデータ同期: 保留台帳」の本文を毎回置き換える。
+- PR・Issue の本文に入れる wiki 由来の文字列は、メンション・タグが効かないようにし、引用はコードとして表示する。
+- 候補のコミットには trailer（`Master-Sync-Candidate`・`Master-Sync-Changes-Digest`・`Master-Sync-Base`・`Master-Sync-Snapshot`）を付ける。
+- PR Check は `feature/master-sync-` からの PR だけ `provenance.mjs` を実行し、次を確かめる。
+  - 先頭コミットの候補ハッシュがブランチ名と一致する
+  - 変更されたファイルがマスターデータ 4 種と生成物だけ（コード・ワークフロー・コインショップは不可）
+  - データの差分が構造のゲート（追加と false→true だけ、参照整合性）を通る
+  - 差分から作り直した変更の要約ハッシュがコミットの記録と一致する（AI レビュー後に中身が変わっていない）
+
 ## 使い方
 
 ```sh
@@ -80,6 +99,10 @@ node scripts/master-sync/candidate.mjs --snapshot ../pcre-tracker-snapshots/late
 # 段階3: AI レビュー（review.json）を検証する（パケットは candidate.mjs が作る。作り直すときは pack）
 node scripts/master-sync/review.mjs pack --candidate-dir .master-sync/candidates/<日時> --snapshot ../pcre-tracker-snapshots/latest
 node scripts/master-sync/review.mjs verify --candidate-dir .master-sync/candidates/<日時> --snapshot ../pcre-tracker-snapshots/latest
+
+# 段階4: PR の準備（合格したら候補ブランチを push して pr.json を書く。--dry-run で push しない）と保留台帳の本文
+node scripts/master-sync/open-pr.mjs prepare --candidate-dir .master-sync/candidates/<日時> --snapshot ../pcre-tracker-snapshots/latest [--dry-run]
+node scripts/master-sync/open-pr.mjs ledger --candidate-dir .master-sync/candidates/<日時> [--skip-reason <理由>]
 
 # 保存した実ページで解析器を検証する（指定しなければ実ページのテストは省略される）
 MASTER_SYNC_SNAPSHOT_DIR=../pcre-tracker-snapshots/latest npx vitest run --project scripts
