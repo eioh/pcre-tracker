@@ -1,6 +1,7 @@
 // 更新候補のゲート判定（段階2）。当てはめ処理とは独立に、元データと候補の差分を検査する。
 // 判定規則（削除・true→false・並び替え・既存値の変更をしない、報告にない変更をしない、形式と参照整合性を守る）を
 // 機械的に確かめ、1 つでも破っていれば不合格にする。
+import { createHash } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import { checkReferenceIntegrity } from "./integrity.mjs";
 import { ATTRIBUTES, ROLES } from "./parsers.mjs";
@@ -51,17 +52,19 @@ function validateNewCharacter(character) {
 
 /**
  * 元データと候補を比べてゲート判定する。
- * @param {{ base: ExistingMaster, candidate: ExistingMaster, report: { globalHoldReasons: string[], proposals: import("./compare.mjs").Finding[] } }} input
+ * report を省くと構造だけを検査する（PR Check の来歴チェック用。報告がなくても、追加と false→true 以外の変更を拒む）。
+ * @param {{ base: ExistingMaster, candidate: ExistingMaster, report?: { globalHoldReasons: string[], proposals: import("./compare.mjs").Finding[] } | null }} input
  * @returns {{ ok: boolean, failures: string[], changes: string[] }}
  */
-export function gateCandidate({ base, candidate, report }) {
+export function gateCandidate({ base, candidate, report = null }) {
   /** @type {string[]} */
   const failures = [];
   /** @type {string[]} */
   const changes = [];
-  const proposed = (kind, target) => report.proposals.some((proposal) => proposal.kind === kind && proposal.target === target);
+  // 報告の変更候補にある変更かを返す（構造だけの検査では常に true）。
+  const proposed = (kind, target) => !report || report.proposals.some((proposal) => proposal.kind === kind && proposal.target === target);
 
-  if (report.globalHoldReasons.length > 0) {
+  if (report && report.globalHoldReasons.length > 0) {
     failures.push(`報告が全体保留になっている（${report.globalHoldReasons.join(" / ")}）`);
   }
 
@@ -170,7 +173,7 @@ export function gateCandidate({ base, candidate, report }) {
   }
 
   // ---- 報告の候補がすべて反映されているか ----
-  if (changes.length !== report.proposals.length) {
+  if (report && changes.length !== report.proposals.length) {
     failures.push(`報告の変更候補 ${report.proposals.length} 件に対し、反映された変更が ${changes.length} 件`);
   }
 
@@ -179,4 +182,9 @@ export function gateCandidate({ base, candidate, report }) {
     failures.push(`参照整合性: ${issue.file} [${issue.location}] ${issue.name} ${issue.problem}`);
   }
   return { ok: failures.length === 0, failures, changes };
+}
+
+// 変更の一覧から、並びに依存しない要約ハッシュを作る。候補のコミットに記録し、PR Check が差分から作り直して照合する。
+export function changesDigest(changes) {
+  return createHash("sha256").update([...changes].sort().join("\n")).digest("hex");
 }
