@@ -2,7 +2,8 @@
 // 判定規則はここで機械的に適用する（AI の判断だけに依存しない）。
 // - 値は「真・偽・不明」の 3 値で扱い、空欄や取得失敗は不明とする。不明を理由に false 化・削除はしない。
 // - 削除や true→false の変化は自動反映せず、すべて保留にする。
-// - 日付は日本時間の今日と比べ、未来日・「近日予定」は未実装、当日は翌日に再確認（保留）とする。
+// - 日付は日本時間の今日と比べ、今日以前は実装済み、未来日・「近日予定」は未実装とする。
+//   当日の日付は実装時刻の前かもしれないので、候補に sameDay の印を付け、PR で確認を促す。
 // - 別名表にも既存マスターにもない名前は保留にする。
 import { normalizeCharacterName } from "./html.mjs";
 import { ATTRIBUTES, ROLES } from "./parsers.mjs";
@@ -28,7 +29,7 @@ const FEATURE_LABELS = { ue1: "専用1", ue1Sp: "専用1SP", ue2: "専用2", sta
 /**
  * 日付の文字列を、日本時間の今日（YYYY-MM-DD）と比べて分類する。
  * - released: 今日より前（実装済み）
- * - today: 今日（時刻が不明なので翌日に再確認）
+ * - today: 今日（実装済みとみなすが、時刻が不明なので候補に当日の印を付ける）
  * - planned: 未来日・「予定」の表記
  * - unknown: 空欄
  * - unparseable: 読み取れない表記
@@ -51,6 +52,11 @@ export function classifyDate(text, today) {
     return { status: "planned", date: null };
   }
   return { status: "unparseable", date: null };
+}
+
+// 日付の分類が「実装済み」とみなせるか（当日を含む）を返す。
+export function isReleasedStatus(status) {
+  return status === "released" || status === "today";
 }
 
 // 日本時間の今日の日付（YYYY-MM-DD）を返す。
@@ -115,8 +121,8 @@ function movedElements(expected, actual) {
 const EMPTY_ACKNOWLEDGED = { limited: [], formationOrder: [] };
 
 /**
- * 比較結果の 1 件。
- * @typedef {{ area: string, target: string, kind: string, detail: string, before?: unknown, after?: unknown, sources: string[] }} Finding
+ * 比較結果の 1 件。sameDay は、当日の日付にもとづく候補（実装時刻の前の可能性がある）であること。
+ * @typedef {{ area: string, target: string, kind: string, detail: string, before?: unknown, after?: unknown, sources: string[], sameDay?: boolean }} Finding
  */
 
 /**
@@ -191,7 +197,7 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
     const existing = masterByName.get(name);
 
     if (!existing) {
-      if (characterDate.status !== "released") {
+      if (!isReleasedStatus(characterDate.status)) {
         notes.push({
           area: "キャラ",
           target: name,
@@ -221,7 +227,9 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
       if (!formationNames.includes(name)) {
         reasons.push("編成順ページに未掲載");
       }
-      const implemented = Object.fromEntries(FEATURE_KEYS.map((key) => [key, classifyDate(row.dates[key], today).status === "released"]));
+      const featureDates = FEATURE_KEYS.map((key) => classifyDate(row.dates[key], today));
+      const implemented = Object.fromEntries(FEATURE_KEYS.map((key, index) => [key, isReleasedStatus(featureDates[index].status)]));
+      const sameDay = characterDate.status === "today" || featureDates.some((date) => date.status === "today");
       const candidate = {
         name,
         baseName: normalizeCharacterName(row.baseName),
@@ -234,9 +242,10 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
         area: "キャラ",
         target: name,
         kind: "新キャラ追加",
-        detail: `キャラ実装日 ${characterDate.date}、入手手段 ${row.acquisition}`,
+        detail: `キャラ実装日 ${characterDate.date}${sameDay ? "（当日。実装時刻の前の可能性あり）" : ""}、入手手段 ${row.acquisition}`,
         after: candidate,
         sources: [url("implementation-dates"), url("attribute"), url("role"), url("formation")],
+        ...(sameDay ? { sameDay: true } : {}),
       };
       if (reasons.length > 0) {
         holds.push({ ...finding, detail: `${finding.detail}。保留理由: ${reasons.join("、")}` });
@@ -251,17 +260,18 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
       const date = classifyDate(row.dates[key], today);
       const current = existing.implemented[key];
       const label = FEATURE_LABELS[key];
-      if (!current && date.status === "released") {
+      if (!current && isReleasedStatus(date.status)) {
         proposals.push({
           area: "実装状況",
           target: name,
           kind: `${label}を実装済みにする`,
-          detail: `${label}追加日 ${date.date}`,
+          detail: `${label}追加日 ${date.date}${date.status === "today" ? "（当日。実装時刻の前の可能性あり）" : ""}`,
           before: false,
           after: true,
           sources: source,
+          ...(date.status === "today" ? { sameDay: true } : {}),
         });
-      } else if (current && date.status !== "released") {
+      } else if (current && !isReleasedStatus(date.status)) {
         holds.push({
           area: "実装状況",
           target: name,
@@ -269,12 +279,12 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
           detail: `${label}追加日: ${row.dates[key] || "空欄"}（${date.status}）。true→false は自動反映しない`,
           sources: source,
         });
-      } else if (date.status === "today" || date.status === "unparseable") {
+      } else if (date.status === "unparseable") {
         holds.push({
           area: "実装状況",
           target: name,
           kind: `${label}: 日付を判定できない`,
-          detail: `${label}追加日: ${row.dates[key]}（${date.status === "today" ? "当日のため翌日に再確認" : "読み取れない表記"}）`,
+          detail: `${label}追加日: ${row.dates[key]}（読み取れない表記）`,
           sources: source,
         });
       } else if (!current && date.status === "planned") {
@@ -501,7 +511,7 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
       if (side.date && !masterSideDates.has(entry.event)) {
         masterSideDates.set(entry.event, side.date);
       }
-      if (side.status !== "released") {
+      if (!isReleasedStatus(side.status)) {
         holds.push({
           area: "サイドストーリー",
           target: entry.event,
@@ -524,15 +534,16 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
       }
       continue;
     }
-    if (side.status === "released") {
+    if (isReleasedStatus(side.status)) {
       const unknown = pieces.filter((name) => !masterByName.has(name) && !candidateNames.has(name));
       const finding = {
         area: "サイドストーリー",
         target: displayName,
         kind: "サイドストーリーを追加",
-        detail: `サイドストーリー追加 ${side.date}、対象: ${pieces.join("、")}`,
+        detail: `サイドストーリー追加 ${side.date}${side.status === "today" ? "（当日。実装時刻の前の可能性あり）" : ""}、対象: ${pieces.join("、")}`,
         after: { event: displayName, characters: pieces },
         sources: source,
+        ...(side.status === "today" ? { sameDay: true } : {}),
       };
       if (pieces.length === 2 && unknown.length === 0) {
         sideStoryAdditions.push({ finding, date: /** @type {string} */ (side.date) });
@@ -542,7 +553,7 @@ export function compareWithMaster({ master, parsed, urls, aliases, acknowledged 
           detail: `${finding.detail}。保留理由: ${unknown.length > 0 ? `マスターにない名前（${unknown.join("、")}）` : "対象キャラが 2 人でない"}`,
         });
       }
-    } else if (side.status === "today" || side.status === "unparseable") {
+    } else if (side.status === "unparseable") {
       holds.push({
         area: "サイドストーリー",
         target: displayName,

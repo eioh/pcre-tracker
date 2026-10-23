@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { applyProposals } from "./apply.mjs";
 import { changesDigest, gateCandidate } from "./gate.mjs";
-import { LEDGER_MARKER, buildLedger, buildPrBody, neutralize } from "./open-pr.mjs";
+import { LEDGER_MARKER, buildLedger, buildPrBody, neutralize, sameDaySection } from "./open-pr.mjs";
 import { checkProvenance, parseTrailers } from "./provenance.mjs";
 
 // マスターのキャラを作る。
@@ -115,6 +115,13 @@ describe("PR と保留台帳の本文", () => {
     expect(body).toContain("- 候補ハッシュ: `0123456789ab`");
     expect(body).toContain("eioh/pcre-tracker-snapshots `cccccccccccc`");
     expect(body).toContain("| https://wiki/impl | 2026-10-22T08:00:10+09:00 | aaaaaaaaaaaa |");
+  });
+
+  it("当日の実装日にもとづく候補があるときだけ、ゲーム内での確認を促す節を出す", () => {
+    expect(sameDaySection(PROPOSALS)).toEqual([]);
+    const section = sameDaySection([{ ...PROPOSALS[0], detail: "★6追加日 2026-10-22（当日。実装時刻の前の可能性あり）", sameDay: true }]).join("\n");
+    expect(section).toContain("## ⚠️ 当日の実装日にもとづく変更");
+    expect(section).toContain("- ★6を実装済みにする: A（★6追加日 2026-10-22（当日。実装時刻の前の可能性あり））");
   });
 
   it("保留台帳に目印・保留・確認済みの差分・PR にしなかった理由を入れる", () => {

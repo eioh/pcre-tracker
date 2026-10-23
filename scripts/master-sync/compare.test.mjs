@@ -100,7 +100,7 @@ describe("compareWithMaster", () => {
     expect(result).toMatchObject({ globalHoldReasons: [], proposals: [], holds: [] });
   });
 
-  it("実装日が過去なら false→true を候補にし、マスターが true で一覧が空欄・未来なら false 化を提案せず保留にする", () => {
+  it("実装日が今日以前なら false→true を候補にし（当日は印を付ける）、マスターが true で一覧が空欄・未来なら false 化を提案せず保留にする", () => {
     const characters = [
       character("A"),
       character("B", { implemented: { star6: true, ue1: true, ue1Sp: false, ue2: false } }),
@@ -110,10 +110,13 @@ describe("compareWithMaster", () => {
       row("B", { dates: { character: "2020/01/01", ue1: "", ue1Sp: "", ue2: "", star6: "2026/11/01" } }),
     ];
     const { proposals, holds } = compareWithMaster(input({ characters, rows }));
-    expect(proposals.map((finding) => [finding.target, finding.kind, finding.after])).toEqual([["A", "専用1を実装済みにする", true]]);
+    expect(proposals.map((finding) => [finding.target, finding.kind, finding.after, finding.sameDay ?? false])).toEqual([
+      ["A", "専用1を実装済みにする", true, false],
+      ["A", "専用2を実装済みにする", true, true],
+    ]);
+    expect(proposals[1].detail).toContain("当日");
     expect(proposals.some((finding) => finding.after === false)).toBe(false);
     expect(holds.map((finding) => [finding.target, finding.kind])).toEqual([
-      ["A", "専用2: 日付を判定できない"],
       ["B", "専用1: マスターは実装済みだが一覧では未確認"],
       ["B", "★6: マスターは実装済みだが一覧では未確認"],
     ]);
@@ -242,6 +245,17 @@ describe("compareWithMaster", () => {
     ];
     const { proposals } = compareWithMaster(input({ sideStory, events }));
     expect(proposals.map((finding) => finding.after)).toEqual([{ event: "二", characters: ["B", "A"], sideStoryAdded: "2025-03-17", insertBefore: "三" }]);
+  });
+
+  it("キャラ実装日・サイドストーリー追加日が当日なら候補にし、当日の印を付ける", () => {
+    const rows = [row("A"), row("B"), row("C", { dates: { character: "2026/10/21", ue1: "", ue1Sp: "", ue2: "", star6: "" } })];
+    const events = [{ event: "今日のイベント", part: null, pieces: ["A", "B"], sideStoryAdded: "2026/10/21", section: "" }];
+    const { proposals } = compareWithMaster(input({ rows, formation: ["A", "C", "B"], events }));
+    expect(proposals.map((finding) => [finding.kind, finding.target, finding.sameDay ?? false])).toEqual([
+      ["新キャラ追加", "C", true],
+      ["編成順に挿入", "C", false],
+      ["サイドストーリーを追加", "今日のイベント", true],
+    ]);
   });
 
   it("取得件数が既存より大きく少なければ全体保留にし、候補をすべて保留へ移す", () => {

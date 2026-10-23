@@ -47,6 +47,22 @@ function cell(text) {
   return neutralize(text).replace(/\|/g, "\\|");
 }
 
+// 当日の日付にもとづく候補があれば、マージ前にゲーム内での確認を促す節を作る（なければ空）。
+export function sameDaySection(proposals) {
+  const sameDay = proposals.filter((proposal) => proposal.sameDay);
+  if (sameDay.length === 0) {
+    return [];
+  }
+  return [
+    "## ⚠️ 当日の実装日にもとづく変更",
+    "",
+    "次の変更は wiki の日付が今日（日本時間）のものです。wiki の日付には時刻がないため、実装時刻の前に作られた可能性があります。**ゲーム内で実装を確認してからマージしてください。**",
+    "",
+    ...sameDay.map((proposal) => `- ${cell(`${proposal.kind}: ${proposal.target}`)}（${cell(proposal.detail)}）`),
+    "",
+  ];
+}
+
 /**
  * PR の本文を作る。
  * @param {{ candidate: any, report: any, review: any, reviewCheck: { warnings: string[] }, snapshotCommit: string | null }} input
@@ -63,6 +79,7 @@ export function buildPrBody({ candidate, report, review, reviewCheck, snapshotCo
     "",
     ...candidate.gate.changes.map((change) => `- ${neutralize(change)}`),
     "",
+    ...sameDaySection(report.proposals),
     "## AI レビュー",
     "",
     `全体の判定: **${review.verdict}**（別文脈のサブエージェントによる。引用は保存したページに実在することをスクリプトで確認済み）`,
