@@ -4565,5 +4565,19 @@
       "ue2": false
     },
     "memoryPieceSources": []
+  },
+  {
+    "name": "アグライア",
+    "baseName": "アグライア",
+    "limited": true,
+    "attribute": "光",
+    "role": "バッファー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
   }
 ]
