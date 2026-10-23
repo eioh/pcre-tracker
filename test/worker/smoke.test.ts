@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import worker from "../../worker/index";
 import { testEnv, TEST_ORIGIN } from "./helpers";
 
-// Worker テスト基盤（@cloudflare/vitest-pool-workers）と基本ルーティングのスモークテスト。
+// Worker テスト基盤（@cloudflare/vitest-plugin）と基本ルーティングのスモークテスト。
 describe("worker スモークテスト", () => {
   // 未定義の /api/* パスへの fetch が 404 の JSON を返すことを確認する。
   it("/api/foo に対して 404 の JSON を返す", async () => {
