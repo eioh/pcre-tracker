@@ -1,10 +1,9 @@
-// 0.18.x では readD1Migrations / cloudflareTest ともにパッケージのルートから export される
-// （旧版の "@cloudflare/vitest-pool-workers/config" サブパスは存在しない）。
-import { cloudflareTest, readD1Migrations } from "@cloudflare/vitest-pool-workers";
+// 旧 vitest-pool-workers は更新終了のため、同じ設定 API を持つ後継パッケージを使う。
+import { cloudflareTest, readD1Migrations } from "@cloudflare/vitest-plugin";
 import { defineProject } from "vitest/config";
 
 // Cloudflare Workers（miniflare 実行環境）向けのテストプロジェクト設定。
-// @cloudflare/vitest-pool-workers 0.18.x の cloudflareTest() プラグイン方式を用い、
+// @cloudflare/vitest-plugin の cloudflareTest() プラグイン方式を用い、
 // wrangler.jsonc の設定（main / bindings 等）を読み取って Worker をテスト用に起動する。
 export default defineProject({
   plugins: [

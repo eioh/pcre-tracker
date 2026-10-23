@@ -11,7 +11,7 @@
 - `src/test/setup.ts`: フロント側 Vitest の共通セットアップ
 - `worker/`: Cloudflare Worker（better-auth 認証、`/api/data` 同期 API）。**`window`/`localStorage` に依存するモジュールを import しないこと**（DOM 非依存の `src/domain` モジュールのみ可）
 - `migrations/`: D1 マイグレーション SQL
-- `test/worker/`: Worker 側テスト（`@cloudflare/vitest-pool-workers`）
+- `test/worker/`: Worker 側テスト（`@cloudflare/vitest-plugin`）
 
 ## ビルド・テスト・開発コマンド
 - `npm run cf-typegen`: Cloudflare ランタイム型（`worker-configuration.d.ts`、gitignore 済み）を生成。**クローン直後や `wrangler.jsonc` 変更後は型チェック前に実行が必要**
@@ -48,7 +48,7 @@ TypeScript + React 関数コンポーネントを前提とし、インデント�
 ## テスト方針
 Vitest の multi-project 構成です。
 - **front プロジェクト**: Testing Library（`@testing-library/react`, `jsdom`）。テストは対象コードの近くに配置します（例: `src/utils/dashboard.test.ts`、`src/domain/storage.test.ts`）
-- **worker プロジェクト**: `@cloudflare/vitest-pool-workers`（実 Worker + ローカル D1）。`test/worker/` に配置し、`migrations/` の SQL はセットアップで自動適用されます
+- **worker プロジェクト**: `@cloudflare/vitest-plugin`（実 Worker + ローカル D1）。`test/worker/` に配置し、`migrations/` の SQL はセットアップで自動適用されます
 - **scripts プロジェクト**: `scripts/` 配下の Node.js スクリプトのテスト（Node 環境、`scripts/**/*.test.mjs`）。設定は `vitest.config.ts` に直接記述しています
 マージ前に、スキーマ検証・保存処理・主要な計算ロジック・データ隔離（ユーザー間）を優先してカバーしてください。
 

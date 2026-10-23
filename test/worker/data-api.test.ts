@@ -18,7 +18,7 @@ import {
 
 // /api/data の統合テスト。
 // 設計書の必須要件（データ隔離・楽観ロック・入力検証・CSRF・レート制限）を Worker 実体に対して検証する。
-// 各テストは vitest-pool-workers の isolated storage により独立した D1 状態で実行される。
+// 各テストファイルは @cloudflare/vitest-plugin のストレージ分離により独立した D1 状態で実行される。
 
 describe("/api/data 認証", () => {
   // セッションなしの GET は 401 を返す。
