@@ -1,7 +1,7 @@
 import { defineConfig } from "vitest/config";
 
 // ルートの Vitest 設定。Vitest 4 の multi-project（projects）構成で
-// フロント（jsdom）と Worker（@cloudflare/vitest-pool-workers）の 2 プロジェクトを束ねる。
+// フロント（jsdom）と Worker（@cloudflare/vitest-plugin）の設定を束ねる。
 // 各プロジェクトの実行環境は両立しないため、それぞれ専用の設定ファイルへ分離している。
 // scripts/ 配下の Node 用スクリプトのテストは、設定が小さいため Node 環境のプロジェクトとしてここに直接書く。
 export default defineConfig({
