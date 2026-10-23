@@ -1,13 +1,13 @@
 # master-sync（マスターデータ同期）
 
 公開サイトからゲーム共通のマスターデータを取得し、`src/data/` の既存データ全件と比較するためのスクリプト群です。
-段階1（読み取り専用の報告）・段階2（作業ブランチへの候補作成）・段階3（AI レビューとその機械的な検証）・段階4（合格した候補の draft PR と保留台帳）・段階5（毎日の定期実行）まで実装しています。実行の手順は [RUNBOOK.md](./RUNBOOK.md) にまとめています。
+段階1（読み取り専用の報告）・段階2（作業ブランチへの候補作成）・段階3（AI レビューとその機械的な検証）・段階4（合格した候補の draft PR と保留台帳）・段階5（月 1 回の定期点検）まで実装しています。実行の手順は [RUNBOOK.md](./RUNBOOK.md) にまとめています。
 
 ## 構成
 
 | 処理 | 実行場所 | 内容 |
 |---|---|---|
-| 取得 | GitHub Actions（`.github/workflows/master-sync-fetch.yml`、毎日 日本時間 11:17） | `fetch.mjs` で取得元を取得し、非公開リポジトリ `eioh/pcre-tracker-snapshots` の `latest/` に push する |
+| 取得 | GitHub Actions（`.github/workflows/master-sync-fetch.yml`、点検のたびに手動実行） | `fetch.mjs` で取得元を取得し、非公開リポジトリ `eioh/pcre-tracker-snapshots` の `latest/` に push する |
 | 解析・比較・報告 | Claude Code のクラウド環境・ローカル | スナップショットを読み、既存マスターと比較して差分・不足・保留理由を報告する |
 | AI レビュー（段階3） | Claude Code のクラウド環境・ローカル | 別の文脈のサブエージェントが `REVIEW_PROMPT.md` に従ってレビュー用パケットを読み、`review.json` を書く。`review.mjs verify` が引用の実在などを機械的に検査する |
 | PR・保留台帳（段階4） | Claude Code のクラウド環境（スクリプト）＋ Claude（GitHub 連携） | `open-pr.mjs prepare` がすべての合格を確かめてから候補ブランチを push し、PR の内容を書く。Claude がその内容のまま `main` 宛ての draft PR を作る。保留台帳の Issue も毎回作り直す |
