@@ -43,7 +43,7 @@
       "ゆい",
       "yui"
     ],
-    "formationOrder": 335
+    "formationOrder": 336
   },
   {
     "name": "レイ",
@@ -181,7 +181,7 @@
       "ゆき",
       "yuki"
     ],
-    "formationOrder": 339
+    "formationOrder": 340
   },
   {
     "name": "アンナ",
@@ -227,7 +227,7 @@
       "まほ",
       "maho"
     ],
-    "formationOrder": 333
+    "formationOrder": 334
   },
   {
     "name": "リノ",
@@ -755,7 +755,7 @@
       "きょうか",
       "kyouka"
     ],
-    "formationOrder": 342
+    "formationOrder": 343
   },
   {
     "name": "トモ",
@@ -824,7 +824,7 @@
       "あおい",
       "aoi"
     ],
-    "formationOrder": 327
+    "formationOrder": 328
   },
   {
     "name": "チカ",
@@ -847,7 +847,7 @@
       "ちか",
       "chika"
     ],
-    "formationOrder": 330
+    "formationOrder": 331
   },
   {
     "name": "マコト",
@@ -1690,7 +1690,7 @@
       "みさき(はろうぃん)",
       "misaki(harouin)"
     ],
-    "formationOrder": 344
+    "formationOrder": 345
   },
   {
     "name": "チカ（クリスマス）",
@@ -2184,7 +2184,7 @@
       "マホ(サマア)",
       "maho(samaa)"
     ],
-    "formationOrder": 331
+    "formationOrder": 332
   },
   {
     "name": "アオイ（編入生）",
@@ -2275,7 +2275,7 @@
       "ゆに",
       "yuni"
     ],
-    "formationOrder": 340
+    "formationOrder": 341
   },
   {
     "name": "キョウカ（ハロウィン）",
@@ -2297,7 +2297,7 @@
       "きょうか(はろうぃん)",
       "kyouka(harouin)"
     ],
-    "formationOrder": 346
+    "formationOrder": 347
   },
   {
     "name": "ミソギ（ハロウィン）",
@@ -3326,7 +3326,7 @@
       "ゆに(聖学祭)",
       "yuni(聖学祭)"
     ],
-    "formationOrder": 341
+    "formationOrder": 342
   },
   {
     "name": "イノリ（タイムトラベル）",
@@ -3597,7 +3597,7 @@
       "ユキ(オウエド)",
       "yuki(ooedo)"
     ],
-    "formationOrder": 334
+    "formationOrder": 335
   },
   {
     "name": "カオリ（ハロウィン）",
@@ -3707,7 +3707,7 @@
       "らんふぁ",
       "ranfua"
     ],
-    "formationOrder": 326
+    "formationOrder": 327
   },
   {
     "name": "ミソラ",
@@ -3751,7 +3751,7 @@
       "かりん",
       "karin"
     ],
-    "formationOrder": 329
+    "formationOrder": 330
   },
   {
     "name": "ネビア",
@@ -3773,7 +3773,7 @@
       "ねびあ",
       "nebia"
     ],
-    "formationOrder": 348
+    "formationOrder": 349
   },
   {
     "name": "イオ（ノワール）",
@@ -4340,7 +4340,7 @@
       "キョウカ(サマア)",
       "kyouka(samaa)"
     ],
-    "formationOrder": 343
+    "formationOrder": 344
   },
   {
     "name": "ミソギ（サマー）",
@@ -4431,7 +4431,7 @@
       "マホ(エクスプロウラア)",
       "maho(ekusupurooraa)"
     ],
-    "formationOrder": 332
+    "formationOrder": 333
   },
   {
     "name": "アヤネ（エクスプローラー）",
@@ -4813,7 +4813,7 @@
       "たまき(かふぇ)",
       "tamaki(kafye)"
     ],
-    "formationOrder": 347
+    "formationOrder": 348
   },
   {
     "name": "モニカ（カフェ）",
@@ -5264,7 +5264,7 @@
       "きゃる(編入生)",
       "kyaru(編入生)"
     ],
-    "formationOrder": 338
+    "formationOrder": 339
   },
   {
     "name": "スズナ（編入生）",
@@ -5479,7 +5479,7 @@
       "ハツネ(ニュウイヤア)",
       "hatsune(nyuuiyaa)"
     ],
-    "formationOrder": 337
+    "formationOrder": 338
   },
   {
     "name": "カスミ（ニューイヤー）",
@@ -5590,7 +5590,7 @@
       "えりす",
       "erisu"
     ],
-    "formationOrder": 336
+    "formationOrder": 337
   },
   {
     "name": "ユニ（ウィンター）",
@@ -6619,7 +6619,7 @@
       "エリス(サマア)",
       "erisu(samaa)"
     ],
-    "formationOrder": 328
+    "formationOrder": 329
   },
   {
     "name": "シェフィ（サマー）",
@@ -6797,7 +6797,7 @@
       "ゆきの",
       "yukino"
     ],
-    "formationOrder": 349
+    "formationOrder": 350
   },
   {
     "name": "サツキ",
@@ -7459,7 +7459,7 @@
       "きょうか(ごしっく)",
       "kyouka(goshikku)"
     ],
-    "formationOrder": 345
+    "formationOrder": 346
   },
   {
     "name": "キャル（覇瞳天星）",
@@ -7793,5 +7793,25 @@
       "amesu(gannaa)"
     ],
     "formationOrder": 188
+  },
+  {
+    "name": "アグライア",
+    "baseName": "アグライア",
+    "limited": true,
+    "attribute": "光",
+    "role": "バッファー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": [],
+    "searchTokens": [
+      "アグライア",
+      "あぐらいあ",
+      "aguraia"
+    ],
+    "formationOrder": 326
   }
 ]
