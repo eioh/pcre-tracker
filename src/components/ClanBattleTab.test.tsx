@@ -119,6 +119,33 @@ describe("ClanBattleTab（キャラ追加時のformationOrder自動ソート）"
     ]);
   });
 
+  // 編成キャラごとにマスターの属性・ロールをアイコン（代替テキスト付き）で表示することを確認する。
+  it("編成キャラの行に属性とロールのアイコンを表示する", () => {
+    const state = buildStateWithFormation();
+    render(<ClanBattleTabHarness masterCharacters={testCharacters} state={state} onChange={vi.fn()} />);
+
+    const rows = screen.getAllByRole("article");
+    [testCharacters[0]!, testCharacters[2]!].forEach((character, index) => {
+      const row = within(rows[index]!);
+      expect(row.getByRole("img", { name: character.attribute })).toBeInTheDocument();
+      expect(row.getByRole("img", { name: character.role })).toBeInTheDocument();
+    });
+  });
+
+  // サポートは独立した列のチェックボックスとして操作でき、他メンバーのサポートは外れることを確認する。
+  it("サポート列のチェックで対象メンバーだけがサポートになる", () => {
+    const state = buildStateWithFormation();
+    state.clanBattle.groups[0]!.formations[0]!.members[0]!.support = true;
+    const onChange = vi.fn();
+    render(<ClanBattleTabHarness masterCharacters={testCharacters} state={state} onChange={onChange} />);
+
+    const secondRow = within(screen.getAllByRole("article")[1]!);
+    fireEvent.click(secondRow.getByRole("checkbox", { name: "サポート" }));
+
+    const next = onChange.mock.calls[0]![0] as ClanBattleState;
+    expect(next.groups[0]!.formations[0]!.members.map((member) => member.support)).toEqual([false, true]);
+  });
+
   it("新しい案内文（編成順で自動的に並ぶ旨）を表示し、旧案内文は表示しない", () => {
     const state = buildStateWithFormation();
     render(<ClanBattleTabHarness masterCharacters={testCharacters} state={state} onChange={vi.fn()} />);
