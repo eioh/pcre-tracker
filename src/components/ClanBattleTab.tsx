@@ -26,8 +26,9 @@ import {
 } from "../domain/clanBattle";
 import { isCharacterNameMatched } from "../utils/nameSearch";
 import { ClanBattleSidebar } from "./ClanBattleSidebar";
-import { panelClass } from "./input/uiStyles";
+import { characterNameCellLayoutClass, panelClass } from "./input/uiStyles";
 import { formatUeLevel } from "./input/formatters";
+import { AttributeIconLabel, RoleIconLabel } from "./input/SemanticIconLabel";
 import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
 import { Input } from "./ui/input";
@@ -442,27 +443,36 @@ export function ClanBattleTab({
                   const diffs = isCurrentMonth ? getClanBattleMemberDiffs(member, state.progressByName[member.characterName]) : [];
                   const hasDiff = diffs.length > 0;
                   // 狭い画面は2列、デスクトップは横一列にし、入力領域を行内の各セルへ広げる。
+                  // デスクトップはサイドバー併置時（xl）にも横スクロールが出ないよう、列間を詰めてサポート列をチェック幅に抑える。
                   // SP実装済みの専用1は、レベル上限だけでなくSP装備時に最大育成色を付ける。
                   return (
                     <article
                       key={member.id}
                       className={cn(
-                        "grid grid-cols-2 gap-x-2 border-b border-table-border px-2 last:border-b-0 odd:bg-row-odd even:bg-row-even hover:bg-row-hover lg:min-w-[800px] lg:grid-cols-[minmax(160px,1.2fr)_88px_80px_112px_120px_112px_44px] lg:items-stretch",
+                        "grid grid-cols-2 gap-x-2 border-b border-table-border px-2 last:border-b-0 odd:bg-row-odd even:bg-row-even hover:bg-row-hover lg:min-w-[820px] lg:gap-x-1 lg:grid-cols-[minmax(160px,1.2fr)_56px_88px_80px_112px_120px_112px_44px] lg:items-stretch",
                         hasDiff && "border-l-2 border-l-accent",
                       )}
                     >
                       {/* 名前ブロックはモバイルでは2列分を使い、キャラ名の折返しを防ぐ。 */}
-                      <div className="col-span-2 flex min-h-[72px] min-w-0 items-center gap-2 px-2 lg:col-span-1">
-                        <div className="min-w-0">
+                      {/* 育成入力と同じく、属性・ロールのアイコンを名前の上の段に置く。 */}
+                      <div className="col-span-2 flex min-h-[72px] min-w-0 items-center px-2 lg:col-span-1">
+                        <div className={cn(characterNameCellLayoutClass, "min-w-0")}>
+                          {character ? (
+                            <div className="flex items-center gap-1.5">
+                              <AttributeIconLabel attribute={character.attribute} />
+                              <RoleIconLabel role={character.role} />
+                            </div>
+                          ) : null}
                           <p className="m-0 truncate text-sm font-semibold">{member.characterName}</p>
-                          <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                            <label className="inline-flex items-center gap-1.5 text-xs text-muted">
-                              <Checkbox checked={member.support} onCheckedChange={(checked) => updateMember(member.id, { support: checked === true })} />
-                              サポート
-                            </label>
-                          </div>
                         </div>
                       </div>
+
+                      <label className="relative grid min-h-[72px] grid-rows-[auto_1fr] gap-1 pt-2 text-xs text-muted">
+                        サポート
+                        <span className="relative inline-flex min-h-11 cursor-pointer items-center px-2 hover:bg-row-hover">
+                          <Checkbox checked={member.support} onCheckedChange={(checked) => updateMember(member.id, { support: checked === true })} />
+                        </span>
+                      </label>
 
                       <label className="relative grid min-h-[72px] grid-rows-[auto_1fr] gap-1 pt-2 text-xs text-muted">
                         限界突破
