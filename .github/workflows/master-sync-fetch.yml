@@ -7,6 +7,7 @@ on:
   # 定時実行はしない。月 1 回の点検のたびに、定期タスク（または手動）がこのワークフローを手動実行してから照合する
   # （Actions の定時実行は遅れたり飛ばされたりするため、照合の直前に取り直す）。
   # 取得処理を変えたときの確認では、feature ブランチを ref に指定して実行できる（ワークフロー自体は main にある必要がある）。
+  # その場合は Environment を使わないため鍵が渡らず、push は省略される。
   workflow_dispatch:
 
 permissions:
@@ -24,6 +25,10 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # 書き込み鍵は GitHub Environment `master-sync` の secret に置き、その Environment は main からしか使えないよう
+    # deployment branch policy で限定している。main 以外では Environment を指定せず、鍵を読めないようにする
+    # （ブランチ上でこの式を書き換えても、branch policy によりジョブが拒否される）。
+    environment: ${{ github.ref == 'refs/heads/main' && 'master-sync' || '' }}
     permissions:
       contents: read
     steps:
@@ -43,7 +48,7 @@ jobs:
         run: node scripts/master-sync/fetch.mjs --out "$RUNNER_TEMP/snapshots"
 
       # 書き込み権限はスナップショット用リポジトリに限定したデプロイキーだけを使う。
-      # 鍵が未登録ならこの手順を飛ばす（取得結果はジョブ概要にのみ残る）。
+      # 鍵が未登録、または main 以外での実行ならこの手順を飛ばす（取得結果はジョブ概要にのみ残る）。
       - name: Push snapshots to private repository
         env:
           DEPLOY_KEY: ${{ secrets.MASTER_SYNC_SNAPSHOTS_DEPLOY_KEY }}
