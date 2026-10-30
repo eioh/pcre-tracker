@@ -85,6 +85,12 @@ export function createAuth(env: AuthEnv) {
         secure: true,
         sameSite: "lax",
       },
+      database: {
+        // 1.7 から既定で有効になった実行時のスキーマ点検を切る。点検はインスタンスごとに 1 回、全テーブルの
+        // 列情報を D1 へ問い合わせるため、リクエストごとにインスタンスを作る本構成では毎リクエスト十数回の
+        // 読み取りが増える。スキーマは migrations/ で管理し、一致は Worker テストで検証する。
+        validateSchema: false,
+      },
     },
   });
 }

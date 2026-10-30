@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import worker from "../../worker/index";
+import { MAX_AUTH_BODY_BYTES } from "../../worker/authBody";
 import { createAuth, type AuthEnv } from "../../worker/auth";
 import { testEnv, TEST_ORIGIN } from "./helpers";
 
@@ -56,6 +57,41 @@ describe("OAuth ログイン開始（state の Cookie 保存）", () => {
     expect(stateCookie?.toLowerCase()).toContain("samesite=lax");
 
     expect(await countAllRows("verification")).toBe(0);
+  });
+});
+
+describe("認証エンドポイントのボディサイズ上限", () => {
+  // 上限を超える本文（巨大な scopes 配列）を better-auth の入力検証に届かせない。
+  // 送信元の IP を変えて、レート制限のテストとカウンタが干渉しないようにする。
+  // 上限を超えるログイン開始リクエストを組み立てる。withContentLength が false なら本文をストリームで渡す。
+  function buildOversizedSignInRequest(ip: string, withContentLength: boolean): Request {
+    const body = JSON.stringify({ provider: "github", callbackURL: "/", scopes: Array.from({ length: 20_000 }, (_, i) => i) });
+    expect(body.length).toBeGreaterThan(MAX_AUTH_BODY_BYTES);
+    const bytes = new TextEncoder().encode(body);
+    return new Request(`${TEST_ORIGIN}/api/auth/sign-in/social`, {
+      method: "POST",
+      headers: { Origin: TEST_ORIGIN, "Content-Type": "application/json", "cf-connecting-ip": ip },
+      // ReadableStream で渡すと Content-Length が付かず、実際のバイト数での判定を通る。
+      body: withContentLength
+        ? bytes
+        : new ReadableStream({
+            start(controller) {
+              controller.enqueue(bytes);
+              controller.close();
+            },
+          }),
+    });
+  }
+
+  it("Content-Length が上限を超える本文は 413 を返す", async () => {
+    const response = await worker.fetch(buildOversizedSignInRequest("198.51.100.10", true), authTestEnv);
+    expect(response.status).toBe(413);
+    expect(await response.json()).toMatchObject({ error: "payload_too_large" });
+  });
+
+  it("Content-Length のない本文も実際のバイト数で 413 を返す", async () => {
+    const response = await worker.fetch(buildOversizedSignInRequest("198.51.100.11", false), authTestEnv);
+    expect(response.status).toBe(413);
   });
 });
 
@@ -137,5 +173,19 @@ describe("createAuth の設定（回帰ガード）", () => {
     expect(options.rateLimit?.storage).toBe("memory");
     expect(options.advanced?.ipAddress?.ipAddressHeaders).toEqual(["cf-connecting-ip"]);
     expect(options.advanced?.defaultCookieAttributes).toEqual({ httpOnly: true, secure: true, sameSite: "lax" });
+  });
+
+  // リクエストごとに D1 へスキーマを問い合わせないよう、実行時の点検が無効になっていることを確認する。
+  it("実行時のスキーマ点検を無効にしている", async () => {
+    const context = await createAuth(testEnv).$context;
+    expect(context.options.advanced?.database?.validateSchema).toBe(false);
+    expect(context.checkSchema).toBeUndefined();
+  });
+
+  // 実行時に点検しない代わりに、migrations/ を当てた D1 が better-auth の期待するスキーマと一致することを確認する。
+  it("マイグレーション後の D1 は better-auth が期待するスキーマと一致する", async () => {
+    const context = await createAuth(testEnv).$context;
+    expect(context.explicitSchemaCheck).toBeDefined();
+    await expect(context.explicitSchemaCheck?.()).resolves.toBeUndefined();
   });
 });
