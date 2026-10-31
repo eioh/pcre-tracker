@@ -4579,5 +4579,33 @@
       "ue2": false
     },
     "memoryPieceSources": []
+  },
+  {
+    "name": "アーモンドアイ",
+    "baseName": "アーモンドアイ",
+    "limited": true,
+    "attribute": "光",
+    "role": "ブレイカー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
+  },
+  {
+    "name": "ゴールドシップ",
+    "baseName": "ゴールドシップ",
+    "limited": false,
+    "attribute": "水",
+    "role": "デバッファー",
+    "implemented": {
+      "star6": false,
+      "ue1": false,
+      "ue1Sp": false,
+      "ue2": false
+    },
+    "memoryPieceSources": []
   }
 ]
