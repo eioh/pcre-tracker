@@ -31,6 +31,30 @@ export function parseAllowedOrigins(allowedOrigins: string): string[] {
     .filter((origin) => origin.length > 0);
 }
 
+// アプリが使う認証 API の経路（許可リスト）。better-auth は未使用の API も標準で公開するため、ここにない経路は渡さない。
+// 列挙して閉じる方式と違い、better-auth の更新で API が増えても最初から閉じた状態になる。
+// 画面で新しい認証機能を使うときは、ここに経路を足す。
+const ALLOWED_AUTH_PATHS: ReadonlySet<string> = new Set([
+  "/api/auth/sign-in/social",
+  "/api/auth/callback/github",
+  "/api/auth/callback/google",
+  "/api/auth/get-session",
+  "/api/auth/sign-out",
+  "/api/auth/delete-user",
+  "/api/auth/error",
+  "/api/auth/ok",
+]);
+
+/**
+ * 指定した経路を better-auth に渡してよいかを判定する。
+ *
+ * @param pathname リクエスト URL の pathname
+ * @returns 許可リストと完全に一致すれば true
+ */
+export function isAllowedAuthPath(pathname: string): boolean {
+  return ALLOWED_AUTH_PATHS.has(pathname);
+}
+
 // env を受け取り、リクエストごとに betterAuth インスタンスを生成する。
 export function createAuth(env: AuthEnv) {
   // ソーシャルプロバイダは、対応する clientId/clientSecret が env に存在する場合のみ有効化する。
