@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import worker from "../../worker/index";
 import { MAX_AUTH_BODY_BYTES } from "../../worker/authBody";
 import { createAuth, type AuthEnv } from "../../worker/auth";
-import { testEnv, TEST_ORIGIN } from "./helpers";
+import { createUserWithSession, testEnv, TEST_ORIGIN } from "./helpers";
 
 // 認証まわりの設定（OAuth state の Cookie 保存・トークン暗号化・レート制限・クライアント IP の取得元）の統合テスト。
 //
@@ -160,6 +160,95 @@ describe("OAuth コールバックの state 検証", () => {
     const location = new URL(response.headers.get("Location") ?? "", TEST_ORIGIN);
     expect(location.searchParams.get("error")).toBe("state_mismatch");
     await expectNoAuthRows();
+  });
+});
+
+describe("認証 API の許可リスト", () => {
+  // 送信元の IP を変えて、レート制限のテストとカウンタが干渉しないようにする。
+  // ログイン済みの Cookie を付けた POST を組み立てる。
+  function buildAuthedPost(path: string, cookie: string, body: unknown): Request {
+    return new Request(`${TEST_ORIGIN}${path}`, {
+      method: "POST",
+      headers: {
+        Cookie: cookie,
+        Origin: TEST_ORIGIN,
+        "Content-Type": "application/json",
+        "cf-connecting-ip": "198.51.100.20",
+      },
+      body: JSON.stringify(body),
+    });
+  }
+
+  // ログイン済みでも update-user は better-auth に届かず、user 行は変わらない（D1 への書き込みが起きない）。
+  it("update-user はログイン済みでも 404 で、user 行を更新しない", async () => {
+    const { cookie, userId } = await createUserWithSession("allowlist@example.com");
+    const before = await testEnv.DB.prepare('SELECT "name", "updatedAt" FROM "user" WHERE "id" = ?').bind(userId).first();
+
+    const response = await worker.fetch(buildAuthedPost("/api/auth/update-user", cookie, { name: "changed" }), testEnv);
+
+    expect(response.status).toBe(404);
+    expect(await response.json()).toMatchObject({ error: "not_found" });
+    const after = await testEnv.DB.prepare('SELECT "name", "updatedAt" FROM "user" WHERE "id" = ?').bind(userId).first();
+    expect(after).toEqual(before);
+  });
+
+  // 未使用の API と、許可リストに似せた経路は、どれも完全一致しないので通さない。
+  it.each([
+    "/api/auth/sign-in/email",
+    "/api/auth/sign-up/email",
+    "/api/auth/update-session",
+    "/api/auth/list-sessions",
+    "/api/auth/link-social",
+    "/api/auth/get-access-token",
+    "/api/auth/request-password-reset",
+    "/api/auth/callback/unknown",
+    "/api/auth/callback/github/extra",
+    "/api/auth/get-session/",
+    "/api/auth//get-session",
+    "/api/auth/%75pdate-user",
+    "/api/auth/GET-SESSION",
+    "/api/auth/",
+  ])("%s は 404 を返す", async (path) => {
+    for (const method of ["GET", "POST"]) {
+      const response = await worker.fetch(
+        new Request(`${TEST_ORIGIN}${path}`, { method, headers: { Origin: TEST_ORIGIN, "cf-connecting-ip": "198.51.100.21" } }),
+        testEnv,
+      );
+      expect(response.status).toBe(404);
+      expect(await response.json()).toMatchObject({ error: "not_found" });
+    }
+  });
+
+  // 上限を超える本文でも、許可リスト外なら本文を読まずに 404 を返す。
+  it("許可リスト外の経路は本文の上限より先に 404 を返す", async () => {
+    const response = await worker.fetch(
+      new Request(`${TEST_ORIGIN}/api/auth/update-user`, {
+        method: "POST",
+        headers: { Origin: TEST_ORIGIN, "Content-Type": "application/json", "cf-connecting-ip": "198.51.100.22" },
+        body: "x".repeat(MAX_AUTH_BODY_BYTES + 1),
+      }),
+      testEnv,
+    );
+    expect(response.status).toBe(404);
+  });
+
+  // アプリが使う経路は better-auth に届く（better-auth の応答であり、許可リストの 404 ではない）。
+  it.each([
+    ["GET", "/api/auth/ok", 200],
+    ["GET", "/api/auth/get-session", 200],
+    ["GET", "/api/auth/error", 200],
+    ["GET", "/api/auth/callback/github", 302],
+    ["GET", "/api/auth/callback/google", 302],
+  ])("%s %s は better-auth が応答する", async (method, path, status) => {
+    const response = await worker.fetch(
+      new Request(`${TEST_ORIGIN}${path}`, { method, headers: { "cf-connecting-ip": "198.51.100.23" }, redirect: "manual" }),
+      {
+        ...authTestEnv,
+        GOOGLE_CLIENT_ID: "dummy",
+        GOOGLE_CLIENT_SECRET: "dummy",
+      },
+    );
+    expect(response.status).toBe(status);
   });
 });
 
