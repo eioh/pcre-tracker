@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import worker from "../../worker/index";
-import { MAX_AUTH_BODY_BYTES } from "../../worker/authBody";
+import { limitAuthRequestBody, MAX_AUTH_BODY_BYTES } from "../../worker/authBody";
 import { createAuth, type AuthEnv } from "../../worker/auth";
 import { createUserWithSession, testEnv, TEST_ORIGIN } from "./helpers";
 
@@ -82,6 +82,27 @@ describe("認証エンドポイントのボディサイズ上限", () => {
           }),
     });
   }
+
+  // 実行環境から届く「body が null でない GET / HEAD」を偽のオブジェクトで再現する（new Request では作れないため）。
+  // 本文を外して作り直し、メソッド・URL・Cookie は保つことを確認する。
+  it.each(["GET", "HEAD"])("本文付きの %s は本文を外して渡す", async (method) => {
+    const url = `${TEST_ORIGIN}/api/auth/get-session`;
+    const request = {
+      method,
+      url,
+      body: new ReadableStream(),
+      headers: new Headers({ "Content-Length": "0", Cookie: "session=abc" }),
+    } as unknown as Request;
+
+    const limited = await limitAuthRequestBody(request);
+
+    expect(limited).toBeInstanceOf(Request);
+    const rebuilt = limited as Request;
+    expect(rebuilt.body).toBeNull();
+    expect(rebuilt.method).toBe(method);
+    expect(rebuilt.url).toBe(url);
+    expect(rebuilt.headers.get("Cookie")).toBe("session=abc");
+  });
 
   it("Content-Length が上限を超える本文は 413 を返す", async () => {
     const response = await worker.fetch(buildOversizedSignInRequest("198.51.100.10", true), authTestEnv);

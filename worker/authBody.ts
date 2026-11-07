@@ -20,6 +20,12 @@ export async function limitAuthRequestBody(request: Request): Promise<Request | 
   if (request.body === null) {
     return request;
   }
+  // 実行環境によっては、Content-Length: 0 や本文付きの GET / HEAD でも request.body が null にならない。
+  // この形は本文を指定して作り直せず（new Request が例外を投げる）、better-auth も本文があるだけで
+  // Content-Type を要求するため、本文を外して普通の GET / HEAD として渡す。
+  if (request.method === "GET" || request.method === "HEAD") {
+    return new Request(request.url, { method: request.method, headers: request.headers });
+  }
   // Content-Length で早期に拒否し、偽装や未指定に備えて実際のバイト数でも確かめる。
   const contentLength = request.headers.get("Content-Length");
   if (contentLength !== null && Number(contentLength) > MAX_AUTH_BODY_BYTES) {
