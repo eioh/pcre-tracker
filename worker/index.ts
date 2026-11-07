@@ -6,13 +6,13 @@
  * `/api/*` のみがこの Worker に到達する。
  *
  * Phase 2 で以下を提供する:
- * - `/api/auth/*`: better-auth のハンドラ（ソーシャルログイン・セッション・アカウント削除）。本文は 16KB まで
+ * - `/api/auth/*`: better-auth のハンドラ（ソーシャルログイン・セッション・アカウント削除）。許可リストの経路だけを通し、本文は 16KB まで
  * - `/api/data`: 同期データの取得・保存（`worker/data.ts`）
  * - `scheduled`: 期限切れ rate_limit 行の日次掃除（Cron Trigger）
  *
  * `/api/*` のすべての応答には `withApiSecurityHeaders`（`worker/securityHeaders.ts`）でセキュリティ関連ヘッダを付ける。
  */
-import { createAuth, type AuthEnv } from "./auth";
+import { createAuth, isAllowedAuthPath, type AuthEnv } from "./auth";
 import { limitAuthRequestBody } from "./authBody";
 import { cleanupExpiredRateLimitRows, handleDataRequest } from "./data";
 import { withApiSecurityHeaders } from "./securityHeaders";
@@ -32,9 +32,9 @@ type WorkerEnv = AuthEnv;
 async function routeApiRequest(request: Request, env: WorkerEnv): Promise<Response> {
   const url = new URL(request.url);
 
-  // better-auth が管理する認証エンドポイント（/api/auth/*）。
+  // better-auth が管理する認証エンドポイントのうち、アプリが使うものだけを渡す。それ以外は末尾の 404 になる。
   // env はリクエスト時にしか得られないため、インスタンスはリクエストごとにファクトリで生成する。
-  if (url.pathname.startsWith("/api/auth/")) {
+  if (isAllowedAuthPath(url.pathname)) {
     const limited = await limitAuthRequestBody(request);
     if (limited instanceof Response) {
       return limited;
