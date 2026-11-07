@@ -1,11 +1,14 @@
 name: Master Sync Fetch
 
-# マスターデータ同期（段階1）の取得処理。クラウド環境の IP は wikiwiki.jp に遮断されるため、取得は GitHub Actions の runner で行う。
-# 取得したページ本文は公開リポジトリ（このリポジトリ）や成果物に載せず、非公開のスナップショット用リポジトリへ push する。
-# 解析・比較・報告はクラウド環境側（Claude の定期タスク）がスナップショット用リポジトリを読んで行う。
+# マスターデータ同期。月 1 回、wiki を取得して非公開のスナップショット用リポジトリへ保存し、既存マスターとの差分を判定する。
+# クラウド環境の IP は wikiwiki.jp に遮断されるため、取得は GitHub Actions の runner で行う。
+# 取得したページ本文と報告の全文は公開リポジトリ（このリポジトリ）のログ・ジョブ概要・成果物に載せない。公開するのは件数だけ。
+# 変更候補があるか全体保留のときはジョブを失敗にして、GitHub の通知メールで利用者に知らせる。
+# 更新は利用者が手元で報告を作り直して確認し、candidate.mjs で候補ブランチを作って PR にする（scripts/master-sync/README.md）。
 on:
-  # 定時実行はしない。月 1 回の点検のたびに、定期タスク（または手動）がこのワークフローを手動実行してから照合する
-  # （Actions の定時実行は遅れたり飛ばされたりするため、照合の直前に取り直す）。
+  # 毎月 1 日 12:23（日本時間）。誰も実行を待っていないので、定時実行が遅れても困らない。毎時 0 分は混みやすいので避ける。
+  schedule:
+    - cron: "23 3 1 * *"
   # 取得処理を変えたときの確認では、feature ブランチを ref に指定して実行できる（ワークフロー自体は main にある必要がある）。
   # その場合は Environment を使わないため鍵が渡らず、push は省略される。
   workflow_dispatch:
@@ -24,7 +27,7 @@ env:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     # 書き込み鍵は GitHub Environment `master-sync` の secret に置き、その Environment は main からしか使えないよう
     # deployment branch policy で限定している。main 以外では Environment を指定せず、鍵を読めないようにする
     # （ブランチ上でこの式を書き換えても、branch policy によりジョブが拒否される）。
@@ -43,12 +46,13 @@ jobs:
           node-version: "22"
           package-manager-cache: false
 
-      # 取得スクリプトは Node.js 標準 API だけを使うため npm ci は不要。
+      # 取得スクリプトは Node.js 標準 API だけを使うため、ここではまだ npm ci しない。
       - name: Fetch sources
         run: node scripts/master-sync/fetch.mjs --out "$RUNNER_TEMP/snapshots"
 
       # 書き込み権限はスナップショット用リポジトリに限定したデプロイキーだけを使う。
       # 鍵が未登録、または main 以外での実行ならこの手順を飛ばす（取得結果はジョブ概要にのみ残る）。
+      # 依存パッケージ（外部のコード）を動かすのはこの手順の後だけにし、鍵はこの手順の環境変数にだけ渡して、終わったら消す。
       - name: Push snapshots to private repository
         env:
           DEPLOY_KEY: ${{ secrets.MASTER_SYNC_SNAPSHOTS_DEPLOY_KEY }}
@@ -60,6 +64,8 @@ jobs:
           fi
           key_dir="$RUNNER_TEMP/ssh"
           mkdir -m 700 "$key_dir"
+          # 成功・失敗のどちらで終わっても、鍵のファイルを消す。
+          trap 'rm -rf "$key_dir"' EXIT
           printf '%s\n' "$DEPLOY_KEY" > "$key_dir/id"
           chmod 600 "$key_dir/id"
           # GitHub が HTTPS の API で公開している SSH ホスト鍵だけを信頼し、接続先のなりすましを防ぐ。
@@ -83,3 +89,20 @@ jobs:
           git commit -q -m "snapshot: ${started_at}" -m "取得スクリプト: eioh/pcre-tracker@${SOURCE_SHA}"
           git push origin HEAD:main
           echo "push したスナップショットのコミット: $(git rev-parse HEAD)" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # 報告の作成は jsdom を使うため、ここで依存パッケージを入れる（インストールスクリプトは実行しない）。
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      # jsdom は解析できなかった HTML・CSS の内容をエラーとして出力するため、標準出力・標準エラーをすべて捨てる。
+      # 失敗しても原因は公開ログに出さない（手元で同じスナップショットから report.mjs を実行して確かめる）。
+      - name: Build report
+        run: |
+          if ! node scripts/master-sync/report.mjs --snapshot "$RUNNER_TEMP/snapshots" --out "$RUNNER_TEMP/report" > /dev/null 2>&1; then
+            echo "報告の作成に失敗しました。原因は公開ログに出さないため、手元で report.mjs を実行して確認してください。" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      # 件数だけをジョブ概要に書く。変更候補があるか全体保留なら失敗にして、通知メールで知らせる。
+      - name: Summarize report
+        run: node scripts/master-sync/summary.mjs --report "$RUNNER_TEMP/report/report.json"
