@@ -6,6 +6,12 @@
       "masterValue": false,
       "acquisition": "イベント限定",
       "reason": "イベントの配布キャラのため非限定として登録（2026-10-21 確認）"
+    },
+    {
+      "name": "ゴールドシップ",
+      "masterValue": false,
+      "acquisition": "イベント限定",
+      "reason": "イベントの配布キャラのため非限定として登録（2026-11-07 確認）"
     }
   ],
   "formationOrder": [
