@@ -1,7 +1,6 @@
 // 更新候補のゲート判定（段階2）。当てはめ処理とは独立に、元データと候補の差分を検査する。
 // 判定規則（削除・true→false・並び替え・既存値の変更をしない、報告にない変更をしない、形式と参照整合性を守る）を
 // 機械的に確かめ、1 つでも破っていれば不合格にする。
-import { createHash } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import { checkReferenceIntegrity } from "./integrity.mjs";
 import { ATTRIBUTES, ROLES } from "./parsers.mjs";
@@ -184,7 +183,3 @@ export function gateCandidate({ base, candidate, report = null }) {
   return { ok: failures.length === 0, failures, changes };
 }
 
-// 変更の一覧から、並びに依存しない要約ハッシュを作る。候補のコミットに記録し、PR Check が差分から作り直して照合する。
-export function changesDigest(changes) {
-  return createHash("sha256").update([...changes].sort().join("\n")).digest("hex");
-}
