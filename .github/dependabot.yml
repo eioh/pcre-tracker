@@ -33,8 +33,3 @@ updates:
       # minor・patch の更新は 1 つの PR にまとめる（major は個別の PR で確認する）。
       npm-minor-and-patch:
         update-types: ["minor", "patch"]
-    ignore:
-      # better-auth 1.7 系への移行は設定・スキーマの確認を伴うため別作業で行う。
-      # 移行に着手するときにこの ignore を外す。
-      - dependency-name: "better-auth"
-        update-types: ["version-update:semver-minor"]
