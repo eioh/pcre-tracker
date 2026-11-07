@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import worker from "../../worker/index";
 import { limitAuthRequestBody, MAX_AUTH_BODY_BYTES } from "../../worker/authBody";
-import { createAuth, type AuthEnv } from "../../worker/auth";
+import { assertAuthSecret, createAuth, type AuthEnv } from "../../worker/auth";
 import { createUserWithSession, testEnv, TEST_ORIGIN } from "./helpers";
 
 // 認証まわりの設定（OAuth state の Cookie 保存・トークン暗号化・レート制限・クライアント IP の取得元）の統合テスト。
@@ -297,5 +297,25 @@ describe("createAuth の設定（回帰ガード）", () => {
     const context = await createAuth(testEnv).$context;
     expect(context.explicitSchemaCheck).toBeDefined();
     await expect(context.explicitSchemaCheck?.()).resolves.toBeUndefined();
+  });
+});
+
+describe("秘密鍵の確認（設定漏れで既定値のまま動かない）", () => {
+  // better-auth が未設定時に代わりに使う、公開されている既定値。
+  const DEFAULT_SECRET = "better-auth-secret-12345678901234567890";
+
+  it.each([undefined, "", "   ", DEFAULT_SECRET])("%j は拒否する", (secret) => {
+    expect(() => assertAuthSecret(secret)).toThrow("BETTER_AUTH_SECRET");
+  });
+
+  // 長さは確かめないので、短くても既定値でなければ通す（本番の鍵の長さが分からないため）。
+  it.each(["short", testEnv.BETTER_AUTH_SECRET])("設定済みの鍵は通す", (secret) => {
+    expect(() => assertAuthSecret(secret)).not.toThrow();
+  });
+
+  // 秘密鍵がないと、認証 API も同期 API も better-auth を作る前に止まる。
+  it.each(["/api/auth/get-session", "/api/data"])("未設定なら %s は処理を進めない", async (path) => {
+    const request = new Request(`${TEST_ORIGIN}${path}`, { headers: { "cf-connecting-ip": "198.51.100.30" } });
+    await expect(worker.fetch(request, { ...testEnv, BETTER_AUTH_SECRET: "" })).rejects.toThrow("BETTER_AUTH_SECRET");
   });
 });
