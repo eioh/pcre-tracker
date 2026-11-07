@@ -8,20 +8,19 @@
 //   4. 合格なら、マスターを書き換えて生成物を作り直し（参照整合性チェックを含む）、feature/master-sync-<候補ハッシュ> に commit する
 //   5. その作業ツリーで npm run verify を実行する（--skip-verify で省略）
 //
-// 候補ブランチを作ったときは、出力先に段階3の AI レビュー用パケット（review-packet/）も書き出す。
+// PR は作らない。結果を確かめたうえで、利用者が push と PR を行う（Windows の手元でも動く）。
 //
 // 使い方: node scripts/master-sync/candidate.mjs --snapshot <スナップショット> [--base <git の参照>] [--today YYYY-MM-DD] [--out <出力先>] [--skip-verify]
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { applyProposals } from "./apply.mjs";
 import { todayInJst } from "./compare.mjs";
-import { changesDigest, gateCandidate } from "./gate.mjs";
+import { gateCandidate } from "./gate.mjs";
 import { loadExistingMaster } from "./integrity.mjs";
 import { buildReport, formatReportMarkdown } from "./report.mjs";
-import { writeReviewPacket } from "./review.mjs";
 
 // 書き換えの対象になるマスターデータのファイル（キーは ExistingMaster の項目）。
 const MASTER_FILES = {
@@ -33,6 +32,8 @@ const MASTER_FILES = {
 };
 const GENERATED_FILE = "src/data/characterMaster.generated.json";
 export const BRANCH_PREFIX = "feature/master-sync-";
+// Windows では npm が npm.cmd なので、シェル経由で起動する。
+const IS_WINDOWS = process.platform === "win32";
 
 /**
  * 変更候補の内容から候補ハッシュを作る。同じ変更の組なら基準のコミットが進んでも同じ値になり、重複の判定に使える。
@@ -145,10 +146,8 @@ export function createCandidate({ repoRoot, snapshotDir, baseRef, today, skipVer
     "",
     ...gate.changes.map((change) => `- ${change}`),
     "",
-    `Master-Sync-Candidate: ${hash}`,
-    `Master-Sync-Changes-Digest: ${changesDigest(gate.changes)}`,
-    `Master-Sync-Base: ${baseSha}`,
-    `Master-Sync-Snapshot: ${report.snapshot.startedAt}`,
+    `基準: ${baseSha}`,
+    `スナップショット: ${report.snapshot.startedAt}`,
   ].join("\n");
   run("git", ["-C", worktree, "commit", "--quiet", "-F", "-"], { input: message });
   const committed = { ...result, hash, branch, worktree, gate, status: "候補を作成（verify 未実施）" };
@@ -159,13 +158,31 @@ export function createCandidate({ repoRoot, snapshotDir, baseRef, today, skipVer
   // verify には依存パッケージが要る。基準の package-lock.json が同じなら元の node_modules を参照させ、違えば npm ci で入れる。
   const startedAt = Date.now();
   const sameLock = readFileSync(join(repoRoot, "package-lock.json"), "utf8") === readFileSync(join(worktree, "package-lock.json"), "utf8");
-  if (sameLock && !existsSync(join(worktree, "node_modules"))) {
-    symlinkSync(join(repoRoot, "node_modules"), join(worktree, "node_modules"), "dir");
+  // Windows のディレクトリのシンボリックリンクは管理者権限が要るため、junction で代える。
+  const nodeModulesLink = join(worktree, "node_modules");
+  const linked = sameLock && !existsSync(nodeModulesLink);
+  if (linked) {
+    symlinkSync(join(repoRoot, "node_modules"), nodeModulesLink, IS_WINDOWS ? "junction" : "dir");
   } else if (!sameLock) {
-    run("npm", ["ci", "--no-audit", "--no-fund"], { cwd: worktree });
+    run("npm", ["ci", "--no-audit", "--no-fund"], { cwd: worktree, shell: IS_WINDOWS });
   }
-  // 標準出力と標準エラーを混ぜた順のまま残すため、シェル経由で 2>&1 にまとめる。
-  const verify = spawnSync("sh", ["-c", "npm run verify 2>&1"], { cwd: worktree, encoding: "utf8", env: { ...process.env, TMPDIR: "/tmp" } });
+  let verify;
+  try {
+    // 標準出力と標準エラーを混ぜた順のまま残すため、シェル（Linux は sh、Windows は cmd）経由で 2>&1 にまとめる。
+    // Workers テストが一時ファイルを短いパスへ作れるよう、Linux では TMPDIR を /tmp にする。
+    verify = spawnSync("npm run verify 2>&1", {
+      cwd: worktree,
+      encoding: "utf8",
+      shell: true,
+      env: IS_WINDOWS ? process.env : { ...process.env, TMPDIR: "/tmp" },
+    });
+  } finally {
+    // リンクだけを消す（リンク先の node_modules は消えない）。Windows の git worktree remove は junction を
+    // 消さずに残し、作業ツリーのフォルダが残って次回の候補作成が止まるため、使い終えたら外しておく。
+    if (linked) {
+      unlinkSync(nodeModulesLink);
+    }
+  }
   const output = verify.stdout ?? "";
   return {
     ...committed,
@@ -225,11 +242,7 @@ function main() {
   const { report: _report, ...summary } = result;
   writeFileSync(join(outDir, "candidate.json"), `${JSON.stringify(summary, null, 2)}\n`, "utf8");
   writeFileSync(join(outDir, "candidate.md"), formatCandidateMarkdown(result), "utf8");
-  // 候補ブランチを作ったときは、段階3の AI レビュー用のパケットも書き出す。
-  const packet = result.worktree ? writeReviewPacket({ candidateDir: outDir, snapshotDir: resolve(/** @type {string} */ (options.snapshot)) }) : null;
-  console.log(
-    `結果: ${result.status}\n出力: ${outDir}${result.branch ? `\nブランチ: ${result.branch}` : ""}${packet ? `\nレビュー用パケット: ${packet.packetDir}` : ""}`,
-  );
+  console.log(`結果: ${result.status}\n出力: ${outDir}${result.branch ? `\nブランチ: ${result.branch}` : ""}`);
   if ((result.gate && !result.gate.ok) || (result.verify && !result.verify.ok)) {
     process.exitCode = 1;
   }

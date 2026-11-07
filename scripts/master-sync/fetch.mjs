@@ -191,6 +191,7 @@ export async function fetchSnapshots({
 }
 
 // manifest を Markdown の表にする（標準出力と GitHub Actions のジョブ概要で使う）。
+// 公開リポジトリの Actions の画面に出るため、取得したページ由来の文字列（タイトルなど）は載せない。
 export function formatManifestMarkdown(manifest) {
   const lines = [
     `取得開始: ${manifest.startedAt} / 終了: ${manifest.finishedAt}`,
@@ -199,13 +200,12 @@ export function formatManifestMarkdown(manifest) {
       .map(([origin, state]) => `${origin} = ${state}`)
       .join(", ")}`,
     "",
-    "| id | 必須 | 結果 | HTTP | バイト数 | sha256(先頭12桁) | title |",
-    "|---|---|---|---|---|---|---|",
+    "| id | 必須 | 結果 | HTTP | バイト数 | sha256(先頭12桁) |",
+    "|---|---|---|---|---|---|",
   ];
   for (const entry of manifest.entries) {
-    const pageTitle = (entry.pageTitle ?? "").replace(/\|/g, "\\|");
     lines.push(
-      `| ${entry.id} | ${entry.required ? "○" : ""} | ${entry.outcome} | ${entry.status ?? "-"} | ${entry.bytes ?? "-"} | ${entry.sha256 ? entry.sha256.slice(0, 12) : "-"} | ${pageTitle} |`,
+      `| ${entry.id} | ${entry.required ? "○" : ""} | ${entry.outcome} | ${entry.status ?? "-"} | ${entry.bytes ?? "-"} | ${entry.sha256 ? entry.sha256.slice(0, 12) : "-"} |`,
     );
   }
   lines.push("", manifest.overall.ok ? "全体: 取得成功" : `全体: 保留\n${manifest.overall.holdReasons.map((reason) => `- ${reason}`).join("\n")}`);
