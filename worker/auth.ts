@@ -55,8 +55,27 @@ export function isAllowedAuthPath(pathname: string): boolean {
   return ALLOWED_AUTH_PATHS.has(pathname);
 }
 
+// better-auth が秘密鍵の未設定時に代わりに使う既定値（better-auth/dist/utils/constants.mjs の DEFAULT_SECRET）。
+// 公開されている値なので、これで署名・暗号化すると誰でも同じ鍵を計算できる。
+const BETTER_AUTH_DEFAULT_SECRET = "better-auth-secret-12345678901234567890";
+
+/**
+ * 秘密鍵が設定されていることを確かめ、未設定（空）か既定値なら例外を投げる。
+ * better-auth が既定値を拒否するのは NODE_ENV=production のときだけで、Worker にはその変数がないため、ここで止める。
+ * 長さは確かめない（本番の鍵の長さが分からず、短い鍵を拒否すると本番が止まりうるため）。
+ *
+ * @param secret env の BETTER_AUTH_SECRET
+ */
+export function assertAuthSecret(secret: string | undefined): void {
+  if (!secret || secret.trim() === "" || secret === BETTER_AUTH_DEFAULT_SECRET) {
+    throw new Error("BETTER_AUTH_SECRET が設定されていないか、既定値のままです。");
+  }
+}
+
 // env を受け取り、リクエストごとに betterAuth インスタンスを生成する。
 export function createAuth(env: AuthEnv) {
+  // 秘密鍵がなければ動かさない（既定値で動き続けると、設定漏れに気づけない）。
+  assertAuthSecret(env.BETTER_AUTH_SECRET);
   // ソーシャルプロバイダは、対応する clientId/clientSecret が env に存在する場合のみ有効化する。
   // ローカル/テスト環境でシークレット未設定でもインスタンス生成が失敗しないようにするため。
   const socialProviders: Record<string, { clientId: string; clientSecret: string }> = {};
