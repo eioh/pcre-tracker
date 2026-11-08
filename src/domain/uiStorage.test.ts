@@ -5,7 +5,7 @@ import {
   loadUiState,
   parseUiState,
   saveUiState,
-  type UiStateV1,
+  type UiStateV2,
 } from "./uiStorage";
 
 describe("uiStorage", () => {
@@ -18,8 +18,8 @@ describe("uiStorage", () => {
   });
 
   it("保存したUI設定を再読み込みできる", () => {
-    const state: UiStateV1 = {
-      schemaVersion: 1,
+    const state: UiStateV2 = {
+      schemaVersion: 2,
       activeTab: "dashboard",
       input: {
         searchText: "ヒヨリ",
@@ -37,7 +37,7 @@ describe("uiStorage", () => {
         starFilters: [4, 6],
         ue1Filters: [370, "sp"],
         ue2Filters: [5],
-        memorySourceFilters: ["hard_quest", "none"],
+        memorySourceFilters: ["none", "hard_quest"],
         sortKey: "obtainedDate",
         sortDirection: "desc",
       },
@@ -157,5 +157,52 @@ describe("uiStorage", () => {
     );
 
     expect(loadUiState().activeTab).toBe("input");
+  });
+
+  it("保存時のスキーマ版は2になる", () => {
+    saveUiState(buildDefaultUiState());
+    expect(JSON.parse(window.localStorage.getItem(UI_STORAGE_KEY) ?? "{}")).toMatchObject({ schemaVersion: 2 });
+  });
+
+  it("複数選択フィルタの既定値は絞り込みなし（null）", () => {
+    const { input } = buildDefaultUiState();
+    expect([input.starFilters, input.ue1Filters, input.ue2Filters, input.memorySourceFilters]).toEqual([null, null, null, null]);
+  });
+
+  it("v1の空配列は絞り込みなし（null）として読み込む", () => {
+    const loaded = parseUiState(
+      JSON.stringify({
+        schemaVersion: 1,
+        input: { starFilters: [], ue1Filters: [], ue2Filters: [], memorySourceFilters: [] },
+      }),
+    );
+    expect(loaded.input.starFilters).toBeNull();
+    expect(loaded.input.ue1Filters).toBeNull();
+    expect(loaded.input.ue2Filters).toBeNull();
+    expect(loaded.input.memorySourceFilters).toBeNull();
+  });
+
+  it("スキーマ版のない旧データの空配列も絞り込みなしとして読み込む", () => {
+    const loaded = parseUiState(JSON.stringify({ input: { starFilters: [] } }));
+    expect(loaded.input.starFilters).toBeNull();
+  });
+
+  it("v2の空配列は何も選んでいない状態、nullは絞り込みなしとして読み込む", () => {
+    const loaded = parseUiState(JSON.stringify({ schemaVersion: 2, input: { starFilters: [], memorySourceFilters: null } }));
+    expect(loaded.input.starFilters).toEqual([]);
+    expect(loaded.input.memorySourceFilters).toBeNull();
+  });
+
+  it("候補外の値しかない配列と全項目がそろう配列は絞り込みなしへまとめる", () => {
+    const loaded = parseUiState(
+      JSON.stringify({ schemaVersion: 2, input: { starFilters: [99, "x"], ue2Filters: ["unimplemented", 0, 1, 2, 3, 4, 5] } }),
+    );
+    expect(loaded.input.starFilters).toBeNull();
+    expect(loaded.input.ue2Filters).toBeNull();
+  });
+
+  it("選択値は選択肢の順に並べ替えて読み込む", () => {
+    const loaded = parseUiState(JSON.stringify({ schemaVersion: 2, input: { ue1Filters: ["sp", 370, "unimplemented"] } }));
+    expect(loaded.input.ue1Filters).toEqual(["unimplemented", 370, "sp"]);
   });
 });

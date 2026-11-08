@@ -1,7 +1,8 @@
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
-import type { Ue1SpImplementedFilter } from "../../domain/uiStorage";
+import type { MultiSelection } from "../../domain/multiSelection";
+import type { MemorySourceFilter, StarFilter, Ue1SpImplementedFilter } from "../../domain/uiStorage";
 import { useVisibleRows } from "./useVisibleRows";
 
 // テスト用のマスターキャラデータを生成する。
@@ -47,6 +48,8 @@ function buildParams(overrides?: {
   masterCharacters?: MasterCharacter[];
   progressByName?: Record<string, CharacterProgress>;
   ue1SpImplementedFilter?: Ue1SpImplementedFilter;
+  starFilters?: MultiSelection<StarFilter>;
+  memorySourceFilters?: MultiSelection<MemorySourceFilter>;
 }) {
   return {
     masterCharacters: overrides?.masterCharacters ?? [],
@@ -61,10 +64,10 @@ function buildParams(overrides?: {
     starMemoryCalcMode: "implemented_max" as const,
     ue1MemoryCalcMode: "implemented_max" as const,
     ue1HeartFragmentCalcMode: "implemented_max" as const,
-    starFilters: [],
-    ue1Filters: [],
-    ue2Filters: [],
-    memorySourceFilters: [],
+    starFilters: overrides?.starFilters ?? null,
+    ue1Filters: null,
+    ue2Filters: null,
+    memorySourceFilters: overrides?.memorySourceFilters ?? null,
     sortKey: "name" as const,
     sortDirection: null,
   };
@@ -119,5 +122,38 @@ describe("useVisibleRows 専用1SP実装有無フィルタ", () => {
     rerender({ ue1SpImplementedFilter: "implemented" });
 
     expect(result.current.map((row) => row.character.name)).toEqual(["ヒヨリ"]);
+  });
+});
+
+describe("useVisibleRows 複数選択フィルタ", () => {
+  const masterCharacters = [
+    buildCharacter({ name: "ヒヨリ", baseName: "ヒヨリ", memoryPieceSources: ["hard_quest"] }),
+    buildCharacter({ name: "ユイ", baseName: "ユイ", memoryPieceSources: [] }),
+  ];
+  const progressByName: Record<string, CharacterProgress> = {
+    ヒヨリ: buildProgress({ star: 5 }),
+    ユイ: buildProgress({ star: 3 }),
+  };
+
+  it("null（絞り込みなし）なら全キャラを表示する", () => {
+    const { result } = renderHook(() => useVisibleRows(buildParams({ masterCharacters, progressByName, starFilters: null })));
+
+    expect(result.current.map((row) => row.character.name)).toEqual(["ヒヨリ", "ユイ"]);
+  });
+
+  it("空配列（何も選んでいない）なら1件も表示しない", () => {
+    const starResult = renderHook(() => useVisibleRows(buildParams({ masterCharacters, progressByName, starFilters: [] })));
+    const sourceResult = renderHook(() =>
+      useVisibleRows(buildParams({ masterCharacters, progressByName, memorySourceFilters: [] })),
+    );
+
+    expect(starResult.result.current).toEqual([]);
+    expect(sourceResult.result.current).toEqual([]);
+  });
+
+  it("選んだ値だけに絞り込む", () => {
+    const { result } = renderHook(() => useVisibleRows(buildParams({ masterCharacters, progressByName, starFilters: [3] })));
+
+    expect(result.current.map((row) => row.character.name)).toEqual(["ユイ"]);
   });
 });
