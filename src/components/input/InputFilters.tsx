@@ -21,7 +21,7 @@ import { MultiSelectFilter } from "../ui/multi-select-filter";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { memorySourceLabelMap } from "./constants";
 import { formatUeLevel } from "./formatters";
-import { inputToolbarClass, sectionLabelClass } from "./uiStyles";
+import { filterTriggerClass, inputToolbarClass, sectionLabelClass } from "./uiStyles";
 
 type InputFiltersProps = {
   ownedFilter: OwnedFilter;
@@ -181,7 +181,7 @@ export const InputFilters = memo(function InputFilters({
         <div className="grid gap-1.5 text-sm text-muted">
           <Label>所持</Label>
           <Select value={ownedFilter} onValueChange={(value) => onOwnedFilterChange(value as OwnedFilter)}>
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={ownedFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -195,7 +195,7 @@ export const InputFilters = memo(function InputFilters({
         <div className="grid gap-1.5 text-sm text-muted">
           <Label>限定</Label>
           <Select value={limitedFilter} onValueChange={(value) => onLimitedFilterChange(value as LimitedFilter)}>
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={limitedFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -209,7 +209,7 @@ export const InputFilters = memo(function InputFilters({
         <div className="grid gap-1.5 text-sm text-muted">
           <Label>限界突破</Label>
           <Select value={limitBreakFilter} onValueChange={(value) => onLimitBreakFilterChange(value as LimitBreakFilter)}>
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={limitBreakFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -226,7 +226,7 @@ export const InputFilters = memo(function InputFilters({
             value={adventureMemoryPieceFilter}
             onValueChange={(value) => onAdventureMemoryPieceFilterChange(value as AdventureMemoryPieceFilter)}
           >
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={adventureMemoryPieceFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -243,7 +243,7 @@ export const InputFilters = memo(function InputFilters({
             value={purePieceAvailabilityFilter}
             onValueChange={(value) => onPurePieceAvailabilityFilterChange(value as PurePieceAvailabilityFilter)}
           >
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={purePieceAvailabilityFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -259,6 +259,7 @@ export const InputFilters = memo(function InputFilters({
           selectedValues={starFilters}
           options={[1, 2, 3, 4, 5, 6].map((star) => ({ value: star as CharacterProgress["star"], label: `☆${star}` }))}
           emptyLabel="すべて"
+          triggerClassName={filterTriggerClass}
           summary={selectedStarLabels}
           onToggle={(value) => toggleFilter(value, setStarFilters)}
         />
@@ -272,6 +273,7 @@ export const InputFilters = memo(function InputFilters({
             { value: "sp", label: "SP" },
           ]}
           emptyLabel="すべて"
+          triggerClassName={filterTriggerClass}
           summary={selectedUe1Labels}
           onToggle={(value) => toggleFilter(value, setUe1Filters)}
         />
@@ -282,7 +284,7 @@ export const InputFilters = memo(function InputFilters({
             value={ue1SpImplementedFilter}
             onValueChange={(value) => onUe1SpImplementedFilterChange(value as Ue1SpImplementedFilter)}
           >
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={ue1SpImplementedFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -301,6 +303,7 @@ export const InputFilters = memo(function InputFilters({
             ...UE2_LEVEL_VALUES.map((level) => ({ value: level as Ue2Filter, label: formatUeLevel(level) })),
           ]}
           emptyLabel="すべて"
+          triggerClassName={filterTriggerClass}
           summary={selectedUe2Labels}
           onToggle={(value) => toggleFilter(value, setUe2Filters)}
         />
@@ -313,6 +316,7 @@ export const InputFilters = memo(function InputFilters({
             ...Object.entries(memorySourceLabelMap).map(([source, label]) => ({ value: source as MemorySourceFilter, label })),
           ]}
           emptyLabel="すべて"
+          triggerClassName={filterTriggerClass}
           summary={selectedMemorySourceLabels}
           onToggle={(value) => toggleFilter(value, setMemorySourceFilters)}
         />

@@ -17,6 +17,8 @@ type MultiSelectFilterProps<T extends string | number> = {
   emptyLabel: string;
   summary: string;
   className?: string;
+  /** トリガーボタンに追加するクラス。トリガーには選択の有無が data-active 属性で付く */
+  triggerClassName?: string;
   onToggle: (value: T) => void;
 };
 
@@ -28,6 +30,7 @@ export function MultiSelectFilter<T extends string | number>({
   emptyLabel,
   summary,
   className,
+  triggerClassName,
   onToggle,
 }: MultiSelectFilterProps<T>) {
   return (
@@ -41,7 +44,9 @@ export function MultiSelectFilter<T extends string | number>({
               "h-10 w-full justify-between rounded-[12px] border-white/20 bg-input-bg px-3 py-2.5 text-sm font-normal text-main",
               "focus-visible:border-accent-strong focus-visible:ring-2 focus-visible:ring-accent-strong/40",
               "overflow-hidden text-ellipsis whitespace-nowrap",
+              triggerClassName,
             )}
+            data-active={selectedValues.length > 0}
             aria-label={`${title}フィルタを開く`}
           >
             <span className="overflow-hidden text-ellipsis whitespace-nowrap text-left">
