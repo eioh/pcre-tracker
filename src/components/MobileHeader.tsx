@@ -5,7 +5,7 @@ import { cn } from "../lib/utils";
 import { formatSyncStatus, SyncHeader } from "./SyncHeader";
 import { Button } from "./ui/button";
 import { FileImportButton } from "./ui/file-import-button";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "./ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetScrollArea, SheetTitle } from "./ui/sheet";
 
 type Props = {
   // ログイン中か（コンパクトヘッダーの同期ステータス表示と SyncHeader 埋め込みに使う）。
@@ -108,7 +108,7 @@ export function MobileHeader({
       </Button>
 
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto">
+        <SheetContent side="bottom" className="max-h-[85dvh]">
           <SheetHeader>
             <SheetTitle>メニュー</SheetTitle>
             <SheetDescription className="sr-only">
@@ -116,56 +116,58 @@ export function MobileHeader({
             </SheetDescription>
           </SheetHeader>
 
-          <div className="flex flex-col gap-2.5">
-            {/*
-              ログイン導線（未ログイン時）またはステータス・ログアウト・アカウント削除（ログイン時）。
-              ダイアログ群は SyncHeader が保持しているため、これらの操作ではシートを閉じない
-              （閉じると SyncHeader ごとアンマウントされダイアログが消えるため）。
-              子ボタンをメニュー項目スタイルへ寄せるためのセレクタを併用する（SyncHeader 本体はレイアウト無改変）。
-              角丸はシート内の他メニュー項目（rounded-[10px]）と揃える。ログイン後のログアウト/アカウント削除は
-              div 内にネストされるため、角丸のみ子孫セレクタ（[&_button]）で全ボタンに適用する
-              （ダイアログ群はポータルで body 直下に描画されるため影響しない）。
-            */}
-            <div className="[&_button]:rounded-[10px] [&>button]:w-full [&>button]:justify-start [&>button]:px-4 [&>button]:py-3 [&>button]:text-sm [&>div]:flex-wrap">
-              <SyncHeader
-                isLoggedIn={isLoggedIn}
-                isSessionPending={isSessionPending}
-                userLabel={userLabel}
-                status={status}
-                onOpenPrivacyPolicy={onOpenPrivacyPolicy}
-                onDeleteRequestStart={onDeleteRequestStart}
-                onBeforeAccountDeleted={onBeforeAccountDeleted}
-                onLogoutStart={onLogoutStart}
-                onDeleteDeviceData={onDeleteDeviceData}
-                hasUnsyncedChanges={hasUnsyncedChanges}
+          <SheetScrollArea className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2.5">
+              {/*
+                ログイン導線（未ログイン時）またはステータス・ログアウト・アカウント削除（ログイン時）。
+                ダイアログ群は SyncHeader が保持しているため、これらの操作ではシートを閉じない
+                （閉じると SyncHeader ごとアンマウントされダイアログが消えるため）。
+                子ボタンをメニュー項目スタイルへ寄せるためのセレクタを併用する（SyncHeader 本体はレイアウト無改変）。
+                角丸はシート内の他メニュー項目（rounded-[10px]）と揃える。ログイン後のログアウト/アカウント削除は
+                div 内にネストされるため、角丸のみ子孫セレクタ（[&_button]）で全ボタンに適用する
+                （ダイアログ群はポータルで body 直下に描画されるため影響しない）。
+              */}
+              <div className="[&_button]:rounded-[10px] [&>button]:w-full [&>button]:justify-start [&>button]:px-4 [&>button]:py-3 [&>button]:text-sm [&>div]:flex-wrap">
+                <SyncHeader
+                  isLoggedIn={isLoggedIn}
+                  isSessionPending={isSessionPending}
+                  userLabel={userLabel}
+                  status={status}
+                  onOpenPrivacyPolicy={onOpenPrivacyPolicy}
+                  onDeleteRequestStart={onDeleteRequestStart}
+                  onBeforeAccountDeleted={onBeforeAccountDeleted}
+                  onLogoutStart={onLogoutStart}
+                  onDeleteDeviceData={onDeleteDeviceData}
+                  hasUnsyncedChanges={hasUnsyncedChanges}
+                />
+              </div>
+
+              <Button variant="outline" className={menuItemClass} onClick={runAfterClose(onExportBackup)}>
+                <Download className="size-4" aria-hidden="true" />
+                エクスポート
+              </Button>
+
+              <FileImportButton
+                label="インポート"
+                icon={<Upload className="size-4" aria-hidden="true" />}
+                accept="application/json,.json"
+                className={menuItemClass}
+                onSelectFile={handleSelectImportFile}
               />
+
+              {/* 破壊的操作のため危険色にする（デスクトップのデータメニューの danger 項目と整合）。 */}
+              <Button
+                variant="outline"
+                className={cn(menuItemClass, "text-danger hover:border-danger")}
+                onClick={runAfterClose(onRequestReset)}
+              >
+                <RotateCcw className="size-4" aria-hidden="true" />
+                保存データを初期化
+              </Button>
             </div>
 
-            <Button variant="outline" className={menuItemClass} onClick={runAfterClose(onExportBackup)}>
-              <Download className="size-4" aria-hidden="true" />
-              エクスポート
-            </Button>
-
-            <FileImportButton
-              label="インポート"
-              icon={<Upload className="size-4" aria-hidden="true" />}
-              accept="application/json,.json"
-              className={menuItemClass}
-              onSelectFile={handleSelectImportFile}
-            />
-
-            {/* 破壊的操作のため危険色にする（デスクトップのデータメニューの danger 項目と整合）。 */}
-            <Button
-              variant="outline"
-              className={cn(menuItemClass, "text-danger hover:border-danger")}
-              onClick={runAfterClose(onRequestReset)}
-            >
-              <RotateCcw className="size-4" aria-hidden="true" />
-              保存データを初期化
-            </Button>
-          </div>
-
-          <p className="m-0 text-sm text-muted">最終更新: {updatedAt}</p>
+            <p className="m-0 text-sm text-muted">最終更新: {updatedAt}</p>
+          </SheetScrollArea>
         </SheetContent>
       </Sheet>
     </header>

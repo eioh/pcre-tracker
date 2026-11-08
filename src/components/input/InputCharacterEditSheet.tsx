@@ -18,7 +18,7 @@ import { computeRowDerived } from "./rowDerived";
 import type { ProgressPatch, SaveStatus, VisibleRow } from "./types";
 import { sectionLabelClass, tableSwitchClass } from "./uiStyles";
 import { Badge } from "../ui/badge";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetScrollArea, SheetTitle } from "../ui/sheet";
 import { TableCheckbox } from "../ui/table-checkbox";
 
 type InputCharacterEditSheetProps = {
@@ -133,7 +133,7 @@ const SheetBody = memo(function SheetBody({
   const displayedSaveStatus: DisplayedSaveStatus = saveStatus === "error" ? "error" : hasUncommittedNumberInput ? "editing" : saveStatus;
 
   return (
-    <div className="grid gap-5">
+    <>
       <SheetHeader>
         <div className="flex flex-wrap items-center gap-2 text-[0.72rem] font-semibold leading-none">
           <span className={character.limited ? "text-limited-text" : "text-normal-text"}>{character.limited ? "限定" : "恒常"}</span>
@@ -150,169 +150,173 @@ const SheetBody = memo(function SheetBody({
         </SheetDescription>
       </SheetHeader>
 
-      {/* 最重要情報「あと何個必要か」をファーストビューで確認できるよう、ヘッダー直下へコンパクトに表示する。
-          詳細な内訳はシート下部の各セクションで従来どおり確認できる。 */}
-      <section
-        aria-label="必要数サマリー"
-        className="grid grid-cols-2 divide-x divide-white/20 rounded-[10px] border border-white/20 bg-input-bg px-3 py-2.5"
-      >
-        <div className="grid gap-0.5 pr-3">
-          <span className="text-xs font-semibold text-muted">必要メモピ</span>
-          <span className="text-lg font-bold leading-tight tabular-nums">{adjustedTotalRemainingMemoryPiece}</span>
-        </div>
-        <div className="grid gap-0.5 pl-3">
-          <span className="text-xs font-semibold text-muted">必要ピュアピ</span>
-          {/* ピュアピが意味を持たない（☆6・専用2とも未実装）キャラは値の代わりに「-」を表示する */}
-          <span className="text-lg font-bold leading-tight tabular-nums">{isPurePieceImplemented ? totalPurePieceNeeded : "-"}</span>
-        </div>
-      </section>
+      {/* タイトル行（スワイプで閉じるつかみ所）を固定し、以降の本文だけを縦スクロールさせる */}
+      <SheetScrollArea className="grid content-start gap-5">
 
-      <section>
-        <h3 className={sectionLabelClass}>基本</h3>
-        <div className="grid gap-3">
-          <div className="grid grid-cols-2 gap-3">
-            <label className={`${tableSwitchClass} min-h-9`}>
-              <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onCheckedChange={handleOwnedChange} />
-              <span>所持</span>
-            </label>
+        {/* 最重要情報「あと何個必要か」をファーストビューで確認できるよう、ヘッダー直下へコンパクトに表示する。
+            詳細な内訳はシート下部の各セクションで従来どおり確認できる。 */}
+        <section
+          aria-label="必要数サマリー"
+          className="grid grid-cols-2 divide-x divide-white/20 rounded-[10px] border border-white/20 bg-input-bg px-3 py-2.5"
+        >
+          <div className="grid gap-0.5 pr-3">
+            <span className="text-xs font-semibold text-muted">必要メモピ</span>
+            <span className="text-lg font-bold leading-tight tabular-nums">{adjustedTotalRemainingMemoryPiece}</span>
+          </div>
+          <div className="grid gap-0.5 pl-3">
+            <span className="text-xs font-semibold text-muted">必要ピュアピ</span>
+            {/* ピュアピが意味を持たない（☆6・専用2とも未実装）キャラは値の代わりに「-」を表示する */}
+            <span className="text-lg font-bold leading-tight tabular-nums">{isPurePieceImplemented ? totalPurePieceNeeded : "-"}</span>
+          </div>
+        </section>
+
+        <section>
+          <h3 className={sectionLabelClass}>基本</h3>
+          <div className="grid gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              <label className={`${tableSwitchClass} min-h-9`}>
+                <TableCheckbox checked={progress.owned} aria-label={`${character.name}の所持状態`} onCheckedChange={handleOwnedChange} />
+                <span>所持</span>
+              </label>
+              <label className={`${tableSwitchClass} min-h-9`}>
+                <TableCheckbox
+                  checked={progress.limitBreak}
+                  aria-label={`${character.name}の限界突破状態`}
+                  onCheckedChange={handleLimitBreakChange}
+                />
+                <span>限界突破</span>
+              </label>
+            </div>
+            {/* ☆はセグメンテッドコントロール（6ボタン）のため1行を占有する */}
+            <FieldRow label="☆">
+              <StarSegmentedControl character={character} star={progress.star} isAtMax={isStarAtMax} onUpdateProgress={onUpdateProgress} />
+            </FieldRow>
+            {/* ステッパーは −/値/+ の横並びのため1行を占有する */}
+            <FieldRow label="コネクトRANK">
+              <ConnectRankStepper
+                character={character}
+                connectRank={progress.connectRank}
+                isAtMax={isConnectRankAtMax}
+                onUpdateProgress={onUpdateProgress}
+              />
+            </FieldRow>
+          </div>
+        </section>
+
+        <section>
+          <h3 className={sectionLabelClass}>専用装備</h3>
+          {/* ステッパーの −/+ に 44px 幅を確保するため、2カラムでなく縦積みにする */}
+          <div className="grid gap-3">
+            <FieldRow label="専用1">
+              <Ue1Stepper character={character} value={ue1CompositeValue} isAtMax={isUe1AtMax} onUpdateProgress={onUpdateProgress} />
+            </FieldRow>
+            <FieldRow label="専用2">
+              <Ue2Stepper character={character} value={ue2Value} isAtMax={isUe2AtMax} onUpdateProgress={onUpdateProgress} />
+            </FieldRow>
+          </div>
+        </section>
+
+        <section>
+          <h3 className={sectionLabelClass}>ピース所持数</h3>
+          {/* 数値ステッパーは −/入力/+ の横並びのため、2カラムでなく縦積みにする */}
+          <div className="grid gap-3">
+            <FieldRow label="所持メモピ">
+              <OwnedMemoryPieceStepper
+                character={character}
+                ownedMemoryPiece={progress.ownedMemoryPiece}
+                onUpdateProgress={onUpdateProgress}
+                onEditingChange={setIsOwnedMemoryPieceEditing}
+              />
+            </FieldRow>
+            <FieldRow label="所持ピュアピ">
+              <OwnedPurePieceStepper
+                character={character}
+                ownedPurePiece={ownedPurePiece}
+                isImplemented={isPurePieceImplemented}
+                onUpdatePurePiece={onUpdatePurePiece}
+                onEditingChange={setIsOwnedPurePieceEditing}
+              />
+            </FieldRow>
+          </div>
+        </section>
+
+        <section>
+          <h3 className={sectionLabelClass}>その他</h3>
+          <div className="grid gap-3">
             <label className={`${tableSwitchClass} min-h-9`}>
               <TableCheckbox
-                checked={progress.limitBreak}
-                aria-label={`${character.name}の限界突破状態`}
-                onCheckedChange={handleLimitBreakChange}
+                checked={progress.adventureMemoryPieceTarget === true}
+                aria-label={`${character.name}のアドベンチャーメモピ枠`}
+                onCheckedChange={handleAdventureMemoryPieceTargetChange}
               />
-              <span>限界突破</span>
+              <span>アドベンチャーメモピ枠</span>
             </label>
+            <FieldRow label="入手日">
+              <ObtainedDatePicker character={character} obtainedDate={progress.obtainedDate} onUpdateProgress={onUpdateProgress} />
+            </FieldRow>
+            <FieldRow label="ガチャ回数">
+              <GachaPullCountStepper
+                character={character}
+                gachaPullCount={progress.gachaPullCount}
+                onUpdateProgress={onUpdateProgress}
+                onEditingChange={setIsGachaPullCountEditing}
+              />
+            </FieldRow>
           </div>
-          {/* ☆はセグメンテッドコントロール（6ボタン）のため1行を占有する */}
-          <FieldRow label="☆">
-            <StarSegmentedControl character={character} star={progress.star} isAtMax={isStarAtMax} onUpdateProgress={onUpdateProgress} />
-          </FieldRow>
-          {/* ステッパーは −/値/+ の横並びのため1行を占有する */}
-          <FieldRow label="コネクトRANK">
-            <ConnectRankStepper
-              character={character}
-              connectRank={progress.connectRank}
-              isAtMax={isConnectRankAtMax}
-              onUpdateProgress={onUpdateProgress}
-            />
-          </FieldRow>
-        </div>
-      </section>
+        </section>
 
-      <section>
-        <h3 className={sectionLabelClass}>専用装備</h3>
-        {/* ステッパーの −/+ に 44px 幅を確保するため、2カラムでなく縦積みにする */}
-        <div className="grid gap-3">
-          <FieldRow label="専用1">
-            <Ue1Stepper character={character} value={ue1CompositeValue} isAtMax={isUe1AtMax} onUpdateProgress={onUpdateProgress} />
-          </FieldRow>
-          <FieldRow label="専用2">
-            <Ue2Stepper character={character} value={ue2Value} isAtMax={isUe2AtMax} onUpdateProgress={onUpdateProgress} />
-          </FieldRow>
-        </div>
-      </section>
+        <section>
+          <h3 className={sectionLabelClass}>必要メモピ合計</h3>
+          {/* デスクトップでは Tooltip で表示している内訳を、タッチ操作向けにインラインで常時表示する */}
+          <div className="grid gap-1.5 rounded-[10px] border border-white/20 bg-input-bg px-3 py-2.5 text-sm">
+            <BreakdownLine label="☆" value={`+${starRemainingMemoryPiece}`} />
+            <BreakdownLine label="コネクトRANK" value={`+${connectRankRemainingMemoryPiece}`} />
+            <BreakdownLine label="専用1" value={`+${ue1RemainingMemoryPiece}`} />
+            <BreakdownLine label="限界突破" value={`+${limitBreakRemainingMemoryPiece}`} />
+            <BreakdownLine label="所持数" value={`-${progress.ownedMemoryPiece}`} />
+            <div className="mt-1 h-px bg-white/20" />
+            <BreakdownLine label="合計" value={`${adjustedTotalRemainingMemoryPiece}`} bold />
+          </div>
+        </section>
 
-      <section>
-        <h3 className={sectionLabelClass}>ピース所持数</h3>
-        {/* 数値ステッパーは −/入力/+ の横並びのため、2カラムでなく縦積みにする */}
-        <div className="grid gap-3">
-          <FieldRow label="所持メモピ">
-            <OwnedMemoryPieceStepper
-              character={character}
-              ownedMemoryPiece={progress.ownedMemoryPiece}
-              onUpdateProgress={onUpdateProgress}
-              onEditingChange={setIsOwnedMemoryPieceEditing}
-            />
-          </FieldRow>
-          <FieldRow label="所持ピュアピ">
-            <OwnedPurePieceStepper
-              character={character}
-              ownedPurePiece={ownedPurePiece}
-              isImplemented={isPurePieceImplemented}
-              onUpdatePurePiece={onUpdatePurePiece}
-              onEditingChange={setIsOwnedPurePieceEditing}
-            />
-          </FieldRow>
-        </div>
-      </section>
+        <section>
+          <h3 className={sectionLabelClass}>必要ピュアピ合計</h3>
+          <div className="grid gap-1.5 rounded-[10px] border border-white/20 bg-input-bg px-3 py-2.5 text-sm">
+            <BreakdownLine label="☆6" value={`+${star6PurePieceNeed}`} />
+            <BreakdownLine label="所持数" value={`-${ownedPurePiece}`} />
+            <div className="h-px bg-white/20" />
+            <BreakdownLine label="小計" value={`+${star6PurePieceSubtotal}`} />
+            <div className="h-2" />
+            <div className="h-px bg-white/20" />
+            <BreakdownLine label="専用2" value={`+${ue2PurePieceNeed}`} />
+            <BreakdownLine label={`・${character.name}`} value={`-${ownedPurePiece}`} />
+            {includeSameBasePurePieceForUe2 && character.implemented.ue2 ? (
+              <BreakdownLine label="・同名別衣装" value={`-${sameBasePurePieceUsed}`} />
+            ) : null}
+            <div className="h-px bg-white/20" />
+            <BreakdownLine label="小計" value={`+${ue2PurePieceSubtotal}`} bold />
+            <div className="h-2" />
+            <div className="h-px bg-white/20" />
+            <BreakdownLine label="合計" value={`+${totalPurePieceNeeded}`} bold />
+          </div>
+        </section>
 
-      <section>
-        <h3 className={sectionLabelClass}>その他</h3>
-        <div className="grid gap-3">
-          <label className={`${tableSwitchClass} min-h-9`}>
-            <TableCheckbox
-              checked={progress.adventureMemoryPieceTarget === true}
-              aria-label={`${character.name}のアドベンチャーメモピ枠`}
-              onCheckedChange={handleAdventureMemoryPieceTargetChange}
-            />
-            <span>アドベンチャーメモピ枠</span>
-          </label>
-          <FieldRow label="入手日">
-            <ObtainedDatePicker character={character} obtainedDate={progress.obtainedDate} onUpdateProgress={onUpdateProgress} />
-          </FieldRow>
-          <FieldRow label="ガチャ回数">
-            <GachaPullCountStepper
-              character={character}
-              gachaPullCount={progress.gachaPullCount}
-              onUpdateProgress={onUpdateProgress}
-              onEditingChange={setIsGachaPullCountEditing}
-            />
-          </FieldRow>
-        </div>
-      </section>
-
-      <section>
-        <h3 className={sectionLabelClass}>必要メモピ合計</h3>
-        {/* デスクトップでは Tooltip で表示している内訳を、タッチ操作向けにインラインで常時表示する */}
-        <div className="grid gap-1.5 rounded-[10px] border border-white/20 bg-input-bg px-3 py-2.5 text-sm">
-          <BreakdownLine label="☆" value={`+${starRemainingMemoryPiece}`} />
-          <BreakdownLine label="コネクトRANK" value={`+${connectRankRemainingMemoryPiece}`} />
-          <BreakdownLine label="専用1" value={`+${ue1RemainingMemoryPiece}`} />
-          <BreakdownLine label="限界突破" value={`+${limitBreakRemainingMemoryPiece}`} />
-          <BreakdownLine label="所持数" value={`-${progress.ownedMemoryPiece}`} />
-          <div className="mt-1 h-px bg-white/20" />
-          <BreakdownLine label="合計" value={`${adjustedTotalRemainingMemoryPiece}`} bold />
-        </div>
-      </section>
-
-      <section>
-        <h3 className={sectionLabelClass}>必要ピュアピ合計</h3>
-        <div className="grid gap-1.5 rounded-[10px] border border-white/20 bg-input-bg px-3 py-2.5 text-sm">
-          <BreakdownLine label="☆6" value={`+${star6PurePieceNeed}`} />
-          <BreakdownLine label="所持数" value={`-${ownedPurePiece}`} />
-          <div className="h-px bg-white/20" />
-          <BreakdownLine label="小計" value={`+${star6PurePieceSubtotal}`} />
-          <div className="h-2" />
-          <div className="h-px bg-white/20" />
-          <BreakdownLine label="専用2" value={`+${ue2PurePieceNeed}`} />
-          <BreakdownLine label={`・${character.name}`} value={`-${ownedPurePiece}`} />
-          {includeSameBasePurePieceForUe2 && character.implemented.ue2 ? (
-            <BreakdownLine label="・同名別衣装" value={`-${sameBasePurePieceUsed}`} />
-          ) : null}
-          <div className="h-px bg-white/20" />
-          <BreakdownLine label="小計" value={`+${ue2PurePieceSubtotal}`} bold />
-          <div className="h-2" />
-          <div className="h-px bg-white/20" />
-          <BreakdownLine label="合計" value={`+${totalPurePieceNeeded}`} bold />
-        </div>
-      </section>
-
-      <section>
-        <h3 className={sectionLabelClass}>メモピ入手</h3>
-        <div className="flex flex-wrap gap-1.5">
-          {character.memoryPieceSources.length === 0 ? (
-            <Badge variant="muted">情報なし</Badge>
-          ) : (
-            character.memoryPieceSources.map((source) => (
-              <Badge key={source} className={sourceChipClassMap[source]}>
-                {memorySourceLabelMap[source]}
-              </Badge>
-            ))
-          )}
-        </div>
-      </section>
-    </div>
+        <section>
+          <h3 className={sectionLabelClass}>メモピ入手</h3>
+          <div className="flex flex-wrap gap-1.5">
+            {character.memoryPieceSources.length === 0 ? (
+              <Badge variant="muted">情報なし</Badge>
+            ) : (
+              character.memoryPieceSources.map((source) => (
+                <Badge key={source} className={sourceChipClassMap[source]}>
+                  {memorySourceLabelMap[source]}
+                </Badge>
+              ))
+            )}
+          </div>
+        </section>
+      </SheetScrollArea>
+    </>
   );
 });
 
@@ -320,8 +324,8 @@ const SheetBody = memo(function SheetBody({
 export function InputCharacterEditSheet({ row, onOpenChange, saveStatus = "saved", ...bodyProps }: InputCharacterEditSheetProps) {
   return (
     <Sheet open={row !== null} onOpenChange={onOpenChange}>
-      {/* iOS の safe-area（ホームバー）を padding で回避しつつ、はみ出す分は縦スクロールで閲覧する */}
-      <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+1.25rem)]">
+      {/* iOS の safe-area（ホームバー）を padding で回避しつつ、はみ出す分は本文だけを縦スクロールで閲覧する */}
+      <SheetContent side="bottom" className="max-h-[85dvh] pb-[calc(env(safe-area-inset-bottom)+1.25rem)]">
         {row ? <SheetBody key={row.character.name} character={row.character} progress={row.progress} saveStatus={saveStatus} {...bodyProps} /> : null}
       </SheetContent>
     </Sheet>
