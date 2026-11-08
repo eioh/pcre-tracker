@@ -32,13 +32,13 @@ function buildProps(overrides?: Partial<ComponentProps<typeof InputFilters>>): C
     onAdventureMemoryPieceFilterChange: vi.fn<(value: AdventureMemoryPieceFilter) => void>(),
     purePieceAvailabilityFilter: "all",
     onPurePieceAvailabilityFilterChange: vi.fn<(value: PurePieceAvailabilityFilter) => void>(),
-    starFilters: [],
+    starFilters: null,
     setStarFilters: vi.fn(),
-    ue1Filters: [],
+    ue1Filters: null,
     setUe1Filters: vi.fn(),
-    ue2Filters: [],
+    ue2Filters: null,
     setUe2Filters: vi.fn(),
-    memorySourceFilters: [],
+    memorySourceFilters: null,
     setMemorySourceFilters: vi.fn(),
     sortKey: "name",
     onSortKeyChange: vi.fn<(value: SortKey) => void>(),
@@ -60,6 +60,21 @@ function selectComboboxOption(label: string, optionLabel: string): void {
 function openMultiSelect(title: string): void {
   const trigger = screen.getByText(title).closest("div")?.querySelector("button");
   fireEvent.click(trigger as HTMLButtonElement);
+}
+
+const singleSelectFilterLabels = ["所持", "限定", "限界突破", "アドベンチャー", "ピュアピ", "専用1SP"];
+const multiSelectFilterTitles = ["☆", "専用1", "専用2", "メモピ入手"];
+
+// ラベルから単一選択セレクトのトリガーを取得する。
+function getSelectTrigger(label: string): HTMLElement {
+  const field = screen.getByText(label).closest("div");
+  expect(field).not.toBeNull();
+  return within(field as HTMLElement).getByRole("combobox");
+}
+
+// タイトルから複数選択フィルタのトリガーを取得する。
+function getMultiSelectTrigger(title: string): HTMLElement {
+  return screen.getByRole("button", { name: `${title}フィルタを開く` });
 }
 
 // リセットボタンの配置変更に影響されないよう、アクセシブル名で取得する。
@@ -90,24 +105,70 @@ describe("InputFilters", () => {
     expect(props.onLimitBreakFilterChange).toHaveBeenCalledWith("all");
     expect(props.onAdventureMemoryPieceFilterChange).toHaveBeenCalledWith("all");
     expect(props.onPurePieceAvailabilityFilterChange).toHaveBeenCalledWith("all");
-    expect(props.setStarFilters).toHaveBeenCalledWith([]);
-    expect(props.setUe1Filters).toHaveBeenCalledWith([]);
-    expect(props.setUe2Filters).toHaveBeenCalledWith([]);
-    expect(props.setMemorySourceFilters).toHaveBeenCalledWith([]);
+    expect(props.setStarFilters).toHaveBeenCalledWith(null);
+    expect(props.setUe1Filters).toHaveBeenCalledWith(null);
+    expect(props.setUe2Filters).toHaveBeenCalledWith(null);
+    expect(props.setMemorySourceFilters).toHaveBeenCalledWith(null);
   });
 
-  it("☆フィルタのチェックで更新関数を呼び出せる", () => {
+  it("☆フィルタは絞り込みなしなら全項目にチェックが付き、外すと残りの項目を通知する", () => {
     const setStarFilters = vi.fn();
-    const props = buildProps({ starFilters: [] as StarFilter[], setStarFilters });
-    render(<InputFilters {...props} />);
+    render(<InputFilters {...buildProps({ starFilters: null, setStarFilters })} />);
 
     openMultiSelect("☆");
+    for (const star of [1, 2, 3, 4, 5, 6]) {
+      expect(screen.getByRole("checkbox", { name: `☆${star}` })).toBeChecked();
+    }
     fireEvent.click(screen.getByRole("checkbox", { name: "☆6" }));
 
     expect(setStarFilters).toHaveBeenCalledTimes(1);
-    const updater = setStarFilters.mock.calls[0]?.[0] as ((prev: StarFilter[]) => StarFilter[]) | undefined;
-    expect(updater).toBeTypeOf("function");
-    expect(updater?.([])).toEqual([6]);
+    expect(setStarFilters).toHaveBeenCalledWith([1, 2, 3, 4, 5]);
+  });
+
+  it("全て選択で絞り込みなし、全て解除で何も選んでいない状態を通知する", () => {
+    const setUe2Filters = vi.fn();
+    render(<InputFilters {...buildProps({ ue2Filters: [5], setUe2Filters })} />);
+
+    openMultiSelect("専用2");
+    fireEvent.click(screen.getByRole("button", { name: "全て選択" }));
+    fireEvent.click(screen.getByRole("button", { name: "全て解除" }));
+
+    expect(setUe2Filters).toHaveBeenNthCalledWith(1, null);
+    expect(setUe2Filters).toHaveBeenNthCalledWith(2, []);
+  });
+
+  it("絞り込みなしでは全て選択、何も選んでいないときは全て解除を押せない", () => {
+    const { unmount } = render(<InputFilters {...buildProps({ starFilters: null })} />);
+    openMultiSelect("☆");
+    expect(screen.getByRole("button", { name: "全て選択" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "全て解除" })).toBeEnabled();
+    unmount();
+
+    render(<InputFilters {...buildProps({ starFilters: [] as StarFilter[] })} />);
+    openMultiSelect("☆");
+    expect(screen.getByRole("button", { name: "全て選択" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "全て解除" })).toBeDisabled();
+    for (const star of [1, 2, 3, 4, 5, 6]) {
+      expect(screen.getByRole("checkbox", { name: `☆${star}` })).not.toBeChecked();
+    }
+  });
+
+  it("トリガーには選択状態に応じた要約を選択肢の順で表示する", () => {
+    render(
+      <InputFilters
+        {...buildProps({ starFilters: null, ue1Filters: [] as Ue1Filter[], memorySourceFilters: ["hard_quest", "none"] })}
+      />,
+    );
+
+    expect(getMultiSelectTrigger("☆")).toHaveTextContent("すべて");
+    expect(getMultiSelectTrigger("専用1")).toHaveTextContent("選択なし");
+    expect(getMultiSelectTrigger("メモピ入手")).toHaveTextContent("情報なし / ハード");
+  });
+
+  it("何も選んでいない複数選択フィルタは絞り込み中として強調する", () => {
+    render(<InputFilters {...buildProps({ starFilters: [] as StarFilter[] })} />);
+
+    expect(getMultiSelectTrigger("☆")).toHaveAttribute("data-active", "true");
   });
 
   it("メモピ入手フィルタで情報なしを選択できる", () => {
@@ -122,11 +183,7 @@ describe("InputFilters", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "情報なし" }));
 
     expect(setMemorySourceFilters).toHaveBeenCalledTimes(1);
-    const updater = setMemorySourceFilters.mock.calls[0]?.[0] as
-      | ((prev: MemorySourceFilter[]) => MemorySourceFilter[])
-      | undefined;
-    expect(typeof updater).toBe("function");
-    expect(updater?.([])).toEqual(["none"]);
+    expect(setMemorySourceFilters).toHaveBeenCalledWith(["none"]);
   });
 
   it("各セレクト変更で型に沿った値を通知する", () => {
@@ -170,6 +227,70 @@ describe("InputFilters", () => {
 
     expect(props.onSortKeyChange).toHaveBeenCalledWith("totalMemoryNeeded");
     expect(props.onSortDirectionChange).toHaveBeenCalledWith("desc");
+  });
+
+  it("既定値のフィルタはトリガーを強調しない", () => {
+    render(<InputFilters {...buildProps()} />);
+
+    for (const label of singleSelectFilterLabels) {
+      expect(getSelectTrigger(label)).toHaveAttribute("data-active", "false");
+    }
+    for (const title of multiSelectFilterTitles) {
+      expect(getMultiSelectTrigger(title)).toHaveAttribute("data-active", "false");
+    }
+  });
+
+  it("既定値から変更したフィルタだけトリガーを強調する", () => {
+    render(
+      <InputFilters
+        {...buildProps({
+          ownedFilter: "owned",
+          limitBreakFilter: "off",
+          starFilters: [5, 6],
+          memorySourceFilters: ["hard_quest"],
+        })}
+      />,
+    );
+
+    expect(getSelectTrigger("所持")).toHaveAttribute("data-active", "true");
+    expect(getSelectTrigger("限界突破")).toHaveAttribute("data-active", "true");
+    expect(getMultiSelectTrigger("☆")).toHaveAttribute("data-active", "true");
+    expect(getMultiSelectTrigger("メモピ入手")).toHaveAttribute("data-active", "true");
+    expect(getSelectTrigger("限定")).toHaveAttribute("data-active", "false");
+    expect(getMultiSelectTrigger("専用1")).toHaveAttribute("data-active", "false");
+  });
+
+  it("全フィルタを変更するとすべてのトリガーを強調する", () => {
+    render(
+      <InputFilters
+        {...buildProps({
+          ownedFilter: "unowned",
+          limitedFilter: "normal",
+          ue1SpImplementedFilter: "unimplemented",
+          limitBreakFilter: "on",
+          adventureMemoryPieceFilter: "off",
+          purePieceAvailabilityFilter: "unavailable",
+          starFilters: [1],
+          ue1Filters: ["unimplemented"],
+          ue2Filters: ["unimplemented"],
+          memorySourceFilters: ["none"],
+        })}
+      />,
+    );
+
+    for (const label of singleSelectFilterLabels) {
+      expect(getSelectTrigger(label)).toHaveAttribute("data-active", "true");
+    }
+    for (const title of multiSelectFilterTitles) {
+      expect(getMultiSelectTrigger(title)).toHaveAttribute("data-active", "true");
+    }
+  });
+
+  it("ソートのセレクトは強調の対象にしない", () => {
+    render(<InputFilters {...buildProps({ sortKey: "star", sortDirection: "desc" })} />);
+
+    expect(getSelectTrigger("ソート列")).not.toHaveAttribute("data-active");
+    expect(getSelectTrigger("ソート順")).not.toHaveAttribute("data-active");
   });
 
   it("フィルタ設定内には一覧の更新操作を表示しない", () => {

@@ -1,6 +1,7 @@
 import { ChevronDown, Search, SlidersHorizontal } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type { CharacterProgress, MasterCharacter, StoredStateV1 } from "../domain/types";
+import type { MultiSelection } from "../domain/multiSelection";
 import type {
   InputViewSettings,
   AdventureMemoryPieceFilter,
@@ -156,10 +157,10 @@ export function InputTab({
   const [includeSameBasePurePieceForUe2, setIncludeSameBasePurePieceForUe2] = useState(
     initialSettings.includeSameBasePurePieceForUe2,
   );
-  const [starFilters, setStarFilters] = useState<StarFilter[]>(initialSettings.starFilters);
-  const [ue1Filters, setUe1Filters] = useState<Ue1Filter[]>(initialSettings.ue1Filters);
-  const [ue2Filters, setUe2Filters] = useState<Ue2Filter[]>(initialSettings.ue2Filters);
-  const [memorySourceFilters, setMemorySourceFilters] = useState<MemorySourceFilter[]>(initialSettings.memorySourceFilters);
+  const [starFilters, setStarFilters] = useState<MultiSelection<StarFilter>>(initialSettings.starFilters);
+  const [ue1Filters, setUe1Filters] = useState<MultiSelection<Ue1Filter>>(initialSettings.ue1Filters);
+  const [ue2Filters, setUe2Filters] = useState<MultiSelection<Ue2Filter>>(initialSettings.ue2Filters);
+  const [memorySourceFilters, setMemorySourceFilters] = useState<MultiSelection<MemorySourceFilter>>(initialSettings.memorySourceFilters);
   const [sortKey, setSortKey] = useState<SortKey>(initialSettings.sortKey);
   const [sortDirection, setSortDirection] = useState<SortDirection>(initialSettings.sortDirection);
   const [appliedProgressByName, setAppliedProgressByName] = useState<Record<string, CharacterProgress>>(() => ({
@@ -329,10 +330,10 @@ export function InputTab({
       appliedDisplaySettings.limitBreakFilter !== "all",
       appliedDisplaySettings.adventureMemoryPieceFilter !== "all",
       appliedDisplaySettings.purePieceAvailabilityFilter !== "all",
-      appliedDisplaySettings.starFilters.length > 0,
-      appliedDisplaySettings.ue1Filters.length > 0,
-      appliedDisplaySettings.ue2Filters.length > 0,
-      appliedDisplaySettings.memorySourceFilters.length > 0,
+      appliedDisplaySettings.starFilters !== null,
+      appliedDisplaySettings.ue1Filters !== null,
+      appliedDisplaySettings.ue2Filters !== null,
+      appliedDisplaySettings.memorySourceFilters !== null,
     ];
     return activeFlags.filter(Boolean).length;
   }, [appliedDisplaySettings]);

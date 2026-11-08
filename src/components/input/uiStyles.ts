@@ -2,6 +2,10 @@ export const panelClass =
   "rounded-[8px] border border-panel-border bg-linear-to-br from-section-from to-section-to p-5 shadow-panel";
 export const inputToolbarClass = "grid grid-cols-1 gap-3 lg:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]";
 export const sectionLabelClass = "mb-2 text-sm font-semibold text-sub";
+// フィルタのトリガーに付ける強調スタイル。data-active="true"（既定値から変更済み）は枠線と薄い背景で強調し、
+// data-active="false"（既定値）は値の文字を薄くして、設定中の項目が浮き上がるようにする。
+export const filterTriggerClass =
+  "data-[active=false]:text-muted data-[active=true]:border-accent/70 data-[active=true]:bg-accent/15 data-[active=true]:font-semibold";
 export const filterSeparatorClass = "my-3 h-px bg-filter-separator";
 export const memoryCalcSectionClass = "mt-0.5 pt-1";
 export const memoryCalcGridClass = "grid grid-cols-1 gap-3 md:grid-cols-3";

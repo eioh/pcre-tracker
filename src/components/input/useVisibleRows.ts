@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { CharacterProgress, MasterCharacter } from "../../domain/types";
+import type { MultiSelection } from "../../domain/multiSelection";
 import type {
   AdventureMemoryPieceFilter,
   LimitBreakFilter,
@@ -38,10 +39,10 @@ type UseVisibleRowsParams = {
   starMemoryCalcMode: StarMemoryCalcMode;
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
   ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
-  starFilters: StarFilter[];
-  ue1Filters: Ue1Filter[];
-  ue2Filters: Ue2Filter[];
-  memorySourceFilters: MemorySourceFilter[];
+  starFilters: MultiSelection<StarFilter>;
+  ue1Filters: MultiSelection<Ue1Filter>;
+  ue2Filters: MultiSelection<Ue2Filter>;
+  memorySourceFilters: MultiSelection<MemorySourceFilter>;
   sortKey: SortKey;
   sortDirection: SortDirection;
 };
@@ -137,18 +138,19 @@ export function useVisibleRows({
   sortKey,
   sortDirection,
 }: UseVisibleRowsParams): VisibleRow[] {
-  const selectedStarSet = useMemo(() => new Set(starFilters), [starFilters]);
-  const selectedUe1Set = useMemo(() => new Set(ue1Filters), [ue1Filters]);
-  const selectedUe2Set = useMemo(() => new Set(ue2Filters), [ue2Filters]);
-  const selectedMemorySourceSet = useMemo(() => new Set(memorySourceFilters), [memorySourceFilters]);
+  const selectedStarSet = useMemo(() => new Set(starFilters ?? []), [starFilters]);
+  const selectedUe1Set = useMemo(() => new Set(ue1Filters ?? []), [ue1Filters]);
+  const selectedUe2Set = useMemo(() => new Set(ue2Filters ?? []), [ue2Filters]);
+  const selectedMemorySourceSet = useMemo(() => new Set(memorySourceFilters ?? []), [memorySourceFilters]);
 
   return useMemo(() => {
     const trimmedSearchText = searchText.trim();
     const filteredRows: FilteredRow[] = [];
-    const hasStarFilter = selectedStarSet.size > 0;
-    const hasUe1Filter = selectedUe1Set.size > 0;
-    const hasUe2Filter = selectedUe2Set.size > 0;
-    const hasMemorySourceFilter = selectedMemorySourceSet.size > 0;
+    // null は絞り込みなし。空配列は何も選んでいない状態なので、一致する行がなくなる。
+    const hasStarFilter = starFilters !== null;
+    const hasUe1Filter = ue1Filters !== null;
+    const hasUe2Filter = ue2Filters !== null;
+    const hasMemorySourceFilter = memorySourceFilters !== null;
     const hasNoneSourceFilter = selectedMemorySourceSet.has("none");
 
     for (let index = 0; index < masterCharacters.length; index += 1) {
@@ -336,15 +338,19 @@ export function useVisibleRows({
     ownedFilter,
     progressByName,
     searchText,
+    memorySourceFilters,
     selectedMemorySourceSet,
     selectedStarSet,
     selectedUe1Set,
     selectedUe2Set,
     sortDirection,
     sortKey,
+    starFilters,
     starMemoryCalcMode,
+    ue1Filters,
     ue1HeartFragmentCalcMode,
     ue1MemoryCalcMode,
     ue1SpImplementedFilter,
+    ue2Filters,
   ]);
 }
