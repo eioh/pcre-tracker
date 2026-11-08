@@ -1,19 +1,22 @@
-import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "../../domain/levels";
 import { memo, type Dispatch, type SetStateAction } from "react";
-import type { CharacterProgress } from "../../domain/types";
-import type {
-  AdventureMemoryPieceFilter,
-  LimitBreakFilter,
-  LimitedFilter,
-  MemorySourceFilter,
-  OwnedFilter,
-  PurePieceAvailabilityFilter,
-  SortDirection,
-  SortKey,
-  StarFilter,
-  Ue1Filter,
-  Ue1SpImplementedFilter,
-  Ue2Filter,
+import type { MultiSelection } from "../../domain/multiSelection";
+import {
+  MEMORY_SOURCE_FILTER_VALUES,
+  STAR_FILTER_VALUES,
+  UE1_FILTER_VALUES,
+  UE2_FILTER_VALUES,
+  type AdventureMemoryPieceFilter,
+  type LimitBreakFilter,
+  type LimitedFilter,
+  type MemorySourceFilter,
+  type OwnedFilter,
+  type PurePieceAvailabilityFilter,
+  type SortDirection,
+  type SortKey,
+  type StarFilter,
+  type Ue1Filter,
+  type Ue1SpImplementedFilter,
+  type Ue2Filter,
 } from "../../domain/uiStorage";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
@@ -21,7 +24,7 @@ import { MultiSelectFilter } from "../ui/multi-select-filter";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { memorySourceLabelMap } from "./constants";
 import { formatUeLevel } from "./formatters";
-import { inputToolbarClass, sectionLabelClass } from "./uiStyles";
+import { filterTriggerClass, inputToolbarClass, sectionLabelClass } from "./uiStyles";
 
 type InputFiltersProps = {
   ownedFilter: OwnedFilter;
@@ -36,14 +39,14 @@ type InputFiltersProps = {
   onAdventureMemoryPieceFilterChange: (value: AdventureMemoryPieceFilter) => void;
   purePieceAvailabilityFilter: PurePieceAvailabilityFilter;
   onPurePieceAvailabilityFilterChange: (value: PurePieceAvailabilityFilter) => void;
-  starFilters: StarFilter[];
-  setStarFilters: Dispatch<SetStateAction<StarFilter[]>>;
-  ue1Filters: Ue1Filter[];
-  setUe1Filters: Dispatch<SetStateAction<Ue1Filter[]>>;
-  ue2Filters: Ue2Filter[];
-  setUe2Filters: Dispatch<SetStateAction<Ue2Filter[]>>;
-  memorySourceFilters: MemorySourceFilter[];
-  setMemorySourceFilters: Dispatch<SetStateAction<MemorySourceFilter[]>>;
+  starFilters: MultiSelection<StarFilter>;
+  setStarFilters: Dispatch<SetStateAction<MultiSelection<StarFilter>>>;
+  ue1Filters: MultiSelection<Ue1Filter>;
+  setUe1Filters: Dispatch<SetStateAction<MultiSelection<Ue1Filter>>>;
+  ue2Filters: MultiSelection<Ue2Filter>;
+  setUe2Filters: Dispatch<SetStateAction<MultiSelection<Ue2Filter>>>;
+  memorySourceFilters: MultiSelection<MemorySourceFilter>;
+  setMemorySourceFilters: Dispatch<SetStateAction<MultiSelection<MemorySourceFilter>>>;
   sortKey: SortKey;
   onSortKeyChange: (value: SortKey) => void;
   sortDirection: SortDirection;
@@ -66,10 +69,20 @@ const sortKeyOptions: Array<{ value: SortKey; label: string }> = [
   { value: "ue1HeartFragmentNeeded", label: "必要ハートの欠片" },
 ];
 
-// ラベル配列をスラッシュ区切りの文字列へ整形する。
-function buildSummary(labels: string[]): string {
-  return labels.join(" / ");
-}
+// 複数選択フィルタの選択肢。値の並びは保存値の検証と同じ定義（uiStorage）を使う。
+const starFilterOptions = STAR_FILTER_VALUES.map((star) => ({ value: star, label: `☆${star}` }));
+const ue1FilterOptions = UE1_FILTER_VALUES.map((filter) => ({
+  value: filter,
+  label: filter === "unimplemented" ? "未実装" : filter === "sp" ? "SP" : formatUeLevel(filter),
+}));
+const ue2FilterOptions = UE2_FILTER_VALUES.map((filter) => ({
+  value: filter,
+  label: filter === "unimplemented" ? "未実装" : formatUeLevel(filter),
+}));
+const memorySourceFilterOptions = MEMORY_SOURCE_FILTER_VALUES.map((filter) => ({
+  value: filter,
+  label: filter === "none" ? "情報なし" : memorySourceLabelMap[filter],
+}));
 
 // 育成入力画面のソートとフィルタ操作 UI を表示する。
 export const InputFilters = memo(function InputFilters({
@@ -98,22 +111,6 @@ export const InputFilters = memo(function InputFilters({
   sortDirection,
   onSortDirectionChange,
 }: InputFiltersProps) {
-  const selectedMemorySourceLabels = buildSummary(
-    memorySourceFilters.map((filter) => (filter === "none" ? "情報なし" : memorySourceLabelMap[filter])),
-  );
-  const selectedStarLabels = buildSummary(starFilters.map((star) => `☆${star}`));
-  const selectedUe1Labels = buildSummary(
-    ue1Filters.map((filter) => (filter === "unimplemented" ? "未実装" : filter === "sp" ? "SP" : formatUeLevel(filter))),
-  );
-  const selectedUe2Labels = buildSummary(
-    ue2Filters.map((filter) => (filter === "unimplemented" ? "未実装" : formatUeLevel(filter))),
-  );
-
-  // 指定フィルタの選択状態を配列内でトグルする。
-  function toggleFilter<T>(filter: T, setFilters: Dispatch<SetStateAction<T[]>>): void {
-    setFilters((previous) => (previous.includes(filter) ? previous.filter((value) => value !== filter) : [...previous, filter]));
-  }
-
   // すべての絞り込み条件を既定値へ戻す。
   function resetFilters(): void {
     onOwnedFilterChange("all");
@@ -122,10 +119,10 @@ export const InputFilters = memo(function InputFilters({
     onLimitBreakFilterChange("all");
     onAdventureMemoryPieceFilterChange("all");
     onPurePieceAvailabilityFilterChange("all");
-    setStarFilters([]);
-    setUe1Filters([]);
-    setUe2Filters([]);
-    setMemorySourceFilters([]);
+    setStarFilters(null);
+    setUe1Filters(null);
+    setUe2Filters(null);
+    setMemorySourceFilters(null);
   }
 
   return (
@@ -181,7 +178,7 @@ export const InputFilters = memo(function InputFilters({
         <div className="grid gap-1.5 text-sm text-muted">
           <Label>所持</Label>
           <Select value={ownedFilter} onValueChange={(value) => onOwnedFilterChange(value as OwnedFilter)}>
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={ownedFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -195,7 +192,7 @@ export const InputFilters = memo(function InputFilters({
         <div className="grid gap-1.5 text-sm text-muted">
           <Label>限定</Label>
           <Select value={limitedFilter} onValueChange={(value) => onLimitedFilterChange(value as LimitedFilter)}>
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={limitedFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -209,7 +206,7 @@ export const InputFilters = memo(function InputFilters({
         <div className="grid gap-1.5 text-sm text-muted">
           <Label>限界突破</Label>
           <Select value={limitBreakFilter} onValueChange={(value) => onLimitBreakFilterChange(value as LimitBreakFilter)}>
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={limitBreakFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -226,7 +223,7 @@ export const InputFilters = memo(function InputFilters({
             value={adventureMemoryPieceFilter}
             onValueChange={(value) => onAdventureMemoryPieceFilterChange(value as AdventureMemoryPieceFilter)}
           >
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={adventureMemoryPieceFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -243,7 +240,7 @@ export const InputFilters = memo(function InputFilters({
             value={purePieceAvailabilityFilter}
             onValueChange={(value) => onPurePieceAvailabilityFilterChange(value as PurePieceAvailabilityFilter)}
           >
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={purePieceAvailabilityFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -257,23 +254,21 @@ export const InputFilters = memo(function InputFilters({
         <MultiSelectFilter
           title="☆"
           selectedValues={starFilters}
-          options={[1, 2, 3, 4, 5, 6].map((star) => ({ value: star as CharacterProgress["star"], label: `☆${star}` }))}
-          emptyLabel="すべて"
-          summary={selectedStarLabels}
-          onToggle={(value) => toggleFilter(value, setStarFilters)}
+          options={starFilterOptions}
+          allLabel="すべて"
+          noneLabel="選択なし"
+          triggerClassName={filterTriggerClass}
+          onValueChange={setStarFilters}
         />
 
         <MultiSelectFilter
           title="専用1"
           selectedValues={ue1Filters}
-          options={[
-            { value: "unimplemented", label: "未実装" },
-            ...UE1_LEVEL_VALUES.map((level) => ({ value: level as Ue1Filter, label: formatUeLevel(level) })),
-            { value: "sp", label: "SP" },
-          ]}
-          emptyLabel="すべて"
-          summary={selectedUe1Labels}
-          onToggle={(value) => toggleFilter(value, setUe1Filters)}
+          options={ue1FilterOptions}
+          allLabel="すべて"
+          noneLabel="選択なし"
+          triggerClassName={filterTriggerClass}
+          onValueChange={setUe1Filters}
         />
 
         <div className="grid gap-1.5 text-sm text-muted">
@@ -282,7 +277,7 @@ export const InputFilters = memo(function InputFilters({
             value={ue1SpImplementedFilter}
             onValueChange={(value) => onUe1SpImplementedFilterChange(value as Ue1SpImplementedFilter)}
           >
-            <SelectTrigger>
+            <SelectTrigger className={filterTriggerClass} data-active={ue1SpImplementedFilter !== "all"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -296,25 +291,21 @@ export const InputFilters = memo(function InputFilters({
         <MultiSelectFilter
           title="専用2"
           selectedValues={ue2Filters}
-          options={[
-            { value: "unimplemented", label: "未実装" },
-            ...UE2_LEVEL_VALUES.map((level) => ({ value: level as Ue2Filter, label: formatUeLevel(level) })),
-          ]}
-          emptyLabel="すべて"
-          summary={selectedUe2Labels}
-          onToggle={(value) => toggleFilter(value, setUe2Filters)}
+          options={ue2FilterOptions}
+          allLabel="すべて"
+          noneLabel="選択なし"
+          triggerClassName={filterTriggerClass}
+          onValueChange={setUe2Filters}
         />
 
         <MultiSelectFilter
           title="メモピ入手"
           selectedValues={memorySourceFilters}
-          options={[
-            { value: "none", label: "情報なし" },
-            ...Object.entries(memorySourceLabelMap).map(([source, label]) => ({ value: source as MemorySourceFilter, label })),
-          ]}
-          emptyLabel="すべて"
-          summary={selectedMemorySourceLabels}
-          onToggle={(value) => toggleFilter(value, setMemorySourceFilters)}
+          options={memorySourceFilterOptions}
+          allLabel="すべて"
+          noneLabel="選択なし"
+          triggerClassName={filterTriggerClass}
+          onValueChange={setMemorySourceFilters}
         />
       </div>
     </>

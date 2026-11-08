@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { UE1_LEVEL_VALUES, UE2_LEVEL_VALUES } from "./levels";
 import { MEMORY_PIECE_SOURCES, type MemoryPieceSource } from "./types";
+import type { MultiSelection } from "./multiSelection";
 import type { StarMemoryCalcMode } from "../utils/starMemoryCost";
 import type { Ue1HeartFragmentCalcMode } from "../utils/ue1HeartFragmentCost";
 import type { Ue1MemoryCalcMode } from "../utils/ue1MemoryCost";
@@ -9,7 +10,8 @@ import { UI_STORAGE_KEY } from "./storageKeys";
 
 // 保存キーは storageKeys.ts へ移したため、既存の import 元を保つよう re-export する。
 export { UI_STORAGE_KEY };
-export const CURRENT_UI_SCHEMA_VERSION = 1 as const;
+// v2: 複数選択フィルタの「絞り込みなし」を null で表すよう変更（v1 までは空配列が絞り込みなし）。
+export const CURRENT_UI_SCHEMA_VERSION = 2 as const;
 
 export type ActiveTab = "input" | "dashboard" | "coin_shop" | "connect_rank_calc" | "clan_battle";
 export type OwnedFilter = "all" | "owned" | "unowned";
@@ -51,10 +53,10 @@ export type InputViewSettings = {
   ue1MemoryCalcMode: Ue1MemoryCalcMode;
   ue1HeartFragmentCalcMode: Ue1HeartFragmentCalcMode;
   includeSameBasePurePieceForUe2: boolean;
-  starFilters: StarFilter[];
-  ue1Filters: Ue1Filter[];
-  ue2Filters: Ue2Filter[];
-  memorySourceFilters: MemorySourceFilter[];
+  starFilters: MultiSelection<StarFilter>;
+  ue1Filters: MultiSelection<Ue1Filter>;
+  ue2Filters: MultiSelection<Ue2Filter>;
+  memorySourceFilters: MultiSelection<MemorySourceFilter>;
   sortKey: SortKey;
   sortDirection: SortDirection;
 };
@@ -63,8 +65,8 @@ export type ClanBattleViewSettings = {
   selectedFormationId: string | null;
 };
 
-export type UiStateV1 = {
-  schemaVersion: 1;
+export type UiStateV2 = {
+  schemaVersion: typeof CURRENT_UI_SCHEMA_VERSION;
   activeTab: ActiveTab;
   input: InputViewSettings;
   clanBattle: ClanBattleViewSettings;
@@ -96,11 +98,12 @@ const SORT_KEY_VALUES: SortKey[] = [
   "totalMemoryNeeded",
 ];
 const SORT_DIRECTION_VALUES: Array<Exclude<SortDirection, null>> = ["asc", "desc"];
-const STAR_VALUES: StarFilter[] = [1, 2, 3, 4, 5, 6];
+// 複数選択フィルタの選択肢（画面の並び順）。保存値の検証と画面の選択肢の両方で使う。
+export const STAR_FILTER_VALUES: readonly StarFilter[] = [1, 2, 3, 4, 5, 6];
+export const UE1_FILTER_VALUES: readonly Ue1Filter[] = ["unimplemented", ...UE1_LEVEL_VALUES, "sp"];
+export const UE2_FILTER_VALUES: readonly Ue2Filter[] = ["unimplemented", ...UE2_LEVEL_VALUES];
+export const MEMORY_SOURCE_FILTER_VALUES: readonly MemorySourceFilter[] = ["none", ...MEMORY_PIECE_SOURCES];
 
-const allowedUe1FilterSet = new Set<Ue1Filter>(["unimplemented", "sp", ...UE1_LEVEL_VALUES]);
-const allowedUe2FilterSet = new Set<Ue2Filter>(["unimplemented", ...UE2_LEVEL_VALUES]);
-const allowedMemorySourceFilterSet = new Set<MemorySourceFilter>(["none", ...MEMORY_PIECE_SOURCES]);
 
 const defaultInputViewSettings: InputViewSettings = {
   searchText: "",
@@ -115,10 +118,10 @@ const defaultInputViewSettings: InputViewSettings = {
   ue1MemoryCalcMode: "implemented_max",
   ue1HeartFragmentCalcMode: "implemented_max",
   includeSameBasePurePieceForUe2: false,
-  starFilters: [],
-  ue1Filters: [],
-  ue2Filters: [],
-  memorySourceFilters: [],
+  starFilters: null,
+  ue1Filters: null,
+  ue2Filters: null,
+  memorySourceFilters: null,
   sortKey: "name",
   sortDirection: null,
 };
@@ -137,10 +140,10 @@ const looseInputSettingsSchema = z
     ue1MemoryCalcMode: z.unknown().optional(),
     ue1HeartFragmentCalcMode: z.unknown().optional(),
     includeSameBasePurePieceForUe2: z.unknown().optional(),
-    starFilters: z.array(z.unknown()).optional(),
-    ue1Filters: z.array(z.unknown()).optional(),
-    ue2Filters: z.array(z.unknown()).optional(),
-    memorySourceFilters: z.array(z.unknown()).optional(),
+    starFilters: z.array(z.unknown()).nullable().optional(),
+    ue1Filters: z.array(z.unknown()).nullable().optional(),
+    ue2Filters: z.array(z.unknown()).nullable().optional(),
+    memorySourceFilters: z.array(z.unknown()).nullable().optional(),
     sortKey: z.unknown().optional(),
     sortDirection: z.unknown().optional(),
   })
@@ -163,13 +166,7 @@ const looseClanBattleSettingsSchema = z
 
 // UI設定の既定値を返す。
 export function buildDefaultInputViewSettings(): InputViewSettings {
-  return {
-    ...defaultInputViewSettings,
-    starFilters: [],
-    ue1Filters: [],
-    ue2Filters: [],
-    memorySourceFilters: [],
-  };
+  return { ...defaultInputViewSettings };
 }
 
 // クラバト画面設定の既定値を返す。
@@ -178,7 +175,7 @@ export function buildDefaultClanBattleViewSettings(): ClanBattleViewSettings {
 }
 
 // UI状態の既定値を返す。
-export function buildDefaultUiState(): UiStateV1 {
+export function buildDefaultUiState(): UiStateV2 {
   return {
     schemaVersion: CURRENT_UI_SCHEMA_VERSION,
     activeTab: "input",
@@ -207,8 +204,30 @@ function normalizeArrayWithSet<T extends string | number>(value: unknown, allowe
   return normalized;
 }
 
+// 保存された複数選択フィルタを正規化する。
+// v1 までの空配列と、候補外の値しか残らない配列は絞り込みなし（null）として読み、全項目がそろう配列も null へまとめる。
+function normalizeMultiSelection<T extends string | number>(
+  value: unknown,
+  allowedValues: readonly T[],
+  emptyArrayMeansAll: boolean,
+): MultiSelection<T> {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+  if (value.length === 0) {
+    return emptyArrayMeansAll ? null : [];
+  }
+  const allowedSet = new Set(allowedValues);
+  const normalized = normalizeArrayWithSet(value, allowedSet);
+  if (normalized.length === 0 || normalized.length === allowedSet.size) {
+    return null;
+  }
+  return allowedValues.filter((candidate) => normalized.includes(candidate));
+}
+
 // 緩い入力オブジェクトからUI設定を安全な形式へ正規化する。
-function normalizeInputSettings(rawInput: unknown): InputViewSettings {
+// legacyEmptyFilter が true（v1 以前の保存値）のときは、複数選択フィルタの空配列を絞り込みなしとして読む。
+function normalizeInputSettings(rawInput: unknown, legacyEmptyFilter: boolean): InputViewSettings {
   const parsedInput = looseInputSettingsSchema.safeParse(rawInput);
   if (!parsedInput.success) {
     return buildDefaultInputViewSettings();
@@ -262,10 +281,10 @@ function normalizeInputSettings(rawInput: unknown): InputViewSettings {
       typeof raw.includeSameBasePurePieceForUe2 === "boolean"
         ? raw.includeSameBasePurePieceForUe2
         : defaultInputViewSettings.includeSameBasePurePieceForUe2,
-    starFilters: normalizeArrayWithSet(raw.starFilters, new Set<StarFilter>(STAR_VALUES)),
-    ue1Filters: normalizeArrayWithSet(raw.ue1Filters, allowedUe1FilterSet),
-    ue2Filters: normalizeArrayWithSet(raw.ue2Filters, allowedUe2FilterSet),
-    memorySourceFilters: normalizeArrayWithSet(raw.memorySourceFilters, allowedMemorySourceFilterSet),
+    starFilters: normalizeMultiSelection(raw.starFilters, STAR_FILTER_VALUES, legacyEmptyFilter),
+    ue1Filters: normalizeMultiSelection(raw.ue1Filters, UE1_FILTER_VALUES, legacyEmptyFilter),
+    ue2Filters: normalizeMultiSelection(raw.ue2Filters, UE2_FILTER_VALUES, legacyEmptyFilter),
+    memorySourceFilters: normalizeMultiSelection(raw.memorySourceFilters, MEMORY_SOURCE_FILTER_VALUES, legacyEmptyFilter),
     sortKey: normalizeEnumValue(raw.sortKey, SORT_KEY_VALUES, defaultInputViewSettings.sortKey),
     sortDirection: raw.sortDirection === null ? null : normalizeEnumValue(raw.sortDirection, SORT_DIRECTION_VALUES, null),
   };
@@ -284,7 +303,7 @@ function normalizeClanBattleSettings(rawClanBattle: unknown): ClanBattleViewSett
 }
 
 // 保存文字列を解析し、現在仕様のUI状態へ正規化する。
-export function parseUiState(rawText: string): UiStateV1 {
+export function parseUiState(rawText: string): UiStateV2 {
   try {
     const parsedJson = JSON.parse(rawText) as unknown;
     const parsedState = looseUiStateSchema.safeParse(parsedJson);
@@ -293,10 +312,11 @@ export function parseUiState(rawText: string): UiStateV1 {
     }
 
     const raw = parsedState.data;
+    const isLegacySchema = typeof raw.schemaVersion !== "number" || raw.schemaVersion < 2;
     return {
       schemaVersion: CURRENT_UI_SCHEMA_VERSION,
       activeTab: normalizeEnumValue(raw.activeTab, ACTIVE_TAB_VALUES, "input"),
-      input: normalizeInputSettings(raw.input),
+      input: normalizeInputSettings(raw.input, isLegacySchema),
       clanBattle: normalizeClanBattleSettings(raw.clanBattle),
     };
   } catch {
@@ -305,7 +325,7 @@ export function parseUiState(rawText: string): UiStateV1 {
 }
 
 // localStorageからUI設定を読み込み、失敗時は既定値を返す。
-export function loadUiState(): UiStateV1 {
+export function loadUiState(): UiStateV2 {
   if (typeof window === "undefined") {
     return buildDefaultUiState();
   }
@@ -318,7 +338,7 @@ export function loadUiState(): UiStateV1 {
 }
 
 // UI設定をlocalStorageへ保存する。
-export function saveUiState(state: UiStateV1): void {
+export function saveUiState(state: UiStateV2): void {
   if (typeof window === "undefined") {
     return;
   }
