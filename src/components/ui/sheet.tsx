@@ -101,6 +101,11 @@ const SheetContent = React.forwardRef<React.ComponentRef<typeof SheetPrimitive.C
       if (event.target instanceof Element && event.target.closest("[data-sheet-scroll-area]")) {
         return;
       }
+      // ポータルで描画されるダイアログ（確認ダイアログや日付ピッカーなど）は React ツリー上ではシートの内側にあるため、
+      // ここまでイベントが届く。DOM 上でシートの外側から始まった操作は対象外にする。
+      if (event.target instanceof Node && !event.currentTarget.contains(event.target)) {
+        return;
+      }
       swipeRef.current = {
         pointerId: event.pointerId,
         startY: event.clientY,
@@ -161,6 +166,11 @@ const SheetContent = React.forwardRef<React.ComponentRef<typeof SheetPrimitive.C
       const shouldClose =
         canClose && (distance >= element.offsetHeight * SWIPE_CLOSE_RATIO || velocity >= SWIPE_CLOSE_VELOCITY);
       if (shouldClose) {
+        // 数値入力は blur で値を確定するため、編集中の入力がシート内にあれば先に blur させて確定してから閉じる。
+        const active = document.activeElement;
+        if (active instanceof HTMLElement && element.contains(active)) {
+          active.blur();
+        }
         // 閉じる処理は Radix の Close ボタンに任せ、開閉状態の持ち方（制御/非制御）に依存しないようにする。
         closeRef.current?.click();
         return;
@@ -221,11 +231,12 @@ function SheetHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 
 // ボトムシートの本文。ここだけを縦スクロールさせてタイトル行を常に表示し、ここから始まる操作はスワイプで閉じる対象にしない。
 // 左右の余白をスクロール領域に含め、スクロールバーをシートの端に置く。上下の余白は入力欄のフォーカスリングが切れないようにするため。
+// 配下に truncate を含む行があるため、min-w-0 で内容の幅に引きずられて広がらないようにする。
 function SheetScrollArea({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       data-sheet-scroll-area=""
-      className={cn("-mx-5 -my-1 min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-1", className)}
+      className={cn("-mx-5 -my-1 min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain px-5 py-1", className)}
       {...props}
     />
   );

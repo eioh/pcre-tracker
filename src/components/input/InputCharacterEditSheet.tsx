@@ -65,9 +65,10 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
 }
 
 // 内訳表示の1行（項目名と符号付き数値）を表示する。
+// 内訳ボックス（grid）の直接の子になるため、min-w-0 を付けて長い項目名の幅まで行が広がらないようにする（ラベル側の truncate を効かせる）。
 function BreakdownLine({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
-    <span className={`inline-flex items-baseline justify-between gap-2 ${bold ? "font-bold" : ""}`}>
+    <span className={`inline-flex min-w-0 items-baseline justify-between gap-2 ${bold ? "font-bold" : ""}`}>
       <span className="min-w-0 truncate">{label}</span>
       <span className="shrink-0 tabular-nums">{value}</span>
     </span>
