@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { createPortal } from "react-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetScrollArea, SheetTitle } from "./sheet";
 
@@ -116,6 +117,90 @@ describe("SheetContent のスワイプで閉じる操作", () => {
 
     expect(onOpenChange).not.toHaveBeenCalled();
     expect(dialog.style.transform).toBe("");
+  });
+
+  it("ポータルで描画されたダイアログから始めた操作では、下のシートを動かさず閉じない", () => {
+    const onOpenChange = vi.fn();
+    render(
+      <Sheet open onOpenChange={onOpenChange}>
+        <SheetContent side="bottom" aria-describedby={undefined}>
+          <SheetHeader>
+            <SheetTitle>シート見出し</SheetTitle>
+          </SheetHeader>
+          {/* React ツリー上はシートの内側、DOM 上はシートの外側（body 直下）に描画する */}
+          {createPortal(<div data-testid="portal-dialog">ポータルのダイアログ</div>, document.body)}
+        </SheetContent>
+      </Sheet>,
+    );
+    const dialog = screen.getByRole("dialog");
+    const portalDialog = screen.getByTestId("portal-dialog");
+    expect(dialog.contains(portalDialog)).toBe(false);
+
+    fireEvent.pointerDown(portalDialog, { pointerId: 1, pointerType: "touch", clientY: 100 });
+    vi.advanceTimersByTime(400);
+    fireEvent.pointerMove(portalDialog, { pointerId: 1, pointerType: "touch", clientY: 300 });
+    expect(dialog.style.transform).toBe("");
+    vi.advanceTimersByTime(300);
+    fireEvent.pointerUp(portalDialog, { pointerId: 1, pointerType: "touch", clientY: 300 });
+
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(dialog.style.transform).toBe("");
+  });
+
+  it("編集中の入力があるままスワイプで閉じると、閉じる前に blur で確定させる", () => {
+    const onOpenChange = vi.fn();
+    const onBlur = vi.fn();
+    render(
+      <Sheet open onOpenChange={onOpenChange}>
+        <SheetContent side="bottom" aria-describedby={undefined}>
+          <SheetHeader>
+            <SheetTitle>シート見出し</SheetTitle>
+          </SheetHeader>
+          <SheetScrollArea>
+            <input aria-label="数値入力" defaultValue="1" onBlur={onBlur} />
+          </SheetScrollArea>
+        </SheetContent>
+      </Sheet>,
+    );
+    const input = screen.getByLabelText("数値入力");
+    input.focus();
+    expect(document.activeElement).toBe(input);
+
+    drag(screen.getByText("シート見出し"), [{ dy: 150, afterMs: 400 }], 300);
+
+    expect(onBlur).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+    expect(onBlur.mock.invocationCallOrder[0] ?? Infinity).toBeLessThan(onOpenChange.mock.invocationCallOrder[0] ?? -Infinity);
+    expect(document.activeElement).not.toBe(input);
+  });
+
+  it("閉じずに元の位置へ戻す場合は、編集中の入力のフォーカスを外さない", () => {
+    const onBlur = vi.fn();
+    render(
+      <Sheet open>
+        <SheetContent side="bottom" aria-describedby={undefined}>
+          <SheetHeader>
+            <SheetTitle>シート見出し</SheetTitle>
+          </SheetHeader>
+          <SheetScrollArea>
+            <input aria-label="数値入力" defaultValue="1" onBlur={onBlur} />
+          </SheetScrollArea>
+        </SheetContent>
+      </Sheet>,
+    );
+    const input = screen.getByLabelText("数値入力");
+    input.focus();
+
+    drag(screen.getByText("シート見出し"), [{ dy: 40, afterMs: 400 }], 300);
+
+    expect(onBlur).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(input);
+  });
+
+  it("本文（スクロール領域）に min-w-0 を付け、truncate を含む内容の幅で広がらないようにする", () => {
+    const { dialog } = renderSheet();
+
+    expect(dialog.querySelector("[data-sheet-scroll-area]")?.classList.contains("min-w-0")).toBe(true);
   });
 
   it("右側のシートではつまみを出さず、スワイプでも閉じない", () => {
