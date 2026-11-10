@@ -730,6 +730,27 @@ describe("InputProgressList", () => {
     expect(within(dialog).getAllByText("+150").length).toBe(2);
   });
 
+  it("内訳の行は長いキャラ名でも内訳ボックスの幅を超えないよう、grid 直下の要素に min-w-0 を付ける", () => {
+    const longName = "とても長い名前のキャラクター（ニューイヤー＆サマー＆ハロウィン＆クリスマス）";
+    const props = buildProps({
+      visibleRows: [{ character: buildCharacter({ name: longName, baseName: longName }), progress: buildProgress() }],
+      purePieceByCharacterName: { [longName]: 0 },
+      purePieceByBaseNameFromCharacters: { [longName]: 0 },
+    });
+    render(<InputProgressList {...props} />);
+
+    const dialog = openEditSheet(longName);
+
+    // jsdom はレイアウトを計算しないため、はみ出しを防ぐクラスの組み合わせ（行=min-w-0、ラベル=min-w-0+truncate）を確認する。
+    const label = within(dialog).getByText(`・${longName}`);
+    expect(label.classList.contains("truncate")).toBe(true);
+    expect(label.classList.contains("min-w-0")).toBe(true);
+    const line = label.parentElement;
+    expect(line?.classList.contains("min-w-0")).toBe(true);
+    // 行が内訳ボックス（grid）の直接の子であること。間にラッパーが入ったら、そのラッパーにも min-w-0 が必要になる。
+    expect(line?.parentElement?.classList.contains("grid")).toBe(true);
+  });
+
   it("シートにメモピ入手ソースのバッジを表示する", () => {
     const props = buildProps();
     render(<InputProgressList {...props} />);
